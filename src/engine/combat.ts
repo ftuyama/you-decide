@@ -1,4 +1,12 @@
-import { mulberry32, roll2d6, roll3d6DropLowest, rollD6 } from './rng';
+import {
+  attackRollSpecial2d6,
+  attackRollSpecial3d6dl,
+  mulberry32,
+  roll2d6,
+  roll3d6DropLowest,
+  rollD6,
+  type AttackRollSpecial,
+} from './rng';
 import type {
   Character,
   CombatLogEntry,
@@ -11,6 +19,28 @@ import type {
 import type { GameData } from './gameData';
 import { addXp, computeCombatXp } from './progression';
 import type { EventBus } from './eventBus';
+
+/** Confirmação de crítico inimigo após 6+6 (padrão ~25%) */
+export const DEFAULT_ENEMY_CRIT_CONFIRM = 0.25;
+
+function toRollOutcome(
+  s: AttackRollSpecial
+): 'crit_threat' | 'fumble_threat' | 'normal' {
+  if (s === 'crit') return 'crit_threat';
+  if (s === 'fumble') return 'fumble_threat';
+  return 'normal';
+}
+
+/** Sorte base + bônus de itens equipados */
+export function getEffectiveLuck(c: Character, data: GameData): number {
+  let sum = c.luck;
+  for (const slot of [c.weaponId, c.armorId, c.relicId] as const) {
+    if (slot && data.items[slot]) {
+      sum += data.items[slot]!.bonusLuck ?? 0;
+    }
+  }
+  return sum;
+}
 
 /** Ajusta seed global após consumo de RNG em combate */
 export function bumpRngSeed(state: GameState): GameState {
@@ -130,6 +160,11 @@ function getArmorValue(data: GameData, c: Character): number {
   return a;
 }
 
+/** CA base (ataques inimigos: 7 + mod AGI + bónus de armadura; postura defensiva +2 em combate). */
+export function getCharacterArmorClass(data: GameData, c: Character): number {
+  return 7 + statMod(c.agi) + getArmorValue(data, c);
+}
+
 export function applyPlayerStance(state: GameState, stance: Stance, _data: GameData): GameState {
   void _data;
   const c = state.combat;
@@ -210,6 +245,10 @@ export function playerAttack(
     total = d1 + d2 + atkMod;
   }
 
+  const special: AttackRollSpecial = c.playerAdvantage
+    ? attackRollSpecial3d6dl(dice as [number, number, number])
+    : attackRollSpecial2d6(dice[0]!, dice[1]!);
+
   const targetDef = def.agi + def.armor + (stance === 'defensive' ? 0 : 0);
   const defense = 7 + Math.floor(targetDef / 2);
 
@@ -226,13 +265,30 @@ export function playerAttack(
     log.push({ kind: 'stress', message: 'Golpe especial! +2 no ataque, +1 Stress.', actor: lead.name });
   }
 
-  const hit = rollTotal >= defense;
+  let hit = false;
+  if (special === 'fumble') {
+    hit = false;
+  } else if (special === 'crit') {
+    hit = true;
+  } else {
+    hit = rollTotal >= defense;
+  }
+
+  const rollOutcome = toRollOutcome(special);
+  let attackMsg: string;
+  if (special === 'fumble') {
+    attackMsg = `${lead.name} falha criticamente (dados 1+1).`;
+  } else if (special === 'crit') {
+    attackMsg = `${lead.name} acerta ${def.name} em cheio (crítico)!`;
+  } else if (hit) {
+    attackMsg = `${lead.name} acerta ${def.name}!`;
+  } else {
+    attackMsg = `${lead.name} erra o golpe (${rollTotal} vs CA ${defense}).`;
+  }
 
   log.push({
     kind: 'attack',
-    message: hit
-      ? `${lead.name} acerta ${def.name}!`
-      : `${lead.name} erra o golpe (${rollTotal} vs CA ${defense}).`,
+    message: attackMsg,
     dice,
     modifier: atkMod,
     final: rollTotal,
@@ -240,11 +296,16 @@ export function playerAttack(
     target: def.name,
     outcome: hit ? 'hit' : 'miss',
     vsDefense: defense,
+    rollOutcome,
   });
 
   if (hit) {
     const dDmg = rollD6(rng);
-    let dmg = dDmg + getWeaponDamage(data, lead) + (stance === 'aggressive' ? 1 : 0);
+    const effLuck = getEffectiveLuck(lead, data);
+    const luckBonus = statMod(effLuck);
+    const baseFlat = getWeaponDamage(data, lead) + (stance === 'aggressive' ? 1 : 0);
+    const holyBonus = def.type === 'undead' && lead.class === 'cleric' ? 1 : 0;
+    const isPlayerCrit = special === 'crit';
     const chipTarget = newEnemies[enemyIndex]!;
     if (def.type === 'armored' && chipTarget.armorChipsRemaining > 0) {
       chipTarget.armorChipsRemaining -= 1;
@@ -255,17 +316,20 @@ export function playerAttack(
       });
       newEnemies[enemyIndex] = { ...chipTarget };
     } else {
-      if (def.type === 'undead' && lead.class === 'cleric') {
-        dmg += 1;
-      }
+      const dmg = isPlayerCrit
+        ? dDmg * 2 + baseFlat + holyBonus + luckBonus
+        : dDmg + baseFlat + holyBonus;
       const nh = Math.max(0, chipTarget.hp - dmg);
       newEnemies[enemyIndex] = { ...chipTarget, hp: nh };
       log.push({
         kind: 'damage',
-        message: `${def.name} sofre ${dmg} de dano.`,
+        message: isPlayerCrit
+          ? `${def.name} sofre ${dmg} de dano (crítico)!`
+          : `${def.name} sofre ${dmg} de dano.`,
         dice: [dDmg],
         final: dmg,
         target: def.name,
+        damageKind: isPlayerCrit ? 'crit' : 'normal',
       });
     }
   }
@@ -353,14 +417,17 @@ function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData, bu
     const target = party[0]!;
     let atk = 0;
     let dice: number[] = [];
+    let special: AttackRollSpecial = 'normal';
     if (c.enemyAdvantage) {
       const r = roll3d6DropLowest(rng);
       dice = [...r.dice];
       atk = r.sum + statMod(def.str);
+      special = attackRollSpecial3d6dl(r.dice);
     } else {
       const [d1, d2] = roll2d6(rng);
       dice = [d1, d2];
       atk = d1 + d2 + statMod(def.str);
+      special = attackRollSpecial2d6(d1, d2);
     }
     const defScore =
       7 +
@@ -368,12 +435,37 @@ function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData, bu
       getArmorValue(data, target) +
       (c.pendingStance === 'defensive' ? 2 : 0);
 
-    const enemyHit = atk >= defScore;
+    const critConfirm = def.critConfirm ?? DEFAULT_ENEMY_CRIT_CONFIRM;
+    let enemyHit = false;
+    let enemyCritDmg = false;
+    if (special === 'fumble') {
+      enemyHit = false;
+    } else if (special === 'crit') {
+      if (rng() < critConfirm) {
+        enemyHit = true;
+        enemyCritDmg = true;
+      } else {
+        enemyHit = atk >= defScore;
+      }
+    } else {
+      enemyHit = atk >= defScore;
+    }
+
+    const rollOutcome = toRollOutcome(special);
+    let enemyAtkMsg: string;
+    if (special === 'fumble') {
+      enemyAtkMsg = `${def.name} falha criticamente (dados 1+1).`;
+    } else if (enemyHit && enemyCritDmg) {
+      enemyAtkMsg = `${def.name} acerta ${target.name} em cheio (crítico)!`;
+    } else if (enemyHit) {
+      enemyAtkMsg = `${def.name} acerta ${target.name}!`;
+    } else {
+      enemyAtkMsg = `${def.name} erra (${atk} vs CA ${defScore}).`;
+    }
+
     log.push({
       kind: 'attack',
-      message: enemyHit
-        ? `${def.name} acerta ${target.name}!`
-        : `${def.name} erra (${atk} vs CA ${defScore}).`,
+      message: enemyAtkMsg,
       dice,
       modifier: statMod(def.str),
       final: atk,
@@ -381,20 +473,31 @@ function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData, bu
       target: target.name,
       outcome: enemyHit ? 'hit' : 'miss',
       vsDefense: defScore,
+      rollOutcome,
     });
+
+    if (special === 'crit' && !enemyCritDmg && enemyHit) {
+      log.push({ kind: 'info', message: 'Quase crítico…' });
+    }
 
     if (enemyHit) {
       const dDmg = rollD6(rng);
       const reduc = getArmorValue(data, target);
-      const dmg = Math.max(1, dDmg + statMod(def.str) - reduc);
+      const strMod = statMod(def.str);
+      const dmg = enemyCritDmg
+        ? Math.max(1, dDmg * 2 + strMod - reduc)
+        : Math.max(1, dDmg + strMod - reduc);
       const nh = Math.max(0, target.hp - dmg);
       party[0] = { ...target, hp: nh };
       log.push({
         kind: 'damage',
-        message: `${target.name} sofre ${dmg}.`,
+        message: enemyCritDmg
+          ? `${target.name} sofre ${dmg} (crítico)!`
+          : `${target.name} sofre ${dmg}.`,
         dice: [dDmg],
         final: dmg,
         target: target.name,
+        damageKind: enemyCritDmg ? 'crit' : 'normal',
       });
       let st = target.stress;
       st = Math.min(4, st + 1);

@@ -4,6 +4,7 @@ const z = (x: Partial<ItemDef> & Pick<ItemDef, 'id' | 'name' | 'slot'>): ItemDef
   bonusStr: 0,
   bonusAgi: 0,
   bonusMind: 0,
+  bonusLuck: 0,
   armor: 0,
   damage: 0,
   ...x,
@@ -15,6 +16,7 @@ export const items: Record<string, ItemDef> = {
     name: 'Espada Enferrujada',
     slot: 'weapon',
     bonusStr: 1,
+    bonusLuck: 1,
     damage: 1,
   }),
   oak_staff: z({
@@ -22,6 +24,7 @@ export const items: Record<string, ItemDef> = {
     name: 'Cajado de Carvalho',
     slot: 'weapon',
     bonusMind: 1,
+    bonusLuck: 1,
     damage: 1,
   }),
   mace: z({
@@ -29,6 +32,7 @@ export const items: Record<string, ItemDef> = {
     name: 'Maça Ritual',
     slot: 'weapon',
     bonusMind: 1,
+    bonusLuck: 1,
     damage: 2,
   }),
   leather: z({

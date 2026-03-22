@@ -655,6 +655,11 @@ button.choice .preview {
   background: rgba(50, 25, 25, 0.25);
 }
 
+.combat-log-entry.combat-log-damage.combat-damage-crit .combat-log-msg {
+  color: #e6c200;
+  font-weight: 600;
+}
+
 .combat-log-entry.combat-log-damage:not(.combat-damage-to-hero):not(.combat-damage-to-enemy) .combat-log-msg {
   color: #d09090;
 }

@@ -40,6 +40,7 @@ export function createPlayerCharacter(name: string, cls: ClassId): GameState['pa
     str: 8,
     agi: 8,
     mind: 8,
+    luck: 8,
     hp: 12,
     maxHp: 12,
     stress: 0,
@@ -54,6 +55,7 @@ export function createPlayerCharacter(name: string, cls: ClassId): GameState['pa
       str: 12,
       agi: 9,
       mind: 7,
+      luck: 8,
       hp: 18,
       maxHp: 18,
       weaponId: 'rusty_sword',
@@ -66,6 +68,7 @@ export function createPlayerCharacter(name: string, cls: ClassId): GameState['pa
       str: 6,
       agi: 8,
       mind: 13,
+      luck: 10,
       hp: 12,
       maxHp: 12,
       weaponId: 'oak_staff',
@@ -77,6 +80,7 @@ export function createPlayerCharacter(name: string, cls: ClassId): GameState['pa
     str: 8,
     agi: 8,
     mind: 11,
+    luck: 9,
     hp: 14,
     maxHp: 14,
     weaponId: 'mace',
@@ -95,10 +99,15 @@ export function deserializeState(json: string): GameState {
   if (o.schemaVersion !== SCHEMA_VERSION) {
     console.warn('Save de versão diferente; tentando carregar mesmo assim.');
   }
+  const rawParty = (o as GameState).party ?? [];
   const merged: GameState = {
     ...(o as GameState),
     level: typeof (o as GameState).level === 'number' ? (o as GameState).level : 1,
     xp: typeof (o as GameState).xp === 'number' ? (o as GameState).xp : 0,
+    party: rawParty.map((p) => ({
+      ...p,
+      luck: typeof p.luck === 'number' ? p.luck : 8,
+    })),
   };
   return merged;
 }

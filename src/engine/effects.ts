@@ -104,6 +104,7 @@ function applyOne(
         str: def.str,
         agi: def.agi,
         mind: def.mind,
+        luck: def.luck ?? 8,
         hp: def.hp,
         maxHp: def.maxHp,
         stress: 0,

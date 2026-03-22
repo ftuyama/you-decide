@@ -5,6 +5,7 @@
     "str": 7,
     "agi": 12,
     "mind": 8,
+    "luck": 10,
     "hp": 14,
     "maxHp": 14,
     "leaveFlag": "mira_left"
@@ -15,6 +16,7 @@
     "str": 10,
     "agi": 7,
     "mind": 6,
+    "luck": 7,
     "hp": 16,
     "maxHp": 16,
     "leaveFlag": "tomas_left"

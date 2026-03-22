@@ -10,7 +10,12 @@ import {
 } from '../engine/sceneRuntime';
 import { applyEffects } from '../engine/effects';
 import type { Choice, ClassId, GameState } from '../engine/schema';
-import { executePlayerTurn, fleeCombat } from '../engine/combat';
+import {
+  executePlayerTurn,
+  fleeCombat,
+  getCharacterArmorClass,
+  getEffectiveLuck,
+} from '../engine/combat';
 import { MAX_LEVEL, xpToNextLevel } from '../engine/progression';
 import type { Stance } from '../engine/schema';
 import { canWalk, renderMap } from '../campaigns/calvario/maps';
@@ -366,6 +371,8 @@ export class GameApp {
         .split('\n\n')
         .map((para) => `<p>${this.escHtml(para)}</p>`)
         .join('');
+      const ca = getCharacterArmorClass(this.registry.data, p);
+      const sor = getEffectiveLuck(p, this.registry.data);
       const lv = this.state.level;
       const need = lv >= MAX_LEVEL ? 0 : xpToNextLevel(lv);
       const xpLine =
@@ -376,13 +383,14 @@ export class GameApp {
       return `<div class="sidebar-line">Nome <strong>${this.escHtml(p.name)}</strong></div>
         <div class="sidebar-line sidebar-class-line">${this.escHtml(CLASS_LABEL_PT[cid])}</div>
         ${xpLine}
+        <div class="sidebar-line">CA <strong>${ca}</strong></div>
+        <div class="sidebar-line">HP <strong>${p.hp}/${p.maxHp}</strong> · Stress <strong>${p.stress}</strong></div>
+        ${this.hpBarMarkup(p.hp, p.maxHp)}
+        <div class="sidebar-line attrs">STR <strong>${p.str}</strong> · AGI <strong>${p.agi}</strong> · MEN <strong>${p.mind}</strong> · SOR <strong>${sor}</strong></div>
         <details class="sidebar-collapse sidebar-lore"${openLore} data-section="personagem_lore">
           <summary class="sidebar-collapse-trigger">História do herói</summary>
           <div class="sidebar-collapse-body sidebar-lore-body">${loreHtml}</div>
-        </details>
-        <div class="sidebar-line">HP <strong>${p.hp}/${p.maxHp}</strong> · Stress <strong>${p.stress}</strong></div>
-        ${this.hpBarMarkup(p.hp, p.maxHp)}
-        <div class="sidebar-line attrs">STR <strong>${p.str}</strong> · AGI <strong>${p.agi}</strong> · MEN <strong>${p.mind}</strong></div>`;
+        </details>`;
     })();
 
     hud.innerHTML = `
@@ -392,6 +400,12 @@ export class GameApp {
         <div class="sidebar-static-body">
           <div class="sidebar-line">Capítulo <strong>${this.state.chapter}</strong></div>
           <div class="sidebar-line">Tier <strong>${this.state.narrativeTier}</strong></div>
+        </div>
+      </div>
+      <div class="sidebar-static">
+        <div class="sidebar-static-title">Personagem</div>
+        <div class="sidebar-static-body sidebar-stats">
+          ${personagemBlock}
         </div>
       </div>
       <details class="sidebar-collapse"${openRec} data-section="recursos">
@@ -410,12 +424,6 @@ export class GameApp {
           <div class="sidebar-line">Culto <strong>${rep.culto}</strong></div>
         </div>
       </details>
-      <div class="sidebar-static">
-        <div class="sidebar-static-title">Personagem</div>
-        <div class="sidebar-static-body sidebar-stats">
-          ${personagemBlock}
-        </div>
-      </div>
     `;
 
     if (this.state.diary.length) {
@@ -590,6 +598,9 @@ export class GameApp {
       }
       if (entry.kind === 'damage' && leadName && entry.target) {
         wrap.classList.add(entry.target === leadName ? 'combat-damage-to-hero' : 'combat-damage-to-enemy');
+      }
+      if (entry.kind === 'damage' && entry.damageKind === 'crit') {
+        wrap.classList.add('combat-damage-crit');
       }
 
       const msg = document.createElement('div');

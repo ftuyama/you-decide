@@ -239,6 +239,8 @@ export const EnemyDefSchema = z.object({
   advantageOnFirstRound: z.boolean().optional(),
   /** XP concedido ao derrotar; se omitido, usa fórmula do engine */
   xp: z.number().int().min(0).optional(),
+  /** Probabilidade de confirmar crítico após 6+6 em 2d6 (ou equivalente 3d6dl); padrão no engine se omitido */
+  critConfirm: z.number().min(0).max(1).optional(),
 });
 
 export type EnemyDef = z.infer<typeof EnemyDefSchema>;
@@ -263,6 +265,7 @@ export const ItemDefSchema = z.object({
   bonusMind: z.number().int().default(0),
   armor: z.number().int().default(0),
   damage: z.number().int().default(0),
+  bonusLuck: z.number().int().default(0),
   cursed: z.boolean().optional(),
   rumor: z.boolean().optional(),
 });
@@ -277,6 +280,7 @@ export const CompanionDefSchema = z.object({
   mind: z.number().int(),
   hp: z.number().int(),
   maxHp: z.number().int(),
+  luck: z.number().int().default(8),
   /** Condição de saída em texto (avaliada por flag) */
   leaveFlag: z.string().optional(),
 });
@@ -290,6 +294,7 @@ export const CharacterSchema = z.object({
   str: z.number().int(),
   agi: z.number().int(),
   mind: z.number().int(),
+  luck: z.number().int().default(8),
   hp: z.number().int(),
   maxHp: z.number().int(),
   stress: z.number().int().min(0).max(4).default(0),
@@ -333,6 +338,10 @@ export const CombatLogEntrySchema = z.object({
   outcome: z.enum(['hit', 'miss']).optional(),
   /** CA usada na resolução (para exibir no log) */
   vsDefense: z.number().int().optional(),
+  /** Resultado especial dos dados de ataque (2d6 / 3d6dl) */
+  rollOutcome: z.enum(['crit_threat', 'fumble_threat', 'normal']).optional(),
+  /** Dano crítico vs normal */
+  damageKind: z.enum(['crit', 'normal']).optional(),
 });
 
 export type CombatLogEntry = z.infer<typeof CombatLogEntrySchema>;

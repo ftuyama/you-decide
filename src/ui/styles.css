@@ -415,13 +415,51 @@ button.choice .preview {
 
 .combat-layout {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  grid-template-columns: 1fr;
+  gap: 1.35rem;
+  align-items: stretch;
 }
 
-@media (max-width: 640px) {
+@media (min-width: 880px) {
   .combat-layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(19rem, 26rem);
+    gap: 1.5rem;
+  }
+}
+
+.combat-enemies-column {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.75rem 0.85rem;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.combat-log-column {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/** Caixa à parte: log + dados — mais altura, borda forte, sombra */
+.combat-log-outer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: min(58vh, 32rem);
+  padding: 0.65rem 0.7rem;
+  border: 2px solid #3d5244;
+  border-radius: 4px;
+  background: linear-gradient(165deg, #070907 0%, #030403 55%, #060806 100%);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.6),
+    0 8px 28px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(110, 143, 106, 0.06);
+}
+
+@media (max-width: 879px) {
+  .combat-log-outer {
+    min-height: min(52vh, 30rem);
   }
 }
 
@@ -429,6 +467,10 @@ button.choice .preview {
   border: 1px solid var(--border);
   padding: 0.75rem;
   background: rgba(0, 0, 0, 0.35);
+}
+
+.enemy-panel + .enemy-panel {
+  margin-top: 0.65rem;
 }
 
 .enemy-sprite {
@@ -460,30 +502,52 @@ button.choice .preview {
 
 .dice-panel {
   font-size: 0.82rem;
-  border: 1px solid var(--border);
+  flex: 1;
+  min-height: 0;
+  border: 1px solid #2a3328;
   padding: 0;
-  background: linear-gradient(180deg, #080a08 0%, #050605 100%);
+  border-radius: 2px;
+  background: linear-gradient(180deg, #050705 0%, #020302 100%);
   display: flex;
   flex-direction: column;
-  max-height: min(22rem, 52vh);
 }
 
 .dice-panel-header {
   flex-shrink: 0;
-  padding: 0.55rem 0.75rem;
+  padding: 0.6rem 0.85rem;
   font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #8a9688;
-  border-bottom: 1px solid var(--border);
-  background: rgba(0, 0, 0, 0.45);
+  letter-spacing: 0.07em;
+  color: #9aaf9a;
+  border-bottom: 1px solid #2a3328;
+  background: linear-gradient(180deg, rgba(30, 38, 30, 0.95) 0%, rgba(10, 12, 10, 0.9) 100%);
 }
 
 .combat-log-scroll {
   overflow-y: auto;
-  padding: 0.5rem 0.65rem 0.65rem;
+  overflow-x: hidden;
+  padding: 0.6rem 0.75rem 0.85rem;
   flex: 1;
-  min-height: 0;
+  min-height: 12rem;
+  scrollbar-gutter: stable;
+}
+
+.combat-log-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.combat-log-scroll::-webkit-scrollbar-track {
+  background: #0a0c0a;
+  border-radius: 2px;
+}
+
+.combat-log-scroll::-webkit-scrollbar-thumb {
+  background: #3a4a3a;
+  border-radius: 2px;
+}
+
+.combat-log-scroll::-webkit-scrollbar-thumb:hover {
+  background: #4d5f4d;
 }
 
 .combat-log-entry {

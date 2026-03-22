@@ -51,6 +51,14 @@ export class GameApp {
         this.closeMenu();
       }
     });
+    /** Primeiro gesto (toque ou tecla) desbloqueia AudioContext (política dos browsers). */
+    const unlockOnce = (): void => {
+      this.unlockAudio();
+      document.removeEventListener('pointerdown', unlockOnce, true);
+      document.removeEventListener('keydown', unlockOnce, true);
+    };
+    document.addEventListener('pointerdown', unlockOnce, true);
+    document.addEventListener('keydown', unlockOnce, true);
     this.render();
   }
 
@@ -74,10 +82,7 @@ export class GameApp {
   }
 
   private unlockAudio(): void {
-    this.audio.ensureContext();
-    if (!this.audio.isMuted()) {
-      this.audio.playAmbient();
-    }
+    this.audio.startAmbientWhenReady();
   }
 
   private ctx(): { sceneId: string; data: import('../engine/gameData').GameData; bus: EventBus } {
@@ -505,6 +510,7 @@ export class GameApp {
     layout.className = 'combat-layout';
 
     const left = document.createElement('div');
+    left.className = 'combat-enemies-column';
     for (const inst of c.enemies) {
       if (inst.hp <= 0) continue;
       const def = this.registry.data.enemies[inst.defId];
@@ -527,6 +533,9 @@ export class GameApp {
     layout.appendChild(left);
 
     const right = document.createElement('div');
+    right.className = 'combat-log-column';
+    const logOuter = document.createElement('div');
+    logOuter.className = 'combat-log-outer';
     const dice = document.createElement('div');
     dice.className = 'dice-panel';
     const hdr = document.createElement('div');
@@ -537,7 +546,7 @@ export class GameApp {
     const logScroll = document.createElement('div');
     logScroll.className = 'combat-log-scroll';
 
-    for (const entry of c.log.slice(-30)) {
+    for (const entry of c.log.slice(-48)) {
       const wrap = document.createElement('div');
       wrap.className = `combat-log-entry combat-log-${entry.kind}`;
 
@@ -581,7 +590,8 @@ export class GameApp {
       logScroll.appendChild(wrap);
     }
     dice.appendChild(logScroll);
-    right.appendChild(dice);
+    logOuter.appendChild(dice);
+    right.appendChild(logOuter);
     layout.appendChild(right);
     inner.appendChild(layout);
 

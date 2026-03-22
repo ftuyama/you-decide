@@ -1,10 +1,15 @@
 const STORAGE_MUTE = 'calvario_sound_muted';
 
-/** Áudio retro: tons simples; requer gesto do utilizador para AudioContext. */
+/**
+ * Áudio retro: tons simples + música de fundo procedural (Web Audio).
+ * Requer gesto do utilizador para AudioContext; sem ficheiros externos.
+ */
 export class GameAudio {
   private ctx: AudioContext | null = null;
   private muted = false;
-  private ambientOsc: OscillatorNode | null = null;
+  /** Limpeza da música de fundo (osciladores + intervalo + nós) */
+  private bgCleanup: (() => void) | null = null;
+  private bgPulseTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     try {
@@ -37,6 +42,25 @@ export class GameAudio {
       void this.ctx.resume();
     }
     return this.ctx;
+  }
+
+  /**
+   * Inicia a música de fundo só depois do AudioContext estar `running`.
+   * O `resume()` tem de ser pedido no gesto do utilizador; o pad não pode
+   * ser criado enquanto o contexto está `suspended` (Chrome/Safari).
+   */
+  startAmbientWhenReady(): void {
+    if (this.muted) return;
+    const ctx = this.ensureContext();
+    const run = (): void => {
+      if (this.muted || this.bgCleanup) return;
+      this.playAmbient();
+    };
+    if (ctx.state === 'running') {
+      run();
+    } else {
+      void ctx.resume().then(run);
+    }
   }
 
   private gain(base: number): number {
@@ -92,27 +116,91 @@ export class GameAudio {
     });
   }
 
+  /**
+   * Música de fundo: pad em lá menor (sub + acorde) com pulsação lenta.
+   * Idempotente: se já a tocar, não duplica.
+   */
   playAmbient(): void {
-    if (this.muted || this.ambientOsc) return;
+    if (this.muted || this.bgCleanup) return;
     const ctx = this.ensureContext();
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type = 'sine';
-    o.frequency.value = 55;
-    g.gain.value = 0.025;
-    o.connect(g);
-    g.connect(ctx.destination);
-    o.start();
-    this.ambientOsc = o;
+
+    const master = ctx.createGain();
+    master.gain.value = this.gain(0.14);
+
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -28;
+    comp.knee.value = 12;
+    comp.ratio.value = 4;
+    comp.attack.value = 0.003;
+    comp.release.value = 0.25;
+    master.connect(comp);
+    comp.connect(ctx.destination);
+
+    /** Hz: sub, fundamental, terça menor, quinta (Am) */
+    const layers: { freq: number; level: number; type: OscillatorType }[] = [
+      { freq: 55, level: 0.22, type: 'sine' },
+      { freq: 110, level: 0.2, type: 'sine' },
+      { freq: 130.81, level: 0.16, type: 'triangle' },
+      { freq: 164.81, level: 0.14, type: 'sine' },
+      { freq: 220, level: 0.06, type: 'triangle' },
+    ];
+
+    const oscillators: OscillatorNode[] = [];
+    for (const { freq, level, type } of layers) {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      o.detune.value = (Math.random() - 0.5) * 10;
+      g.gain.value = level * 0.45;
+      o.connect(g);
+      g.connect(master);
+      o.start();
+      oscillators.push(o);
+    }
+
+    let t = 0;
+    this.bgPulseTimer = setInterval(() => {
+      if (this.muted || !this.ctx) return;
+      t += 0.035;
+      const breathe = 0.11 + Math.sin(t) * 0.032 + Math.sin(t * 0.37) * 0.014;
+      try {
+        master.gain.setTargetAtTime(this.gain(breathe), this.ctx.currentTime, 0.55);
+      } catch {
+        /* noop */
+      }
+    }, 380);
+
+    this.bgCleanup = () => {
+      if (this.bgPulseTimer) {
+        clearInterval(this.bgPulseTimer);
+        this.bgPulseTimer = null;
+      }
+      for (const o of oscillators) {
+        try {
+          o.stop();
+        } catch {
+          /* noop */
+        }
+      }
+      try {
+        master.disconnect();
+        comp.disconnect();
+      } catch {
+        /* noop */
+      }
+    };
   }
 
   stopAmbient(): void {
-    try {
-      this.ambientOsc?.stop();
-    } catch {
-      /* noop */
+    if (this.bgPulseTimer) {
+      clearInterval(this.bgPulseTimer);
+      this.bgPulseTimer = null;
     }
-    this.ambientOsc = null;
+    if (this.bgCleanup) {
+      this.bgCleanup();
+      this.bgCleanup = null;
+    }
   }
 
   private playTone(freq: number, dur: number, vol: number, type: OscillatorType = 'sine'): void {

@@ -44,6 +44,8 @@ O projeto está preparado para **GitHub Pages** (URLs relativas na build; não d
 
 Se o repositório tiver outro nome, o mesmo URL relativo continua a funcionar — não é preciso alterar o `base` do Vite.
 
+**Se no browser vires erros como `GET …/src/main.ts` (404):** o GitHub está a servir o **`index.html` da raiz do repo** (modo desenvolvimento), não a pasta **`dist`** da build. Abre **Settings → Pages** e confirma que **Source** é só **GitHub Actions** — desativa **“Deploy from a branch”** (por exemplo `main` / `/ (root)`), porque isso publica o código-fonte em vez do artefacto do workflow. Depois, em **Actions**, volta a correr o último workflow (ou faz um push vazio) para voltar a publicar.
+
 ---
 
 ## Como jogar

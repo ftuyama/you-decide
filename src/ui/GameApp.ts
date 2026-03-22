@@ -11,7 +11,15 @@ import {
 } from '../engine/sceneRuntime';
 import { applyEffects } from '../engine/effects';
 import { effectiveLeadAttr, tickActiveBuffs } from '../engine/leadStats';
-import type { Character, Choice, ClassId, CombatLogEntry, GameState, SpellDef } from '../engine/schema';
+import type {
+  Character,
+  Choice,
+  ClassId,
+  CombatLogEntry,
+  GameState,
+  LevelUpStatDeltas,
+  SpellDef,
+} from '../engine/schema';
 import { migrateLegacyKnownSpells } from '../engine/spellsKnown';
 import {
   canCastSpell,
@@ -31,9 +39,11 @@ import { getHeroClassLabel, getHeroLore } from '../campaigns/calvario/classHero'
 import { formatDiceAscii } from './diceAscii';
 import { GameAudio, type AmbientTheme } from './sound';
 import './styles.css';
+import pkg from '../../package.json' with { type: 'json' };
 
 const SAVE_KEY = 'calvario_save_v1';
 const SIDEBAR_KEY = 'calvario_sidebar_sections_v1';
+const FONT_KEY = 'calvario_font_step_v1';
 
 export class GameApp {
   private registry: ContentRegistry;
@@ -43,6 +53,9 @@ export class GameApp {
   private root: HTMLElement;
   private timedTimer: ReturnType<typeof setTimeout> | null = null;
   private menuOpen = false;
+  /** 0 = 100%, 1 = 110%, 2 = 120% */
+  private fontStep = 0;
+  private readonly choiceHotkeyHandler: (e: KeyboardEvent) => void;
   /** Secções colapsáveis (recursos, faccoes, diario) — persistido em sessionStorage */
   private sidebarSections: Record<string, boolean> = {};
   /** Buffs/debuffs/marcas — mostra banner até o jogador fechar */
@@ -54,6 +67,23 @@ export class GameApp {
 
   constructor(root: HTMLElement) {
     this.root = root;
+    this.fontStep = this.loadFontStep();
+    this.choiceHotkeyHandler = (e: KeyboardEvent): void => {
+      if (this.state.mode !== 'story') return;
+      const el = e.target;
+      if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || el instanceof HTMLSelectElement) {
+        return;
+      }
+      if (!/^[1-9]$/.test(e.key)) return;
+      const idx = parseInt(e.key, 10) - 1;
+      const btns = this.root.querySelectorAll<HTMLButtonElement>('.story-shell .choices .choice');
+      const btn = btns[idx];
+      if (!btn || btn.disabled) return;
+      e.preventDefault();
+      btn.click();
+    };
+    document.addEventListener('keydown', this.choiceHotkeyHandler, true);
+
     this.registry = new ContentRegistry();
     const idx = getCampaignIndex();
     this.bus.subscribe((ev) => {
@@ -89,6 +119,56 @@ export class GameApp {
     document.addEventListener('pointerdown', unlockOnce, true);
     document.addEventListener('keydown', unlockOnce, true);
     this.render();
+  }
+
+  private loadFontStep(): number {
+    try {
+      const raw = localStorage.getItem(FONT_KEY);
+      const n = raw != null ? parseInt(raw, 10) : 0;
+      if (n === 1 || n === 2) return n;
+      return 0;
+    } catch {
+      return 0;
+    }
+  }
+
+  private saveFontStep(): void {
+    try {
+      localStorage.setItem(FONT_KEY, String(this.fontStep));
+    } catch {
+      /* noop */
+    }
+  }
+
+  private cycleFontSize(): void {
+    this.fontStep = (this.fontStep + 1) % 3;
+    this.saveFontStep();
+    this.closeMenu();
+    this.render();
+  }
+
+  private exportSaveToClipboard(): void {
+    this.unlockAudio();
+    const json = serializeState(this.state);
+    void navigator.clipboard.writeText(json).then(
+      () => {
+        alert('Gravação copiada para a área de transferência (JSON).');
+        this.closeMenu();
+      },
+      () => {
+        prompt('Copia manualmente o estado:', json);
+        this.closeMenu();
+      }
+    );
+  }
+
+  private showCredits(): void {
+    this.unlockAudio();
+    const v = (pkg as { version?: string }).version ?? '?';
+    alert(
+      `Calvário Subterrâneo\nYou Decide · v${v}\n\nMotor: TypeScript, Vite.\nTexto narrativo em Markdown.\n\nObrigado por jogar.`
+    );
+    this.closeMenu();
   }
 
   private loadSidebarSections(): Record<string, boolean> {
@@ -290,6 +370,7 @@ export class GameApp {
 
     const frame = document.createElement('div');
     frame.className = 'app-frame';
+    frame.style.setProperty('--app-font-pct', `${100 + this.fontStep * 10}%`);
 
     const header = document.createElement('header');
     header.className = 'app-top';
@@ -350,9 +431,30 @@ export class GameApp {
     soundRow.appendChild(soundCb);
     soundRow.appendChild(document.createTextNode(' Som ligado'));
 
+    const fontBtn = document.createElement('button');
+    fontBtn.type = 'button';
+    fontBtn.className = 'menu-item';
+    fontBtn.textContent = `Tamanho do texto (${100 + this.fontStep * 10}%)`;
+    fontBtn.addEventListener('click', () => this.cycleFontSize());
+
+    const exportBtn = document.createElement('button');
+    exportBtn.type = 'button';
+    exportBtn.className = 'menu-item';
+    exportBtn.textContent = 'Exportar gravação (JSON)';
+    exportBtn.addEventListener('click', () => this.exportSaveToClipboard());
+
+    const creditsBtn = document.createElement('button');
+    creditsBtn.type = 'button';
+    creditsBtn.className = 'menu-item';
+    creditsBtn.textContent = 'Créditos';
+    creditsBtn.addEventListener('click', () => this.showCredits());
+
     drawer.appendChild(saveBtn);
     drawer.appendChild(loadBtn);
+    drawer.appendChild(exportBtn);
     drawer.appendChild(soundRow);
+    drawer.appendChild(fontBtn);
+    drawer.appendChild(creditsBtn);
     frame.appendChild(drawer);
 
     const bodyRow = document.createElement('div');
@@ -382,8 +484,12 @@ export class GameApp {
     frame.appendChild(bodyRow);
 
     this.root.appendChild(frame);
-    if (this.state.lastCombatXpGain != null) {
-      this.state = { ...this.state, lastCombatXpGain: null };
+    if (this.state.lastCombatXpGain != null || this.state.lastCombatLevelUps != null) {
+      this.state = {
+        ...this.state,
+        lastCombatXpGain: null,
+        lastCombatLevelUps: null,
+      };
     }
     this.syncAmbientTheme();
   }
@@ -412,6 +518,19 @@ export class GameApp {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
+  }
+
+  /** Resumo dos ganhos por subida de nível (texto da vitória). */
+  private formatLevelUpDeltaLine(d: LevelUpStatDeltas): string {
+    const parts: string[] = [];
+    if (d.str) parts.push(`Força +${d.str}`);
+    if (d.agi) parts.push(`Agilidade +${d.agi}`);
+    if (d.mind) parts.push(`Mente +${d.mind}`);
+    if (d.maxHp) parts.push(`HP máx +${d.maxHp}`);
+    if (d.hp) parts.push(`HP +${d.hp}`);
+    if (d.maxMana) parts.push(`Mana máx +${d.maxMana}`);
+    if (d.mana) parts.push(`Mana +${d.mana}`);
+    return parts.join(' · ');
   }
 
   /** `fill`: xp = verde (barra de XP), hp = vermelho (HP do herói) */
@@ -565,6 +684,7 @@ export class GameApp {
     const openDiary = this.sidebarSections['diario'] ? ' open' : '';
     const openLore = this.sidebarSections['personagem_lore'] ? ' open' : '';
     const openSpells = this.sidebarSections['personagem_spells'] ? ' open' : '';
+    const openMem = this.sidebarSections['memorias'] ? ' open' : '';
 
     const personagemBlock = (() => {
       if (!p) {
@@ -669,6 +789,27 @@ export class GameApp {
       </details>
     `;
 
+    const visitedIds = Object.keys(this.state.visitedScenes)
+      .filter((k) => this.state.visitedScenes[k])
+      .sort();
+    if (visitedIds.length > 0) {
+      const max = 48;
+      const shown = visitedIds.slice(0, max);
+      const rest = visitedIds.length - shown.length;
+      const memHtml = shown.map((id) => `<div class="sidebar-line"><code>${this.escHtml(id)}</code></div>`).join('');
+      const more =
+        rest > 0 ? `<div class="sidebar-line sidebar-muted">… e mais ${rest} cena(s)</div>` : '';
+      const mem = document.createElement('details');
+      mem.className = 'sidebar-collapse';
+      if (openMem) mem.setAttribute('open', '');
+      mem.dataset.section = 'memorias';
+      mem.innerHTML = `
+        <summary class="sidebar-collapse-trigger">Memórias (cenas visitadas)</summary>
+        <div class="sidebar-collapse-body memories-list">${memHtml}${more}</div>
+      `;
+      hud.appendChild(mem);
+    }
+
     if (this.state.diary.length) {
       const diary = document.createElement('details');
       diary.className = 'sidebar-collapse';
@@ -699,9 +840,18 @@ export class GameApp {
     if (this.statusHighlightQueue.length > 0) {
       const wrap = document.createElement('div');
       wrap.className = 'status-highlight-stack';
+      if (this.statusHighlightQueue.some((h) => h.variant === 'debuff')) {
+        wrap.classList.add('status-highlight-stack--debuff');
+      }
       for (const h of this.statusHighlightQueue) {
         const block = document.createElement('div');
         block.className = `status-highlight-banner status-highlight-banner--${h.variant}`;
+        if (h.variant === 'debuff') {
+          const kicker = document.createElement('div');
+          kicker.className = 'status-highlight-debuff-kicker';
+          kicker.textContent = 'Penalidade';
+          block.appendChild(kicker);
+        }
         const titleEl = document.createElement('div');
         titleEl.className = 'status-highlight-title';
         titleEl.textContent = h.title;
@@ -767,11 +917,43 @@ export class GameApp {
     }
 
     const xpGain = this.state.lastCombatXpGain;
-    if (xpGain != null && xpGain > 0) {
-      const xpBanner = document.createElement('div');
-      xpBanner.className = 'victory-xp-banner';
-      xpBanner.textContent = `+${xpGain} XP ganhos nesta batalha.`;
-      inner.appendChild(xpBanner);
+    const levelUps = this.state.lastCombatLevelUps;
+    if ((xpGain != null && xpGain > 0) || (levelUps != null && levelUps.length > 0)) {
+      const wrap = document.createElement('div');
+      wrap.className =
+        levelUps != null && levelUps.length > 0
+          ? 'victory-progress-banner victory-progress-banner--level-up'
+          : 'victory-progress-banner';
+      if (xpGain != null && xpGain > 0) {
+        const xpEl = document.createElement('div');
+        xpEl.className = 'victory-xp-line';
+        xpEl.textContent = `+${xpGain} XP ganhos nesta batalha.`;
+        wrap.appendChild(xpEl);
+      }
+      if (levelUps != null && levelUps.length > 0) {
+        this.unlockAudio();
+        this.audio.playLevelUpCelebration();
+        const hero = this.state.party[0];
+        const kicker = document.createElement('div');
+        kicker.className = 'level-up-kicker';
+        kicker.textContent =
+          levelUps.length === 1 ? 'Subiste de nível!' : `${levelUps.length} níveis de uma vez!`;
+        wrap.appendChild(kicker);
+        for (const step of levelUps) {
+          const block = document.createElement('div');
+          block.className = 'level-up-block';
+          const title = document.createElement('div');
+          title.className = 'level-up-title';
+          title.textContent = hero ? `Nível ${step.level} — ${hero.name}` : `Nível ${step.level}`;
+          block.appendChild(title);
+          const attrs = document.createElement('div');
+          attrs.className = 'level-up-attrs';
+          attrs.textContent = this.formatLevelUpDeltaLine(step.deltas);
+          block.appendChild(attrs);
+          wrap.appendChild(block);
+        }
+      }
+      inner.appendChild(wrap);
     }
 
     const h1 = document.createElement('h1');
@@ -835,10 +1017,11 @@ export class GameApp {
     const chWrap = document.createElement('div');
     chWrap.className = 'choices';
 
-    for (const ch of choices) {
+    choices.forEach((ch, i) => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'choice';
+      if (i < 9) btn.title = `Tecla ${i + 1}`;
       btn.appendChild(document.createTextNode(ch.text));
       if (ch.preview) {
         const span = document.createElement('span');
@@ -848,7 +1031,7 @@ export class GameApp {
       }
       btn.addEventListener('click', () => this.applyChoice(ch));
       chWrap.appendChild(btn);
-    }
+    });
     inner.appendChild(chWrap);
 
     this.setupTimedChoices(choices, inner);

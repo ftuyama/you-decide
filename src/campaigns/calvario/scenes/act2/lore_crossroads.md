@@ -18,6 +18,21 @@ choices:
   - text: "Mergulhar o braço no lodo que sussurra"
     next: act2/luck_mire
     preview: Sorte — 2d6 + SOR
+  - text: "Recordar o cavaleiro caído (eco do path)"
+    next: act2/hub_catacomb
+    condition: { path: fallen }
+    effects:
+      - { op: addDiary, text: "O cruzeiro lembrou-me o nome que aceitei: caído, mas ainda de pé." }
+  - text: "Recordar o arcano sombrio (eco do path)"
+    next: act2/hub_catacomb
+    condition: { path: dark }
+    effects:
+      - { op: addDiary, text: "Sombras não pedem permissão — eu dei mesma assim." }
+  - text: "Recordar o penitente (eco do path)"
+    next: act2/hub_catacomb
+    condition: { path: penitent }
+    effects:
+      - { op: addDiary, text: "Cada pedra aqui confessa melhor do que eu." }
   - text: "Regressar ao cruzeiro"
     next: act2/hub_catacomb
 onEnter: []

@@ -641,18 +641,24 @@ function finishCombat(
   let s = state;
   if (victory) {
     let xpGain = 0;
+    let lastCombatLevelUps: GameState['lastCombatLevelUps'] = null;
     const enc = data.encounters[c.encounterId];
     if (enc) {
       xpGain = computeCombatXp(enc, data);
       if (xpGain > 0) {
-        s = addXp(s, xpGain, { bus, data });
-        s = { ...s, diary: [...s.diary, `+${xpGain} XP pela vitória.`] };
+        const { state: afterXp, levelUps } = addXp(s, xpGain, { bus, data });
+        s = { ...afterXp, diary: [...afterXp.diary, `+${xpGain} XP pela vitória.`] };
+        lastCombatLevelUps = levelUps.length > 0 ? levelUps : null;
       }
     }
-    s = { ...s, lastCombatXpGain: xpGain > 0 ? xpGain : null };
+    s = {
+      ...s,
+      lastCombatXpGain: xpGain > 0 ? xpGain : null,
+      lastCombatLevelUps,
+    };
     bus?.emit({ type: 'combat.end', victory: true });
   } else {
-    s = { ...s, lastCombatXpGain: null };
+    s = { ...s, lastCombatXpGain: null, lastCombatLevelUps: null };
     bus?.emit({ type: 'combat.end', victory: false });
   }
   return tickActiveBuffs({
@@ -827,6 +833,7 @@ export function fleeCombat(state: GameState, bus?: EventBus): GameState {
   return tickActiveBuffs({
     ...state,
     lastCombatXpGain: null,
+    lastCombatLevelUps: null,
     mode: 'story',
     combat: null,
     sceneId: c.onFlee ?? c.returnScene,

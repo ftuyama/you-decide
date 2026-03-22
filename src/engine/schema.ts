@@ -449,6 +449,23 @@ export const CombatStateSchema = z.object({
 
 export type CombatState = z.infer<typeof CombatStateSchema>;
 
+export const LevelUpStatDeltasSchema = z.object({
+  str: z.number(),
+  agi: z.number(),
+  mind: z.number(),
+  maxHp: z.number(),
+  hp: z.number(),
+  maxMana: z.number(),
+  mana: z.number(),
+});
+export type LevelUpStatDeltas = z.infer<typeof LevelUpStatDeltasSchema>;
+
+export const LevelUpStepSchema = z.object({
+  level: z.number().int().min(1),
+  deltas: LevelUpStatDeltasSchema,
+});
+export type LevelUpStep = z.infer<typeof LevelUpStepSchema>;
+
 export const GameStateSchema = z.object({
   schemaVersion: z.string(),
   rngSeed: z.number(),
@@ -500,6 +517,8 @@ export const GameStateSchema = z.object({
   timedChoiceDeadline: z.number().nullable().optional(),
   /** XP ganho na última vitória — mostrado uma vez na narrativa (omitido no save). */
   lastCombatXpGain: z.number().int().min(0).nullable().default(null),
+  /** Subidas de nível na última vitória (com deltas) — mostrado uma vez na narrativa (omitido no save). */
+  lastCombatLevelUps: z.array(LevelUpStepSchema).nullable().default(null),
   /** Bónus temporários (poções); decrementa ao mudar de cena */
   activeBuffs: z.array(TemporaryBuffSchema).default([]),
 });

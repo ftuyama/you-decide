@@ -1,6 +1,15 @@
-/** Mapas ASCII 5×5: # parede, . chão, ! evento, @ jogador (desenhado por estado) */
+/** Mapas ASCII: # parede, . chão, ! evento, @ jogador (desenhado por estado) */
 export const MAPS: Record<string, string[]> = {
   demo5: ['#####', '#...#', '#.#.#', '#..!#', '#####'],
+  /** Profundezas 6×6 — mais exploração que o demo 5×5 */
+  depths6: [
+    '######',
+    '#....#',
+    '#.##.#',
+    '#..!.#',
+    '#....#',
+    '######',
+  ],
 };
 
 export function renderMap(

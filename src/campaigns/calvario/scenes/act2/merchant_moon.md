@@ -14,8 +14,30 @@ choices:
     next: act2/hub_catacomb
   - text: "Perguntar de onde veio o mapa"
     next: act2/merchant_ask
+  - text: "Mencionar patrulhas da Vigília (aliados)"
+    next: act2/hub_catacomb
+    condition: { rep: { faction: vigilia, gte: 2 } }
+    effects:
+      - { op: addDiary, text: "O mercador hesitou quando falei da Vigília — interesse compra silêncio." }
+    preview: "Diário · rumor de respeito"
+  - text: "Sussurrar símbolos do Círculo"
+    next: act2/hub_catacomb
+    condition: { rep: { faction: circulo, gte: 1 } }
+    effects:
+      - { op: addResource, resource: gold, delta: 1 }
+      - { op: addDiary, text: "O capuz inclinou-se: o Círculo paga em moeda e em olhos." }
+    preview: "+1 ouro"
+  - text: "Deixar o Terceiro Sino nomear o preço"
+    next: act2/hub_catacomb
+    condition: { rep: { faction: culto, gte: 1 } }
+    effects:
+      - { op: addResource, resource: corruption, delta: 1 }
+      - { op: addDiary, text: "Uma risada seca sob o tecido — o culto gosta de quem já ouve o mesmo eco." }
+    preview: "+1 corrupção, diário"
 onEnter: []
 ---
 Um capuz **sem rosto** estende um **mapa** com margens roídas. Os dedos por baixo do tecido são **demasiado longos** para serem só humanos.
 
 "Rumores mudam **pesos**", diz a voz — como se o ar saísse da própria pedra.
+
+Se alguém te **reconhece** nas facções, o preço deixa de ser só ouro — torna-se **olhar**.

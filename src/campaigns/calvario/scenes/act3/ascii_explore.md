@@ -5,6 +5,6 @@ choices:
   - text: "Sair do mapa"
     next: act3/hub_depths
 onEnter:
-  - { op: setAsciiMap, mapId: demo5, playerX: 2, playerY: 2 }
+  - { op: setAsciiMap, mapId: depths6, playerX: 1, playerY: 1 }
 ---
 Usa o **mini-mapa** abaixo. Cada passo pode custar suprimento.

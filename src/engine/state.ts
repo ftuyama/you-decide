@@ -31,6 +31,7 @@ export function createInitialState(entryScene: string, seed?: number): GameState
     pendingInterleave: null,
     timedChoiceDeadline: null,
     lastCombatXpGain: null,
+    lastCombatLevelUps: null,
     activeBuffs: [],
   };
 }
@@ -104,7 +105,7 @@ export function createPlayerCharacter(name: string, cls: ClassId): GameState['pa
 }
 
 export function serializeState(state: GameState): string {
-  const { lastCombatXpGain: _x, ...rest } = state;
+  const { lastCombatXpGain: _x, lastCombatLevelUps: _l, ...rest } = state;
   return JSON.stringify(rest);
 }
 
@@ -129,6 +130,7 @@ export function deserializeState(json: string): GameState {
     level: typeof (o as GameState).level === 'number' ? (o as GameState).level : 1,
     xp: typeof (o as GameState).xp === 'number' ? (o as GameState).xp : 0,
     lastCombatXpGain: null,
+    lastCombatLevelUps: null,
     activeBuffs: Array.isArray((o as GameState).activeBuffs) ? (o as GameState).activeBuffs : [],
     knownSpells: Array.isArray((o as GameState).knownSpells) ? (o as GameState).knownSpells : [],
     party: rawParty.map((p) => ({

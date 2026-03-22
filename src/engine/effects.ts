@@ -39,6 +39,28 @@ function titleForMark(mark: string): string {
   return MARK_TITLE_PT[mark] ?? humanizeMarkId(mark);
 }
 
+const RESOURCE_LABEL: Record<'gold' | 'supply' | 'faith' | 'corruption', string> = {
+  gold: 'Gold',
+  supply: 'Suprimento',
+  faith: 'Fé',
+  corruption: 'Corrupção',
+};
+
+function resourceDebuffSubtitle(resource: keyof typeof RESOURCE_LABEL): string {
+  switch (resource) {
+    case 'corruption':
+      return 'Marca sombria — o pacto cobra o preço';
+    case 'faith':
+      return 'A convicção abala-se';
+    case 'supply':
+      return 'Recursos a escassear';
+    case 'gold':
+      return 'Perda material';
+    default:
+      return '';
+  }
+}
+
 export function applyEffects(
   state: GameState,
   effects: Effect[],
@@ -97,14 +119,39 @@ function applyOne(
       };
     case 'addResource': {
       const r = { ...state.resources };
-      if (e.resource === 'gold') {
-        r.gold = Math.max(0, Math.min(999, (r.gold ?? 0) + e.delta));
-      } else if (e.resource === 'supply') {
+      let actual = 0;
+      const res = e.resource;
+      if (res === 'gold') {
+        const before = r.gold ?? 0;
+        r.gold = Math.max(0, Math.min(999, before + e.delta));
+        actual = r.gold - before;
+      } else if (res === 'supply') {
+        const before = r.supply;
         r.supply = Math.max(0, Math.min(10, r.supply + e.delta));
-      } else if (e.resource === 'faith') {
+        actual = r.supply - before;
+      } else if (res === 'faith') {
+        const before = r.faith;
         r.faith = Math.max(0, Math.min(5, r.faith + e.delta));
+        actual = r.faith - before;
       } else {
+        const before = r.corruption;
         r.corruption = Math.max(0, Math.min(5, r.corruption + e.delta));
+        actual = r.corruption - before;
+      }
+      if (actual !== 0) {
+        const isDebuff =
+          (res === 'corruption' && actual > 0) ||
+          (res === 'faith' && actual < 0) ||
+          (res === 'supply' && actual < 0) ||
+          (res === 'gold' && actual < 0);
+        if (isDebuff) {
+          bus.emit({
+            type: 'statusHighlight',
+            variant: 'debuff',
+            title: `${RESOURCE_LABEL[res]} ${actual > 0 ? '+' : ''}${actual}`,
+            subtitle: resourceDebuffSubtitle(res),
+          });
+        }
       }
       return { ...state, resources: r };
     }
@@ -215,7 +262,7 @@ function applyOne(
       return { ...state, knownSpells: [...state.knownSpells, e.spellId] };
     }
     case 'addXp': {
-      return addXp(state, e.amount, { bus, data: ctx.data });
+      return addXp(state, e.amount, { bus, data: ctx.data }).state;
     }
     case 'addMana': {
       const lead = state.party[0];

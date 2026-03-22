@@ -7,6 +7,9 @@ choices:
     condition: { resource: { supply: { gte: 1 } } }
     effects:
       - { op: campRest }
+  - text: "Trocar duas palavras com o grupo"
+    next: act2/camp_companion_chat
+    condition: { companionCount: { gte: 1 } }
   - text: "Continuar"
     next: act2/hub_catacomb
 onEnter:

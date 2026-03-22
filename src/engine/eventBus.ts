@@ -9,7 +9,7 @@ export type GameEvent =
   | { type: 'item.acquired'; itemId: string }
   | {
       type: 'statusHighlight';
-      variant: 'good' | 'bad' | 'neutral';
+      variant: 'good' | 'bad' | 'neutral' | 'debuff';
       title: string;
       subtitle?: string;
     };

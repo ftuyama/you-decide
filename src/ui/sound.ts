@@ -211,6 +211,48 @@ export class GameAudio {
     });
   }
 
+  /** Fanfarra curta ao subir de nível (após vitória). */
+  playLevelUpCelebration(): void {
+    const ctx = this.ensureContext();
+    const g = this.gain(0.1);
+    if (g <= 0) return;
+    const t0 = ctx.currentTime;
+    const notes = [
+      { f: 392, t: 0, dur: 0.12 },
+      { f: 523.25, t: 0.1, dur: 0.14 },
+      { f: 659.25, t: 0.22, dur: 0.14 },
+      { f: 783.99, t: 0.36, dur: 0.16 },
+      { f: 1046.5, t: 0.52, dur: 0.28 },
+    ];
+    for (const { f, t, dur } of notes) {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'triangle';
+      o.frequency.value = f;
+      gn.gain.setValueAtTime(0.001, t0 + t);
+      gn.gain.exponentialRampToValueAtTime(g, t0 + t + 0.02);
+      gn.gain.exponentialRampToValueAtTime(0.001, t0 + t + dur);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(t0 + t);
+      o.stop(t0 + t + dur + 0.04);
+    }
+    const chordT = t0 + 0.5;
+    for (const f of [523.25, 659.25, 783.99]) {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = f;
+      gn.gain.setValueAtTime(0.001, chordT);
+      gn.gain.exponentialRampToValueAtTime(g * 0.45, chordT + 0.04);
+      gn.gain.exponentialRampToValueAtTime(0.001, chordT + 0.55);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(chordT);
+      o.stop(chordT + 0.6);
+    }
+  }
+
   /**
    * Derrota / fim de combate mau — linha descendente.
    */

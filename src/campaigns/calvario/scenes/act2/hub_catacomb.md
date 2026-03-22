@@ -19,6 +19,8 @@ choices:
     next: act2/vigilia_camp
   - text: "Rota aleatória (demo)"
     next: act2/random_router
+  - text: "Passagem marcada — eco de juramentos"
+    next: act2/lore_crossroads
   - text: "Observar o cruzeiro: marcas no chão"
     next: act2/hub_observe
   - text: "Descer mais fundo"

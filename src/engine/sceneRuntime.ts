@@ -3,10 +3,11 @@ import { splitFrontmatter } from './frontmatter';
 import DOMPurify from 'dompurify';
 import { SceneFrontmatterSchema, type GameState, type SceneFrontmatter } from './schema';
 import { evaluateCondition } from './conditions';
-import { applyEffects } from './effects';
+import { applyEffects, tickActiveBuffs } from './effects';
 import { injectText } from './template';
 import type { EventBus } from './eventBus';
 import type { GameData } from './gameData';
+import { getEffectiveLuck } from './combat';
 import { mulberry32, roll2d6 } from './rng';
 import type { Choice } from './schema';
 
@@ -58,7 +59,7 @@ export function enterScene(
     const nextId = pass ? g.passNext : g.failNext;
     s = { ...s, sceneId: nextId };
     if (nextId !== scene.id) {
-      return s;
+      return tickActiveBuffs(s);
     }
   }
 
@@ -103,11 +104,35 @@ export function resolveSkillCheck(
   const ok = total >= sc.tn;
   const next = ok ? sc.successNext : sc.failNext;
   const rollLog = `Teste (${sc.attr.toUpperCase()}): [${d1}][${d2}] +${mod} = ${total} vs TN ${sc.tn} → ${ok ? 'sucesso' : 'falha'}.`;
-  const newState = {
+  const newState = tickActiveBuffs({
     ...state,
     rngSeed: (state.rngSeed + 17) >>> 0,
     sceneId: next,
-  };
+  });
+  return { state: newState, nextSceneId: next, rollLog };
+}
+
+export function resolveLuckCheck(
+  state: GameState,
+  scene: LoadedScene,
+  data: GameData
+): { state: GameState; nextSceneId: string; rollLog: string } {
+  const lc = scene.frontmatter.luckCheck;
+  if (!lc) return { state, nextSceneId: state.sceneId, rollLog: '' };
+  const rng = mulberry32(state.rngSeed);
+  const [d1, d2] = roll2d6(rng);
+  const lead = state.party[0];
+  const effLuck = lead ? getEffectiveLuck(lead, data, state) : 8;
+  const mod = Math.floor((effLuck - 6) / 2);
+  const total = d1 + d2 + mod;
+  const ok = total >= lc.tn;
+  const next = ok ? lc.successNext : lc.failNext;
+  const rollLog = `Sorte: [${d1}][${d2}] +${mod} = ${total} vs TN ${lc.tn} → ${ok ? 'sucesso' : 'falha'}.`;
+  const newState = tickActiveBuffs({
+    ...state,
+    rngSeed: (state.rngSeed + 19) >>> 0,
+    sceneId: next,
+  });
   return { state: newState, nextSceneId: next, rollLog };
 }
 
@@ -129,7 +154,11 @@ export function resolveRandomBranch(
     }
   }
   return {
-    state: { ...state, rngSeed: (state.rngSeed + 41) >>> 0, sceneId: next },
+    state: {
+      ...state,
+      rngSeed: (state.rngSeed + 41) >>> 0,
+      sceneId: next,
+    },
     nextSceneId: next,
   };
 }

@@ -45,6 +45,10 @@ export function evaluateCondition(cond: Condition | undefined, state: GameState)
     const lead = state.party[0];
     return lead?.class === (cond.class as ClassId);
   }
+  if ('path' in cond) {
+    const lead = state.party[0];
+    return lead?.path === cond.path;
+  }
   if ('chapter' in cond) {
     if (cond.chapter.gte !== undefined && state.chapter < cond.chapter.gte) return false;
     if (cond.chapter.lte !== undefined && state.chapter > cond.chapter.lte) return false;

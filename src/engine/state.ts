@@ -30,6 +30,7 @@ export function createInitialState(entryScene: string, seed?: number): GameState
     pendingInterleave: null,
     timedChoiceDeadline: null,
     lastCombatXpGain: null,
+    activeBuffs: [],
   };
 }
 
@@ -51,6 +52,7 @@ export function createPlayerCharacter(name: string, cls: ClassId): GameState['pa
     specialUsedThisCombat: false,
     mana: 0,
     maxMana: 0,
+    path: null,
   };
   if (cls === 'knight') {
     return {
@@ -65,6 +67,7 @@ export function createPlayerCharacter(name: string, cls: ClassId): GameState['pa
       maxMana: 0,
       weaponId: 'rusty_sword',
       armorId: 'leather',
+      path: null,
     };
   }
   if (cls === 'mage') {
@@ -80,6 +83,7 @@ export function createPlayerCharacter(name: string, cls: ClassId): GameState['pa
       maxMana: 15,
       weaponId: 'oak_staff',
       armorId: 'cloth_robe',
+      path: null,
     };
   }
   return {
@@ -94,6 +98,7 @@ export function createPlayerCharacter(name: string, cls: ClassId): GameState['pa
     maxMana: 10,
     weaponId: 'mace',
     armorId: 'chain_shirt',
+    path: null,
   };
 }
 
@@ -115,11 +120,13 @@ export function deserializeState(json: string): GameState {
     level: typeof (o as GameState).level === 'number' ? (o as GameState).level : 1,
     xp: typeof (o as GameState).xp === 'number' ? (o as GameState).xp : 0,
     lastCombatXpGain: null,
+    activeBuffs: Array.isArray((o as GameState).activeBuffs) ? (o as GameState).activeBuffs : [],
     party: rawParty.map((p) => ({
       ...p,
       luck: typeof p.luck === 'number' ? p.luck : 8,
       mana: typeof p.mana === 'number' ? p.mana : 0,
       maxMana: typeof p.maxMana === 'number' ? p.maxMana : 0,
+      path: typeof p.path === 'string' ? p.path : null,
     })),
   };
   return merged;

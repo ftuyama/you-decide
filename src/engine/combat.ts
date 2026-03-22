@@ -17,6 +17,7 @@ import type {
   Stance,
 } from './schema';
 import type { GameData } from './gameData';
+import { effectiveLeadAttr, tickActiveBuffs } from './leadStats';
 import { addXp, computeCombatXp } from './progression';
 import type { EventBus } from './eventBus';
 
@@ -31,9 +32,9 @@ function toRollOutcome(
   return 'normal';
 }
 
-/** Sorte base + bônus de itens equipados */
-export function getEffectiveLuck(c: Character, data: GameData): number {
-  let sum = c.luck;
+/** Sorte base (+ buffs temporários) + bônus de itens equipados */
+export function getEffectiveLuck(c: Character, data: GameData, state?: GameState): number {
+  let sum = state ? effectiveLeadAttr(state, c, 'luck') : c.luck;
   for (const slot of [c.weaponId, c.armorId, c.relicId] as const) {
     if (slot && data.items[slot]) {
       sum += data.items[slot]!.bonusLuck ?? 0;
@@ -122,9 +123,11 @@ function buildTurnOrder(
   rng: () => number
 ): string[] {
   const rolls: { id: string; score: number }[] = [];
+  const lead = state.party[0];
   for (const p of state.party) {
     const [d1, d2] = roll2d6(rng);
-    const score = d1 + d2 + p.agi;
+    const agi = lead && p.id === lead.id ? effectiveLeadAttr(state, p, 'agi') : p.agi;
+    const score = d1 + d2 + agi;
     rolls.push({ id: `p:${p.id}`, score });
   }
   for (let i = 0; i < combat.enemies.length; i++) {
@@ -161,12 +164,13 @@ function getArmorValue(data: GameData, c: Character): number {
 }
 
 /** CA base (ataques inimigos: 7 + mod AGI + bónus de armadura; postura defensiva +2 em combate). */
-export function getCharacterArmorClass(data: GameData, c: Character): number {
-  return 7 + statMod(c.agi) + getArmorValue(data, c);
+export function getCharacterArmorClass(data: GameData, c: Character, state?: GameState): number {
+  const agi = state ? effectiveLeadAttr(state, c, 'agi') : c.agi;
+  return 7 + statMod(agi) + getArmorValue(data, c);
 }
 
-function getTotalMind(data: GameData, c: Character): number {
-  let mind = c.mind;
+function getTotalMind(data: GameData, c: Character, state?: GameState): number {
+  let mind = state ? effectiveLeadAttr(state, c, 'mind') : c.mind;
   for (const slot of [c.weaponId, c.armorId, c.relicId] as const) {
     if (slot && data.items[slot]) {
       mind += data.items[slot]!.bonusMind;
@@ -200,7 +204,7 @@ export function castSpell(
   if (!canCastSpell(state, spellId, data)) return state;
 
   const rng = mulberry32(state.rngSeed + c.round * 701 + spellId.length * 13);
-  const mindMod = statMod(getTotalMind(data, lead));
+  const mindMod = statMod(getTotalMind(data, lead, state));
   let newLead: Character = { ...lead, mana: lead.mana - sp.manaCost };
   const log = [...c.log];
   log.push({
@@ -336,9 +340,9 @@ export function playerAttack(
   const def = data.enemies[c.enemies[enemyIndex]?.defId ?? ''];
   if (!def) return state;
 
-  let str = lead.str;
-  let agi = lead.agi;
-  let mind = lead.mind;
+  let str = effectiveLeadAttr(state, lead, 'str');
+  let agi = effectiveLeadAttr(state, lead, 'agi');
+  let mind = effectiveLeadAttr(state, lead, 'mind');
   if (lead.weaponId && data.items[lead.weaponId]) {
     const w = data.items[lead.weaponId]!;
     str += w.bonusStr;
@@ -438,7 +442,7 @@ export function playerAttack(
 
   if (hit) {
     const dDmg = rollD6(rng);
-    const effLuck = getEffectiveLuck(lead, data);
+    const effLuck = getEffectiveLuck(lead, data, state);
     const luckBonus = statMod(effLuck);
     const baseFlat = getWeaponDamage(data, lead) + (stance === 'aggressive' ? 1 : 0);
     const holyBonus = def.type === 'undead' && lead.class === 'cleric' ? 1 : 0;
@@ -529,12 +533,12 @@ function finishCombat(
     s = { ...s, lastCombatXpGain: null };
     bus?.emit({ type: 'combat.end', victory: false });
   }
-  return {
+  return tickActiveBuffs({
     ...s,
     mode: 'story',
     combat: null,
     sceneId: next,
-  };
+  });
 }
 
 function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData, bus?: EventBus): GameState {
@@ -571,7 +575,7 @@ function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData, bu
     }
     const defScore =
       7 +
-      statMod(target.agi) +
+      statMod(effectiveLeadAttr(state, target, 'agi')) +
       getArmorValue(data, target) +
       (c.pendingStance === 'defensive' ? 2 : 0);
 
@@ -698,11 +702,11 @@ export function fleeCombat(state: GameState, bus?: EventBus): GameState {
   const c = state.combat;
   if (!c) return state;
   bus?.emit({ type: 'combat.end', victory: false });
-  return {
+  return tickActiveBuffs({
     ...state,
     lastCombatXpGain: null,
     mode: 'story',
     combat: null,
     sceneId: c.onFlee ?? c.returnScene,
-  };
+  });
 }

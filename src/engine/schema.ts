@@ -45,6 +45,7 @@ export const ConditionSchema: z.ZodType<Condition> = z.lazy(() =>
       }),
     }),
     z.object({ class: ClassIdSchema }),
+    z.object({ path: z.string() }),
     z.object({ chapter: z.object({ gte: z.number().optional(), lte: z.number().optional() }) }),
     z.object({ corruption: z.object({ gte: z.number().optional(), lte: z.number().optional() }) }),
   ])
@@ -70,6 +71,7 @@ export type Condition =
       };
     }
   | { class: ClassId }
+  | { path: string }
   | { chapter: { gte?: number; lte?: number } }
   | { corruption: { gte?: number; lte?: number } };
 
@@ -109,6 +111,18 @@ export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
   z.object({ op: z.literal('initClass'), class: ClassIdSchema }),
   z.object({ op: z.literal('addXp'), amount: z.number().int().min(1) }),
   z.object({ op: z.literal('addMana'), amount: z.number().int() }),
+  z.object({ op: z.literal('setPath'), path: z.string().nullable() }),
+  z.object({
+    op: z.literal('adjustLeadStat'),
+    attr: z.enum(['str', 'agi', 'mind', 'luck']),
+    delta: z.number().int(),
+  }),
+  z.object({
+    op: z.literal('grantTemporaryBuff'),
+    attr: z.enum(['str', 'agi', 'mind', 'luck']),
+    delta: z.number().int(),
+    remainingScenes: z.number().int().min(1),
+  }),
   z.object({ op: z.literal('resetRun') }),
 ]);
 
@@ -140,6 +154,14 @@ export type Effect =
   | { op: 'initClass'; class: ClassId }
   | { op: 'addXp'; amount: number }
   | { op: 'addMana'; amount: number }
+  | { op: 'setPath'; path: string | null }
+  | { op: 'adjustLeadStat'; attr: 'str' | 'agi' | 'mind' | 'luck'; delta: number }
+  | {
+      op: 'grantTemporaryBuff';
+      attr: 'str' | 'agi' | 'mind' | 'luck';
+      delta: number;
+      remainingScenes: number;
+    }
   | { op: 'resetRun' };
 
 export const ChoiceSchema = z.object({
@@ -167,6 +189,17 @@ export const SkillCheckSchema = z.object({
 });
 
 export type SkillCheck = z.infer<typeof SkillCheckSchema>;
+
+/** 2d6 + mod(sorte efetiva) vs TN — paralelo a skillCheck */
+export const LuckCheckSchema = z.object({
+  id: z.string(),
+  tn: z.number().int(),
+  successNext: z.string(),
+  failNext: z.string(),
+  label: z.string().optional(),
+});
+
+export type LuckCheck = z.infer<typeof LuckCheckSchema>;
 
 export const RandomBranchSchema = z.object({
   id: z.string(),
@@ -206,6 +239,7 @@ export const SceneFrontmatterSchema = z.object({
   onEnter: z.array(EffectSchema).default([]),
   choices: z.array(ChoiceSchema).default([]),
   skillCheck: SkillCheckSchema.optional(),
+  luckCheck: LuckCheckSchema.optional(),
   randomBranch: RandomBranchSchema.optional(),
   chapterGate: ChapterGateSchema.optional(),
   /** Arte ASCII inline (multilinha no YAML) */
@@ -322,9 +356,20 @@ export const CharacterSchema = z.object({
   armorId: z.string().nullable(),
   relicId: z.string().nullable(),
   specialUsedThisCombat: z.boolean().default(false),
+  /** Arquétipo narrativo (Cavaleiro caído, Mago das trevas, …); mecânica continua em `class` */
+  path: z.string().nullable().default(null),
 });
 
 export type Character = z.infer<typeof CharacterSchema>;
+
+export const TemporaryBuffSchema = z.object({
+  id: z.string(),
+  attr: z.enum(['str', 'agi', 'mind', 'luck']),
+  delta: z.number().int(),
+  remainingScenes: z.number().int().min(1),
+});
+
+export type TemporaryBuff = z.infer<typeof TemporaryBuffSchema>;
 
 export const EnemyInstanceSchema = z.object({
   defId: z.string(),
@@ -436,6 +481,8 @@ export const GameStateSchema = z.object({
   timedChoiceDeadline: z.number().nullable().optional(),
   /** XP ganho na última vitória — mostrado uma vez na narrativa (omitido no save). */
   lastCombatXpGain: z.number().int().min(0).nullable().default(null),
+  /** Bónus temporários (poções); decrementa ao mudar de cena */
+  activeBuffs: z.array(TemporaryBuffSchema).default([]),
 });
 
 export type GameState = z.infer<typeof GameStateSchema>;

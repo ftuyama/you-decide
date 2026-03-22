@@ -28,3 +28,40 @@ Os colegas chamam-lhe imprudente. Ela chama-lhes cobardes — e carrega o cadern
 
 Há quem o confunda com confessor; no fundo, é enfermeiro de almas em sítios onde nem Deus responde à primeira chamada.`,
 };
+
+/** Rótulos por arquétipo narrativo (`path`). Chave: `classId:path`. */
+const PATH_LABEL_PT: Partial<Record<string, string>> = {
+  'knight:fallen': 'Cavaleiro caído',
+  'mage:dark': 'Mago das trevas',
+  'cleric:penitent': 'Clérigo penitente',
+};
+
+const PATH_LORE_PT: Partial<Record<string, string>> = {
+  'knight:fallen': `O juramento quebrou-se antes da espada. Não foi cobardia — foi o peso de ver o que não devia ser visto nas galerias. Ainda carrega o ferro; já não carrega a ilusão de que a honra lava o que a escuridão mancha.
+
+Quem o chama de caído não sabe o que é levantar outra vez só para não deixar ninguém atrás.`,
+
+  'mage:dark': `A Torre ensinou símbolos seguros; o Calvário ensinou os outros. Ysara escolheu a segunda lição de propósito — não por sede de poder, mas porque certas portas só abrem com sombras honestas.
+
+O caderno tem páginas que ela não mostra ao scriptorium.`,
+
+  'cleric:penitent': `Oris marca o corpo para lembrar o que a alma esqueceu. A Vigília ainda o reconhece; ele já não tem a certeza se isso é misericórdia ou sentença.
+
+Cada oração é um contrato renegociado com o silêncio.`,
+};
+
+export function getHeroClassLabel(classId: ClassId, path: string | null | undefined): string {
+  if (path) {
+    const label = PATH_LABEL_PT[`${classId}:${path}`];
+    if (label) return label;
+  }
+  return CLASS_LABEL_PT[classId];
+}
+
+export function getHeroLore(classId: ClassId, path: string | null | undefined): string {
+  if (path) {
+    const lore = PATH_LORE_PT[`${classId}:${path}`];
+    if (lore) return lore;
+  }
+  return CLASS_LORE_PT[classId];
+}

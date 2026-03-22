@@ -7,6 +7,9 @@ import { addXp } from './progression';
 import { createInitialState, createPlayerCharacter } from './state';
 import { DEFAULT_HERO_NAME } from '../campaigns/calvario/classHero';
 import campaignIndex from '../campaigns/calvario/index.json';
+import { clampLeadStat, tickActiveBuffs, type LeadStatAttr } from './leadStats';
+
+export { tickActiveBuffs };
 
 function clampRep(n: number): number {
   return Math.max(-3, Math.min(3, n));
@@ -114,6 +117,7 @@ function applyOne(
         armorId: null,
         relicId: null,
         specialUsedThisCombat: false,
+        path: null,
       };
       return {
         ...state,
@@ -148,6 +152,41 @@ function applyOne(
       return {
         ...state,
         party: state.party.map((p, i) => (i === 0 ? { ...p, mana: nm } : p)),
+      };
+    }
+    case 'setPath': {
+      const lead = state.party[0];
+      if (!lead) return state;
+      return {
+        ...state,
+        party: state.party.map((p, i) => (i === 0 ? { ...p, path: e.path } : p)),
+      };
+    }
+    case 'adjustLeadStat': {
+      const lead = state.party[0];
+      if (!lead) return state;
+      const attr = e.attr as LeadStatAttr;
+      const cur = lead[attr];
+      const nextVal = clampLeadStat(attr, cur + e.delta);
+      return {
+        ...state,
+        party: state.party.map((p, i) => (i === 0 ? { ...p, [attr]: nextVal } : p)),
+      };
+    }
+    case 'grantTemporaryBuff': {
+      const id = `buff_${ctx.sceneId}_${state.rngSeed}_${e.attr}_${state.activeBuffs.length}`;
+      return {
+        ...state,
+        activeBuffs: [
+          ...state.activeBuffs,
+          {
+            id,
+            attr: e.attr,
+            delta: e.delta,
+            remainingScenes: e.remainingScenes,
+          },
+        ],
+        rngSeed: (state.rngSeed + 0x9e37) >>> 0,
       };
     }
     case 'resetRun': {

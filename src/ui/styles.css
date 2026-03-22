@@ -240,6 +240,12 @@ button.hamburger:hover {
   font-weight: 600;
 }
 
+.sidebar-buffs {
+  font-size: 0.68rem;
+  color: #a89860;
+  line-height: 1.35;
+}
+
 .sidebar-stats {
   color: var(--fg);
   line-height: 1.45;
@@ -285,16 +291,43 @@ button.hamburger:hover {
   opacity: 0.45;
 }
 
-.hp-bar-fill {
+.hp-bar-fill--xp {
   height: 100%;
   background: linear-gradient(90deg, #3d5c3d 0%, #6e9a6e 55%, #8fbc8f 100%);
   box-shadow: 0 0 8px rgba(110, 154, 110, 0.35);
   transition: width 0.2s ease;
 }
 
-/** Barra de HP do personagem — encostada à barra amarela de stress */
+.hp-bar-fill--hp {
+  height: 100%;
+  background: linear-gradient(90deg, #6a2020 0%, #b03030 50%, #d84848 100%);
+  box-shadow: 0 0 8px rgba(180, 48, 48, 0.35);
+  transition: width 0.2s ease;
+}
+
+/** Barra de HP do personagem; mana azul abaixo */
 .sidebar-stats .hp-bar-resource {
   margin-bottom: 0.2rem;
+}
+
+.mana-bar-track {
+  height: 6px;
+  margin: 0.25rem 0 0.45rem;
+  background: #121820;
+  border: 1px solid #2a3548;
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.mana-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #1a3a6a 0%, #2a60b0 50%, #4a90e0 100%);
+  box-shadow: 0 0 8px rgba(74, 144, 224, 0.35);
+  transition: width 0.2s ease;
+}
+
+.sidebar-stress-label {
+  margin-top: 0.15rem;
 }
 
 .stress-bar-track {
@@ -337,6 +370,85 @@ button.hamburger:hover {
   color: var(--accent);
   font-style: italic;
   margin: 0.2rem 0 0.45rem;
+}
+
+/** Grupo: uma caixinha por personagem recrutado */
+.party-slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 0.55rem;
+}
+
+.party-member-card {
+  flex: 1 1 calc(50% - 0.25rem);
+  min-width: 5.5rem;
+  padding: 0.4rem 0.45rem;
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.party-member-card-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--accent);
+  margin-bottom: 0.25rem;
+}
+
+.party-member-card-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #e0d8c8;
+  line-height: 1.25;
+  word-break: break-word;
+}
+
+.party-member-card-class {
+  font-size: 0.65rem;
+  color: var(--muted);
+  margin-top: 0.15rem;
+  line-height: 1.3;
+}
+
+/** Facções: filiação −3…+3 */
+.sidebar-faccoes .faction-rep-label {
+  margin: 0.35rem 0 0.2rem;
+}
+
+.sidebar-faccoes .faction-rep-row:first-child .faction-rep-label {
+  margin-top: 0;
+}
+
+.faction-rep-track {
+  height: 6px;
+  margin: 0 0 0.35rem;
+  background: #141618;
+  border: 1px solid #2a2824;
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.faction-rep-fill {
+  height: 100%;
+  min-width: 0;
+  transition: width 0.2s ease;
+}
+
+.faction-rep-fill--vigilia {
+  background: linear-gradient(90deg, #2a3a48 0%, #4a6a82 50%, #6a8aa0 100%);
+  box-shadow: 0 0 8px rgba(90, 130, 160, 0.35);
+}
+
+.faction-rep-fill--circulo {
+  background: linear-gradient(90deg, #3a2a50 0%, #6a4a8a 50%, #8a6ab0 100%);
+  box-shadow: 0 0 8px rgba(120, 90, 160, 0.35);
+}
+
+.faction-rep-fill--culto {
+  background: linear-gradient(90deg, #2a3020 0%, #4a6038 50%, #5a7848 100%);
+  box-shadow: 0 0 8px rgba(80, 100, 60, 0.35);
 }
 
 .sidebar-lore {

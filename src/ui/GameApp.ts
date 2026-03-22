@@ -5,10 +5,12 @@ import {
   enterScene,
   filterChoices,
   renderSceneBody,
+  resolveLuckCheck,
   resolveSkillCheck,
   type LoadedScene,
 } from '../engine/sceneRuntime';
 import { applyEffects } from '../engine/effects';
+import { effectiveLeadAttr, tickActiveBuffs } from '../engine/leadStats';
 import type { Choice, ClassId, GameState } from '../engine/schema';
 import {
   canCastSpell,
@@ -22,7 +24,7 @@ import { MAX_LEVEL, xpToNextLevel } from '../engine/progression';
 import type { Stance } from '../engine/schema';
 import { canWalk, renderMap } from '../campaigns/calvario/maps';
 import { SCENE_ART } from '../campaigns/calvario/ascii/art';
-import { CLASS_LABEL_PT, CLASS_LORE_PT } from '../campaigns/calvario/classHero';
+import { getHeroClassLabel, getHeroLore } from '../campaigns/calvario/classHero';
 import { formatDiceAscii } from './diceAscii';
 import { GameAudio } from './sound';
 import './styles.css';
@@ -119,9 +121,13 @@ export class GameApp {
       clearTimeout(this.timedTimer);
       this.timedTimer = null;
     }
+    const prevScene = this.state.sceneId;
     let s = applyEffects(this.state, choice.effects, this.ctx());
     if (choice.next && s.mode === 'story') {
       s = { ...s, sceneId: choice.next };
+    }
+    if (s.sceneId !== prevScene) {
+      s = tickActiveBuffs(s);
     }
     this.state = this.stabilize(s);
     this.render();
@@ -131,6 +137,14 @@ export class GameApp {
     this.unlockAudio();
     this.audio.playDice();
     const r = resolveSkillCheck(this.state, scene);
+    this.state = this.stabilize(r.state);
+    this.render();
+  }
+
+  private onLuckRoll(scene: LoadedScene): void {
+    this.unlockAudio();
+    this.audio.playDice();
+    const r = resolveLuckCheck(this.state, scene, this.registry.data);
     this.state = this.stabilize(r.state);
     this.render();
   }
@@ -331,12 +345,28 @@ export class GameApp {
       .replace(/"/g, '&quot;');
   }
 
-  private hpBarMarkup(cur: number, max: number, trackClass?: string): string {
+  /** `fill`: xp = verde (barra de XP), hp = vermelho (HP do herói) */
+  private hpBarMarkup(
+    cur: number,
+    max: number,
+    trackClass?: string,
+    fill: 'xp' | 'hp' = 'xp'
+  ): string {
     const trackCls = trackClass ? `hp-bar-track ${trackClass}` : 'hp-bar-track';
+    const fillCls = fill === 'hp' ? 'hp-bar-fill hp-bar-fill--hp' : 'hp-bar-fill hp-bar-fill--xp';
     if (max <= 0) return `<div class="${trackCls} empty"></div>`;
     const pct = Math.min(100, Math.max(0, Math.round((cur / max) * 100)));
-    return `<div class="${trackCls}" title="HP ${cur} / ${max}">
-      <div class="hp-bar-fill" style="width:${pct}%"></div>
+    const label = fill === 'hp' ? 'HP' : 'XP';
+    return `<div class="${trackCls}" title="${label} ${cur} / ${max}">
+      <div class="${fillCls}" style="width:${pct}%"></div>
+    </div>`;
+  }
+
+  private manaBarMarkup(cur: number, max: number): string {
+    if (max <= 0) return '';
+    const pct = Math.min(100, Math.max(0, Math.round((cur / max) * 100)));
+    return `<div class="mana-bar-track" title="Mana ${cur} / ${max}">
+      <div class="mana-bar-fill" style="width:${pct}%"></div>
     </div>`;
   }
 
@@ -347,6 +377,38 @@ export class GameApp {
     return `<div class="stress-bar-track" title="Stress ${cur} / ${max}">
       <div class="stress-bar-fill" style="width:${pct}%"></div>
     </div>`;
+  }
+
+  /** Cartões «Personagem #n» para todo o grupo recrutado. */
+  private partyMemberCardsMarkup(party: GameState['party']): string {
+    if (!party.length) return '';
+    const cards = party
+      .map((char, i) => {
+        const cid = char.class as ClassId;
+        const clsLabel = getHeroClassLabel(cid, char.path);
+        return `<div class="party-member-card">
+      <div class="party-member-card-label">Personagem #${i + 1}</div>
+      <div class="party-member-card-name">${this.escHtml(char.name)}</div>
+      <div class="party-member-card-class">${this.escHtml(clsLabel)}</div>
+    </div>`;
+      })
+      .join('');
+    return `<div class="party-slots">${cards}</div>`;
+  }
+
+  /** Reputação −3…+3 como barra (0% = −3, 100% = +3). */
+  private repBarMarkup(
+    label: string,
+    value: number,
+    variant: 'vigilia' | 'circulo' | 'culto'
+  ): string {
+    const pct = Math.min(100, Math.max(0, Math.round(((value + 3) / 6) * 100)));
+    return `<div class="faction-rep-row">
+    <div class="sidebar-line faction-rep-label">${label} <strong>${value}</strong></div>
+    <div class="faction-rep-track faction-rep-track--${variant}" title="${label}: ${value} (−3 a +3)">
+      <div class="faction-rep-fill faction-rep-fill--${variant}" style="width:${pct}%"></div>
+    </div>
+  </div>`;
   }
 
   private wireSidebarDetails(hud: HTMLElement): void {
@@ -377,17 +439,21 @@ export class GameApp {
     const openLore = this.sidebarSections['personagem_lore'] ? ' open' : '';
 
     const personagemBlock = (() => {
+      const slots = this.partyMemberCardsMarkup(this.state.party);
       if (!p) {
-        return `<div class="sidebar-line">Escolha uma classe na narrativa.</div>
+        return `${slots}<div class="sidebar-line">Escolha uma classe na narrativa.</div>
         <div class="sidebar-line">Nível <strong>${this.state.level}</strong> · XP <strong>${this.state.xp}</strong></div>`;
       }
       const cid = p.class as ClassId;
-      const loreHtml = CLASS_LORE_PT[cid]
+      const loreHtml = getHeroLore(cid, p.path)
         .split('\n\n')
         .map((para) => `<p>${this.escHtml(para)}</p>`)
         .join('');
-      const ca = getCharacterArmorClass(this.registry.data, p);
-      const sor = getEffectiveLuck(p, this.registry.data);
+      const ca = getCharacterArmorClass(this.registry.data, p, this.state);
+      const sor = getEffectiveLuck(p, this.registry.data, this.state);
+      const effStr = effectiveLeadAttr(this.state, p, 'str');
+      const effAgi = effectiveLeadAttr(this.state, p, 'agi');
+      const effMen = effectiveLeadAttr(this.state, p, 'mind');
       const lv = this.state.level;
       const need = lv >= MAX_LEVEL ? 0 : xpToNextLevel(lv);
       const xpLine =
@@ -395,14 +461,22 @@ export class GameApp {
           ? `<div class="sidebar-line">Nível <strong>${lv}</strong> · <em>Máx.</em></div>`
           : `<div class="sidebar-line">Nível <strong>${lv}</strong> · XP <strong>${this.state.xp}</strong> / <strong>${need}</strong></div>
         ${this.hpBarMarkup(this.state.xp, need)}`;
-      return `<div class="sidebar-line">Nome <strong>${this.escHtml(p.name)}</strong></div>
-        <div class="sidebar-line sidebar-class-line">${this.escHtml(CLASS_LABEL_PT[cid])}</div>
+      const buffHint =
+        this.state.activeBuffs.length > 0
+          ? `<div class="sidebar-line sidebar-buffs">${this.state.activeBuffs
+              .map((b) => `${b.attr.toUpperCase()} ${b.delta >= 0 ? '+' : ''}${b.delta} (${b.remainingScenes} cena(s))`)
+              .join(' · ')}</div>`
+          : '';
+      return `${slots}<div class="sidebar-line">Nome <strong>${this.escHtml(p.name)}</strong></div>
+        <div class="sidebar-line sidebar-class-line">${this.escHtml(getHeroClassLabel(cid, p.path))}</div>
         ${xpLine}
-        ${p.maxMana > 0 ? `<div class="sidebar-line">Mana <strong>${p.mana}</strong> / <strong>${p.maxMana}</strong></div>` : ''}
         <div class="sidebar-line">HP <strong>${p.hp}/${p.maxHp}</strong> · CA <strong>${ca}</strong></div>
-        ${this.hpBarMarkup(p.hp, p.maxHp, 'hp-bar-resource')}
+        ${this.hpBarMarkup(p.hp, p.maxHp, 'hp-bar-resource', 'hp')}
+        ${p.maxMana > 0 ? `<div class="sidebar-line">Mana <strong>${p.mana}</strong> / <strong>${p.maxMana}</strong></div>${this.manaBarMarkup(p.mana, p.maxMana)}` : ''}
+        <div class="sidebar-line sidebar-stress-label">Stress <strong>${p.stress}</strong> / 4</div>
         ${this.stressBarMarkup(p.stress)}
-        <div class="sidebar-line attrs">STR <strong>${p.str}</strong> · AGI <strong>${p.agi}</strong> · MEN <strong>${p.mind}</strong> · SOR <strong>${sor}</strong></div>
+        ${buffHint}
+        <div class="sidebar-line attrs">STR <strong>${effStr}</strong> · AGI <strong>${effAgi}</strong> · MEN <strong>${effMen}</strong> · SOR <strong>${sor}</strong></div>
         <details class="sidebar-collapse sidebar-lore"${openLore} data-section="personagem_lore">
           <summary class="sidebar-collapse-trigger">História do herói</summary>
           <div class="sidebar-collapse-body sidebar-lore-body">${loreHtml}</div>
@@ -434,10 +508,10 @@ export class GameApp {
       </details>
       <details class="sidebar-collapse"${openFac} data-section="faccoes">
         <summary class="sidebar-collapse-trigger">Facções</summary>
-        <div class="sidebar-collapse-body">
-          <div class="sidebar-line">Vigília <strong>${rep.vigilia}</strong></div>
-          <div class="sidebar-line">Círculo <strong>${rep.circulo}</strong></div>
-          <div class="sidebar-line">Culto <strong>${rep.culto}</strong></div>
+        <div class="sidebar-collapse-body sidebar-faccoes">
+          ${this.repBarMarkup('Vigília', rep.vigilia, 'vigilia')}
+          ${this.repBarMarkup('Círculo', rep.circulo, 'circulo')}
+          ${this.repBarMarkup('Culto', rep.culto, 'culto')}
         </div>
       </details>
     `;
@@ -518,6 +592,18 @@ export class GameApp {
       b.className = 'choice';
       b.textContent = `Rolar teste: ${scene.frontmatter.skillCheck.label ?? scene.frontmatter.skillCheck.attr} (2d6)`;
       b.addEventListener('click', () => this.onSkillRoll(scene));
+      row.appendChild(b);
+      inner.appendChild(row);
+    }
+
+    if (scene.frontmatter.luckCheck) {
+      const row = document.createElement('div');
+      row.className = 'skill-row';
+      const b = document.createElement('button');
+      b.className = 'choice';
+      const lc = scene.frontmatter.luckCheck;
+      b.textContent = `Rolar sorte: ${lc.label ?? '2d6 + mod(SOR)'} vs TN ${lc.tn}`;
+      b.addEventListener('click', () => this.onLuckRoll(scene));
       row.appendChild(b);
       inner.appendChild(row);
     }

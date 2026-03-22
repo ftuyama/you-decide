@@ -379,7 +379,7 @@ choices:
     effects:
       - { op: addRep, faction: vigilia, delta: 1 }
   - text: "Aceitar servir ao Terceiro Sino"
-    next: act4/pact_ending
+    next: act4/pact_ascent
     condition: { rep: { faction: culto, gte: 0 } }
     preview: "Corrupção e poder sombrio."
   - text: "Tentar selar o Calvário (sacrifício)"
@@ -430,17 +430,262 @@ O pulso verde **esmorece**. O mundo respira — um sopro, não um hino.
 
 **Vitória.**`);
 
-add('act4/pact_ending.md', `---
-id: act4/pact_ending
+add('act4/pact_ascent.md', `---
+id: act4/pact_ascent
 chapter: 4
 choices:
-  - text: "Fim"
+  - text: "Subir à cidade com o eco na nuca"
+    next: act4/pact_whispers
+onEnter:
+  - { op: addDiary, text: "Aceitei o Terceiro Sino. Cada degrau para cima soa como um badalar que só eu ouço." }
+---
+O **Calvário** deixa-te nas costas como um casulo húmido. O ar da rua acima cheira a chuva velha e a incenso barato — mas por baixo da pele, algo **puxa** para baixo, sempre, como se o mundo tivesse aprendido a obedecer a um ritmo novo.
+
+Um **sino** não toca. Mesmo assim, o teu pulso tenta acompanhar o que não existe.
+`);
+
+add('act4/pact_whispers.md', `---
+id: act4/pact_whispers
+chapter: 4
+choices:
+  - text: "Deixar o sussurro completar-se"
+    next: act4/pact_trial_mind
+onEnter:
+  - { op: addDiary, text: "Na cidade, as janelas fecham cedo. O silêncio não é paz — é fila." }
+---
+Entre **vigias** que fingem não ver e mercadores que desviam o olhar, uma voz — não a tua — descreve o que vais fazer antes de pensares.
+
+**"Serve."** Não é pedido. É **compasso**.
+
+O Terceiro Sino não precisa de metal: precisa de **alguém** que carregue o eco sem partir.
+`);
+
+add('act4/pact_trial_mind.md', `---
+id: act4/pact_trial_mind
+chapter: 4
+skillCheck:
+  id: pact_hold
+  attr: mind
+  tn: 10
+  successNext: act4/pact_after_mind
+  failNext: act4/pact_after_mind_fail
+  label: "Sustentar o eco do Terceiro Sino na mente"
+choices: []
+onEnter: []
+---
+O ruído do mercado **dobra** sobre si mesmo. Vês símbolos onde não há nada — ou há sempre, e só agora consegues **ler**.
+
+Para não te **partires** ao meio, precisas de uma só coisa: manter a cabeça como **câmara** do som, não como o sino.
+`);
+
+add('act4/pact_after_mind.md', `---
+id: act4/pact_after_mind
+chapter: 4
+choices:
+  - text: "Atravessar a praça sem vacilar"
+    next: act4/pact_vigil_skirmish
+onEnter: []
+---
+O eco **assenta**. Não desaparece — aprende o teu nome e cala-se por educação.
+
+Por um instante, sentes o mundo como uma **máquina** bem oleada: cada roda a girar porque **deixas**.
+`);
+
+add('act4/pact_after_mind_fail.md', `---
+id: act4/pact_after_mind_fail
+chapter: 4
+choices:
+  - text: "Atravessar na mesma — à força"
+    next: act4/pact_vigil_skirmish
+onEnter:
+  - { op: addResource, resource: corruption, delta: 1 }
+  - { op: addDiary, text: "O eco escorreu-me pela garganta. Um dente partiu-se na minha atenção — e o Terceiro Sino riu baixinho." }
+---
+O eco **morde**. Uma faísca atravessa-te os pensamentos como **ferro** em língua.
+
+Ainda serves — mas sentes o preço como **náusea** doce, como mel venenoso colado ao céu da boca.
+`);
+
+add('act4/pact_vigil_skirmish.md', `---
+id: act4/pact_vigil_skirmish
+chapter: 4
+choices:
+  - text: "Responder ao aço da Vigília"
+    effects:
+      - op: startCombat
+        encounterId: vigil_hunter_fight
+        onVictory: act4/pact_coda
+        onDefeat: act4/game_over
+onEnter:
+  - { op: addRep, faction: vigilia, delta: -1 }
+  - { op: addDiary, text: "Um caçador da Vigília reconheceu o meu passo — não o meu rosto. O pacto cheira a traição para quem jura pela luz." }
+---
+Do lado da **sombra** de um chafariz, um arqueiro da **Vigília** corta-te o caminho. Não vem com sermão — vem com **certeza**.
+
+"**Servo** não é cidadão", diz. "É **ferida** aberta na cidade."
+`);
+
+add('act4/pact_coda.md', `---
+id: act4/pact_coda
+chapter: 4
+choices:
+  - text: "Aceitar o que ficou escrito em ti"
     next: act4/epilogue_modular
 onEnter:
   - { op: addResource, resource: corruption, delta: 3 }
   - { op: addMark, mark: pact_bound }
+  - { op: grantItem, itemId: third_bell }
+  - { op: addDiary, text: "Servi ao Terceiro Sino. O anel no dedo não toca — mas o mundo aprendeu a calar quando eu respiro." }
 ---
-Serves ao **Terceiro Sino**. A cidade dorme sob um silêncio novo — húmido e obediente.`);
+O caçador cai — ou foge — e o que fica é **clareza** húmida: a cidade não dorme; **aprende** a fingir.
+
+Serves ao **Terceiro Sino**. Não como vassalo de coroa, mas como **conduto**: cada passo teu é uma batida que não precisa de torre, porque a torre **soubeste** tu.
+
+Um frio fino sobe do Calvário até à pele da cidade. As pessoas falam baixo não por medo do crime — por medo de **acertarem** no ritmo errado e o chão lhes **lembrar** quem manda no silêncio.
+
+No dedo, o **anel** pesa como um sino fechado numa caixa: **mudo** para os outros, ensurdecedor para ti.
+
+Quando a noite acaba, o dia chega **obediente**. E tu — tu ouves o quarto toque que nunca foi fundido, apenas **prometido**.
+`);
+
+add('act4/epilogue_close.md', `---
+id: act4/epilogue_close
+chapter: 4
+choices: []
+onEnter: []
+---
+O diário **fecha**. O que ficou ficou — o que perdeste, o que escolheste.
+
+*(Podes **salvar** o jogo no menu ou **recomeçar** quando quiseres.)*
+`);
+
+add('act5/frost_opening.md', `---
+id: act5/frost_opening
+chapter: 5
+artKey: frost_peaks
+choices:
+  - text: "Subir o desfiladeiro gelado"
+    next: act5/frost_ridgeline
+onEnter:
+  - { op: setChapter, chapter: 5 }
+  - { op: addResource, resource: supply, delta: -1 }
+  - { op: addDiary, text: "Ordem do culto: nas Cimeiras há um dragão que não pede permissão ao Sino. Devo trazer-lhe o silêncio — ou o contrário." }
+---
+## Cimeiras do Vento Cinzento
+
+O mapa que te deram não é de estradas — é de **sombras** sobre neve. Cada marco é um aviso: *aqui o vento corta quem fala alto*.
+
+Ainda assim, o **Terceiro Sino** ressoa na tua tempestade interior, mais alto que o vendaval. Serve-te de **bússola** ou de **âncora** — não há terceira coisa.
+
+O rumor fala de **Vetrnax**: não uma fera qualquer, mas um **fio** de geada tão antigo quanto a primeira noite em que o mundo aprendeu a ter medo do céu.
+`);
+
+add('act5/frost_ridgeline.md', `---
+id: act5/frost_ridgeline
+chapter: 5
+choices:
+  - text: "Seguir o rasto de garras na neve"
+    next: act5/frost_whelp_pack
+onEnter:
+  - { op: addDiary, text: "A neve não mente: algo grande deslizou aqui. E algo pequeno ainda espreita." }
+---
+A **cordilheira** não acolhe. O ar torna-se **lâmina**; cada respiração é um preço cobrado ao peito.
+
+Longe, um **estalido** — não trovão, mas gelo a **partir-se** sob peso impossível.
+
+Vês **pegadas** que não são humanas, e um rasto de **cristais** azuis como veias expostas na neve.
+`);
+
+add('act5/frost_whelp_pack.md', `---
+id: act5/frost_whelp_pack
+chapter: 5
+choices:
+  - text: "Lutar contra as crias de geada"
+    effects:
+      - op: startCombat
+        encounterId: frost_whelps
+        onVictory: act5/frost_lair_approach
+        onDefeat: act4/game_over
+onEnter: []
+---
+Duas **crias** rodeiam-te com fome de calor vivo. Os olhos delas são **buracos** onde o luar foi congelado.
+
+Se passares, o covil deixa de ser rumor — torna-se **porta**.
+`);
+
+add('act5/frost_lair_approach.md', `---
+id: act5/frost_lair_approach
+chapter: 5
+artKey: ice_dragon
+choices:
+  - text: "Entrar na câmara do hálito branco"
+    next: act5/fight_ice_dragon
+onEnter:
+  - { op: addDiary, text: "O covil não cheira a enxofre — cheira a tempestade adiada. Vetrnax dorme acordado." }
+---
+Uma **galeria** de gelo espelha o teu rosto em dez versões — nenhuma **inteira**.
+
+No fundo, a sombra **respira** e o ar enche-se de **agulhas** invisíveis. Duas fileiras de dentes como **serras** de inverno abrem-se num sorriso que não é para ti.
+
+É para o **céu**, que por um instante hesita em cair.
+`);
+
+add('act5/fight_ice_dragon.md', `---
+id: act5/fight_ice_dragon
+chapter: 5
+choices:
+  - text: "Primeira fase — o hálito gela o ar"
+    effects:
+      - op: startCombat
+        encounterId: boss_ice_dragon_1
+        onVictory: act5/fight_ice_dragon_2
+        onDefeat: act4/game_over
+onEnter: []
+---
+**Vetrnax** desenrola o pescoço como uma **corda** de trovão. O primeiro assalto não é dente — é **frio** que rouba o som da língua.
+`);
+
+add('act5/fight_ice_dragon_2.md', `---
+id: act5/fight_ice_dragon_2
+chapter: 5
+choices:
+  - text: "Segunda fase — partir o coração da geada"
+    effects:
+      - op: startCombat
+        encounterId: boss_ice_dragon_2
+        onVictory: act5/frost_epilogue
+        onDefeat: act4/game_over
+onEnter: []
+---
+O dragão **rasga** o próprio rugido e deixa entrar um **silêncio** pior que o barulho.
+
+No peito dele, algo **pulsar** — não sangue, mas uma **nota** presa, como um sino fundido ao osso.
+
+Se o partires, o Terceiro Sino ouve — ou **cala** para sempre.
+`);
+
+add('act5/frost_epilogue.md', `---
+id: act5/frost_epilogue
+chapter: 5
+choices:
+  - text: "Guardar este fim nas montanhas e encerrar o diário"
+    next: act4/epilogue_close
+onEnter:
+  - { op: grantItem, itemId: frost_wyrm_scale }
+  - { op: addMark, mark: vetrnax_slain }
+  - { op: addDiary, text: "Vetrnax caiu. O gelo partiu-se como vidro — e por baixo, por um instante, ouvi o Terceiro Sino a aprender um nome novo." }
+---
+**Vetrnax** desfaz-se em **cascata** de cristais. O vento, que antes mordia, agora só **sussurra** — como quem repete uma ordem sem acreditar.
+
+Na tua mão, uma **escama** tão fria que queima: troféu, relíquia, **prova** de que o culto não é o único som no mundo.
+
+O rumor das Cimeiras vai mudar. Alguns dirão que o dragão morreu; outros, que **dorme** num eco mais profundo.
+
+Tu sabes a verdade **húmida** do pacto: cada vitória é outra **corda** — e o Sino adora quem puxa sem se queixar.
+`);
+
+
+
 
 add('act4/seal_ending.md', `---
 id: act4/seal_ending
@@ -457,14 +702,23 @@ Selas o **Calvário** com preço. Cicatrizes na alma; paz frágil nas pedras.`);
 add('act4/epilogue_modular.md', `---
 id: act4/epilogue_modular
 chapter: 4
-choices: []
+choices:
+  - text: "Partir para as Cimeiras do Vento Cinzento — caçar o rumor do gelo"
+    next: act5/frost_opening
+    condition: { mark: pact_bound }
+    preview: "Capítulo 5. O culto não perdoa rivais nem altitude."
+  - text: "Apagar a luz desta memória e encerrar o diário"
+    next: act4/epilogue_close
 onEnter: []
 ---
 ## Epílogo
 
 Marcas: **{{corruption}}** de corrupção ecoam na carne.
 
-Diário final: o mundo continua — **menos** um necromante, ou **mais** um trono.`);
+Diário final: o mundo continua — **menos** um necromante, ou **mais** um trono.
+
+Se o Terceiro Sino te **nomeou**, o frio longínquo pode ser o único sítio onde o som não te alcança — ou onde **aprendes** a tocá-lo de outra forma.
+`);
 
 add('act4/game_over.md', `---
 id: act4/game_over
@@ -567,17 +821,29 @@ add('act4/sino_puzzle.md', `---
 id: act4/sino_puzzle
 chapter: 4
 choices:
-  - text: "◇ ◈ ◇ (sequência correta)"
+  - text: "◇ ◈ ◇ (sequência do Terceiro Sino)"
     next: act4/throne_gate
     effects:
       - { op: setFlag, key: sino_solved, value: true }
-  - text: "Tentativa errada"
+      - { op: addDiary, text: "As runas do sino alinharam-se — o trono ouviu antes de eu chegar." }
+  - text: "◈ ◇ ◈ (eco invertido — provar outro ritmo)"
     next: act4/throne_gate
     effects:
       - { op: addResource, resource: supply, delta: -1 }
+      - { op: addResource, resource: corruption, delta: 1 }
+      - { op: addDiary, text: "Inverti o compasso. O sino não tocou, mas algo mordeu-me por dentro." }
+  - text: "◇ ◇ ◈ (pressa — apagar e avançar)"
+    next: act4/throne_gate
+    effects:
+      - { op: addResource, resource: supply, delta: -2 }
+      - { op: addResource, resource: faith, delta: -1 }
+      - { op: addDiary, text: "Forcei a sequência. O metal lembrou-me que pressa também é erro." }
 onEnter: []
 ---
-**Sino ao Luar**: alinhas runas. O eco agradece ou morde.`);
+**Sino ao Luar**: alinhas runas numa pedra que **respira**. O eco agradece, **morde**, ou finge obediça — conforme a ordem em que tocas o silêncio.
+
+Cada padrão é uma **promessa** diferente ao trono.
+`);
 
 add('act1/breadcrumb_test.md', `---
 id: act1/breadcrumb_test

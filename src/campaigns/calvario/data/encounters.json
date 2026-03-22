@@ -35,5 +35,33 @@
     "playerAdvantage": true,
     "enemyAdvantage": false,
     "xpReward": 120
+  },
+  "vigil_hunter_fight": {
+    "id": "vigil_hunter_fight",
+    "enemies": ["vigil_hunter"],
+    "playerAdvantage": false,
+    "enemyAdvantage": false,
+    "xpReward": 45
+  },
+  "frost_whelps": {
+    "id": "frost_whelps",
+    "enemies": ["frost_whelp", "frost_whelp"],
+    "playerAdvantage": false,
+    "enemyAdvantage": false,
+    "xpReward": 35
+  },
+  "boss_ice_dragon_1": {
+    "id": "boss_ice_dragon_1",
+    "enemies": ["ice_dragon_p1"],
+    "playerAdvantage": false,
+    "enemyAdvantage": false,
+    "xpReward": 100
+  },
+  "boss_ice_dragon_2": {
+    "id": "boss_ice_dragon_2",
+    "enemies": ["ice_dragon_p2"],
+    "playerAdvantage": true,
+    "enemyAdvantage": false,
+    "xpReward": 130
   }
 }

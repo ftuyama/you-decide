@@ -1,6 +1,6 @@
 import { ContentRegistry, getCampaignIndex } from '../content/registry';
 import { createInitialState, deserializeState, serializeState } from '../engine/state';
-import { EventBus } from '../engine/eventBus';
+import { EventBus, type GameEvent } from '../engine/eventBus';
 import {
   enterScene,
   filterChoices,
@@ -44,6 +44,8 @@ export class GameApp {
   private menuOpen = false;
   /** Secções colapsáveis (recursos, faccoes, diario) — persistido em sessionStorage */
   private sidebarSections: Record<string, boolean> = {};
+  /** Buffs/debuffs/marcas — mostra banner até o jogador fechar */
+  private statusHighlightQueue: Extract<GameEvent, { type: 'statusHighlight' }>[] = [];
   /** Itens recém-adquiridos (grantItem) — mostra banner até o jogador fechar */
   private itemAcquireQueue: string[] = [];
   /** Só reproduz efeitos de som para entradas novas do log de combate */
@@ -62,6 +64,9 @@ export class GameApp {
       }
       if (ev.type === 'item.acquired') {
         this.itemAcquireQueue.push(ev.itemId);
+      }
+      if (ev.type === 'statusHighlight') {
+        this.statusHighlightQueue.push(ev);
       }
     });
     this.state = createInitialState(idx.entryScene);
@@ -117,6 +122,7 @@ export class GameApp {
     }
     const sid = this.state.sceneId;
     if (sid.includes('vigilia_camp') || sid.includes('acamp')) return 'camp';
+    if (sid.includes('act5') || sid.includes('frost')) return 'camp';
     return 'explore';
   }
 
@@ -668,6 +674,37 @@ export class GameApp {
     bc.className = 'breadcrumb';
     bc.textContent = `📁 campaigns/calvario/scenes/${scene.id}.md`;
     inner.appendChild(bc);
+
+    if (this.statusHighlightQueue.length > 0) {
+      const wrap = document.createElement('div');
+      wrap.className = 'status-highlight-stack';
+      for (const h of this.statusHighlightQueue) {
+        const block = document.createElement('div');
+        block.className = `status-highlight-banner status-highlight-banner--${h.variant}`;
+        const titleEl = document.createElement('div');
+        titleEl.className = 'status-highlight-title';
+        titleEl.textContent = h.title;
+        block.appendChild(titleEl);
+        if (h.subtitle) {
+          const sub = document.createElement('div');
+          sub.className = 'status-highlight-subtitle';
+          sub.textContent = h.subtitle;
+          block.appendChild(sub);
+        }
+        wrap.appendChild(block);
+      }
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'status-highlight-dismiss';
+      btn.textContent = 'Continuar';
+      btn.addEventListener('click', () => {
+        this.statusHighlightQueue = [];
+        this.audio.playUiClick();
+        this.render();
+      });
+      wrap.appendChild(btn);
+      inner.appendChild(wrap);
+    }
 
     if (this.itemAcquireQueue.length > 0) {
       const unique = [...new Set(this.itemAcquireQueue)];

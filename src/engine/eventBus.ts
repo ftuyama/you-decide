@@ -6,7 +6,13 @@ export type GameEvent =
   | { type: 'effect.applied'; op: string }
   | { type: 'xp.gained'; amount: number }
   | { type: 'level.up'; level: number }
-  | { type: 'item.acquired'; itemId: string };
+  | { type: 'item.acquired'; itemId: string }
+  | {
+      type: 'statusHighlight';
+      variant: 'good' | 'bad' | 'neutral';
+      title: string;
+      subtitle?: string;
+    };
 
 type Listener = (e: GameEvent) => void;
 

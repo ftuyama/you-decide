@@ -7,7 +7,7 @@ choices:
     effects:
       - { op: addRep, faction: vigilia, delta: 1 }
   - text: "Aceitar servir ao Terceiro Sino"
-    next: act4/pact_ending
+    next: act4/pact_ascent
     condition: { rep: { faction: culto, gte: 0 } }
     preview: "Corrupção e poder sombrio."
   - text: "Tentar selar o Calvário (sacrifício)"

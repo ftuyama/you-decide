@@ -5,7 +5,7 @@ import { beginEncounter } from './combat';
 import type { GameData } from './gameData';
 import { addXp } from './progression';
 import { createInitialState, createPlayerCharacter } from './state';
-import { DEFAULT_HERO_NAME } from '../campaigns/calvario/classHero';
+import { DEFAULT_HERO_NAME, getHeroClassLabel } from '../campaigns/calvario/classHero';
 import campaignIndex from '../campaigns/calvario/index.json';
 import { clampLeadStat, tickActiveBuffs, type LeadStatAttr } from './leadStats';
 
@@ -13,6 +13,29 @@ export { tickActiveBuffs };
 
 function clampRep(n: number): number {
   return Math.max(-3, Math.min(3, n));
+}
+
+const ATTR_LABEL: Record<LeadStatAttr, string> = {
+  str: 'STR',
+  agi: 'AGI',
+  mind: 'MEN',
+  luck: 'SOR',
+};
+
+function humanizeMarkId(mark: string): string {
+  return mark
+    .split('_')
+    .map((w) => (w.length ? w[0]!.toUpperCase() + w.slice(1) : w))
+    .join(' ');
+}
+
+/** Títulos amigáveis para marcas de campanha (fallback: humanizeMarkId). */
+const MARK_TITLE_PT: Partial<Record<string, string>> = {
+  wound_mire_leg: 'Mordida do poço',
+};
+
+function titleForMark(mark: string): string {
+  return MARK_TITLE_PT[mark] ?? humanizeMarkId(mark);
 }
 
 export function applyEffects(
@@ -41,9 +64,18 @@ function applyOne(
       const cur = !!state.flags[e.key];
       return { ...state, flags: { ...state.flags, [e.key]: !cur } };
     }
-    case 'addMark':
+    case 'addMark': {
       if (state.marks.includes(e.mark)) return state;
+      const isBad =
+        /wound|curse|maled|bleed|fract|broken|rot|po[cç]o|mire|hex/i.test(e.mark);
+      bus.emit({
+        type: 'statusHighlight',
+        variant: isBad ? 'bad' : 'neutral',
+        title: titleForMark(e.mark),
+        subtitle: 'Nova marca no personagem',
+      });
       return { ...state, marks: [...state.marks, e.mark] };
+    }
     case 'removeMark':
       return { ...state, marks: state.marks.filter((m) => m !== e.mark) };
     case 'addRep': {
@@ -176,6 +208,14 @@ function applyOne(
     case 'setPath': {
       const lead = state.party[0];
       if (!lead) return state;
+      if (e.path) {
+        bus.emit({
+          type: 'statusHighlight',
+          variant: 'neutral',
+          title: getHeroClassLabel(lead.class, e.path),
+          subtitle: 'Novo arquétipo narrativo',
+        });
+      }
       return {
         ...state,
         party: state.party.map((p, i) => (i === 0 ? { ...p, path: e.path } : p)),
@@ -187,6 +227,19 @@ function applyOne(
       const attr = e.attr as LeadStatAttr;
       const cur = lead[attr];
       const nextVal = clampLeadStat(attr, cur + e.delta);
+      const actual = nextVal - cur;
+      if (actual !== 0) {
+        const label = ATTR_LABEL[attr];
+        bus.emit({
+          type: 'statusHighlight',
+          variant: actual < 0 ? 'bad' : 'good',
+          title: `${label} ${actual > 0 ? '+' : ''}${actual}`,
+          subtitle:
+            actual < 0
+              ? 'Efeito permanente no personagem'
+              : 'Melhoria permanente no personagem',
+        });
+      }
       return {
         ...state,
         party: state.party.map((p, i) => (i === 0 ? { ...p, [attr]: nextVal } : p)),
@@ -194,6 +247,13 @@ function applyOne(
     }
     case 'grantTemporaryBuff': {
       const id = `buff_${ctx.sceneId}_${state.rngSeed}_${e.attr}_${state.activeBuffs.length}`;
+      const label = ATTR_LABEL[e.attr as LeadStatAttr];
+      bus.emit({
+        type: 'statusHighlight',
+        variant: e.delta >= 0 ? 'good' : 'bad',
+        title: `${label} ${e.delta >= 0 ? '+' : ''}${e.delta} · ${e.remainingScenes} cena(s)`,
+        subtitle: 'Buff temporário (decresce ao mudar de cena)',
+      });
       return {
         ...state,
         activeBuffs: [

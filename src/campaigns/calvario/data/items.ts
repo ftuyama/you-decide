@@ -148,4 +148,22 @@ export const items: Record<string, ItemDef> = {
       '        `-----´',
     ].join('\n'),
   }),
+  frost_wyrm_scale: z({
+    id: 'frost_wyrm_scale',
+    name: 'Escama de Vetrnax',
+    slot: 'relic',
+    bonusMind: 1,
+    bonusLuck: 1,
+    armor: 1,
+    sprite: [
+      '      ._________.',
+      '     /~~~~~~~~~~~\\',
+      '    |~*~*~*~*~*~*~|',
+      '    | * prisma * |  gelo',
+      '    |~*~*~*~*~*~*~|  eterno',
+      '     \\___________/',
+      '        \\  |  /',
+      '         `---´',
+    ].join('\n'),
+  }),
 };

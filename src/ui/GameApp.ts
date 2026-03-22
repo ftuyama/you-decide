@@ -529,19 +529,58 @@ export class GameApp {
     const right = document.createElement('div');
     const dice = document.createElement('div');
     dice.className = 'dice-panel';
-    dice.innerHTML = '<strong>Dados & log</strong>';
-    for (const entry of c.log.slice(-24)) {
-      const line = document.createElement('div');
-      line.className = `entry ${entry.kind}`;
-      let t = entry.message;
+    const hdr = document.createElement('div');
+    hdr.className = 'dice-panel-header';
+    hdr.textContent = 'Dados & log de batalha';
+    dice.appendChild(hdr);
+
+    const logScroll = document.createElement('div');
+    logScroll.className = 'combat-log-scroll';
+
+    for (const entry of c.log.slice(-30)) {
+      const wrap = document.createElement('div');
+      wrap.className = `combat-log-entry combat-log-${entry.kind}`;
+
+      const msg = document.createElement('div');
+      msg.className = 'combat-log-msg';
+      msg.textContent = entry.message;
+      wrap.appendChild(msg);
+
       if (entry.dice?.length) {
-        t += ` · [${entry.dice.join('][')}]`;
+        const pre = document.createElement('pre');
+        pre.className = 'dice-ascii-block';
+        pre.textContent = formatDiceAscii(entry.dice);
+        wrap.appendChild(pre);
+        const metaParts: string[] = [];
+        if (entry.modifier !== undefined) {
+          metaParts.push(`mod ${entry.modifier >= 0 ? '+' : ''}${entry.modifier}`);
+        }
+        if (entry.final !== undefined) {
+          metaParts.push(`total ${entry.final}`);
+        }
+        if (metaParts.length) {
+          const meta = document.createElement('div');
+          meta.className = 'combat-log-meta';
+          meta.textContent = metaParts.join(' · ');
+          wrap.appendChild(meta);
+        }
+      } else if (entry.modifier !== undefined || entry.final !== undefined) {
+        const metaParts: string[] = [];
+        if (entry.modifier !== undefined) {
+          metaParts.push(`mod ${entry.modifier >= 0 ? '+' : ''}${entry.modifier}`);
+        }
+        if (entry.final !== undefined) {
+          metaParts.push(`total ${entry.final}`);
+        }
+        const meta = document.createElement('div');
+        meta.className = 'combat-log-meta';
+        meta.textContent = metaParts.join(' · ');
+        wrap.appendChild(meta);
       }
-      if (entry.modifier !== undefined) t += ` mod ${entry.modifier >= 0 ? '+' : ''}${entry.modifier}`;
-      if (entry.final !== undefined) t += ` → ${entry.final}`;
-      line.textContent = t;
-      dice.appendChild(line);
+
+      logScroll.appendChild(wrap);
     }
+    dice.appendChild(logScroll);
     right.appendChild(dice);
     layout.appendChild(right);
     inner.appendChild(layout);

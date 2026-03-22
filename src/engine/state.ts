@@ -20,7 +20,7 @@ export function createInitialState(entryScene: string, seed?: number): GameState
     reputation: { ...defaultRep },
     flags: {},
     marks: [],
-    resources: { supply: 5, faith: 3, corruption: 0 },
+    resources: { supply: 5, faith: 3, corruption: 0, gold: 8 },
     combat: null,
     mode: 'story',
     modal: null,
@@ -115,8 +115,16 @@ export function deserializeState(json: string): GameState {
     console.warn('Save de versão diferente; tentando carregar mesmo assim.');
   }
   const rawParty = (o as GameState).party ?? [];
+  const rawRes = (o as GameState).resources;
+  const resources = {
+    supply: typeof rawRes?.supply === 'number' ? rawRes.supply : 5,
+    faith: typeof rawRes?.faith === 'number' ? rawRes.faith : 3,
+    corruption: typeof rawRes?.corruption === 'number' ? rawRes.corruption : 0,
+    gold: typeof rawRes?.gold === 'number' ? rawRes.gold : 0,
+  };
   const merged: GameState = {
     ...(o as GameState),
+    resources,
     level: typeof (o as GameState).level === 'number' ? (o as GameState).level : 1,
     xp: typeof (o as GameState).xp === 'number' ? (o as GameState).xp : 0,
     lastCombatXpGain: null,

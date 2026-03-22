@@ -39,6 +39,11 @@ export function evaluateCondition(cond: Condition | undefined, state: GameState)
       if (r.mana.gte !== undefined && m < r.mana.gte) return false;
       if (r.mana.lte !== undefined && m > r.mana.lte) return false;
     }
+    if (r.gold) {
+      const g = state.resources.gold ?? 0;
+      if (r.gold.gte !== undefined && g < r.gold.gte) return false;
+      if (r.gold.lte !== undefined && g > r.gold.lte) return false;
+    }
     return true;
   }
   if ('class' in cond) {

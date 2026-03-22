@@ -21,6 +21,7 @@ export function injectText(text: string, state: GameState): string {
     .replace(/\{\{chapter\}\}/g, String(state.chapter))
     .replace(/\{\{corruption\}\}/g, String(state.resources.corruption))
     .replace(/\{\{supply\}\}/g, String(state.resources.supply))
+    .replace(/\{\{gold\}\}/g, String(state.resources.gold ?? 0))
     .replace(/\{\{faith\}\}/g, String(state.resources.faith))
     .replace(/\{\{level\}\}/g, String(state.level))
     .replace(/\{\{xp\}\}/g, String(state.xp))

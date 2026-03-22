@@ -4,11 +4,12 @@ chapter: 2
 artKey: merchant
 title: Mercador sem rosto
 choices:
-  - text: "Aceitar o mapa rasgado (−1 suprimento)"
+  - text: "Aceitar o mapa rasgado (−1 ouro)"
     next: act2/hub_catacomb
+    condition: { resource: { gold: { gte: 1 } } }
     effects:
       - { op: grantItem, itemId: rumor_map }
-      - { op: addResource, resource: supply, delta: -1 }
+      - { op: addResource, resource: gold, delta: -1 }
   - text: "Recusar educadamente"
     next: act2/hub_catacomb
   - text: "Perguntar de onde veio o mapa"

@@ -11,7 +11,7 @@ import {
 } from '../engine/sceneRuntime';
 import { applyEffects } from '../engine/effects';
 import { effectiveLeadAttr, tickActiveBuffs } from '../engine/leadStats';
-import type { Choice, ClassId, GameState } from '../engine/schema';
+import type { Character, Choice, ClassId, GameState } from '../engine/schema';
 import {
   canCastSpell,
   executePlayerTurn,
@@ -19,6 +19,8 @@ import {
   fleeCombat,
   getCharacterArmorClass,
   getEffectiveLuck,
+  getEquippedArmorPoints,
+  sumEquippedItemBonuses,
 } from '../engine/combat';
 import { MAX_LEVEL, xpToNextLevel } from '../engine/progression';
 import type { Stance } from '../engine/schema';
@@ -379,6 +381,42 @@ export class GameApp {
     </div>`;
   }
 
+  /** Bônus só de equipamento; omitido se 0. */
+  private statBonusParen(n: number): string {
+    if (n === 0) return '';
+    const sign = n > 0 ? '+' : '';
+    return ` <span class="stat-build-bonus">(${sign}${n})</span>`;
+  }
+
+  /** CA, STR, AGI, MEN, SOR com totais e (+X) da build. */
+  private formatStatAttrsLineHtml(c: Character, opts?: { compact?: boolean }): string {
+    const data = this.registry.data;
+    const state = this.state;
+    const eq = sumEquippedItemBonuses(data, c);
+    const str = effectiveLeadAttr(state, c, 'str') + eq.str;
+    const agi = effectiveLeadAttr(state, c, 'agi') + eq.agi;
+    const men = effectiveLeadAttr(state, c, 'mind') + eq.mind;
+    const sor = getEffectiveLuck(c, data, state);
+    const ca = getCharacterArmorClass(data, c, state);
+    const caEq = getEquippedArmorPoints(data, c);
+    const cls = opts?.compact ? 'sidebar-line attrs party-member-card-stats' : 'sidebar-line attrs';
+    return `<div class="${cls}">CA <strong>${ca}</strong>${this.statBonusParen(caEq)} · STR <strong>${str}</strong>${this.statBonusParen(eq.str)} · AGI <strong>${agi}</strong>${this.statBonusParen(eq.agi)} · MEN <strong>${men}</strong>${this.statBonusParen(eq.mind)} · SOR <strong>${sor}</strong>${this.statBonusParen(eq.luck)}</div>`;
+  }
+
+  private inventoryMarkup(): string {
+    const inv = this.state.inventory;
+    if (!inv.length) {
+      return `<div class="sidebar-line inventory-empty">Nenhum item ainda.</div>`;
+    }
+    return inv
+      .map((id) => {
+        const def = this.registry.data.items[id];
+        const label = def?.name ?? id;
+        return `<div class="sidebar-line inventory-item">· ${this.escHtml(label)}</div>`;
+      })
+      .join('');
+  }
+
   /** Cartões «Personagem #n» para todo o grupo recrutado. */
   private partyMemberCardsMarkup(party: GameState['party']): string {
     if (!party.length) return '';
@@ -386,10 +424,12 @@ export class GameApp {
       .map((char, i) => {
         const cid = char.class as ClassId;
         const clsLabel = getHeroClassLabel(cid, char.path);
+        const stats = this.formatStatAttrsLineHtml(char, { compact: true });
         return `<div class="party-member-card">
       <div class="party-member-card-label">Personagem #${i + 1}</div>
       <div class="party-member-card-name">${this.escHtml(char.name)}</div>
       <div class="party-member-card-class">${this.escHtml(clsLabel)}</div>
+      ${stats}
     </div>`;
       })
       .join('');
@@ -430,10 +470,12 @@ export class GameApp {
     const hud = document.createElement('div');
     hud.className = 'sidebar-inner';
     const r = this.state.resources;
+    const gold = r.gold ?? 0;
     const p = this.state.party[0];
     const rep = this.state.reputation;
 
     const openRec = this.sidebarSections['recursos'] ? ' open' : '';
+    const openInv = this.sidebarSections['inventario'] ? ' open' : '';
     const openFac = this.sidebarSections['faccoes'] ? ' open' : '';
     const openDiary = this.sidebarSections['diario'] ? ' open' : '';
     const openLore = this.sidebarSections['personagem_lore'] ? ' open' : '';
@@ -449,11 +491,6 @@ export class GameApp {
         .split('\n\n')
         .map((para) => `<p>${this.escHtml(para)}</p>`)
         .join('');
-      const ca = getCharacterArmorClass(this.registry.data, p, this.state);
-      const sor = getEffectiveLuck(p, this.registry.data, this.state);
-      const effStr = effectiveLeadAttr(this.state, p, 'str');
-      const effAgi = effectiveLeadAttr(this.state, p, 'agi');
-      const effMen = effectiveLeadAttr(this.state, p, 'mind');
       const lv = this.state.level;
       const need = lv >= MAX_LEVEL ? 0 : xpToNextLevel(lv);
       const xpLine =
@@ -470,13 +507,13 @@ export class GameApp {
       return `${slots}<div class="sidebar-line">Nome <strong>${this.escHtml(p.name)}</strong></div>
         <div class="sidebar-line sidebar-class-line">${this.escHtml(getHeroClassLabel(cid, p.path))}</div>
         ${xpLine}
-        <div class="sidebar-line">HP <strong>${p.hp}/${p.maxHp}</strong> · CA <strong>${ca}</strong></div>
+        <div class="sidebar-line">HP <strong>${p.hp}/${p.maxHp}</strong></div>
         ${this.hpBarMarkup(p.hp, p.maxHp, 'hp-bar-resource', 'hp')}
         ${p.maxMana > 0 ? `<div class="sidebar-line">Mana <strong>${p.mana}</strong> / <strong>${p.maxMana}</strong></div>${this.manaBarMarkup(p.mana, p.maxMana)}` : ''}
         <div class="sidebar-line sidebar-stress-label">Stress <strong>${p.stress}</strong> / 4</div>
         ${this.stressBarMarkup(p.stress)}
         ${buffHint}
-        <div class="sidebar-line attrs">STR <strong>${effStr}</strong> · AGI <strong>${effAgi}</strong> · MEN <strong>${effMen}</strong> · SOR <strong>${sor}</strong></div>
+        ${this.formatStatAttrsLineHtml(p)}
         <details class="sidebar-collapse sidebar-lore"${openLore} data-section="personagem_lore">
           <summary class="sidebar-collapse-trigger">História do herói</summary>
           <div class="sidebar-collapse-body sidebar-lore-body">${loreHtml}</div>
@@ -501,9 +538,16 @@ export class GameApp {
       <details class="sidebar-collapse"${openRec} data-section="recursos">
         <summary class="sidebar-collapse-trigger">Recursos</summary>
         <div class="sidebar-collapse-body">
-          <div class="sidebar-line">Suprimento <strong>${r.supply}</strong></div>
+          <div class="sidebar-line">Gold <strong>${gold}</strong></div>
+          <div class="sidebar-line">Suprimento <strong>${r.supply}</strong> <span class="sidebar-resource-hint">(mapa, acampamento)</span></div>
           <div class="sidebar-line">Fé <strong>${r.faith}</strong></div>
           <div class="sidebar-line">Corrupção <strong>${r.corruption}</strong></div>
+        </div>
+      </details>
+      <details class="sidebar-collapse"${openInv} data-section="inventario">
+        <summary class="sidebar-collapse-trigger">Inventário</summary>
+        <div class="sidebar-collapse-body sidebar-inventory">
+          ${this.inventoryMarkup()}
         </div>
       </details>
       <details class="sidebar-collapse"${openFac} data-section="faccoes">

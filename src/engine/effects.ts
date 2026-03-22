@@ -64,9 +64,26 @@ function applyOne(
       };
     case 'addResource': {
       const r = { ...state.resources };
-      const k = e.resource;
-      r[k] = Math.max(0, Math.min(10, r[k] + e.delta));
+      if (e.resource === 'gold') {
+        r.gold = Math.max(0, Math.min(999, (r.gold ?? 0) + e.delta));
+      } else if (e.resource === 'supply') {
+        r.supply = Math.max(0, Math.min(10, r.supply + e.delta));
+      } else if (e.resource === 'faith') {
+        r.faith = Math.max(0, Math.min(5, r.faith + e.delta));
+      } else {
+        r.corruption = Math.max(0, Math.min(5, r.corruption + e.delta));
+      }
       return { ...state, resources: r };
+    }
+    case 'campRest': {
+      if (state.resources.supply < 1) return state;
+      const res = { ...state.resources, supply: state.resources.supply - 1 };
+      const party = state.party.map((p) => ({
+        ...p,
+        hp: p.maxHp,
+        stress: Math.max(0, p.stress - 1),
+      }));
+      return { ...state, resources: res, party };
     }
     case 'setChapter':
       return { ...state, chapter: e.chapter };

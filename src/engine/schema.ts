@@ -42,6 +42,7 @@ export const ConditionSchema: z.ZodType<Condition> = z.lazy(() =>
           .object({ gte: z.number().optional(), lte: z.number().optional() })
           .optional(),
         mana: z.object({ gte: z.number().optional(), lte: z.number().optional() }).optional(),
+        gold: z.object({ gte: z.number().optional(), lte: z.number().optional() }).optional(),
       }),
     }),
     z.object({ class: ClassIdSchema }),
@@ -68,6 +69,7 @@ export type Condition =
         faith?: { gte?: number; lte?: number };
         corruption?: { gte?: number; lte?: number };
         mana?: { gte?: number; lte?: number };
+        gold?: { gte?: number; lte?: number };
       };
     }
   | { class: ClassId }
@@ -88,9 +90,10 @@ export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
   }),
   z.object({
     op: z.literal('addResource'),
-    resource: z.enum(['supply', 'faith', 'corruption']),
+    resource: z.enum(['supply', 'faith', 'corruption', 'gold']),
     delta: z.number().int(),
   }),
+  z.object({ op: z.literal('campRest') }),
   z.object({ op: z.literal('setChapter'), chapter: z.number().int().min(1) }),
   z.object({ op: z.literal('setNarrativeTier'), tier: z.number().int().min(1).max(4) }),
   z.object({ op: z.literal('grantItem'), itemId: z.string() }),
@@ -133,7 +136,8 @@ export type Effect =
   | { op: 'removeMark'; mark: string }
   | { op: 'addRep'; faction: FactionId; delta: number }
   | { op: 'setRep'; faction: FactionId; value: number }
-  | { op: 'addResource'; resource: 'supply' | 'faith' | 'corruption'; delta: number }
+  | { op: 'addResource'; resource: 'supply' | 'faith' | 'corruption' | 'gold'; delta: number }
+  | { op: 'campRest' }
   | { op: 'setChapter'; chapter: number }
   | { op: 'setNarrativeTier'; tier: number }
   | { op: 'grantItem'; itemId: string }
@@ -454,6 +458,7 @@ export const GameStateSchema = z.object({
     supply: z.number().int().min(0).max(10).default(5),
     faith: z.number().int().min(0).max(5).default(3),
     corruption: z.number().int().min(0).max(5).default(0),
+    gold: z.number().int().min(0).max(999).default(0),
   }),
   combat: CombatStateSchema.nullable(),
   mode: AppModeSchema.default('story'),

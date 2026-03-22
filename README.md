@@ -17,6 +17,10 @@ O **pulso verde** não cessa — sobe pela garganta da cidade como vómito de lu
 Seja por honra, ganância ou desespero, o primeiro passo é sempre o mesmo: **descer**.
 
 ```
+////////////////////////////////////////////////////////////////
+///// # /// # /// # /// # /// # /// # /// # /// # /// # /// # ///
+////////////////////////////////////////////////////////////////
+
                         *     .        *       .
            /\      /\       /\       /\       /\
       /\  //\  /\ //\  /\ //\  /\ //\  /\ //\
@@ -31,6 +35,7 @@ Seja por honra, ganância ou desespero, o primeiro passo é sempre o mesmo: **de
      |     |' lua  |'     |'verde|'     |     /     \
      |     |  · ·  |     |  · ·  |     |    |       |
      '---'         '---'         '---'         '...'
+||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 oooooooooooooooooooooooooooooooooooooooooooooooooooooo
    ░░ pedra húmida — o pulso sobe da garganta da cidade ░░
 ```

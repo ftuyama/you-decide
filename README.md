@@ -4,7 +4,7 @@
 
 **Um jogo de texto onde cada clique pesa como uma lâmina.**
 
-[Como jogar](#como-jogar) · [O que te espera](#o-que-te-espera-lá-embaixo) · [Dicas](#dicas-de-sobrevivência)
+[Jogar online](#jogar-online-github-pages) · [Como jogar](#como-jogar) · [O que te espera](#o-que-te-espera-lá-embaixo) · [Dicas](#dicas-de-sobrevivência)
 
 </div>
 
@@ -31,6 +31,18 @@ Seja por honra, ganância ou desespero, o primeiro passo é sempre o mesmo: **de
 ```
 
 *Arte ASCII usada no jogo — trecho da abertura.*
+
+---
+
+## Jogar online (GitHub Pages)
+
+O projeto está preparado para **GitHub Pages** (URLs relativas na build; não dependes do nome do repositório para os assets).
+
+1. No GitHub: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+2. Faz push para `main` (ou `master`). O workflow [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) corre `npm ci`, `npm run build` e publica a pasta `dist`.
+3. O jogo fica disponível em `https://<teu-utilizador>.github.io/<nome-do-repo>/` (ex.: `https://ftuyama.github.io/you-decide/`).
+
+Se o repositório tiver outro nome, o mesmo URL relativo continua a funcionar — não é preciso alterar o `base` do Vite.
 
 ---
 

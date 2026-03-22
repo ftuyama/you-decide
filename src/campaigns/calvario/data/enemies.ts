@@ -12,12 +12,16 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 0,
     type: 'normal',
     armorChips: 0,
-    sprite: `  )\\.(
- (')(')
-  /  \\`,
-    spriteWounded: `  )\\.(
- (x)(')
-  /  \\`,
+    sprite: ` ∿∿ cano ∿∿
+  )\\.(
+ (')(')  olhos
+  /  \\   rubros
+ ∿∿∿∿∿∿∿∿∿∿∿`,
+    spriteWounded: ` ∿∿ cano ∿∿
+  )\\.(
+ (x)(')  fúria
+  /  \\
+ ∿∿∿∿∿∿∿∿∿∿∿`,
   },
   skeleton: {
     id: 'skeleton',
@@ -30,14 +34,18 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 1,
     type: 'undead',
     armorChips: 0,
-    sprite: ` .-===-.
- | o o |
- |  <  |
- /|___|\\`,
-    spriteWounded: ` .-===-.
- | @ @ |
- |  ~  |
- /|___|\\`,
+    sprite: `  .-===-.
+ | o   o |  elmo
+ |   <   |  partido
+ |___|___|
+ /    |    \\
+~~   / \\   ~~`,
+    spriteWounded: `  .-===-.
+ | @   @ |  racha
+ |   ~   |  no crânio
+ |___|___|
+ /    |    \\
+~~   / \\   ~~`,
   },
   cultist: {
     id: 'cultist',
@@ -50,10 +58,11 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 0,
     type: 'cultist',
     armorChips: 0,
-    sprite: `  /\\\\
- | ██ |
- | ^^ |
-  \\__/`,
+    sprite: `  ╱‾‾‾╲
+ | ███ |  capuz
+ | ^ ^ |  bordado
+ | ██  |
+  ╲___╱`,
   },
   stone_guard: {
     id: 'stone_guard',
@@ -66,10 +75,11 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 3,
     type: 'armored',
     armorChips: 3,
-    sprite: ` ███████
- ██ ◆ ██
- ███████
- ▀▀▀▀▀▀▀`,
+    sprite: ` ▄███████▄
+ ███ ◆ ███  runas
+ █████████  apagadas
+ █████████
+ ▀▀▀▀▀▀▀▀▀`,
   },
   morvayn_p1: {
     id: 'morvayn_p1',
@@ -82,16 +92,20 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 2,
     type: 'cultist',
     armorChips: 0,
-    sprite: `  .:::.
- ╔|☠|╗
- ║ ◊ ║
- ╚═╦═╝
-  ║ ║`,
-    spriteWounded: `  .:::.
- ╔|☠|╗
- ║ ░ ║
- ╚═╦═╝
-  ║ ║`,
+    sprite: `   .:::.
+  ╔|☠|╗   manto
+  ║ ◊ ║   de noite
+  ║ ~ ║   e osso
+  ╚═╦═╝
+   ║ ║
+  ╱   ╲`,
+    spriteWounded: `   .:::.
+  ╔|☠|╗   ferido
+  ║ ░ ║   o véu
+  ║ ~ ║   verde
+  ╚═╦═╝
+   ║ ║
+  ╱   ╲`,
   },
   morvayn_p2: {
     id: 'morvayn_p2',
@@ -104,9 +118,10 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 3,
     type: 'armored',
     armorChips: 2,
-    sprite: ` ▄█████▄
-██☠││☠██
-▀█████▀
- ▀▀▀▀▀`,
+    sprite: ` ▄█████████▄
+██☠││││☠██  trono
+███████████  funde-se
+▀█████████▀  à carne
+ ▀▀▀▀▀▀▀▀▀`,
   },
 };

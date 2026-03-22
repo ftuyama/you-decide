@@ -9,11 +9,13 @@ import {
   type LoadedScene,
 } from '../engine/sceneRuntime';
 import { applyEffects } from '../engine/effects';
-import type { Choice, GameState } from '../engine/schema';
+import type { Choice, ClassId, GameState } from '../engine/schema';
 import { executePlayerTurn, fleeCombat } from '../engine/combat';
+import { MAX_LEVEL, xpToNextLevel } from '../engine/progression';
 import type { Stance } from '../engine/schema';
 import { canWalk, renderMap } from '../campaigns/calvario/maps';
 import { SCENE_ART } from '../campaigns/calvario/ascii/art';
+import { CLASS_LABEL_PT, CLASS_LORE_PT } from '../campaigns/calvario/classHero';
 import { formatDiceAscii } from './diceAscii';
 import { GameAudio } from './sound';
 import './styles.css';
@@ -293,6 +295,7 @@ export class GameApp {
     main.className = 'story-shell';
 
     if (this.state.mode === 'combat') {
+      main.classList.add('main--combat');
       this.renderCombatInto(main);
     } else {
       const scene = this.registry.getScene(this.state.sceneId);
@@ -308,6 +311,14 @@ export class GameApp {
     frame.appendChild(bodyRow);
 
     this.root.appendChild(frame);
+  }
+
+  private escHtml(s: string): string {
+    return s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   }
 
   private hpBarMarkup(cur: number, max: number): string {
@@ -343,6 +354,36 @@ export class GameApp {
     const openRec = this.sidebarSections['recursos'] ? ' open' : '';
     const openFac = this.sidebarSections['faccoes'] ? ' open' : '';
     const openDiary = this.sidebarSections['diario'] ? ' open' : '';
+    const openLore = this.sidebarSections['personagem_lore'] ? ' open' : '';
+
+    const personagemBlock = (() => {
+      if (!p) {
+        return `<div class="sidebar-line">Escolha uma classe na narrativa.</div>
+        <div class="sidebar-line">Nível <strong>${this.state.level}</strong> · XP <strong>${this.state.xp}</strong></div>`;
+      }
+      const cid = p.class as ClassId;
+      const loreHtml = CLASS_LORE_PT[cid]
+        .split('\n\n')
+        .map((para) => `<p>${this.escHtml(para)}</p>`)
+        .join('');
+      const lv = this.state.level;
+      const need = lv >= MAX_LEVEL ? 0 : xpToNextLevel(lv);
+      const xpLine =
+        lv >= MAX_LEVEL
+          ? `<div class="sidebar-line">Nível <strong>${lv}</strong> · <em>Máx.</em></div>`
+          : `<div class="sidebar-line">Nível <strong>${lv}</strong> · XP <strong>${this.state.xp}</strong> / <strong>${need}</strong></div>
+        ${this.hpBarMarkup(this.state.xp, need)}`;
+      return `<div class="sidebar-line">Nome <strong>${this.escHtml(p.name)}</strong></div>
+        <div class="sidebar-line sidebar-class-line">${this.escHtml(CLASS_LABEL_PT[cid])}</div>
+        ${xpLine}
+        <details class="sidebar-collapse sidebar-lore"${openLore} data-section="personagem_lore">
+          <summary class="sidebar-collapse-trigger">História do herói</summary>
+          <div class="sidebar-collapse-body sidebar-lore-body">${loreHtml}</div>
+        </details>
+        <div class="sidebar-line">HP <strong>${p.hp}/${p.maxHp}</strong> · Stress <strong>${p.stress}</strong></div>
+        ${this.hpBarMarkup(p.hp, p.maxHp)}
+        <div class="sidebar-line attrs">STR <strong>${p.str}</strong> · AGI <strong>${p.agi}</strong> · MEN <strong>${p.mind}</strong></div>`;
+    })();
 
     hud.innerHTML = `
       <h2 class="sidebar-title">Herói</h2>
@@ -372,14 +413,7 @@ export class GameApp {
       <div class="sidebar-static">
         <div class="sidebar-static-title">Personagem</div>
         <div class="sidebar-static-body sidebar-stats">
-          ${
-            p
-              ? `<div class="sidebar-line">Nome <strong>${p.name}</strong></div>
-                 <div class="sidebar-line">HP <strong>${p.hp}/${p.maxHp}</strong> · Stress <strong>${p.stress}</strong></div>
-                 ${this.hpBarMarkup(p.hp, p.maxHp)}
-                 <div class="sidebar-line attrs">STR <strong>${p.str}</strong> · AGI <strong>${p.agi}</strong> · MEN <strong>${p.mind}</strong></div>`
-              : '<div class="sidebar-line">Escolha uma classe na narrativa.</div>'
-          }
+          ${personagemBlock}
         </div>
       </div>
     `;
@@ -546,14 +580,30 @@ export class GameApp {
     const logScroll = document.createElement('div');
     logScroll.className = 'combat-log-scroll';
 
-    for (const entry of c.log.slice(-48)) {
+    const leadName = this.state.party[0]?.name;
+
+    for (const entry of c.log.slice(-64)) {
       const wrap = document.createElement('div');
       wrap.className = `combat-log-entry combat-log-${entry.kind}`;
+      if (entry.kind === 'attack' && entry.outcome) {
+        wrap.classList.add(entry.outcome === 'hit' ? 'combat-outcome-hit' : 'combat-outcome-miss');
+      }
+      if (entry.kind === 'damage' && leadName && entry.target) {
+        wrap.classList.add(entry.target === leadName ? 'combat-damage-to-hero' : 'combat-damage-to-enemy');
+      }
 
       const msg = document.createElement('div');
       msg.className = 'combat-log-msg';
       msg.textContent = entry.message;
       wrap.appendChild(msg);
+
+      const appendMeta = (metaParts: string[]): void => {
+        if (!metaParts.length) return;
+        const meta = document.createElement('div');
+        meta.className = 'combat-log-meta';
+        meta.textContent = metaParts.join(' · ');
+        wrap.appendChild(meta);
+      };
 
       if (entry.dice?.length) {
         const pre = document.createElement('pre');
@@ -564,32 +614,37 @@ export class GameApp {
         if (entry.modifier !== undefined) {
           metaParts.push(`mod ${entry.modifier >= 0 ? '+' : ''}${entry.modifier}`);
         }
+        if (entry.kind === 'attack' && entry.vsDefense !== undefined) {
+          metaParts.push(`CA ${entry.vsDefense}`);
+        }
         if (entry.final !== undefined) {
           metaParts.push(`total ${entry.final}`);
         }
-        if (metaParts.length) {
-          const meta = document.createElement('div');
-          meta.className = 'combat-log-meta';
-          meta.textContent = metaParts.join(' · ');
-          wrap.appendChild(meta);
-        }
+        appendMeta(metaParts);
       } else if (entry.modifier !== undefined || entry.final !== undefined) {
         const metaParts: string[] = [];
         if (entry.modifier !== undefined) {
           metaParts.push(`mod ${entry.modifier >= 0 ? '+' : ''}${entry.modifier}`);
         }
+        if (entry.kind === 'attack' && entry.vsDefense !== undefined) {
+          metaParts.push(`CA ${entry.vsDefense}`);
+        }
         if (entry.final !== undefined) {
           metaParts.push(`total ${entry.final}`);
         }
-        const meta = document.createElement('div');
-        meta.className = 'combat-log-meta';
-        meta.textContent = metaParts.join(' · ');
-        wrap.appendChild(meta);
+        appendMeta(metaParts);
       }
-
       logScroll.appendChild(wrap);
     }
     dice.appendChild(logScroll);
+
+    const scrollLogToEnd = (): void => {
+      logScroll.scrollTop = logScroll.scrollHeight;
+    };
+    requestAnimationFrame(() => {
+      scrollLogToEnd();
+      requestAnimationFrame(scrollLogToEnd);
+    });
     logOuter.appendChild(dice);
     right.appendChild(logOuter);
     layout.appendChild(right);
@@ -612,7 +667,7 @@ export class GameApp {
         btn.addEventListener('click', () => {
           this.unlockAudio();
           this.audio.playDice();
-          this.state = executePlayerTurn(this.state, st, this.registry.data, false);
+          this.state = executePlayerTurn(this.state, st, this.registry.data, false, this.bus);
           this.render();
         });
         bar.appendChild(btn);
@@ -625,7 +680,7 @@ export class GameApp {
         if (!lead.specialUsedThisCombat) {
           this.unlockAudio();
           this.audio.playDice();
-          this.state = executePlayerTurn(this.state, 'aggressive', this.registry.data, true);
+          this.state = executePlayerTurn(this.state, 'aggressive', this.registry.data, true, this.bus);
           this.render();
         }
       });
@@ -638,7 +693,7 @@ export class GameApp {
     flee.textContent = 'Tentar fugir';
     flee.addEventListener('click', () => {
       this.unlockAudio();
-      this.state = fleeCombat(this.state);
+      this.state = fleeCombat(this.state, this.bus);
       this.render();
     });
     inner.appendChild(flee);

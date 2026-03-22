@@ -3,7 +3,9 @@ export type GameEvent =
   | { type: 'reputation.changed'; faction: string; value: number }
   | { type: 'combat.start'; encounterId: string }
   | { type: 'combat.end'; victory: boolean }
-  | { type: 'effect.applied'; op: string };
+  | { type: 'effect.applied'; op: string }
+  | { type: 'xp.gained'; amount: number }
+  | { type: 'level.up'; level: number };
 
 type Listener = (e: GameEvent) => void;
 

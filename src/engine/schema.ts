@@ -105,6 +105,7 @@ export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
   z.object({ op: z.literal('setAsciiMap'), mapId: z.string(), playerX: z.number(), playerY: z.number() }),
   z.object({ op: z.literal('clearAsciiMap') }),
   z.object({ op: z.literal('initClass'), class: ClassIdSchema }),
+  z.object({ op: z.literal('addXp'), amount: z.number().int().min(1) }),
   z.object({ op: z.literal('resetRun') }),
 ]);
 
@@ -134,6 +135,7 @@ export type Effect =
   | { op: 'setAsciiMap'; mapId: string; playerX: number; playerY: number }
   | { op: 'clearAsciiMap' }
   | { op: 'initClass'; class: ClassId }
+  | { op: 'addXp'; amount: number }
   | { op: 'resetRun' };
 
 export const ChoiceSchema = z.object({
@@ -235,6 +237,8 @@ export const EnemyDefSchema = z.object({
   sprite: z.string(),
   spriteWounded: z.string().optional(),
   advantageOnFirstRound: z.boolean().optional(),
+  /** XP concedido ao derrotar; se omitido, usa fórmula do engine */
+  xp: z.number().int().min(0).optional(),
 });
 
 export type EnemyDef = z.infer<typeof EnemyDefSchema>;
@@ -244,6 +248,8 @@ export const EncounterSchema = z.object({
   enemies: z.array(z.string()),
   playerAdvantage: z.boolean().optional(),
   enemyAdvantage: z.boolean().optional(),
+  /** Substitui o XP calculado por inimigos (chefes, encontros especiais) */
+  xpReward: z.number().int().min(0).optional(),
 });
 
 export type Encounter = z.infer<typeof EncounterSchema>;
@@ -306,7 +312,16 @@ export const EnemyInstanceSchema = z.object({
 export type EnemyInstance = z.infer<typeof EnemyInstanceSchema>;
 
 export const CombatLogEntrySchema = z.object({
-  kind: z.enum(['info', 'attack', 'damage', 'heal', 'stance', 'stress', 'armor_break']),
+  kind: z.enum([
+    'info',
+    'attack',
+    'damage',
+    'heal',
+    'stance',
+    'stress',
+    'armor_break',
+    'turn_banner',
+  ]),
   message: z.string(),
   dice: z.array(z.number()).optional(),
   total: z.number().optional(),
@@ -314,6 +329,10 @@ export const CombatLogEntrySchema = z.object({
   final: z.number().optional(),
   actor: z.string().optional(),
   target: z.string().optional(),
+  /** Ataque: acerto ou erro vs CA */
+  outcome: z.enum(['hit', 'miss']).optional(),
+  /** CA usada na resolução (para exibir no log) */
+  vsDefense: z.number().int().optional(),
 });
 
 export type CombatLogEntry = z.infer<typeof CombatLogEntrySchema>;
@@ -347,6 +366,10 @@ export const GameStateSchema = z.object({
   narrativeTier: z.number().int().min(1).max(4).default(2),
   sceneId: z.string(),
   playerName: z.string().default('Herói'),
+  /** Nível do líder (progressão) */
+  level: z.number().int().min(1).default(1),
+  /** XP dentro do nível atual (0 até xpToNext(level)-1) */
+  xp: z.number().int().min(0).default(0),
   party: z.array(CharacterSchema),
   companionsAvailable: z.array(z.string()).default([]),
   inventory: z.array(z.string()),

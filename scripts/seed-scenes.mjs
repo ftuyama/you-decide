@@ -117,6 +117,7 @@ Viscos escuros no calcanhar. Uma **vitória pequena** — mas suficiente para re
 add('act2/skeleton_room.md', `---
 id: act2/skeleton_room
 chapter: 2
+artKey: skeleton
 choices:
   - text: "Forçar a porta"
     next: act2/skeleton_combat_intro
@@ -127,6 +128,7 @@ Restos armados erguem-se por **hábito**, não por vontade.`);
 add('act2/skeleton_combat_intro.md', `---
 id: act2/skeleton_combat_intro
 chapter: 2
+artKey: skeleton
 choices:
   - text: "Lutar!"
     effects:
@@ -342,6 +344,7 @@ Pedra **contra** carne. Três camadas de armadura antes da ferida real.`);
 add('act3/hub_depths.md', `---
 id: act3/hub_depths
 chapter: 3
+artKey: depths
 choices:
   - text: "Rumo ao trono de ossos"
     next: act4/throne_gate

@@ -1,4 +1,5 @@
 import type { FactionId, GameState } from './schema';
+import { MAX_LEVEL, xpToNextLevel } from './progression';
 
 function repTier(f: FactionId, state: GameState): string {
   const v = state.reputation[f] ?? 0;
@@ -12,6 +13,8 @@ function repTier(f: FactionId, state: GameState): string {
 
 export function injectText(text: string, state: GameState): string {
   const lead = state.party[0];
+  const lv = state.level;
+  const xpNext = lv >= MAX_LEVEL ? 0 : xpToNextLevel(lv);
   return text
     .replace(/\{\{playerName\}\}/g, state.playerName)
     .replace(/\{\{leadName\}\}/g, lead?.name ?? '???')
@@ -19,6 +22,9 @@ export function injectText(text: string, state: GameState): string {
     .replace(/\{\{corruption\}\}/g, String(state.resources.corruption))
     .replace(/\{\{supply\}\}/g, String(state.resources.supply))
     .replace(/\{\{faith\}\}/g, String(state.resources.faith))
+    .replace(/\{\{level\}\}/g, String(state.level))
+    .replace(/\{\{xp\}\}/g, String(state.xp))
+    .replace(/\{\{xpToNext\}\}/g, String(xpNext))
     .replace(/\{\{faction\.vigiliaTier\}\}/g, repTier('vigilia', state))
     .replace(/\{\{faction\.circuloTier\}\}/g, repTier('circulo', state))
     .replace(/\{\{faction\.cultoTier\}\}/g, repTier('culto', state));

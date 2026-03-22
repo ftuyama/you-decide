@@ -1,6 +1,7 @@
 ---
 id: act3/hub_depths
 chapter: 3
+artKey: depths
 choices:
   - text: "Rumo ao trono de ossos"
     next: act4/throne_gate

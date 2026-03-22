@@ -33,6 +33,7 @@
     "id": "boss_morvayn_2",
     "enemies": ["morvayn_p2"],
     "playerAdvantage": true,
-    "enemyAdvantage": false
+    "enemyAdvantage": false,
+    "xpReward": 120
   }
 }

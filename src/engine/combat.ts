@@ -9,6 +9,8 @@ import type {
   Stance,
 } from './schema';
 import type { GameData } from './gameData';
+import { addXp, computeCombatXp } from './progression';
+import type { EventBus } from './eventBus';
 
 /** Ajusta seed global após consumo de RNG em combate */
 export function bumpRngSeed(state: GameState): GameState {
@@ -67,6 +69,10 @@ export function beginEncounter(
   log.push({
     kind: 'info',
     message: `Ordem: ${combat.turnOrder.join(' → ')}`,
+  });
+  log.push({
+    kind: 'turn_banner',
+    message: `Rodada ${combat.round} — sua vez (postura e ataque)`,
   });
 
   const party = state.party.map((p) => ({ ...p, specialUsedThisCombat: false }));
@@ -147,7 +153,8 @@ export function playerAttack(
   state: GameState,
   enemyIndex: number,
   data: GameData,
-  useSpecial: boolean
+  useSpecial: boolean,
+  bus?: EventBus
 ): GameState {
   const c = state.combat;
   if (!c || c.phase !== 'choose_target' || !c.pendingStance) return state;
@@ -207,29 +214,33 @@ export function playerAttack(
   const defense = 7 + Math.floor(targetDef / 2);
 
   const log = [...c.log];
-  log.push({
-    kind: 'attack',
-    message: `${lead.name} ataca ${def.name}.`,
-    dice,
-    total,
-    modifier: atkMod,
-    final: total,
-    actor: lead.name,
-    target: def.name,
-  });
-
   let newEnemies = [...c.enemies];
   let newLead = { ...lead };
   let stress = newLead.stress;
+  let rollTotal = total;
 
   if (useSpecial && !lead.specialUsedThisCombat) {
     newLead.specialUsedThisCombat = true;
-    total += 2;
+    rollTotal += 2;
     stress = Math.min(4, stress + 1);
     log.push({ kind: 'stress', message: 'Golpe especial! +2 no ataque, +1 Stress.', actor: lead.name });
   }
 
-  const hit = total >= defense;
+  const hit = rollTotal >= defense;
+
+  log.push({
+    kind: 'attack',
+    message: hit
+      ? `${lead.name} acerta ${def.name}!`
+      : `${lead.name} erra o golpe (${rollTotal} vs CA ${defense}).`,
+    dice,
+    modifier: atkMod,
+    final: rollTotal,
+    actor: lead.name,
+    target: def.name,
+    outcome: hit ? 'hit' : 'miss',
+    vsDefense: defense,
+  });
 
   if (hit) {
     const dDmg = rollD6(rng);
@@ -257,8 +268,6 @@ export function playerAttack(
         target: def.name,
       });
     }
-  } else {
-    log.push({ kind: 'info', message: 'Ataque falha.', actor: lead.name });
   }
 
   if (lead.stress >= 4) {
@@ -276,7 +285,8 @@ export function playerAttack(
       { ...state, party, rngSeed: (state.rngSeed + 31) >>> 0 },
       { ...c, enemies: newEnemies, log, phase: 'ended' },
       true,
-      data
+      data,
+      bus
     );
   }
 
@@ -287,7 +297,8 @@ export function playerAttack(
       rngSeed: (state.rngSeed + 31) >>> 0,
     },
     { ...c, enemies: newEnemies, log, phase: 'enemy', pendingStance: undefined },
-    data
+    data,
+    bus
   );
 }
 
@@ -295,22 +306,42 @@ function finishCombat(
   state: GameState,
   c: CombatState,
   victory: boolean,
-  _data: GameData
+  data: GameData,
+  bus?: EventBus
 ): GameState {
-  void _data;
   const next =
     victory ? (c.onVictory ?? c.returnScene) : (c.onDefeat ?? 'act4/game_over');
+  let s = state;
+  if (victory) {
+    const enc = data.encounters[c.encounterId];
+    if (enc) {
+      const xpGain = computeCombatXp(enc, data);
+      if (xpGain > 0) {
+        s = addXp(s, xpGain, { bus });
+        s = { ...s, diary: [...s.diary, `+${xpGain} XP pela vitória.`] };
+      }
+    }
+    bus?.emit({ type: 'combat.end', victory: true });
+  } else {
+    bus?.emit({ type: 'combat.end', victory: false });
+  }
   return {
-    ...state,
+    ...s,
     mode: 'story',
     combat: null,
     sceneId: next,
   };
 }
 
-function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData): GameState {
+function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData, bus?: EventBus): GameState {
   const rng = mulberry32(state.rngSeed + 999);
-  const log = [...c.log];
+  const log = [
+    ...c.log,
+    {
+      kind: 'turn_banner' as const,
+      message: `Rodada ${c.round} — inimigos`,
+    },
+  ];
   const enemies = [...c.enemies];
   let party = state.party.map((p) => ({ ...p }));
 
@@ -337,17 +368,22 @@ function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData): G
       getArmorValue(data, target) +
       (c.pendingStance === 'defensive' ? 2 : 0);
 
+    const enemyHit = atk >= defScore;
     log.push({
       kind: 'attack',
-      message: `${def.name} ataca ${target.name}.`,
+      message: enemyHit
+        ? `${def.name} acerta ${target.name}!`
+        : `${def.name} erra (${atk} vs CA ${defScore}).`,
       dice,
       modifier: statMod(def.str),
       final: atk,
       actor: def.name,
       target: target.name,
+      outcome: enemyHit ? 'hit' : 'miss',
+      vsDefense: defScore,
     });
 
-    if (atk >= defScore) {
+    if (enemyHit) {
       const dDmg = rollD6(rng);
       const reduc = getArmorValue(data, target);
       const dmg = Math.max(1, dDmg + statMod(def.str) - reduc);
@@ -363,8 +399,6 @@ function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData): G
       let st = target.stress;
       st = Math.min(4, st + 1);
       party[0] = { ...party[0]!, stress: st };
-    } else {
-      log.push({ kind: 'info', message: `${def.name} erra.` });
     }
   }
 
@@ -375,9 +409,16 @@ function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData): G
       { ...state, party },
       { ...c, enemies, log, phase: 'ended' },
       false,
-      data
+      data,
+      bus
     );
   }
+
+  const nextRound = c.round + 1;
+  log.push({
+    kind: 'turn_banner',
+    message: `Rodada ${nextRound} — sua vez (postura e ataque)`,
+  });
 
   return {
     ...state,
@@ -387,7 +428,7 @@ function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData): G
       enemies,
       log,
       phase: 'choose_stance',
-      round: c.round + 1,
+      round: nextRound,
       pendingStance: undefined,
     },
     rngSeed: (state.rngSeed + 17) >>> 0,
@@ -399,19 +440,21 @@ export function executePlayerTurn(
   state: GameState,
   stance: Stance,
   data: GameData,
-  useSpecial: boolean
+  useSpecial: boolean,
+  bus?: EventBus
 ): GameState {
   let s = applyPlayerStance(state, stance, data);
   const c = s.combat;
   if (!c) return s;
   let idx = c.enemies.findIndex((e) => e.hp > 0);
   if (idx < 0) idx = 0;
-  return playerAttack(s, idx, data, useSpecial);
+  return playerAttack(s, idx, data, useSpecial, bus);
 }
 
-export function fleeCombat(state: GameState): GameState {
+export function fleeCombat(state: GameState, bus?: EventBus): GameState {
   const c = state.combat;
   if (!c) return state;
+  bus?.emit({ type: 'combat.end', victory: false });
   return {
     ...state,
     mode: 'story',

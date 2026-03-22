@@ -12,6 +12,8 @@ export function createInitialState(entryScene: string, seed?: number): GameState
     narrativeTier: 1,
     sceneId: entryScene,
     playerName: 'Viajante',
+    level: 1,
+    xp: 0,
     party: [],
     companionsAvailable: ['rogue_mira', 'squire_tomas'],
     inventory: [],
@@ -93,5 +95,10 @@ export function deserializeState(json: string): GameState {
   if (o.schemaVersion !== SCHEMA_VERSION) {
     console.warn('Save de versão diferente; tentando carregar mesmo assim.');
   }
-  return o as GameState;
+  const merged: GameState = {
+    ...(o as GameState),
+    level: typeof (o as GameState).level === 'number' ? (o as GameState).level : 1,
+    xp: typeof (o as GameState).xp === 'number' ? (o as GameState).xp : 0,
+  };
+  return merged;
 }

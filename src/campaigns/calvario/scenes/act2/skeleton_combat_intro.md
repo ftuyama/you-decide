@@ -1,6 +1,7 @@
 ---
 id: act2/skeleton_combat_intro
 chapter: 2
+artKey: skeleton
 choices:
   - text: "Lutar!"
     effects:

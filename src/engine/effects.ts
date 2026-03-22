@@ -3,7 +3,9 @@ import { CampaignIndexSchema, GameStateSchema } from './schema';
 import type { EventBus } from './eventBus';
 import { beginEncounter } from './combat';
 import type { GameData } from './gameData';
+import { addXp } from './progression';
 import { createInitialState, createPlayerCharacter } from './state';
+import { DEFAULT_HERO_NAME } from '../campaigns/calvario/classHero';
 import campaignIndex from '../campaigns/calvario/index.json';
 
 function clampRep(n: number): number {
@@ -129,8 +131,12 @@ function applyOne(
     case 'clearAsciiMap':
       return { ...state, asciiMap: null };
     case 'initClass': {
-      const pc = createPlayerCharacter(state.playerName, e.class);
-      return { ...state, party: [pc] };
+      const heroName = DEFAULT_HERO_NAME[e.class];
+      const pc = createPlayerCharacter(heroName, e.class);
+      return { ...state, party: [pc], playerName: heroName, level: 1, xp: 0 };
+    }
+    case 'addXp': {
+      return addXp(state, e.amount, { bus });
     }
     case 'resetRun': {
       const idx = CampaignIndexSchema.parse(campaignIndex);

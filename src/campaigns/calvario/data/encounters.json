@@ -1,0 +1,38 @@
+{
+  "rats_cellar": {
+    "id": "rats_cellar",
+    "enemies": ["rat_swarm"],
+    "playerAdvantage": false,
+    "enemyAdvantage": false
+  },
+  "skeleton_hall": {
+    "id": "skeleton_hall",
+    "enemies": ["skeleton"],
+    "playerAdvantage": false,
+    "enemyAdvantage": false
+  },
+  "cult_ambush": {
+    "id": "cult_ambush",
+    "enemies": ["cultist", "cultist"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true
+  },
+  "stone_guard_fight": {
+    "id": "stone_guard_fight",
+    "enemies": ["stone_guard"],
+    "playerAdvantage": false,
+    "enemyAdvantage": false
+  },
+  "boss_morvayn_1": {
+    "id": "boss_morvayn_1",
+    "enemies": ["morvayn_p1"],
+    "playerAdvantage": false,
+    "enemyAdvantage": false
+  },
+  "boss_morvayn_2": {
+    "id": "boss_morvayn_2",
+    "enemies": ["morvayn_p2"],
+    "playerAdvantage": true,
+    "enemyAdvantage": false
+  }
+}

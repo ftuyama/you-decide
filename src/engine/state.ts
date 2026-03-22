@@ -1,0 +1,97 @@
+import { SCHEMA_VERSION, type ClassId, type GameState } from './schema';
+import { parseSeedFromSearch } from './rng';
+
+const defaultRep = { vigilia: 0, circulo: 0, culto: 0 } as GameState['reputation'];
+
+export function createInitialState(entryScene: string, seed?: number): GameState {
+  const rngSeed = (seed ?? parseSeedFromSearch() ?? Date.now()) >>> 0;
+  return {
+    schemaVersion: SCHEMA_VERSION,
+    rngSeed,
+    chapter: 1,
+    narrativeTier: 1,
+    sceneId: entryScene,
+    playerName: 'Viajante',
+    party: [],
+    companionsAvailable: ['rogue_mira', 'squire_tomas'],
+    inventory: [],
+    reputation: { ...defaultRep },
+    flags: {},
+    marks: [],
+    resources: { supply: 5, faith: 3, corruption: 0 },
+    combat: null,
+    mode: 'story',
+    modal: null,
+    diary: [],
+    visitedScenes: {},
+    asciiMap: null,
+    pendingInterleave: null,
+    timedChoiceDeadline: null,
+  };
+}
+
+export function createPlayerCharacter(name: string, cls: ClassId): GameState['party'][0] {
+  const base = {
+    id: 'player',
+    name,
+    class: cls,
+    str: 8,
+    agi: 8,
+    mind: 8,
+    hp: 12,
+    maxHp: 12,
+    stress: 0,
+    weaponId: null as string | null,
+    armorId: null as string | null,
+    relicId: null as string | null,
+    specialUsedThisCombat: false,
+  };
+  if (cls === 'knight') {
+    return {
+      ...base,
+      str: 12,
+      agi: 9,
+      mind: 7,
+      hp: 18,
+      maxHp: 18,
+      weaponId: 'rusty_sword',
+      armorId: 'leather',
+    };
+  }
+  if (cls === 'mage') {
+    return {
+      ...base,
+      str: 6,
+      agi: 8,
+      mind: 13,
+      hp: 12,
+      maxHp: 12,
+      weaponId: 'oak_staff',
+      armorId: 'cloth_robe',
+    };
+  }
+  return {
+    ...base,
+    str: 8,
+    agi: 8,
+    mind: 11,
+    hp: 14,
+    maxHp: 14,
+    weaponId: 'mace',
+    armorId: 'chain_shirt',
+  };
+}
+
+export function serializeState(state: GameState): string {
+  return JSON.stringify(state);
+}
+
+export function deserializeState(json: string): GameState {
+  const raw = JSON.parse(json) as unknown;
+  if (typeof raw !== 'object' || raw === null) throw new Error('Save inválido');
+  const o = raw as GameState;
+  if (o.schemaVersion !== SCHEMA_VERSION) {
+    console.warn('Save de versão diferente; tentando carregar mesmo assim.');
+  }
+  return o as GameState;
+}

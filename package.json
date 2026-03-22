@@ -1,0 +1,23 @@
+{
+  "name": "you-decide",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "seed:scenes": "node scripts/seed-scenes.mjs"
+  },
+  "devDependencies": {
+    "@types/dompurify": "^3.0.5",
+    "typescript": "~5.9.3",
+    "vite": "^8.0.1"
+  },
+  "dependencies": {
+    "dompurify": "^3.3.3",
+    "marked": "^17.0.5",
+    "yaml": "^2.8.3",
+    "zod": "^4.3.6"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "rogue_mira": {
+    "id": "rogue_mira",
+    "name": "Mira, a Sombra",
+    "str": 7,
+    "agi": 12,
+    "mind": 8,
+    "hp": 14,
+    "maxHp": 14,
+    "leaveFlag": "mira_left"
+  },
+  "squire_tomas": {
+    "id": "squire_tomas",
+    "name": "Tomás, Escudeiro",
+    "str": 10,
+    "agi": 7,
+    "mind": 6,
+    "hp": 16,
+    "maxHp": 16,
+    "leaveFlag": "tomas_left"
+  }
+}

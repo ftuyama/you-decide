@@ -33,6 +33,12 @@ export function evaluateCondition(cond: Condition | undefined, state: GameState)
       if (r.corruption.lte !== undefined && state.resources.corruption > r.corruption.lte)
         return false;
     }
+    if (r.mana) {
+      const lead = state.party[0];
+      const m = lead?.mana ?? 0;
+      if (r.mana.gte !== undefined && m < r.mana.gte) return false;
+      if (r.mana.lte !== undefined && m > r.mana.lte) return false;
+    }
     return true;
   }
   if ('class' in cond) {

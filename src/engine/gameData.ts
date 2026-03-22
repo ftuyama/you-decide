@@ -4,6 +4,7 @@ import type {
   EnemyDef,
   Encounter,
   ItemDef,
+  SpellDef,
 } from './schema';
 
 export type GameData = {
@@ -12,6 +13,7 @@ export type GameData = {
   encounters: Record<string, Encounter>;
   items: Record<string, ItemDef>;
   companions: Record<string, CompanionDef>;
+  spells: Record<string, SpellDef>;
 };
 
 export function emptyGameData(campaign: CampaignIndex): GameData {
@@ -21,5 +23,6 @@ export function emptyGameData(campaign: CampaignIndex): GameData {
     encounters: {},
     items: {},
     companions: {},
+    spells: {},
   };
 }

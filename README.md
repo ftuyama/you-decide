@@ -17,18 +17,22 @@ O **pulso verde** não cessa — sobe pela garganta da cidade como vómito de lu
 Seja por honra, ganância ou desespero, o primeiro passo é sempre o mesmo: **descer**.
 
 ```
-    .·´¯`·.     .·´¯`·.     .·´¯`·.     .·´¯`·.
-   (  fog  )   (  fog  )   (  fog  )   (  fog  )
-    `·.¸.·´     `·.¸.·´     `·.¸.·´     `·.¸.·´
-   ~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
-        ░░▒▒  C A L V Á R I O  ▒▒░░
-   ~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
-      _..._   pedra húmida   _..._         _
-     |     |_.---._|     |_.---._|      .' '.
-     |     |' luar |'     |' verde'|     /     \
-     |     |  .·.  |     |  .·.  |    |       |
-     '---'         '---'         '---'  '.......'
-    ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+                        *     .        *       .
+           /\      /\       /\       /\       /\
+      /\  //\  /\ //\  /\ //\  /\ //\  /\ //\
+     /  ^\/  ^\/  ^\/  ^\/  ^\/  ^\/  ^\/  ^\
+    /^ ^  ^\^ ^  ^/^ ^  ^\^ ^  ^/^ ^  ^\^ ^  ^/^ ^\
+   / ^    ^ \/ ^    ^ /\ ^    ^ \/ ^    ^ /\ ^    ^ \
+  /__________________________________________________\
+        ~^~^~^~  C A L V Á R I O  ~^~^~^~
+  ~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
+      _..._         _..._         _..._         _
+     |     |_.---._|     |_.---._|     |      .' '.
+     |     |' lua  |'     |'verde|'     |     /     \
+     |     |  · ·  |     |  · ·  |     |    |       |
+     '---'         '---'         '---'         '...'
+oooooooooooooooooooooooooooooooooooooooooooooooooooooo
+   ░░ pedra húmida — o pulso sobe da garganta da cidade ░░
 ```
 
 *Arte ASCII usada no jogo — trecho da abertura.*

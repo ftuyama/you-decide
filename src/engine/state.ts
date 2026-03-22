@@ -29,6 +29,7 @@ export function createInitialState(entryScene: string, seed?: number): GameState
     asciiMap: null,
     pendingInterleave: null,
     timedChoiceDeadline: null,
+    lastCombatXpGain: null,
   };
 }
 
@@ -48,6 +49,8 @@ export function createPlayerCharacter(name: string, cls: ClassId): GameState['pa
     armorId: null as string | null,
     relicId: null as string | null,
     specialUsedThisCombat: false,
+    mana: 0,
+    maxMana: 0,
   };
   if (cls === 'knight') {
     return {
@@ -58,6 +61,8 @@ export function createPlayerCharacter(name: string, cls: ClassId): GameState['pa
       luck: 8,
       hp: 18,
       maxHp: 18,
+      mana: 0,
+      maxMana: 0,
       weaponId: 'rusty_sword',
       armorId: 'leather',
     };
@@ -71,6 +76,8 @@ export function createPlayerCharacter(name: string, cls: ClassId): GameState['pa
       luck: 10,
       hp: 12,
       maxHp: 12,
+      mana: 12,
+      maxMana: 15,
       weaponId: 'oak_staff',
       armorId: 'cloth_robe',
     };
@@ -83,13 +90,16 @@ export function createPlayerCharacter(name: string, cls: ClassId): GameState['pa
     luck: 9,
     hp: 14,
     maxHp: 14,
+    mana: 8,
+    maxMana: 10,
     weaponId: 'mace',
     armorId: 'chain_shirt',
   };
 }
 
 export function serializeState(state: GameState): string {
-  return JSON.stringify(state);
+  const { lastCombatXpGain: _x, ...rest } = state;
+  return JSON.stringify(rest);
 }
 
 export function deserializeState(json: string): GameState {
@@ -104,9 +114,12 @@ export function deserializeState(json: string): GameState {
     ...(o as GameState),
     level: typeof (o as GameState).level === 'number' ? (o as GameState).level : 1,
     xp: typeof (o as GameState).xp === 'number' ? (o as GameState).xp : 0,
+    lastCombatXpGain: null,
     party: rawParty.map((p) => ({
       ...p,
       luck: typeof p.luck === 'number' ? p.luck : 8,
+      mana: typeof p.mana === 'number' ? p.mana : 0,
+      maxMana: typeof p.maxMana === 'number' ? p.maxMana : 0,
     })),
   };
   return merged;

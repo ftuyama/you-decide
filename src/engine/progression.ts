@@ -33,7 +33,7 @@ function applyOneLevelUp(state: GameState, newLevel: number, newXp: number): Gam
   const lead = state.party[0];
   if (!lead) return { ...state, level: newLevel, xp: newXp };
   const cls: ClassId = lead.class;
-  let { str, agi, mind, maxHp, hp } = lead;
+  let { str, agi, mind, maxHp, hp, mana, maxMana } = lead;
   const hpGain = 3;
   maxHp += hpGain;
   hp = Math.min(maxHp, hp + hpGain);
@@ -43,11 +43,15 @@ function applyOneLevelUp(state: GameState, newLevel: number, newXp: number): Gam
   } else if (cls === 'mage') {
     mind += 1;
     if (newLevel % 2 === 0) agi += 1;
+    maxMana += 2;
+    mana = Math.min(maxMana, mana + 2);
   } else {
     mind += 1;
     if (newLevel % 2 === 0) str += 1;
+    maxMana += 2;
+    mana = Math.min(maxMana, mana + 2);
   }
-  const newLead = { ...lead, str, agi, mind, maxHp, hp };
+  const newLead = { ...lead, str, agi, mind, maxHp, hp, mana, maxMana };
   return {
     ...state,
     level: newLevel,

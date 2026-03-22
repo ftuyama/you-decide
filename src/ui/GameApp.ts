@@ -11,7 +11,9 @@ import {
 import { applyEffects } from '../engine/effects';
 import type { Choice, ClassId, GameState } from '../engine/schema';
 import {
+  canCastSpell,
   executePlayerTurn,
+  executeSpellTurn,
   fleeCombat,
   getCharacterArmorClass,
   getEffectiveLuck,
@@ -316,6 +318,9 @@ export class GameApp {
     frame.appendChild(bodyRow);
 
     this.root.appendChild(frame);
+    if (this.state.lastCombatXpGain != null) {
+      this.state = { ...this.state, lastCombatXpGain: null };
+    }
   }
 
   private escHtml(s: string): string {
@@ -326,11 +331,21 @@ export class GameApp {
       .replace(/"/g, '&quot;');
   }
 
-  private hpBarMarkup(cur: number, max: number): string {
-    if (max <= 0) return '<div class="hp-bar-track empty"></div>';
+  private hpBarMarkup(cur: number, max: number, trackClass?: string): string {
+    const trackCls = trackClass ? `hp-bar-track ${trackClass}` : 'hp-bar-track';
+    if (max <= 0) return `<div class="${trackCls} empty"></div>`;
     const pct = Math.min(100, Math.max(0, Math.round((cur / max) * 100)));
-    return `<div class="hp-bar-track" title="HP ${cur} / ${max}">
+    return `<div class="${trackCls}" title="HP ${cur} / ${max}">
       <div class="hp-bar-fill" style="width:${pct}%"></div>
+    </div>`;
+  }
+
+  /** Stress 0–4 (máx. do personagem). */
+  private stressBarMarkup(cur: number): string {
+    const max = 4;
+    const pct = Math.min(100, Math.max(0, Math.round((cur / max) * 100)));
+    return `<div class="stress-bar-track" title="Stress ${cur} / ${max}">
+      <div class="stress-bar-fill" style="width:${pct}%"></div>
     </div>`;
   }
 
@@ -383,9 +398,10 @@ export class GameApp {
       return `<div class="sidebar-line">Nome <strong>${this.escHtml(p.name)}</strong></div>
         <div class="sidebar-line sidebar-class-line">${this.escHtml(CLASS_LABEL_PT[cid])}</div>
         ${xpLine}
-        <div class="sidebar-line">CA <strong>${ca}</strong></div>
-        <div class="sidebar-line">HP <strong>${p.hp}/${p.maxHp}</strong> · Stress <strong>${p.stress}</strong></div>
-        ${this.hpBarMarkup(p.hp, p.maxHp)}
+        ${p.maxMana > 0 ? `<div class="sidebar-line">Mana <strong>${p.mana}</strong> / <strong>${p.maxMana}</strong></div>` : ''}
+        <div class="sidebar-line">HP <strong>${p.hp}/${p.maxHp}</strong> · CA <strong>${ca}</strong></div>
+        ${this.hpBarMarkup(p.hp, p.maxHp, 'hp-bar-resource')}
+        ${this.stressBarMarkup(p.stress)}
         <div class="sidebar-line attrs">STR <strong>${p.str}</strong> · AGI <strong>${p.agi}</strong> · MEN <strong>${p.mind}</strong> · SOR <strong>${sor}</strong></div>
         <details class="sidebar-collapse sidebar-lore"${openLore} data-section="personagem_lore">
           <summary class="sidebar-collapse-trigger">História do herói</summary>
@@ -452,6 +468,14 @@ export class GameApp {
     bc.className = 'breadcrumb';
     bc.textContent = `📁 campaigns/calvario/scenes/${scene.id}.md`;
     inner.appendChild(bc);
+
+    const xpGain = this.state.lastCombatXpGain;
+    if (xpGain != null && xpGain > 0) {
+      const xpBanner = document.createElement('div');
+      xpBanner.className = 'victory-xp-banner';
+      xpBanner.textContent = `+${xpGain} XP ganhos nesta batalha.`;
+      inner.appendChild(xpBanner);
+    }
 
     const h1 = document.createElement('h1');
     h1.textContent = scene.frontmatter.title ?? scene.id;
@@ -697,6 +721,35 @@ export class GameApp {
       });
       bar.appendChild(sp);
       inner.appendChild(bar);
+
+      if (lead.maxMana > 0) {
+        const spellBar = document.createElement('div');
+        spellBar.className = 'combat-spell-bar';
+        const spellHdr = document.createElement('div');
+        spellHdr.className = 'combat-spell-hdr';
+        spellHdr.textContent = 'Magias';
+        spellBar.appendChild(spellHdr);
+        const spells = this.registry.data.spells;
+        for (const [spellId, sp] of Object.entries(spells)) {
+          if (sp.classId !== 'any' && sp.classId !== lead.class) continue;
+          if (this.state.level < sp.minLevel) continue;
+          const btn = document.createElement('button');
+          btn.className = 'combat-spell';
+          btn.type = 'button';
+          btn.textContent = `${sp.name} (${sp.manaCost})`;
+          const castOk = canCastSpell(this.state, spellId, this.registry.data);
+          btn.disabled = !castOk;
+          btn.addEventListener('click', () => {
+            if (!canCastSpell(this.state, spellId, this.registry.data)) return;
+            this.unlockAudio();
+            this.audio.playDice();
+            this.state = executeSpellTurn(this.state, spellId, this.registry.data, this.bus);
+            this.render();
+          });
+          spellBar.appendChild(btn);
+        }
+        inner.appendChild(spellBar);
+      }
     }
 
     const flee = document.createElement('button');

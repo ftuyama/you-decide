@@ -1,6 +1,6 @@
 import { CampaignIndexSchema, type CampaignIndex } from '../engine/schema';
 import { parseSceneMarkdown, type LoadedScene } from '../engine/sceneRuntime';
-import type { EnemyDef, Encounter, ItemDef, CompanionDef } from '../engine/schema';
+import type { EnemyDef, Encounter, ItemDef, CompanionDef, SpellDef } from '../engine/schema';
 import type { GameData } from '../engine/gameData';
 import { emptyGameData } from '../engine/gameData';
 
@@ -9,6 +9,7 @@ import { enemies as enemiesTs } from '../campaigns/calvario/data/enemies';
 import { items as itemsTs } from '../campaigns/calvario/data/items';
 import encounters from '../campaigns/calvario/data/encounters.json';
 import companions from '../campaigns/calvario/data/companions.json';
+import { spells as spellsTs } from '../campaigns/calvario/data/spells';
 
 const sceneRaw = import.meta.glob<string>('../campaigns/calvario/scenes/**/*.md', {
   query: '?raw',
@@ -27,6 +28,7 @@ export class ContentRegistry {
     this.data.encounters = encounters as Record<string, Encounter>;
     this.data.items = itemsTs as Record<string, ItemDef>;
     this.data.companions = companions as Record<string, CompanionDef>;
+    this.data.spells = spellsTs as Record<string, SpellDef>;
 
     for (const [path, raw] of Object.entries(sceneRaw)) {
       const id = pathToSceneId(path);

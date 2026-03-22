@@ -41,6 +41,7 @@ export const ConditionSchema: z.ZodType<Condition> = z.lazy(() =>
         corruption: z
           .object({ gte: z.number().optional(), lte: z.number().optional() })
           .optional(),
+        mana: z.object({ gte: z.number().optional(), lte: z.number().optional() }).optional(),
       }),
     }),
     z.object({ class: ClassIdSchema }),
@@ -65,6 +66,7 @@ export type Condition =
         supply?: { gte?: number; lte?: number };
         faith?: { gte?: number; lte?: number };
         corruption?: { gte?: number; lte?: number };
+        mana?: { gte?: number; lte?: number };
       };
     }
   | { class: ClassId }
@@ -106,6 +108,7 @@ export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
   z.object({ op: z.literal('clearAsciiMap') }),
   z.object({ op: z.literal('initClass'), class: ClassIdSchema }),
   z.object({ op: z.literal('addXp'), amount: z.number().int().min(1) }),
+  z.object({ op: z.literal('addMana'), amount: z.number().int() }),
   z.object({ op: z.literal('resetRun') }),
 ]);
 
@@ -136,6 +139,7 @@ export type Effect =
   | { op: 'clearAsciiMap' }
   | { op: 'initClass'; class: ClassId }
   | { op: 'addXp'; amount: number }
+  | { op: 'addMana'; amount: number }
   | { op: 'resetRun' };
 
 export const ChoiceSchema = z.object({
@@ -287,6 +291,20 @@ export const CompanionDefSchema = z.object({
 
 export type CompanionDef = z.infer<typeof CompanionDefSchema>;
 
+/** Magias de campanha — dano ou cura em si mesmo; N d6 + mod Mente */
+export const SpellDefSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  manaCost: z.number().int().min(0),
+  minLevel: z.number().int().min(1).default(1),
+  classId: z.enum(['mage', 'cleric', 'any']),
+  spellKind: z.enum(['damage', 'heal_self']),
+  /** Número de dados d6 */
+  dice: z.number().int().min(1),
+});
+
+export type SpellDef = z.infer<typeof SpellDefSchema>;
+
 export const CharacterSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -298,6 +316,8 @@ export const CharacterSchema = z.object({
   hp: z.number().int(),
   maxHp: z.number().int(),
   stress: z.number().int().min(0).max(4).default(0),
+  mana: z.number().int().min(0).default(0),
+  maxMana: z.number().int().min(0).default(0),
   weaponId: z.string().nullable(),
   armorId: z.string().nullable(),
   relicId: z.string().nullable(),
@@ -414,6 +434,8 @@ export const GameStateSchema = z.object({
   pendingInterleave: z.string().nullable().default(null),
   /** Timed choice deadline ms epoch */
   timedChoiceDeadline: z.number().nullable().optional(),
+  /** XP ganho na última vitória — mostrado uma vez na narrativa (omitido no save). */
+  lastCombatXpGain: z.number().int().min(0).nullable().default(null),
 });
 
 export type GameState = z.infer<typeof GameStateSchema>;

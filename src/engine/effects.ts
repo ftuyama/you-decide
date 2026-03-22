@@ -105,6 +105,8 @@ function applyOne(
         agi: def.agi,
         mind: def.mind,
         luck: def.luck ?? 8,
+        mana: 0,
+        maxMana: 0,
         hp: def.hp,
         maxHp: def.maxHp,
         stress: 0,
@@ -138,6 +140,15 @@ function applyOne(
     }
     case 'addXp': {
       return addXp(state, e.amount, { bus });
+    }
+    case 'addMana': {
+      const lead = state.party[0];
+      if (!lead) return state;
+      const nm = Math.max(0, Math.min(lead.maxMana, lead.mana + e.amount));
+      return {
+        ...state,
+        party: state.party.map((p, i) => (i === 0 ? { ...p, mana: nm } : p)),
+      };
     }
     case 'resetRun': {
       const idx = CampaignIndexSchema.parse(campaignIndex);

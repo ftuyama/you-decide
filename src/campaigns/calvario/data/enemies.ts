@@ -12,16 +12,26 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 0,
     type: 'normal',
     armorChips: 0,
-    sprite: ` ∿∿ cano ∿∿
-  )\\.(
- (')(')  olhos
-  /  \\   rubros
- ∿∿∿∿∿∿∿∿∿∿∿`,
-    spriteWounded: ` ∿∿ cano ∿∿
-  )\\.(
- (x)(')  fúria
-  /  \\
- ∿∿∿∿∿∿∿∿∿∿∿`,
+    sprite: [
+      '      .-._.-._.-.   cano',
+      '    ./   ~   ~   \\.',
+      '   /  ()    ()    ()  \\',
+      '  |  ^^    ^^    ^^   |   olhos',
+      '   \\ ~~~~  sombras  ~~~~ /',
+      "    `'..`'..`'..`'",
+      '  .__)(__.)(__.)(__.',
+      ' /~~~~~~~~~~~~~~~~~~\\',
+    ].join('\n'),
+    spriteWounded: [
+      '      .-._.-._.-.',
+      '    ./ ! ~ ! ~ ! \\.',
+      '   /  (x)   ()   ()  \\',
+      '  |  **    ^^    ^^   |   fúria',
+      '   \\~~~~~~mordida~~~~~/',
+      "    `'..`'..`'..`'",
+      '  .__)(__.)(__.)(__.',
+      ' /~~~~~~~~~~~~~~~~~~\\',
+    ].join('\n'),
   },
   skeleton: {
     id: 'skeleton',
@@ -34,18 +44,28 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 1,
     type: 'undead',
     armorChips: 0,
-    sprite: `  .-===-.
- | o   o |  elmo
- |   <   |  partido
- |___|___|
- /    |    \\
-~~   / \\   ~~`,
-    spriteWounded: `  .-===-.
- | @   @ |  racha
- |   ~   |  no crânio
- |___|___|
- /    |    \\
-~~   / \\   ~~`,
+    sprite: [
+      '        .-===-.',
+      '       / o   o \\',
+      '      |    <    |  cranio',
+      '      |___|___|',
+      '     /    |    \\   elmo',
+      '    |  ]===[  |   partido',
+      '   /____/ \\____\\',
+      '  ~~   /   \\   ~~',
+      '     /_______\\',
+    ].join('\n'),
+    spriteWounded: [
+      '        .-===-.',
+      '       / @   @ \\',
+      '      |    ~    |  racha',
+      '      |___|___|',
+      '     /    |    \\   no cranio',
+      '    |  )-x-(-  |',
+      '   /____/ \\____\\',
+      '  ~~   /   \\   ~~',
+      '     /_______\\',
+    ].join('\n'),
   },
   cultist: {
     id: 'cultist',
@@ -58,11 +78,17 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 0,
     type: 'cultist',
     armorChips: 0,
-    sprite: `  ╱‾‾‾╲
- | ███ |  capuz
- | ^ ^ |  bordado
- | ██  |
-  ╲___╱`,
+    sprite: [
+      '      .-"""-.',
+      '     /~~~~~~~\\',
+      '    |  )   (  |  capuz',
+      '    |  > ^ <  |  bordado',
+      '    |___| |___|',
+      '       | | |',
+      '      /| | |\\',
+      '     / | | | \\',
+      '    "~~" "~"~~"',
+    ].join('\n'),
   },
   stone_guard: {
     id: 'stone_guard',
@@ -75,11 +101,17 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 3,
     type: 'armored',
     armorChips: 3,
-    sprite: ` ▄███████▄
- ███ ◆ ███  runas
- █████████  apagadas
- █████████
- ▀▀▀▀▀▀▀▀▀`,
+    sprite: [
+      '     .___________.',
+      '    /:::::::::::::\\',
+      '   |::::::():::::::|',
+      '   |:::::____::::::|  runas',
+      '   |::::/    \\:::::|  apagadas',
+      '   |:::|  ◆  |:::::|',
+      '   |:::|_____|:::::|',
+      '   |:::::::::::::::|',
+      '    \\_____________/',
+    ].join('\n'),
   },
   morvayn_p1: {
     id: 'morvayn_p1',
@@ -98,14 +130,16 @@ export const enemies: Record<string, EnemyDef> = {
   ║ ~ ║   e osso
   ╚═╦═╝
    ║ ║
-  ╱   ╲`,
+  ╱   ╲
+ ╱~~~~~╲`,
     spriteWounded: `   .:::.
   ╔|☠|╗   ferido
   ║ ░ ║   o véu
   ║ ~ ║   verde
   ╚═╦═╝
    ║ ║
-  ╱   ╲`,
+  ╱   ╲
+ ╱~~~~~╲`,
   },
   morvayn_p2: {
     id: 'morvayn_p2',
@@ -122,6 +156,7 @@ export const enemies: Record<string, EnemyDef> = {
 ██☠││││☠██  trono
 ███████████  funde-se
 ▀█████████▀  à carne
- ▀▀▀▀▀▀▀▀▀`,
+ ▀▀▀▀▀▀▀▀▀
+  ╲~~~~~/`,
   },
 };

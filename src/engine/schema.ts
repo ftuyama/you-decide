@@ -310,6 +310,8 @@ export const ItemDefSchema = z.object({
   bonusLuck: z.number().int().default(0),
   cursed: z.boolean().optional(),
   rumor: z.boolean().optional(),
+  /** Arte ASCII (ex.: ao comprar ou encontrar) */
+  sprite: z.string().optional(),
 });
 
 export type ItemDef = z.infer<typeof ItemDefSchema>;
@@ -325,6 +327,8 @@ export const CompanionDefSchema = z.object({
   luck: z.number().int().default(8),
   /** Condição de saída em texto (avaliada por flag) */
   leaveFlag: z.string().optional(),
+  /** Texto de lore (sidebar / história) */
+  lorePt: z.string().optional(),
 });
 
 export type CompanionDef = z.infer<typeof CompanionDefSchema>;

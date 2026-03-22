@@ -11,7 +11,7 @@ import {
 } from '../engine/sceneRuntime';
 import { applyEffects } from '../engine/effects';
 import { effectiveLeadAttr, tickActiveBuffs } from '../engine/leadStats';
-import type { Character, Choice, ClassId, GameState } from '../engine/schema';
+import type { Character, Choice, ClassId, CombatLogEntry, GameState } from '../engine/schema';
 import {
   canCastSpell,
   executePlayerTurn,
@@ -28,7 +28,7 @@ import { canWalk, renderMap } from '../campaigns/calvario/maps';
 import { SCENE_ART } from '../campaigns/calvario/ascii/art';
 import { getHeroClassLabel, getHeroLore } from '../campaigns/calvario/classHero';
 import { formatDiceAscii } from './diceAscii';
-import { GameAudio } from './sound';
+import { GameAudio, type AmbientTheme } from './sound';
 import './styles.css';
 
 const SAVE_KEY = 'calvario_save_v1';
@@ -44,19 +44,29 @@ export class GameApp {
   private menuOpen = false;
   /** Secções colapsáveis (recursos, faccoes, diario) — persistido em sessionStorage */
   private sidebarSections: Record<string, boolean> = {};
+  /** Itens recém-adquiridos (grantItem) — mostra banner até o jogador fechar */
+  private itemAcquireQueue: string[] = [];
+  /** Só reproduz efeitos de som para entradas novas do log de combate */
+  private combatLogSoundCursor: { encounterId: string; index: number } = { encounterId: '', index: 0 };
 
   constructor(root: HTMLElement) {
     this.root = root;
     this.registry = new ContentRegistry();
     const idx = getCampaignIndex();
-    this.state = createInitialState(idx.entryScene);
-    this.state = this.stabilize(this.state);
-    this.sidebarSections = this.loadSidebarSections();
     this.bus.subscribe((ev) => {
       if (ev.type === 'combat.end' && ev.victory) {
         this.audio.playVictory();
       }
+      if (ev.type === 'combat.end' && !ev.victory) {
+        this.audio.playDefeat();
+      }
+      if (ev.type === 'item.acquired') {
+        this.itemAcquireQueue.push(ev.itemId);
+      }
     });
+    this.state = createInitialState(idx.entryScene);
+    this.state = this.stabilize(this.state);
+    this.sidebarSections = this.loadSidebarSections();
     window.addEventListener('keydown', (e) => this.onMapKey(e));
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
@@ -96,6 +106,23 @@ export class GameApp {
 
   private unlockAudio(): void {
     this.audio.startAmbientWhenReady();
+    this.syncAmbientTheme();
+  }
+
+  private resolveAmbientTheme(): AmbientTheme {
+    if (this.state.mode === 'combat' && this.state.combat) {
+      const id = this.state.combat.encounterId;
+      if (id.startsWith('boss_') || id.includes('boss')) return 'boss';
+      return 'combat';
+    }
+    const sid = this.state.sceneId;
+    if (sid.includes('vigilia_camp') || sid.includes('acamp')) return 'camp';
+    return 'explore';
+  }
+
+  private syncAmbientTheme(): void {
+    if (this.audio.isMuted()) return;
+    this.audio.setAmbientTheme(this.resolveAmbientTheme());
   }
 
   private ctx(): { sceneId: string; data: import('../engine/gameData').GameData; bus: EventBus } {
@@ -138,7 +165,12 @@ export class GameApp {
   private onSkillRoll(scene: LoadedScene): void {
     this.unlockAudio();
     this.audio.playDice();
+    const sc = scene.frontmatter.skillCheck;
     const r = resolveSkillCheck(this.state, scene);
+    if (sc) {
+      if (r.state.sceneId === sc.failNext) this.audio.playCheckFail();
+      else if (r.state.sceneId === sc.successNext) this.audio.playCheckSuccess();
+    }
     this.state = this.stabilize(r.state);
     this.render();
   }
@@ -146,7 +178,12 @@ export class GameApp {
   private onLuckRoll(scene: LoadedScene): void {
     this.unlockAudio();
     this.audio.playDice();
+    const lc = scene.frontmatter.luckCheck;
     const r = resolveLuckCheck(this.state, scene, this.registry.data);
+    if (lc) {
+      if (r.state.sceneId === lc.failNext) this.audio.playCheckFail();
+      else if (r.state.sceneId === lc.successNext) this.audio.playCheckSuccess();
+    }
     this.state = this.stabilize(r.state);
     this.render();
   }
@@ -237,6 +274,9 @@ export class GameApp {
     if (this.timedTimer) {
       clearTimeout(this.timedTimer);
       this.timedTimer = null;
+    }
+    if (this.state.mode !== 'combat') {
+      this.combatLogSoundCursor = { encounterId: '', index: 0 };
     }
     this.root.innerHTML = '';
 
@@ -337,6 +377,25 @@ export class GameApp {
     if (this.state.lastCombatXpGain != null) {
       this.state = { ...this.state, lastCombatXpGain: null };
     }
+    this.syncAmbientTheme();
+  }
+
+  private playCombatLogSound(entry: CombatLogEntry, leadName: string | undefined): void {
+    if (entry.kind === 'attack' && entry.outcome === 'miss') {
+      this.audio.playMiss();
+      return;
+    }
+    if (entry.kind === 'damage' && leadName && entry.target === leadName) {
+      this.audio.playDamageTaken();
+      return;
+    }
+    if (entry.kind === 'stress') {
+      this.audio.playStressSting();
+      return;
+    }
+    if (entry.kind === 'armor_break') {
+      this.audio.playHit();
+    }
   }
 
   private escHtml(s: string): string {
@@ -417,23 +476,41 @@ export class GameApp {
       .join('');
   }
 
-  /** Cartões «Personagem #n» para todo o grupo recrutado. */
-  private partyMemberCardsMarkup(party: GameState['party']): string {
-    if (!party.length) return '';
-    const cards = party
-      .map((char, i) => {
-        const cid = char.class as ClassId;
-        const clsLabel = getHeroClassLabel(cid, char.path);
-        const stats = this.formatStatAttrsLineHtml(char, { compact: true });
-        return `<div class="party-member-card">
-      <div class="party-member-card-label">Personagem #${i + 1}</div>
-      <div class="party-member-card-name">${this.escHtml(char.name)}</div>
-      <div class="party-member-card-class">${this.escHtml(clsLabel)}</div>
-      ${stats}
+  /** Bloco lateral por companheiro (party[1..]). */
+  private companionCardMarkup(c: Character): string {
+    const cid = c.class as ClassId;
+    const clsLabel = getHeroClassLabel(cid, c.path);
+    const def = this.registry.data.companions[c.id];
+    const lore = def?.lorePt;
+    const openKey = `companion_lore_${c.id}`;
+    const open = this.sidebarSections[openKey] ? ' open' : '';
+    const loreHtml = lore
+      ? lore
+          .split('\n\n')
+          .map((para) => `<p>${this.escHtml(para)}</p>`)
+          .join('')
+      : `<p class="sidebar-muted">Sem história gravada.</p>`;
+    return `<div class="companion-sidebar-card">
+      <div class="companion-sidebar-name">${this.escHtml(c.name)}</div>
+      <div class="companion-sidebar-class">${this.escHtml(clsLabel)}</div>
+      <div class="sidebar-line">HP <strong>${c.hp}</strong> / <strong>${c.maxHp}</strong></div>
+      ${this.hpBarMarkup(c.hp, c.maxHp, 'hp-bar-resource', 'hp')}
+      <div class="sidebar-line sidebar-stress-label">Stress <strong>${c.stress}</strong> / 4</div>
+      ${this.stressBarMarkup(c.stress)}
+      ${this.formatStatAttrsLineHtml(c, { compact: true })}
+      <details class="sidebar-collapse companion-lore"${open} data-section="${openKey}">
+        <summary class="sidebar-collapse-trigger">História</summary>
+        <div class="sidebar-collapse-body sidebar-lore-body">${loreHtml}</div>
+      </details>
     </div>`;
-      })
-      .join('');
-    return `<div class="party-slots">${cards}</div>`;
+  }
+
+  private companionsSectionMarkup(): string {
+    const rest = this.state.party.slice(1);
+    if (!rest.length) {
+      return `<div class="sidebar-line sidebar-muted">Nenhum companheiro no grupo.</div>`;
+    }
+    return rest.map((ch) => this.companionCardMarkup(ch)).join('');
   }
 
   /** Reputação −3…+3 como barra (0% = −3, 100% = +3). */
@@ -481,9 +558,8 @@ export class GameApp {
     const openLore = this.sidebarSections['personagem_lore'] ? ' open' : '';
 
     const personagemBlock = (() => {
-      const slots = this.partyMemberCardsMarkup(this.state.party);
       if (!p) {
-        return `${slots}<div class="sidebar-line">Escolha uma classe na narrativa.</div>
+        return `<div class="sidebar-line">Escolha uma classe na narrativa.</div>
         <div class="sidebar-line">Nível <strong>${this.state.level}</strong> · XP <strong>${this.state.xp}</strong></div>`;
       }
       const cid = p.class as ClassId;
@@ -504,7 +580,7 @@ export class GameApp {
               .map((b) => `${b.attr.toUpperCase()} ${b.delta >= 0 ? '+' : ''}${b.delta} (${b.remainingScenes} cena(s))`)
               .join(' · ')}</div>`
           : '';
-      return `${slots}<div class="sidebar-line">Nome <strong>${this.escHtml(p.name)}</strong></div>
+      return `<div class="sidebar-line">Nome <strong>${this.escHtml(p.name)}</strong></div>
         <div class="sidebar-line sidebar-class-line">${this.escHtml(getHeroClassLabel(cid, p.path))}</div>
         ${xpLine}
         <div class="sidebar-line">HP <strong>${p.hp}/${p.maxHp}</strong></div>
@@ -533,6 +609,12 @@ export class GameApp {
         <div class="sidebar-static-title">Personagem</div>
         <div class="sidebar-static-body sidebar-stats">
           ${personagemBlock}
+        </div>
+      </div>
+      <div class="sidebar-static">
+        <div class="sidebar-static-title">Companheiros</div>
+        <div class="sidebar-static-body sidebar-stats">
+          ${this.companionsSectionMarkup()}
         </div>
       </div>
       <details class="sidebar-collapse"${openRec} data-section="recursos">
@@ -586,6 +668,45 @@ export class GameApp {
     bc.className = 'breadcrumb';
     bc.textContent = `📁 campaigns/calvario/scenes/${scene.id}.md`;
     inner.appendChild(bc);
+
+    if (this.itemAcquireQueue.length > 0) {
+      const unique = [...new Set(this.itemAcquireQueue)];
+      const wrap = document.createElement('div');
+      wrap.className = 'item-acquire-banner';
+      const kicker = document.createElement('div');
+      kicker.className = 'item-acquire-kicker';
+      kicker.textContent = unique.length > 1 ? 'Novos itens adquiridos' : 'Item adquirido';
+      wrap.appendChild(kicker);
+      for (const itemId of unique) {
+        const def = this.registry.data.items[itemId];
+        if (!def) continue;
+        const block = document.createElement('div');
+        block.className = 'item-acquire-block';
+        const nameEl = document.createElement('div');
+        nameEl.className = 'item-acquire-name';
+        nameEl.textContent = def.name;
+        block.appendChild(nameEl);
+        const art = def.sprite?.trim();
+        if (art) {
+          const pre = document.createElement('pre');
+          pre.className = 'item-sprite';
+          pre.textContent = art;
+          block.appendChild(pre);
+        }
+        wrap.appendChild(block);
+      }
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'item-acquire-dismiss';
+      btn.textContent = 'Continuar';
+      btn.addEventListener('click', () => {
+        this.itemAcquireQueue = [];
+        this.audio.playUiClick();
+        this.render();
+      });
+      wrap.appendChild(btn);
+      inner.appendChild(wrap);
+    }
 
     const xpGain = this.state.lastCombatXpGain;
     if (xpGain != null && xpGain > 0) {
@@ -698,6 +819,19 @@ export class GameApp {
   private renderCombatInto(shell: HTMLElement): void {
     const c = this.state.combat;
     if (!c) return;
+
+    const encId = c.encounterId;
+    const leadName = this.state.party[0]?.name;
+    if (this.combatLogSoundCursor.encounterId !== encId) {
+      this.combatLogSoundCursor = { encounterId: encId, index: c.log.length };
+    } else {
+      const newEntries = c.log.slice(this.combatLogSoundCursor.index);
+      for (const entry of newEntries) {
+        this.playCombatLogSound(entry, leadName);
+      }
+      this.combatLogSoundCursor.index = c.log.length;
+    }
+
     const inner = document.createElement('div');
     inner.className = 'shell combat-shell';
     inner.innerHTML = `<h1>Combate</h1>`;
@@ -742,7 +876,7 @@ export class GameApp {
     const logScroll = document.createElement('div');
     logScroll.className = 'combat-log-scroll';
 
-    const leadName = this.state.party[0]?.name;
+    const partyNames = new Set(this.state.party.map((x) => x.name));
 
     for (const entry of c.log.slice(-64)) {
       const wrap = document.createElement('div');
@@ -750,8 +884,10 @@ export class GameApp {
       if (entry.kind === 'attack' && entry.outcome) {
         wrap.classList.add(entry.outcome === 'hit' ? 'combat-outcome-hit' : 'combat-outcome-miss');
       }
-      if (entry.kind === 'damage' && leadName && entry.target) {
-        wrap.classList.add(entry.target === leadName ? 'combat-damage-to-hero' : 'combat-damage-to-enemy');
+      if (entry.kind === 'damage' && entry.target) {
+        wrap.classList.add(
+          partyNames.has(entry.target) ? 'combat-damage-to-hero' : 'combat-damage-to-enemy'
+        );
       }
       if (entry.kind === 'damage' && entry.damageKind === 'crit') {
         wrap.classList.add('combat-damage-crit');
@@ -817,6 +953,13 @@ export class GameApp {
 
     const lead = this.state.party[0];
     if (c.phase === 'choose_stance' && lead) {
+      if (this.state.party.length > 1) {
+        const allyHint = document.createElement('div');
+        allyHint.className = 'combat-allies-hint';
+        allyHint.textContent =
+          'Cada companheiro ataca em seguida (mesma postura), contra o primeiro inimigo vivo.';
+        inner.appendChild(allyHint);
+      }
       const bar = document.createElement('div');
       bar.className = 'stance-bar';
       const stances: Stance[] = ['aggressive', 'defensive', 'focus'];

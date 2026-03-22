@@ -359,51 +359,48 @@ export function applyPlayerStance(state: GameState, stance: Stance, _data: GameD
   };
 }
 
-export function playerAttack(
+/**
+ * Um ataque físico (líder ou companheiro). Na mesma vaga de combate, todos usam a postura escolhida pelo líder.
+ * Golpe especial só para o índice 0.
+ */
+function physicalAttackForCharacter(
   state: GameState,
+  c: CombatState,
+  party: Character[],
+  enemies: EnemyInstance[],
+  attackerIndex: number,
   enemyIndex: number,
-  data: GameData,
+  stance: Stance,
   useSpecial: boolean,
-  bus?: EventBus
-): GameState {
-  const c = state.combat;
-  if (!c || c.phase !== 'choose_target' || !c.pendingStance) return state;
-  const rng = mulberry32(state.rngSeed + c.round * 997);
-  const lead = getLead(state);
-  const stance = c.pendingStance;
-  const def = data.enemies[c.enemies[enemyIndex]?.defId ?? ''];
-  if (!def) return state;
+  data: GameData,
+  rng: () => number,
+  log: CombatLogEntry[],
+  _bus?: EventBus
+): { party: Character[]; enemies: EnemyInstance[]; log: CombatLogEntry[] } | null {
+  void _bus;
+  const attacker = party[attackerIndex];
+  if (!attacker || attacker.hp <= 0) return null;
+  const inst = enemies[enemyIndex];
+  if (!inst || inst.hp <= 0) return null;
+  const def = data.enemies[inst.defId];
+  if (!def) return null;
+  if (useSpecial && attackerIndex !== 0) return null;
 
-  let str = effectiveLeadAttr(state, lead, 'str');
-  let agi = effectiveLeadAttr(state, lead, 'agi');
-  let mind = effectiveLeadAttr(state, lead, 'mind');
-  if (lead.weaponId && data.items[lead.weaponId]) {
-    const w = data.items[lead.weaponId]!;
-    str += w.bonusStr;
-    agi += w.bonusAgi;
-    mind += w.bonusMind;
-  }
-  if (lead.armorId && data.items[lead.armorId]) {
-    const ar = data.items[lead.armorId]!;
-    str += ar.bonusStr;
-    agi += ar.bonusAgi;
-    mind += ar.bonusMind;
-  }
-  if (lead.relicId && data.items[lead.relicId]) {
-    const r = data.items[lead.relicId]!;
-    str += r.bonusStr;
-    agi += r.bonusAgi;
-    mind += r.bonusMind;
+  let str = effectiveLeadAttr(state, attacker, 'str');
+  let mind = effectiveLeadAttr(state, attacker, 'mind');
+  for (const slot of [attacker.weaponId, attacker.armorId, attacker.relicId] as const) {
+    if (slot && data.items[slot]) {
+      const it = data.items[slot]!;
+      str += it.bonusStr;
+      mind += it.bonusMind;
+    }
   }
 
   let atkMod = statMod(str);
-  let defMod = statMod(agi);
   if (stance === 'aggressive') {
     atkMod += 1;
-    defMod -= 1;
   } else if (stance === 'defensive') {
     atkMod -= 1;
-    defMod += 1;
   } else if (stance === 'focus') {
     atkMod = statMod(mind) + 1;
   }
@@ -424,20 +421,24 @@ export function playerAttack(
     ? attackRollSpecial3d6dl(dice as [number, number, number])
     : attackRollSpecial2d6(dice[0]!, dice[1]!);
 
-  const targetDef = def.agi + def.armor + (stance === 'defensive' ? 0 : 0);
+  const targetDef = def.agi + def.armor;
   const defense = 7 + Math.floor(targetDef / 2);
 
-  const log = [...c.log];
-  let newEnemies = [...c.enemies];
-  let newLead = { ...lead };
-  let stress = newLead.stress;
+  const logOut = [...log];
+  let newEnemies = [...enemies];
+  let newAttacker = { ...attacker };
+  let stress = newAttacker.stress;
   let rollTotal = total;
 
-  if (useSpecial && !lead.specialUsedThisCombat) {
-    newLead.specialUsedThisCombat = true;
+  if (useSpecial && attackerIndex === 0 && !attacker.specialUsedThisCombat) {
+    newAttacker.specialUsedThisCombat = true;
     rollTotal += 2;
     stress = Math.min(4, stress + 1);
-    log.push({ kind: 'stress', message: 'Golpe especial! +2 no ataque, +1 Stress.', actor: lead.name });
+    logOut.push({
+      kind: 'stress',
+      message: 'Golpe especial! +2 no ataque, +1 Stress.',
+      actor: attacker.name,
+    });
   }
 
   let hit = false;
@@ -452,22 +453,22 @@ export function playerAttack(
   const rollOutcome = toRollOutcome(special);
   let attackMsg: string;
   if (special === 'fumble') {
-    attackMsg = `${lead.name} falha criticamente (dados 1+1).`;
+    attackMsg = `${attacker.name} falha criticamente (dados 1+1).`;
   } else if (special === 'crit') {
-    attackMsg = `${lead.name} acerta ${def.name} em cheio (crítico)!`;
+    attackMsg = `${attacker.name} acerta ${def.name} em cheio (crítico)!`;
   } else if (hit) {
-    attackMsg = `${lead.name} acerta ${def.name}!`;
+    attackMsg = `${attacker.name} acerta ${def.name}!`;
   } else {
-    attackMsg = `${lead.name} erra o golpe (${rollTotal} vs CA ${defense}).`;
+    attackMsg = `${attacker.name} erra o golpe (${rollTotal} vs CA ${defense}).`;
   }
 
-  log.push({
+  logOut.push({
     kind: 'attack',
     message: attackMsg,
     dice,
     modifier: atkMod,
     final: rollTotal,
-    actor: lead.name,
+    actor: attacker.name,
     target: def.name,
     outcome: hit ? 'hit' : 'miss',
     vsDefense: defense,
@@ -476,27 +477,32 @@ export function playerAttack(
 
   if (hit) {
     const dDmg = rollD6(rng);
-    const effLuck = getEffectiveLuck(lead, data, state);
+    const effLuck = getEffectiveLuck(attacker, data, state);
     const luckBonus = statMod(effLuck);
-    const baseFlat = getWeaponDamage(data, lead) + (stance === 'aggressive' ? 1 : 0);
-    const holyBonus = def.type === 'undead' && lead.class === 'cleric' ? 1 : 0;
+    let wd = getWeaponDamage(data, attacker);
+    if (wd === 0 && !attacker.weaponId) wd = 1;
+    const baseFlat = wd + (stance === 'aggressive' ? 1 : 0);
+    const holyBonus = def.type === 'undead' && attacker.class === 'cleric' ? 1 : 0;
     const isPlayerCrit = special === 'crit';
     const chipTarget = newEnemies[enemyIndex]!;
     if (def.type === 'armored' && chipTarget.armorChipsRemaining > 0) {
-      chipTarget.armorChipsRemaining -= 1;
-      log.push({
+      const ct = {
+        ...chipTarget,
+        armorChipsRemaining: chipTarget.armorChipsRemaining - 1,
+      };
+      logOut.push({
         kind: 'armor_break',
         message: 'Camada de armadura quebrada!',
         target: def.name,
       });
-      newEnemies[enemyIndex] = { ...chipTarget };
+      newEnemies[enemyIndex] = ct;
     } else {
       const dmg = isPlayerCrit
         ? dDmg * 2 + baseFlat + holyBonus + luckBonus
         : dDmg + baseFlat + holyBonus;
       const nh = Math.max(0, chipTarget.hp - dmg);
       newEnemies[enemyIndex] = { ...chipTarget, hp: nh };
-      log.push({
+      logOut.push({
         kind: 'damage',
         message: isPlayerCrit
           ? `${def.name} sofre ${dmg} de dano (crítico)!`
@@ -509,33 +515,114 @@ export function playerAttack(
     }
   }
 
-  if (lead.stress >= 4) {
-    defMod -= 2;
-    log.push({ kind: 'stress', message: 'Pânico! Defesa penalizada no próximo turno inimigo.' });
+  newAttacker.stress = stress;
+  if (attackerIndex === 0 && newAttacker.stress >= 4) {
+    logOut.push({
+      kind: 'stress',
+      message: 'Pânico! Defesa penalizada no próximo turno inimigo.',
+    });
   }
 
-  newLead.stress = stress;
-  const party = state.party.map((p) => (p.id === lead.id ? newLead : p));
+  const newParty = party.map((p, i) => (i === attackerIndex ? newAttacker : p));
 
-  const allDead = newEnemies.every((e) => e.hp <= 0);
-  if (allDead) {
+  return { party: newParty, enemies: newEnemies, log: logOut };
+}
+
+export function playerAttack(
+  state: GameState,
+  enemyIndex: number,
+  data: GameData,
+  useSpecial: boolean,
+  bus?: EventBus
+): GameState {
+  const c = state.combat;
+  if (!c || c.phase !== 'choose_target' || !c.pendingStance) return state;
+  const stance = c.pendingStance;
+  const def0 = data.enemies[c.enemies[enemyIndex]?.defId ?? ''];
+  if (!def0) return state;
+
+  let rng = mulberry32(state.rngSeed + c.round * 997);
+  let log = [...c.log];
+  let party = state.party.map((p) => ({ ...p }));
+  let enemies = [...c.enemies];
+
+  const st = { ...state, party };
+  const r0 = physicalAttackForCharacter(
+    st,
+    c,
+    party,
+    enemies,
+    0,
+    enemyIndex,
+    stance,
+    useSpecial,
+    data,
+    rng,
+    log,
+    bus
+  );
+  if (!r0) return state;
+  party = r0.party;
+  enemies = r0.enemies;
+  log = r0.log;
+
+  let rngSeed = (state.rngSeed + 31) >>> 0;
+
+  if (enemies.every((e) => e.hp <= 0)) {
     log.push({ kind: 'info', message: 'Vitória!' });
     return finishCombat(
-      { ...state, party, rngSeed: (state.rngSeed + 31) >>> 0 },
-      { ...c, enemies: newEnemies, log, phase: 'ended' },
+      { ...state, party, rngSeed },
+      { ...c, enemies, log, phase: 'ended' },
       true,
       data,
       bus
     );
   }
 
+  for (let pi = 1; pi < party.length; pi++) {
+    if (party[pi]!.hp <= 0) continue;
+    const eIdx = enemies.findIndex((e) => e.hp > 0);
+    if (eIdx < 0) break;
+    rng = mulberry32(rngSeed + c.round * 997 + pi * 47);
+    const rn = physicalAttackForCharacter(
+      { ...state, party, rngSeed },
+      c,
+      party,
+      enemies,
+      pi,
+      eIdx,
+      stance,
+      false,
+      data,
+      rng,
+      log,
+      bus
+    );
+    if (!rn) break;
+    party = rn.party;
+    enemies = rn.enemies;
+    log = rn.log;
+    rngSeed = (rngSeed + 31) >>> 0;
+
+    if (enemies.every((e) => e.hp <= 0)) {
+      log.push({ kind: 'info', message: 'Vitória!' });
+      return finishCombat(
+        { ...state, party, rngSeed },
+        { ...c, enemies, log, phase: 'ended' },
+        true,
+        data,
+        bus
+      );
+    }
+  }
+
   return advanceToEnemyTurn(
     {
       ...state,
       party,
-      rngSeed: (state.rngSeed + 31) >>> 0,
+      rngSeed,
     },
-    { ...c, enemies: newEnemies, log, phase: 'enemy', pendingStance: undefined },
+    { ...c, enemies, log, phase: 'enemy', pendingStance: undefined },
     data,
     bus
   );

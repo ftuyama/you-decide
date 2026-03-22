@@ -89,9 +89,11 @@ function applyOne(
       return { ...state, chapter: e.chapter };
     case 'setNarrativeTier':
       return { ...state, narrativeTier: e.tier };
-    case 'grantItem':
+    case 'grantItem': {
       if (state.inventory.includes(e.itemId)) return state;
+      bus.emit({ type: 'item.acquired', itemId: e.itemId });
       return { ...state, inventory: [...state.inventory, e.itemId] };
+    }
     case 'removeItem':
       return { ...state, inventory: state.inventory.filter((i) => i !== e.itemId) };
     case 'goto':

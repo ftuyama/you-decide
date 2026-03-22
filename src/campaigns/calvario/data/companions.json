@@ -8,7 +8,8 @@
     "luck": 10,
     "hp": 14,
     "maxHp": 14,
-    "leaveFlag": "mira_left"
+    "leaveFlag": "mira_left",
+    "lorePt": "Cresceu nos becos do Calvário, onde silêncio paga mais que ouro. Não confia em ninguém que use palavras bonitas — mas segue quem provar coragem no escuro."
   },
   "squire_tomas": {
     "id": "squire_tomas",
@@ -19,6 +20,7 @@
     "luck": 7,
     "hp": 16,
     "maxHp": 16,
-    "leaveFlag": "tomas_left"
+    "leaveFlag": "tomas_left",
+    "lorePt": "Filho de ferreiros, jurou espada a uma ordem que já não existe. Carrega o escudo com vergonha e orgulho — e espera que alguém digno o mande levantar de novo."
   }
 }

@@ -5,7 +5,8 @@ export type GameEvent =
   | { type: 'combat.end'; victory: boolean }
   | { type: 'effect.applied'; op: string }
   | { type: 'xp.gained'; amount: number }
-  | { type: 'level.up'; level: number };
+  | { type: 'level.up'; level: number }
+  | { type: 'item.acquired'; itemId: string };
 
 type Listener = (e: GameEvent) => void;
 

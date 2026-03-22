@@ -6,7 +6,7 @@ choices:
     effects:
       - op: startCombat
         encounterId: boss_morvayn_1
-        onVictory: act4/fight_morvayn_2
+        onVictory: act4/morvayn_interlude
         onDefeat: act4/game_over
 onEnter: []
 ---

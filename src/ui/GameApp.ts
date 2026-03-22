@@ -11,7 +11,8 @@ import {
 } from '../engine/sceneRuntime';
 import { applyEffects } from '../engine/effects';
 import { effectiveLeadAttr, tickActiveBuffs } from '../engine/leadStats';
-import type { Character, Choice, ClassId, CombatLogEntry, GameState } from '../engine/schema';
+import type { Character, Choice, ClassId, CombatLogEntry, GameState, SpellDef } from '../engine/schema';
+import { migrateLegacyKnownSpells } from '../engine/spellsKnown';
 import {
   canCastSpell,
   executePlayerTurn,
@@ -137,6 +138,7 @@ export class GameApp {
 
   /** Não reentrar em cenas narrativas enquanto o combate está ativo (evita sobrescrever mode). */
   private stabilize(state: GameState): GameState {
+    state = migrateLegacyKnownSpells(state, this.registry.data);
     if (state.mode === 'combat') return state;
     let s = state;
     for (let i = 0; i < 14; i++) {
@@ -562,6 +564,7 @@ export class GameApp {
     const openFac = this.sidebarSections['faccoes'] ? ' open' : '';
     const openDiary = this.sidebarSections['diario'] ? ' open' : '';
     const openLore = this.sidebarSections['personagem_lore'] ? ' open' : '';
+    const openSpells = this.sidebarSections['personagem_spells'] ? ' open' : '';
 
     const personagemBlock = (() => {
       if (!p) {
@@ -596,6 +599,24 @@ export class GameApp {
         ${this.stressBarMarkup(p.stress)}
         ${buffHint}
         ${this.formatStatAttrsLineHtml(p)}
+        ${(() => {
+          const spellLines = this.state.knownSpells
+            .map((id) => this.registry.data.spells[id])
+            .filter((sp): sp is SpellDef => !!sp);
+          const body =
+            spellLines.length === 0
+              ? `<p class="sidebar-muted">Nenhuma magia aprendida.</p>`
+              : spellLines
+                  .map(
+                    (sp) =>
+                      `<p class="sidebar-spell-line"><strong>${this.escHtml(sp.name)}</strong> — ${sp.manaCost} mana · ${sp.spellKind === 'damage' ? 'dano' : 'cura'} (${sp.dice}d6 + Mente)</p>`
+                  )
+                  .join('');
+          return `<details class="sidebar-collapse sidebar-spells"${openSpells} data-section="personagem_spells">
+          <summary class="sidebar-collapse-trigger">Magias aprendidas</summary>
+          <div class="sidebar-collapse-body sidebar-lore-body">${body}</div>
+        </details>`;
+        })()}
         <details class="sidebar-collapse sidebar-lore"${openLore} data-section="personagem_lore">
           <summary class="sidebar-collapse-trigger">História do herói</summary>
           <div class="sidebar-collapse-body sidebar-lore-body">${loreHtml}</div>
@@ -1041,6 +1062,7 @@ export class GameApp {
         spellBar.appendChild(spellHdr);
         const spells = this.registry.data.spells;
         for (const [spellId, sp] of Object.entries(spells)) {
+          if (!this.state.knownSpells.includes(spellId)) continue;
           if (sp.classId !== 'any' && sp.classId !== lead.class) continue;
           if (this.state.level < sp.minLevel) continue;
           const btn = document.createElement('button');

@@ -13,6 +13,11 @@ function repTier(f: FactionId, state: GameState): string {
 
 export function injectText(text: string, state: GameState): string {
   const lead = state.party[0];
+  const companions = state.party.slice(1);
+  const companionLine =
+    companions.length === 0
+      ? ''
+      : `${companions.map((c) => c.name).join(' e ')} ${companions.length > 1 ? 'trocam' : 'troca'} um olhar que não pede permissão à pedra.`;
   const lv = state.level;
   const xpNext = lv >= MAX_LEVEL ? 0 : xpToNextLevel(lv);
   return text
@@ -28,5 +33,7 @@ export function injectText(text: string, state: GameState): string {
     .replace(/\{\{xpToNext\}\}/g, String(xpNext))
     .replace(/\{\{faction\.vigiliaTier\}\}/g, repTier('vigilia', state))
     .replace(/\{\{faction\.circuloTier\}\}/g, repTier('circulo', state))
-    .replace(/\{\{faction\.cultoTier\}\}/g, repTier('culto', state));
+    .replace(/\{\{faction\.cultoTier\}\}/g, repTier('culto', state))
+    .replace(/\{\{companionLine\}\}/g, companionLine)
+    .replace(/\{\{companionCount\}\}/g, String(companions.length));
 }

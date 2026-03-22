@@ -65,5 +65,12 @@ export function evaluateCondition(cond: Condition | undefined, state: GameState)
     if (cond.corruption.lte !== undefined && c > cond.corruption.lte) return false;
     return true;
   }
+  if ('companionCount' in cond) {
+    const n = Math.max(0, state.party.length - 1);
+    const cc = cond.companionCount;
+    if (cc.gte !== undefined && n < cc.gte) return false;
+    if (cc.lte !== undefined && n > cc.lte) return false;
+    return true;
+  }
   return true;
 }

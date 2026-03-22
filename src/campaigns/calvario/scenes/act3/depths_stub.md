@@ -1,9 +1,13 @@
 ---
 id: act3/depths_stub
 chapter: 3
+title: Dobra nas profundezas
 choices:
-  - text: "Ao hub"
+  - text: "Voltar ao átrio das profundezas"
     next: act3/hub_depths
-onEnter: []
+onEnter:
+  - { op: addDiary, text: "A pedra dobra-se sobre si mesma — ou fui eu que dobrei primeiro." }
 ---
-Passagem **estreita**.
+A passagem **espelha** o som até ele parecer **dois** exércitos a marchar em sentidos opostos.
+
+Quem desce aqui não procura saída — procura **testemunha**.

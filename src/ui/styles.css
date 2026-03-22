@@ -665,6 +665,17 @@ button.hamburger:hover {
   margin-top: 0;
 }
 
+.sidebar-spells .sidebar-spell-line {
+  margin: 0.4rem 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: #a8b8c8;
+}
+
+.sidebar-spells .sidebar-spell-line:first-child {
+  margin-top: 0;
+}
+
 .player-sidebar .diary-box p {
   margin: 0.35rem 0;
   font-size: 0.72rem;

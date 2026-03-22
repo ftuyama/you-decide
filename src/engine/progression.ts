@@ -2,6 +2,7 @@ import type { ClassId, GameState } from './schema';
 import type { GameData } from './gameData';
 import type { Encounter } from './schema';
 import type { EventBus } from './eventBus';
+import { unlockSpellsForNewLevel } from './spellsKnown';
 
 /** XP necessário para sair do nível `level` e ir para `level + 1` */
 export const XP_PER_LEVEL_BASE = 100;
@@ -63,11 +64,12 @@ function applyOneLevelUp(state: GameState, newLevel: number, newXp: number): Gam
 export function addXp(
   state: GameState,
   amount: number,
-  opts?: { bus?: EventBus }
+  opts?: { bus?: EventBus; data?: GameData }
 ): GameState {
   if (amount <= 0) return state;
   if (state.level >= MAX_LEVEL) return state;
   const bus = opts?.bus;
+  const data = opts?.data;
   let level = state.level;
   let xp = state.xp + amount;
   let s = state;
@@ -76,6 +78,9 @@ export function addXp(
     xp -= xpToNextLevel(level);
     level += 1;
     s = applyOneLevelUp(s, level, xp);
+    if (data) {
+      s = unlockSpellsForNewLevel(s, level, data);
+    }
     bus?.emit({ type: 'level.up', level });
   }
 

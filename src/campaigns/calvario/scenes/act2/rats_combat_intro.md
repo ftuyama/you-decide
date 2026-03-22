@@ -10,6 +10,7 @@ choices:
         encounterId: rats_cellar
         onVictory: act2/after_rats
         onDefeat: act4/game_over
+        onFlee: act2/flee_rats
 onEnter: []
 ---
 O chão **vibra** — não de medo teu, mas de **garras** a escavar pedra mole.

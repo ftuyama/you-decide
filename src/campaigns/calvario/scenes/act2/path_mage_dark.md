@@ -4,6 +4,7 @@ chapter: 2
 title: Mago das trevas
 onEnter:
   - { op: setPath, path: dark }
+  - { op: learnSpell, spellId: whisper_cache }
   - { op: addDiary, text: "Os símbolos seguros ficaram pequenos. Carrego os outros no sangue e no silêncio." }
 choices:
   - text: "Voltar ao cruzeiro"

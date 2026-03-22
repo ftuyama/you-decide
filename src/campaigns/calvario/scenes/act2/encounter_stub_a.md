@@ -1,9 +1,13 @@
 ---
 id: act2/encounter_stub_a
 chapter: 2
+title: Corredor sem mapa
 choices:
-  - text: "Seguir"
+  - text: "Voltar ao cruzeiro"
     next: act2/hub_catacomb
-onEnter: []
+onEnter:
+  - { op: addDiary, text: "Um corredor que não estava nos mapas — só no instinto de quem foge ou de quem caça." }
 ---
-Cena curta **A**.
+A **galeria** secundária cheira a seiva antiga. Nada salta — mas sentes **olhos** nas ranhuras da pedra, como traços ainda húmidos de giz.
+
+Não é lugar para **ficar**. É lugar para **lembrar** que o Calvário tem mais bocas do que portas.

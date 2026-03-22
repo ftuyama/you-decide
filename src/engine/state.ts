@@ -25,6 +25,7 @@ export function createInitialState(entryScene: string, seed?: number): GameState
     mode: 'story',
     modal: null,
     diary: [],
+    knownSpells: [],
     visitedScenes: {},
     asciiMap: null,
     pendingInterleave: null,
@@ -129,6 +130,7 @@ export function deserializeState(json: string): GameState {
     xp: typeof (o as GameState).xp === 'number' ? (o as GameState).xp : 0,
     lastCombatXpGain: null,
     activeBuffs: Array.isArray((o as GameState).activeBuffs) ? (o as GameState).activeBuffs : [],
+    knownSpells: Array.isArray((o as GameState).knownSpells) ? (o as GameState).knownSpells : [],
     party: rawParty.map((p) => ({
       ...p,
       luck: typeof p.luck === 'number' ? p.luck : 8,

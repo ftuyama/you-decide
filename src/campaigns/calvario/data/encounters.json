@@ -11,6 +11,24 @@
     "playerAdvantage": false,
     "enemyAdvantage": false
   },
+  "rats_cellar_pair": {
+    "id": "rats_cellar_pair",
+    "enemies": ["rat_swarm", "rat_swarm"],
+    "playerAdvantage": false,
+    "enemyAdvantage": false
+  },
+  "cellar_mixed": {
+    "id": "cellar_mixed",
+    "enemies": ["rat_swarm", "skeleton"],
+    "playerAdvantage": false,
+    "enemyAdvantage": false
+  },
+  "cultist_patrol": {
+    "id": "cultist_patrol",
+    "enemies": ["cultist"],
+    "playerAdvantage": true,
+    "enemyAdvantage": false
+  },
   "cult_ambush": {
     "id": "cult_ambush",
     "enemies": ["cultist", "cultist"],

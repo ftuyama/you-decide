@@ -49,6 +49,9 @@ export const ConditionSchema: z.ZodType<Condition> = z.lazy(() =>
     z.object({ path: z.string() }),
     z.object({ chapter: z.object({ gte: z.number().optional(), lte: z.number().optional() }) }),
     z.object({ corruption: z.object({ gte: z.number().optional(), lte: z.number().optional() }) }),
+    z.object({
+      companionCount: z.object({ gte: z.number().optional(), lte: z.number().optional() }),
+    }),
   ])
 );
 
@@ -75,7 +78,8 @@ export type Condition =
   | { class: ClassId }
   | { path: string }
   | { chapter: { gte?: number; lte?: number } }
-  | { corruption: { gte?: number; lte?: number } };
+  | { corruption: { gte?: number; lte?: number } }
+  | { companionCount: { gte?: number; lte?: number } };
 
 export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
   z.object({ op: z.literal('setFlag'), key: z.string(), value: z.boolean() }),
@@ -113,6 +117,7 @@ export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
   z.object({ op: z.literal('clearAsciiMap') }),
   z.object({ op: z.literal('initClass'), class: ClassIdSchema }),
   z.object({ op: z.literal('addXp'), amount: z.number().int().min(1) }),
+  z.object({ op: z.literal('learnSpell'), spellId: z.string() }),
   z.object({ op: z.literal('addMana'), amount: z.number().int() }),
   z.object({ op: z.literal('setPath'), path: z.string().nullable() }),
   z.object({
@@ -157,6 +162,7 @@ export type Effect =
   | { op: 'clearAsciiMap' }
   | { op: 'initClass'; class: ClassId }
   | { op: 'addXp'; amount: number }
+  | { op: 'learnSpell'; spellId: string }
   | { op: 'addMana'; amount: number }
   | { op: 'setPath'; path: string | null }
   | { op: 'adjustLeadStat'; attr: 'str' | 'agi' | 'mind' | 'luck'; delta: number }
@@ -343,6 +349,8 @@ export const SpellDefSchema = z.object({
   spellKind: z.enum(['damage', 'heal_self']),
   /** Número de dados d6 */
   dice: z.number().int().min(1),
+  /** Só via narrativa (learnSpell), não no nível 1 nem ao subir de nível */
+  learnOnly: z.boolean().optional(),
 });
 
 export type SpellDef = z.infer<typeof SpellDefSchema>;
@@ -474,6 +482,8 @@ export const GameStateSchema = z.object({
     .nullable()
     .default(null),
   diary: z.array(z.string()).default([]),
+  /** IDs de magias conhecidas pelo líder (combate e sidebar) */
+  knownSpells: z.array(z.string()).default([]),
   visitedScenes: z.record(z.string(), z.boolean()).default({}),
   /** Mapa ASCII ativo */
   asciiMap: z

@@ -4,6 +4,7 @@ import type { EventBus } from './eventBus';
 import { beginEncounter } from './combat';
 import type { GameData } from './gameData';
 import { addXp } from './progression';
+import { initialKnownSpellIds } from './spellsKnown';
 import { createInitialState, createPlayerCharacter } from './state';
 import { DEFAULT_HERO_NAME, getHeroClassLabel } from '../campaigns/calvario/classHero';
 import campaignIndex from '../campaigns/calvario/index.json';
@@ -191,10 +192,30 @@ function applyOne(
     case 'initClass': {
       const heroName = DEFAULT_HERO_NAME[e.class];
       const pc = createPlayerCharacter(heroName, e.class);
-      return { ...state, party: [pc], playerName: heroName, level: 1, xp: 0 };
+      const knownSpells = initialKnownSpellIds(pc, ctx.data);
+      return {
+        ...state,
+        party: [pc],
+        playerName: heroName,
+        level: 1,
+        xp: 0,
+        knownSpells,
+      };
+    }
+    case 'learnSpell': {
+      const sp = ctx.data.spells[e.spellId];
+      if (!sp) return state;
+      if (state.knownSpells.includes(e.spellId)) return state;
+      bus.emit({
+        type: 'statusHighlight',
+        variant: 'good',
+        title: `Magia: ${sp.name}`,
+        subtitle: 'Nova magia aprendida',
+      });
+      return { ...state, knownSpells: [...state.knownSpells, e.spellId] };
     }
     case 'addXp': {
-      return addXp(state, e.amount, { bus });
+      return addXp(state, e.amount, { bus, data: ctx.data });
     }
     case 'addMana': {
       const lead = state.party[0];

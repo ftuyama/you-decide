@@ -218,6 +218,7 @@ export function canCastSpell(state: GameState, spellId: string, data: GameData):
   const lead = state.party[0];
   const sp = data.spells[spellId];
   if (!c || c.phase !== 'choose_stance' || !lead || !sp) return false;
+  if (!state.knownSpells.includes(spellId)) return false;
   if (lead.maxMana <= 0) return false;
   if (lead.mana < sp.manaCost) return false;
   if (state.level < sp.minLevel) return false;
@@ -644,7 +645,7 @@ function finishCombat(
     if (enc) {
       xpGain = computeCombatXp(enc, data);
       if (xpGain > 0) {
-        s = addXp(s, xpGain, { bus });
+        s = addXp(s, xpGain, { bus, data });
         s = { ...s, diary: [...s.diary, `+${xpGain} XP pela vitória.`] };
       }
     }

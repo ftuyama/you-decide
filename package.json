@@ -7,7 +7,6 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "seed:scenes": "node scripts/seed-scenes.mjs",
     "validate:scenes": "node scripts/validate-scenes.mjs"
   },
   "devDependencies": {

@@ -774,7 +774,7 @@ function finishCombat(
       xpGain = computeCombatXp(enc, data);
       if (xpGain > 0) {
         const { state: afterXp, levelUps } = addXp(s, xpGain, { bus, data });
-        s = { ...afterXp, diary: [...afterXp.diary, `+${xpGain} XP pela vitória.`] };
+        s = afterXp;
         lastCombatLevelUps = levelUps.length > 0 ? levelUps : null;
       }
     }

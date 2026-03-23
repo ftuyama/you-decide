@@ -326,10 +326,6 @@ export class GameApp {
       return;
     }
     let s: GameState = { ...this.state, asciiMap: { ...m, playerX: nx, playerY: ny } };
-    if (this.state.resources.supply > 0) {
-      const next = applyEffects(s, [{ op: 'addResource', resource: 'supply', delta: -1 }], this.ctx());
-      s = { ...next, asciiMap: s.asciiMap };
-    }
     this.audio.playUiClick();
     this.state = s;
     this.render();

@@ -1285,7 +1285,7 @@ export class GameApp {
     if (artText) {
       const pre = document.createElement('pre');
       pre.className = 'scene-art';
-      pre.textContent = artText.trim();
+      pre.textContent = artText;
       inner.appendChild(pre);
     }
 

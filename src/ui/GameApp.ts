@@ -1370,6 +1370,33 @@ export class GameApp {
     }, timed.timedMs);
   }
 
+  /**
+   * Entorno amarelo no painel do campo: último dano resolvido foi crítico
+   * (ignora rodada / vitória / pânico após o golpe).
+   */
+  private combatLastResolvedDamageWasCrit(log: CombatLogEntry[]): boolean {
+    let i = log.length - 1;
+    while (i >= 0) {
+      const e = log[i]!;
+      if (e.kind === 'turn_banner') {
+        i--;
+        continue;
+      }
+      if (e.kind === 'info' && (e.message === 'Vitória!' || e.message === 'Fim de linha.')) {
+        i--;
+        continue;
+      }
+      if (e.kind === 'stress' && e.message?.startsWith('Pânico!')) {
+        i--;
+        continue;
+      }
+      break;
+    }
+    if (i < 0) return false;
+    const e = log[i]!;
+    return e.kind === 'damage' && e.damageKind === 'crit';
+  }
+
   private renderCombatInto(shell: HTMLElement): void {
     const c = this.state.combat;
     if (!c) return;
@@ -1395,6 +1422,9 @@ export class GameApp {
 
     const left = document.createElement('div');
     left.className = 'combat-enemies-column';
+    if (this.combatLastResolvedDamageWasCrit(c.log)) {
+      left.classList.add('combat-enemies-column--crit-damage');
+    }
     for (const inst of c.enemies) {
       if (inst.hp <= 0) continue;
       const def = this.registry.data.enemies[inst.defId];

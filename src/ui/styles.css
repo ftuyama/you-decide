@@ -1084,6 +1084,18 @@ button.camp-equip-btn:hover {
   border-radius: 3px;
   padding: 0.75rem 0.85rem;
   background: rgba(0, 0, 0, 0.28);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/** Último dano aplicado foi crítico — destaque no “quadrado” do campo (inimigos) */
+.combat-enemies-column.combat-enemies-column--crit-damage {
+  border-color: #d4a820;
+  box-shadow:
+    0 0 0 2px rgba(230, 194, 0, 0.55),
+    inset 0 0 0 1px rgba(230, 194, 0, 0.2),
+    inset 0 0 32px rgba(230, 194, 0, 0.07);
 }
 
 /** Postura, magias, itens e fugir — grelha visível (mesmo padrão que --ui-grid-*) */

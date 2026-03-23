@@ -61,6 +61,13 @@
     "enemyAdvantage": false,
     "xpReward": 45
   },
+  "boss_fallen_angel_trial": {
+    "id": "boss_fallen_angel_trial",
+    "enemies": ["fallen_angel"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 55
+  },
   "frost_whelps": {
     "id": "frost_whelps",
     "enemies": ["frost_whelp", "frost_whelp"],

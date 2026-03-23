@@ -47,6 +47,7 @@ import pkg from '../../package.json' with { type: 'json' };
 const SAVE_KEY = 'calvario_save_v1';
 const SIDEBAR_KEY = 'calvario_sidebar_sections_v1';
 const FONT_KEY = 'calvario_font_step_v1';
+const DEV_MODE_KEY = 'calvario_dev_mode';
 
 export class GameApp {
   private registry: ContentRegistry;
@@ -58,6 +59,8 @@ export class GameApp {
   private menuOpen = false;
   /** 0 = 100%, 1 = 110%, 2 = 120% */
   private fontStep = 0;
+  /** Memórias (cenas visitadas), caminho do ficheiro da cena, etc. */
+  private devMode = false;
   private readonly choiceHotkeyHandler: (e: KeyboardEvent) => void;
   /** Secções colapsáveis (recursos, faccoes, diario) — persistido em sessionStorage */
   private sidebarSections: Record<string, boolean> = {};
@@ -71,6 +74,7 @@ export class GameApp {
   constructor(root: HTMLElement) {
     this.root = root;
     this.fontStep = this.loadFontStep();
+    this.devMode = this.loadDevMode();
     this.choiceHotkeyHandler = (e: KeyboardEvent): void => {
       if (this.state.mode !== 'story') return;
       const el = e.target;
@@ -140,6 +144,22 @@ export class GameApp {
   private saveFontStep(): void {
     try {
       localStorage.setItem(FONT_KEY, String(this.fontStep));
+    } catch {
+      /* noop */
+    }
+  }
+
+  private loadDevMode(): boolean {
+    try {
+      return localStorage.getItem(DEV_MODE_KEY) === '1';
+    } catch {
+      return false;
+    }
+  }
+
+  private saveDevMode(): void {
+    try {
+      localStorage.setItem(DEV_MODE_KEY, this.devMode ? '1' : '0');
     } catch {
       /* noop */
     }
@@ -277,7 +297,11 @@ export class GameApp {
       if (r.state.sceneId === lc.failNext) this.audio.playCheckFail();
       else if (r.state.sceneId === lc.successNext) this.audio.playCheckSuccess();
     }
-    this.state = this.stabilize(r.state);
+    const afterRoll: GameState = {
+      ...r.state,
+      visitedScenes: { ...r.state.visitedScenes, [scene.id]: true },
+    };
+    this.state = this.stabilize(afterRoll);
     this.render();
   }
 
@@ -527,6 +551,20 @@ export class GameApp {
     soundRow.appendChild(soundCb);
     soundRow.appendChild(document.createTextNode(' Som ligado'));
 
+    const devRow = document.createElement('label');
+    devRow.className = 'menu-item menu-sound menu-dev';
+    const devCb = document.createElement('input');
+    devCb.type = 'checkbox';
+    devCb.checked = this.devMode;
+    devCb.addEventListener('change', () => {
+      this.devMode = devCb.checked;
+      this.saveDevMode();
+      this.closeMenu();
+      this.render();
+    });
+    devRow.appendChild(devCb);
+    devRow.appendChild(document.createTextNode(' Modo desenvolvedor'));
+
     const fontBtn = document.createElement('button');
     fontBtn.type = 'button';
     fontBtn.className = 'menu-item';
@@ -549,6 +587,7 @@ export class GameApp {
     drawer.appendChild(loadBtn);
     drawer.appendChild(exportBtn);
     drawer.appendChild(soundRow);
+    drawer.appendChild(devRow);
     drawer.appendChild(fontBtn);
     drawer.appendChild(creditsBtn);
     frame.appendChild(drawer);
@@ -614,6 +653,48 @@ export class GameApp {
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
+  }
+
+  /** Formata modificador numérico com sinal (ex.: +2, −1 com sinal tipográfico). */
+  private fmtSignedMod(n: number): string {
+    if (n >= 0) return `+${n}`;
+    return `−${Math.abs(n)}`;
+  }
+
+  /**
+   * Resumo compacto sob os dados: ataques = resultado vs CA + bônus;
+   * dano/cura = totais com rótulos em português.
+   */
+  private appendCombatLogMeta(wrap: HTMLElement, entry: CombatLogEntry): void {
+    if (entry.kind === 'attack' && entry.final !== undefined && entry.vsDefense !== undefined) {
+      const meta = document.createElement('div');
+      meta.className = 'combat-log-meta combat-log-meta--attack-roll';
+      let line = `${entry.final} vs CA ${entry.vsDefense}`;
+      if (entry.modifier !== undefined) {
+        line += ` · bônus ${this.fmtSignedMod(entry.modifier)}`;
+      }
+      meta.textContent = line;
+      wrap.appendChild(meta);
+      return;
+    }
+
+    const parts: string[] = [];
+    if (entry.modifier !== undefined) {
+      parts.push(`Modificador ${this.fmtSignedMod(entry.modifier)}`);
+    }
+    if (entry.kind === 'damage' && entry.final !== undefined) {
+      parts.push(`Dano ${entry.final}`);
+    } else if (entry.kind === 'heal' && entry.final !== undefined) {
+      parts.push(`Cura ${entry.final} HP`);
+    } else if (entry.final !== undefined) {
+      parts.push(`Total ${entry.final}`);
+    }
+
+    if (parts.length === 0) return;
+    const meta = document.createElement('div');
+    meta.className = 'combat-log-meta';
+    meta.textContent = parts.join(' · ');
+    wrap.appendChild(meta);
   }
 
   /** Resumo dos ganhos por subida de nível (texto da vitória). */
@@ -938,7 +1019,7 @@ export class GameApp {
     const visitedIds = Object.keys(this.state.visitedScenes)
       .filter((k) => this.state.visitedScenes[k])
       .sort();
-    if (visitedIds.length > 0) {
+    if (this.devMode && visitedIds.length > 0) {
       const max = 48;
       const shown = visitedIds.slice(0, max);
       const rest = visitedIds.length - shown.length;
@@ -978,10 +1059,12 @@ export class GameApp {
     const inner = document.createElement('div');
     inner.className = 'shell';
 
-    const bc = document.createElement('div');
-    bc.className = 'breadcrumb';
-    bc.textContent = `📁 campaigns/calvario/scenes/${scene.id}.md`;
-    inner.appendChild(bc);
+    if (this.devMode) {
+      const bc = document.createElement('div');
+      bc.className = 'breadcrumb';
+      bc.textContent = `📁 campaigns/calvario/scenes/${scene.id}.md`;
+      inner.appendChild(bc);
+    }
 
     if (this.statusHighlightQueue.length > 0) {
       const wrap = document.createElement('div');
@@ -1417,43 +1500,14 @@ export class GameApp {
       msg.textContent = entry.message;
       wrap.appendChild(msg);
 
-      const appendMeta = (metaParts: string[]): void => {
-        if (!metaParts.length) return;
-        const meta = document.createElement('div');
-        meta.className = 'combat-log-meta';
-        meta.textContent = metaParts.join(' · ');
-        wrap.appendChild(meta);
-      };
-
       if (entry.dice?.length) {
         const pre = document.createElement('pre');
         pre.className = 'dice-ascii-block';
         pre.textContent = formatDiceAscii(entry.dice);
         wrap.appendChild(pre);
-        const metaParts: string[] = [];
-        if (entry.modifier !== undefined) {
-          metaParts.push(`mod ${entry.modifier >= 0 ? '+' : ''}${entry.modifier}`);
-        }
-        if (entry.kind === 'attack' && entry.vsDefense !== undefined) {
-          metaParts.push(`CA ${entry.vsDefense}`);
-        }
-        if (entry.final !== undefined) {
-          metaParts.push(`total ${entry.final}`);
-        }
-        appendMeta(metaParts);
-      } else if (entry.modifier !== undefined || entry.final !== undefined) {
-        const metaParts: string[] = [];
-        if (entry.modifier !== undefined) {
-          metaParts.push(`mod ${entry.modifier >= 0 ? '+' : ''}${entry.modifier}`);
-        }
-        if (entry.kind === 'attack' && entry.vsDefense !== undefined) {
-          metaParts.push(`CA ${entry.vsDefense}`);
-        }
-        if (entry.final !== undefined) {
-          metaParts.push(`total ${entry.final}`);
-        }
-        appendMeta(metaParts);
       }
+
+      this.appendCombatLogMeta(wrap, entry);
       logScroll.appendChild(wrap);
     }
     dice.appendChild(logScroll);

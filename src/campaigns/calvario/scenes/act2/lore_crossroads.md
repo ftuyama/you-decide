@@ -4,13 +4,13 @@ chapter: 2
 title: Eco de juramentos
 choices:
   - text: "Aceitar o nome de Cavaleiro caído (cavaleiro)"
-    next: act2/path_knight_fallen
+    next: act2/trial_fallen_angel_gate
     condition: { class: knight }
-    preview: Arquétipo narrativo
+    preview: "Provação · anjo caído; título só se venceres"
   - text: "Aceitar o título de Mago das trevas (arcanista)"
-    next: act2/path_mage_dark
+    next: act2/trial_fallen_angel_gate
     condition: { class: mage }
-    preview: Arquétipo narrativo
+    preview: "Provação · anjo caído; título só se venceres"
   - text: "Voltar-se ao Clérigo penitente"
     next: act2/path_cleric_penitent
     condition: { class: cleric }

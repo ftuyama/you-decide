@@ -73,6 +73,12 @@ export function enterScene(
     return s;
   }
 
+  /** Cenas só com teste de sorte: não marcar visitada ao entrar — a marca fica ao rolar (GameApp), para onEnter repetir se necessário; hoje onEnter costuma estar vazio. */
+  if (fm.luckCheck) {
+    s = applyEffects(s, fm.onEnter, { sceneId: scene.id, data, bus });
+    return s;
+  }
+
   const already = !!s.visitedScenes[scene.id];
   if (!already) {
     s = applyEffects(s, fm.onEnter, { sceneId: scene.id, data, bus });

@@ -23,9 +23,11 @@ import type {
 import { migrateLegacyKnownSpells } from '../engine/spellsKnown';
 import {
   canCastSpell,
+  canUseCombatConsumable,
   executePlayerTurn,
   executeSpellTurn,
   fleeCombat,
+  useCombatConsumable,
   getCharacterArmorClass,
   getEffectiveLuck,
   getEquippedArmorPoints,
@@ -95,6 +97,8 @@ export class GameApp {
       }
       if (ev.type === 'item.acquired') {
         this.itemAcquireQueue.push(ev.itemId);
+        this.unlockAudio();
+        this.audio.playItemAcquire();
       }
       if (ev.type === 'statusHighlight') {
         this.statusHighlightQueue.push(ev);
@@ -594,13 +598,20 @@ export class GameApp {
     if (!inv.length) {
       return `<div class="sidebar-line inventory-empty">Nenhum item ainda.</div>`;
     }
-    return inv
-      .map((id) => {
-        const def = this.registry.data.items[id];
-        const label = def?.name ?? id;
-        return `<div class="sidebar-line inventory-item">· ${this.escHtml(label)}</div>`;
-      })
-      .join('');
+    const counts = new Map<string, number>();
+    for (const id of inv) {
+      counts.set(id, (counts.get(id) ?? 0) + 1);
+    }
+    const lines: string[] = [];
+    for (const [id, n] of counts) {
+      const def = this.registry.data.items[id];
+      const label = def?.name ?? id;
+      const suffix = n > 1 ? ` ×${n}` : '';
+      lines.push(
+        `<div class="sidebar-line inventory-item">· ${this.escHtml(label)}${this.escHtml(suffix)}</div>`
+      );
+    }
+    return lines.join('');
   }
 
   /** Bloco lateral por companheiro (party[1..]). */
@@ -684,6 +695,7 @@ export class GameApp {
     const openDiary = this.sidebarSections['diario'] ? ' open' : '';
     const openLore = this.sidebarSections['personagem_lore'] ? ' open' : '';
     const openSpells = this.sidebarSections['personagem_spells'] ? ' open' : '';
+    const openEquip = this.sidebarSections['personagem_equip'] ? ' open' : '';
     const openMem = this.sidebarSections['memorias'] ? ' open' : '';
 
     const personagemBlock = (() => {
@@ -719,6 +731,22 @@ export class GameApp {
         ${this.stressBarMarkup(p.stress)}
         ${buffHint}
         ${this.formatStatAttrsLineHtml(p)}
+        ${(() => {
+          const d = this.registry.data.items;
+          const line = (label: string, id: string | null) => {
+            if (!id) {
+              return `<p class="sidebar-muted"><strong>${label}</strong> — —</p>`;
+            }
+            const it = d[id];
+            const name = it?.name ?? id;
+            return `<p class="sidebar-equip-line"><strong>${label}</strong> — ${this.escHtml(name)}</p>`;
+          };
+          const equipBody = `${line('Arma', p.weaponId)}${line('Armadura', p.armorId)}${line('Relíquia', p.relicId)}`;
+          return `<details class="sidebar-collapse sidebar-equip"${openEquip} data-section="personagem_equip">
+          <summary class="sidebar-collapse-trigger">Equipamento</summary>
+          <div class="sidebar-collapse-body sidebar-lore-body">${equipBody}</div>
+        </details>`;
+        })()}
         ${(() => {
           const spellLines = this.state.knownSpells
             .map((id) => this.registry.data.spells[id])
@@ -1264,6 +1292,39 @@ export class GameApp {
           spellBar.appendChild(btn);
         }
         inner.appendChild(spellBar);
+      }
+
+      const potionIds = [...new Set(this.state.inventory)].filter((id) => {
+        const d = this.registry.data.items[id];
+        return d?.slot === 'consumable';
+      });
+      if (potionIds.length) {
+        const potionBar = document.createElement('div');
+        potionBar.className = 'combat-potion-bar';
+        const potionHdr = document.createElement('div');
+        potionHdr.className = 'combat-potion-hdr';
+        potionHdr.textContent = 'Itens';
+        potionBar.appendChild(potionHdr);
+        for (const itemId of potionIds) {
+          const def = this.registry.data.items[itemId];
+          if (!def) continue;
+          const count = this.state.inventory.filter((x) => x === itemId).length;
+          const btn = document.createElement('button');
+          btn.className = 'combat-potion';
+          btn.type = 'button';
+          btn.textContent = count > 1 ? `${def.name} (${count})` : def.name;
+          const ok = canUseCombatConsumable(this.state, itemId, this.registry.data);
+          btn.disabled = !ok;
+          btn.addEventListener('click', () => {
+            if (!canUseCombatConsumable(this.state, itemId, this.registry.data)) return;
+            this.unlockAudio();
+            this.audio.playDice();
+            this.state = useCombatConsumable(this.state, itemId, this.registry.data, this.bus);
+            this.render();
+          });
+          potionBar.appendChild(btn);
+        }
+        inner.appendChild(potionBar);
       }
     }
 

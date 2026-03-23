@@ -1,5 +1,13 @@
 import type { ClassId, Condition, FactionId, GameState } from './schema';
 
+/** Inventário ou equipado no líder (para hasItem / noItem). */
+export function leadOwnsItem(state: GameState, itemId: string): boolean {
+  if (state.inventory.includes(itemId)) return true;
+  const lead = state.party[0];
+  if (!lead) return false;
+  return lead.weaponId === itemId || lead.armorId === itemId || lead.relicId === itemId;
+}
+
 export function evaluateCondition(cond: Condition | undefined, state: GameState): boolean {
   if (cond === undefined) return true;
   if ('all' in cond) return cond.all.every((c) => evaluateCondition(c, state));
@@ -15,8 +23,8 @@ export function evaluateCondition(cond: Condition | undefined, state: GameState)
   if ('noFlag' in cond) return !state.flags[cond.noFlag];
   if ('mark' in cond) return state.marks.includes(cond.mark);
   if ('noMark' in cond) return !state.marks.includes(cond.noMark);
-  if ('hasItem' in cond) return state.inventory.includes(cond.hasItem);
-  if ('noItem' in cond) return !state.inventory.includes(cond.noItem);
+  if ('hasItem' in cond) return leadOwnsItem(state, cond.hasItem);
+  if ('noItem' in cond) return !leadOwnsItem(state, cond.noItem);
   if ('resource' in cond) {
     const r = cond.resource;
     if (r.supply) {

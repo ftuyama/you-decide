@@ -10,6 +10,8 @@ choices:
     next: act4/fight_morvayn
   - text: "Observar o trono: ossos, runas, correntes"
     next: act4/throne_observe
+  - text: "Negociar com o mercador à sombra das correntes"
+    next: act4/late_merchant
 onEnter: []
 ---
 O **Trono de Ossos** ergue-se como onda fossilizada — costelas de gigantes entrelaçadas, **correntes** vivas que range sem vento.

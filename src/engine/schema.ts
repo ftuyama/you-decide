@@ -102,6 +102,7 @@ export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
   z.object({ op: z.literal('setNarrativeTier'), tier: z.number().int().min(1).max(4) }),
   z.object({ op: z.literal('grantItem'), itemId: z.string() }),
   z.object({ op: z.literal('removeItem'), itemId: z.string() }),
+  z.object({ op: z.literal('equipItem'), itemId: z.string() }),
   z.object({ op: z.literal('goto'), sceneId: z.string() }),
   z.object({ op: z.literal('addDiary'), text: z.string() }),
   z.object({
@@ -131,6 +132,11 @@ export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
     delta: z.number().int(),
     remainingScenes: z.number().int().min(1),
   }),
+  z.object({
+    op: z.literal('useConsumable'),
+    itemId: z.string(),
+    targetIndex: z.number().int().min(0).max(2).optional(),
+  }),
   z.object({ op: z.literal('resetRun') }),
 ]);
 
@@ -147,6 +153,7 @@ export type Effect =
   | { op: 'setNarrativeTier'; tier: number }
   | { op: 'grantItem'; itemId: string }
   | { op: 'removeItem'; itemId: string }
+  | { op: 'equipItem'; itemId: string }
   | { op: 'goto'; sceneId: string }
   | { op: 'addDiary'; text: string }
   | {
@@ -172,6 +179,7 @@ export type Effect =
       delta: number;
       remainingScenes: number;
     }
+  | { op: 'useConsumable'; itemId: string; targetIndex?: number }
   | { op: 'resetRun' };
 
 export const ChoiceSchema = z.object({
@@ -217,6 +225,7 @@ export const RandomBranchSchema = z.object({
     z.object({
       weight: z.number().positive(),
       next: z.string(),
+      condition: ConditionSchema.optional(),
     })
   ),
 });
@@ -307,7 +316,7 @@ export type Encounter = z.infer<typeof EncounterSchema>;
 export const ItemDefSchema = z.object({
   id: z.string(),
   name: z.string(),
-  slot: z.enum(['weapon', 'armor', 'relic']),
+  slot: z.enum(['weapon', 'armor', 'relic', 'consumable']),
   bonusStr: z.number().int().default(0),
   bonusAgi: z.number().int().default(0),
   bonusMind: z.number().int().default(0),
@@ -318,6 +327,11 @@ export const ItemDefSchema = z.object({
   rumor: z.boolean().optional(),
   /** Arte ASCII (ex.: ao comprar ou encontrar) */
   sprite: z.string().optional(),
+  /** Poções / consumíveis */
+  restoreHp: z.number().int().min(0).optional(),
+  restoreMana: z.number().int().min(0).optional(),
+  /** Reduz stress (0–4) em N */
+  stressRelief: z.number().int().min(0).optional(),
 });
 
 export type ItemDef = z.infer<typeof ItemDefSchema>;

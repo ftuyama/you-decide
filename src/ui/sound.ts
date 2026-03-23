@@ -193,6 +193,26 @@ export class GameAudio {
     this.playTone(880, 0.08, 0.04, 'sine');
   }
 
+  /** Item novo no inventário (fanfarra curta em três notas). */
+  playItemAcquire(): void {
+    const ctx = this.ensureContext();
+    const g = this.gain(0.07);
+    if (g <= 0) return;
+    [784, 988, 1175].forEach((freq, i) => {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = freq;
+      gn.gain.setValueAtTime(g, ctx.currentTime + i * 0.07);
+      gn.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.07 + 0.12);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      const t = ctx.currentTime + i * 0.07;
+      o.start(t);
+      o.stop(t + 0.14);
+    });
+  }
+
   playVictory(): void {
     const ctx = this.ensureContext();
     const g = this.gain(0.08);

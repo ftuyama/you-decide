@@ -5,10 +5,24 @@ chapter: 2
 choices:
   - text: "Aceitar o mapa (−1 ouro)"
     next: act2/hub_catacomb
-    condition: { resource: { gold: { gte: 1 } } }
+    condition:
+      all:
+        - { resource: { gold: { gte: 1 } } }
+        - { noItem: rumor_map }
     effects:
       - { op: grantItem, itemId: rumor_map }
       - { op: addResource, resource: gold, delta: -1 }
+  - text: "Comprar adaga de ferro e empunhar na hora (−3 ouro)"
+    next: act2/hub_catacomb
+    condition:
+      all:
+        - { resource: { gold: { gte: 3 } } }
+        - { noItem: iron_dagger }
+    effects:
+      - { op: grantItem, itemId: iron_dagger }
+      - { op: equipItem, itemId: iron_dagger }
+      - { op: addResource, resource: gold, delta: -3 }
+    preview: "Arma · entra equipada"
   - text: "Recusar e voltar ao hub"
     next: act2/hub_catacomb
 onEnter: []

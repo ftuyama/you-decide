@@ -5,10 +5,11 @@ import { beginEncounter } from './combat';
 import type { GameData } from './gameData';
 import { addXp } from './progression';
 import { initialKnownSpellIds } from './spellsKnown';
-import { createInitialState, createPlayerCharacter } from './state';
+import { createInitialState, createPlayerCharacter, startingEquipmentInventoryIds } from './state';
 import { DEFAULT_HERO_NAME, getHeroClassLabel } from '../campaigns/calvario/classHero';
 import campaignIndex from '../campaigns/calvario/index.json';
 import { clampLeadStat, tickActiveBuffs, type LeadStatAttr } from './leadStats';
+import { applyConsumableToCharacter, isConsumable, removeOneInventoryItem } from './consumables';
 
 export { tickActiveBuffs };
 
@@ -170,12 +171,44 @@ function applyOne(
     case 'setNarrativeTier':
       return { ...state, narrativeTier: e.tier };
     case 'grantItem': {
-      if (state.inventory.includes(e.itemId)) return state;
+      const def = ctx.data.items[e.itemId];
+      if (!def) return state;
+      const stackable = isConsumable(def);
+      if (!stackable && state.inventory.includes(e.itemId)) return state;
       bus.emit({ type: 'item.acquired', itemId: e.itemId });
       return { ...state, inventory: [...state.inventory, e.itemId] };
     }
-    case 'removeItem':
-      return { ...state, inventory: state.inventory.filter((i) => i !== e.itemId) };
+    case 'removeItem': {
+      const next = removeOneInventoryItem(state.inventory, e.itemId);
+      if (!next) return state;
+      return { ...state, inventory: next };
+    }
+    case 'equipItem': {
+      const lead = state.party[0];
+      if (!lead) return state;
+      const def = ctx.data.items[e.itemId];
+      if (!def) return state;
+      if (def.slot === 'consumable') return state;
+      const inInv = state.inventory.includes(e.itemId);
+      const alreadyEquipped =
+        lead.weaponId === e.itemId || lead.armorId === e.itemId || lead.relicId === e.itemId;
+      if (!inInv && !alreadyEquipped) return state;
+      const key =
+        def.slot === 'weapon' ? 'weaponId' : def.slot === 'armor' ? 'armorId' : 'relicId';
+      if (lead[key] === e.itemId) return state;
+      let inv = [...state.inventory];
+      if (inInv) {
+        const ix = inv.indexOf(e.itemId);
+        if (ix >= 0) inv = [...inv.slice(0, ix), ...inv.slice(ix + 1)];
+      }
+      const prev = lead[key];
+      if (prev && prev !== e.itemId) inv = [...inv, prev];
+      return {
+        ...state,
+        inventory: inv,
+        party: state.party.map((p, i) => (i === 0 ? { ...p, [key]: e.itemId } : p)),
+      };
+    }
     case 'goto':
       return { ...state, sceneId: e.sceneId, mode: 'story' };
     case 'addDiary':
@@ -240,6 +273,11 @@ function applyOne(
       const heroName = DEFAULT_HERO_NAME[e.class];
       const pc = createPlayerCharacter(heroName, e.class);
       const knownSpells = initialKnownSpellIds(pc, ctx.data);
+      const startIds = startingEquipmentInventoryIds(e.class);
+      const inv = [...state.inventory];
+      for (const id of startIds) {
+        if (!inv.includes(id)) inv.push(id);
+      }
       return {
         ...state,
         party: [pc],
@@ -247,6 +285,7 @@ function applyOne(
         level: 1,
         xp: 0,
         knownSpells,
+        inventory: inv,
       };
     }
     case 'learnSpell': {
@@ -335,6 +374,25 @@ function applyOne(
         ],
         rngSeed: (state.rngSeed + 0x9e37) >>> 0,
       };
+    }
+    case 'useConsumable': {
+      const def = ctx.data.items[e.itemId];
+      if (!def || !isConsumable(def)) return state;
+      const ti = e.targetIndex ?? 0;
+      if (ti < 0 || ti >= state.party.length) return state;
+      const target = state.party[ti];
+      if (!target || target.hp <= 0) return state;
+      const inv = removeOneInventoryItem(state.inventory, e.itemId);
+      if (!inv) return state;
+      const updated = applyConsumableToCharacter(def, target);
+      const party = state.party.map((p, i) => (i === ti ? updated : p));
+      bus.emit({
+        type: 'statusHighlight',
+        variant: 'good',
+        title: def.name,
+        subtitle: ti === 0 ? 'Usada' : `Usada em ${target.name}`,
+      });
+      return { ...state, inventory: inv, party };
     }
     case 'resetRun': {
       const idx = CampaignIndexSchema.parse(campaignIndex);

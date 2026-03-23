@@ -104,6 +104,15 @@ export function createPlayerCharacter(name: string, cls: ClassId): GameState['pa
   };
 }
 
+/** IDs de equipamento inicial da classe (arma, armadura, relíquia) para o inventário ao escolher classe. */
+export function startingEquipmentInventoryIds(cls: ClassId): string[] {
+  const pc = createPlayerCharacter('_', cls);
+  const ids = [pc.weaponId, pc.armorId, pc.relicId].filter(
+    (x): x is string => typeof x === 'string' && x.length > 0
+  );
+  return [...new Set(ids)];
+}
+
 export function serializeState(state: GameState): string {
   const { lastCombatXpGain: _x, lastCombatLevelUps: _l, ...rest } = state;
   return JSON.stringify(rest);

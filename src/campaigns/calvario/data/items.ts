@@ -11,6 +11,23 @@ const z = (x: Partial<ItemDef> & Pick<ItemDef, 'id' | 'name' | 'slot'>): ItemDef
 });
 
 export const items: Record<string, ItemDef> = {
+  iron_dagger: z({
+    id: 'iron_dagger',
+    name: 'Adaga de Ferro',
+    slot: 'weapon',
+    bonusAgi: 1,
+    damage: 2,
+    sprite: [
+      '         |',
+      '        /|\\',
+      '       / | \\  fio',
+      '      |  |  | curto',
+      '       \\ | /',
+      '        \\|/',
+      '         |',
+      '        _|_',
+    ].join('\n'),
+  }),
   rusty_sword: z({
     id: 'rusty_sword',
     name: 'Espada Enferrujada',
@@ -164,6 +181,48 @@ export const items: Record<string, ItemDef> = {
       '     \\___________/',
       '        \\  |  /',
       '         `---´',
+    ].join('\n'),
+  }),
+  potion_hp: z({
+    id: 'potion_hp',
+    name: 'Poção Rubra',
+    slot: 'consumable',
+    restoreHp: 8,
+    sprite: [
+      '     .===.',
+      '    / ~~~ \\',
+      '   | o o o |  líquido',
+      '   |  ~~~  |   denso',
+      '    \\_____/',
+      '      |_|',
+    ].join('\n'),
+  }),
+  potion_mana: z({
+    id: 'potion_mana',
+    name: 'Tônico Azul',
+    slot: 'consumable',
+    restoreMana: 6,
+    sprite: [
+      '     .===.',
+      '    / ~*~ \\',
+      '   | * * * |  vórtice',
+      '   |  ~*~  |   etéreo',
+      '    \\_____/',
+      '      |_|',
+    ].join('\n'),
+  }),
+  potion_stress: z({
+    id: 'potion_stress',
+    name: 'Infusão Serena',
+    slot: 'consumable',
+    stressRelief: 1,
+    sprite: [
+      '     .===.',
+      '    / --- \\',
+      '   | ~ ~ ~ |  vapor',
+      '   |  ---  |   calmo',
+      '    \\_____/',
+      '      |_|',
     ].join('\n'),
   }),
 };

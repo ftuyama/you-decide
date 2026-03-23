@@ -7,6 +7,29 @@ choices:
     condition: { resource: { supply: { gte: 1 } } }
     effects:
       - { op: campRest }
+  - text: "Beber poção rubra (ti)"
+    next: act2/vigilia_camp
+    condition: { hasItem: potion_hp }
+    effects:
+      - { op: useConsumable, itemId: potion_hp, targetIndex: 0 }
+  - text: "Dar poção rubra ao companheiro"
+    next: act2/vigilia_camp
+    condition: { all: [{ hasItem: potion_hp }, { companionCount: { gte: 1 } }] }
+    effects:
+      - { op: useConsumable, itemId: potion_hp, targetIndex: 1 }
+  - text: "Beber tônico azul (mana)"
+    next: act2/vigilia_camp
+    condition:
+      all:
+        - { hasItem: potion_mana }
+        - { any: [{ class: mage }, { class: cleric }] }
+    effects:
+      - { op: useConsumable, itemId: potion_mana, targetIndex: 0 }
+  - text: "Beber infusão serena (stress)"
+    next: act2/vigilia_camp
+    condition: { hasItem: potion_stress }
+    effects:
+      - { op: useConsumable, itemId: potion_stress, targetIndex: 0 }
   - text: "Trocar duas palavras com o grupo"
     next: act2/camp_companion_chat
     condition: { companionCount: { gte: 1 } }

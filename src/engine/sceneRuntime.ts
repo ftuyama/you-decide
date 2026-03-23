@@ -142,11 +142,13 @@ export function resolveRandomBranch(
 ): { state: GameState; nextSceneId: string } {
   const rb = scene.frontmatter.randomBranch;
   if (!rb) return { state, nextSceneId: state.sceneId };
+  const eligible = rb.branches.filter((b) => evaluateCondition(b.condition, state));
+  const pool = eligible.length > 0 ? eligible : rb.branches;
   const rng = mulberry32(state.rngSeed ^ rb.id.length);
-  const w = rb.branches.reduce((a, b) => a + b.weight, 0);
+  const w = pool.reduce((a, b) => a + b.weight, 0);
   let t = rng() * w;
-  let next = rb.branches[0]!.next;
-  for (const b of rb.branches) {
+  let next = pool[0]!.next;
+  for (const b of pool) {
     t -= b.weight;
     if (t <= 0) {
       next = b.next;

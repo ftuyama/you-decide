@@ -1,5 +1,6 @@
 ---
 id: act4/pact_after_mind_fail
+title: Mordida do Eco
 chapter: 4
 choices:
   - text: "Atravessar na mesma — à força"

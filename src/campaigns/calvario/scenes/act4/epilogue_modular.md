@@ -1,5 +1,6 @@
 ---
 id: act4/epilogue_modular
+title: Epílogo
 chapter: 4
 choices:
   - text: "Partir para as Cimeiras do Vento Cinzento — caçar o rumor do gelo"

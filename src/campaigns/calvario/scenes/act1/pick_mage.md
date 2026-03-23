@@ -1,5 +1,6 @@
 ---
 id: act1/pick_mage
+title: Juramento do Mago
 chapter: 1
 artKey: pick_mage
 choices:

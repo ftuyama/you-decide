@@ -1,5 +1,6 @@
 ---
 id: act3/cult_ambush_scene
+title: Emboscada dos Cultistas
 chapter: 3
 choices:
   - text: "Lutar na emboscada!"

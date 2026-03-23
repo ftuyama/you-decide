@@ -1,5 +1,6 @@
 ---
 id: act1/pick_cleric
+title: Juramento da Clériga
 chapter: 1
 artKey: pick_cleric
 choices:

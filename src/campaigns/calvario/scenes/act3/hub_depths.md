@@ -1,5 +1,6 @@
 ---
 id: act3/hub_depths
+title: Núcleo das Profundezas
 chapter: 3
 artKey: depths
 choices:

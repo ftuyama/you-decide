@@ -1,5 +1,6 @@
 ---
 id: act5/frost_opening
+title: Cimeiras do Vento Cinzento
 chapter: 5
 artKey: frost_peaks
 choices:

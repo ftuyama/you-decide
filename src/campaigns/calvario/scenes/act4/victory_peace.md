@@ -1,5 +1,6 @@
 ---
 id: act4/victory_peace
+title: Vitória em Silêncio
 chapter: 4
 choices:
   - text: "Epílogo"

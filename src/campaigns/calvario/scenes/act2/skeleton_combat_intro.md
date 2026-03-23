@@ -1,5 +1,6 @@
 ---
 id: act2/skeleton_combat_intro
+title: Crânio e Ferrugem
 chapter: 2
 artKey: skeleton
 choices:

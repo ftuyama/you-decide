@@ -1,5 +1,6 @@
 ---
 id: act4/pact_trial_mind
+title: Prova da Mente
 chapter: 4
 skillCheck:
   id: pact_hold

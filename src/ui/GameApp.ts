@@ -672,6 +672,24 @@ export class GameApp {
       .replace(/"/g, '&quot;');
   }
 
+  /** Emoji por magia para leitura rápida no menu (ex.: Centelha -> fogo). */
+  private spellEmoji(spellId: string, spellDef: SpellDef): string {
+    const byId: Partial<Record<string, string>> = {
+      ember_spark: '🔥',
+      arcane_bolt: '✨',
+      silver_bolt: '⚡',
+      lesser_heal: '💚',
+      merciful_light: '🕯️',
+      whisper_cache: '🫧',
+      pilgrims_benediction: '🙏',
+    };
+    const byKind: Record<SpellDef['spellKind'], string> = {
+      damage: '✨',
+      heal_self: '💚',
+    };
+    return byId[spellId] ?? byKind[spellDef.spellKind] ?? '✦';
+  }
+
   /** Formata modificador numérico com sinal (ex.: +2, −1 com sinal tipográfico). */
   private fmtSignedMod(n: number): string {
     if (n >= 0) return `+${n}`;
@@ -1048,7 +1066,7 @@ export class GameApp {
               : spellLines
                   .map(
                     (sp) =>
-                      `<p class="sidebar-spell-line"><strong>${this.escHtml(sp.name)}</strong> — ${sp.manaCost} mana · ${sp.spellKind === 'damage' ? 'dano' : 'cura'} (${sp.dice}d6 + Mente)</p>`
+                      `<p class="sidebar-spell-line sidebar-line--with-icon"><span class="spell-emoji" aria-hidden="true">${this.spellEmoji(sp.id, sp)}</span><span><strong>${this.escHtml(sp.name)}</strong> — ${sp.manaCost} mana · ${sp.spellKind === 'damage' ? 'dano' : 'cura'} (${sp.dice}d6 + Mente)</span></p>`
                   )
                   .join('');
           return `<details class="sidebar-collapse sidebar-spells"${openSpells} data-section="personagem_spells">
@@ -1528,7 +1546,7 @@ export class GameApp {
           const btn = document.createElement('button');
           btn.className = 'combat-spell';
           btn.type = 'button';
-          btn.textContent = `${spellDef.name} (${spellDef.manaCost})`;
+          btn.innerHTML = `<span class="spell-emoji" aria-hidden="true">${this.spellEmoji(spellId, spellDef)}</span><span>${this.escHtml(spellDef.name)} (${spellDef.manaCost})</span>`;
           const castOk = canCastSpell(this.state, spellId, this.registry.data);
           btn.disabled = !castOk;
           btn.addEventListener('click', () => {

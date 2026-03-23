@@ -1,5 +1,6 @@
 ---
 id: act4/pact_coda
+title: Coda do Pacto
 chapter: 4
 choices:
   - text: "Aceitar o que ficou escrito em ti"

@@ -1,5 +1,6 @@
 ---
 id: act4/epilogue_close
+title: Fecho do Diário
 chapter: 4
 choices: []
 onEnter: []

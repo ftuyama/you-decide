@@ -1,5 +1,6 @@
 ---
 id: act4/pact_whispers
+title: Sussurros do Pacto
 chapter: 4
 choices:
   - text: "Deixar o sussurro completar-se"

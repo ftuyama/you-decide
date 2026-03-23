@@ -1,5 +1,6 @@
 ---
 id: act5/frost_lair_approach
+title: Aproximação ao Covil de Gelo
 chapter: 5
 artKey: ice_dragon
 choices:

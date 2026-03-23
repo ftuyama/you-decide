@@ -1,5 +1,6 @@
 ---
 id: act1/map_tutorial
+title: Tutorial do Mapa ASCII
 chapter: 1
 choices:
   - text: "Sair"

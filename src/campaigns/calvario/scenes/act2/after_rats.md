@@ -1,5 +1,6 @@
 ---
 id: act2/after_rats
+title: Após os Ratos
 chapter: 2
 choices:
   - text: "Continuar"

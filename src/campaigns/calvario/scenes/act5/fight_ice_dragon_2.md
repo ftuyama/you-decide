@@ -1,5 +1,6 @@
 ---
 id: act5/fight_ice_dragon_2
+title: Silêncio de Gelo
 chapter: 5
 choices:
   - text: "Segunda fase — partir o coração da geada"

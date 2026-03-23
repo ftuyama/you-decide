@@ -1,5 +1,6 @@
 ---
 id: act4/morvayn_parley
+title: Parlamento com Morvayn
 chapter: 4
 choices:
   - text: "Recusar o pacto e lutar"

@@ -1,5 +1,6 @@
 ---
 id: act4/pact_ascent
+title: Ascensão do Pacto
 chapter: 4
 choices:
   - text: "Subir à cidade com o eco na nuca"

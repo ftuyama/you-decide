@@ -1,5 +1,6 @@
 ---
 id: act2/skeleton_room
+title: Sala dos Ossos Armados
 chapter: 2
 artKey: skeleton
 choices:

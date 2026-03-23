@@ -60,6 +60,21 @@ function resourceDebuffSubtitle(resource: keyof typeof RESOURCE_LABEL): string {
   }
 }
 
+function resourceGainSubtitle(resource: keyof typeof RESOURCE_LABEL): string {
+  switch (resource) {
+    case 'corruption':
+      return 'A sombra recua';
+    case 'faith':
+      return 'A conviccao fortalece';
+    case 'supply':
+      return 'Recursos repostos';
+    case 'gold':
+      return 'Ganho material';
+    default:
+      return '';
+  }
+}
+
 export function applyEffects(
   state: GameState,
   effects: Effect[],
@@ -143,14 +158,12 @@ function applyOne(
           (res === 'faith' && actual < 0) ||
           (res === 'supply' && actual < 0) ||
           (res === 'gold' && actual < 0);
-        if (isDebuff) {
-          bus.emit({
-            type: 'statusHighlight',
-            variant: 'debuff',
-            title: `${RESOURCE_LABEL[res]} ${actual > 0 ? '+' : ''}${actual}`,
-            subtitle: resourceDebuffSubtitle(res),
-          });
-        }
+        bus.emit({
+          type: 'statusHighlight',
+          variant: isDebuff ? 'debuff' : 'good',
+          title: `${RESOURCE_LABEL[res]} ${actual > 0 ? '+' : ''}${actual}`,
+          subtitle: isDebuff ? resourceDebuffSubtitle(res) : resourceGainSubtitle(res),
+        });
       }
       return { ...state, resources: r };
     }

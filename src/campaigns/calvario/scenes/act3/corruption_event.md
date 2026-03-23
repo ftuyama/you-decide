@@ -1,5 +1,6 @@
 ---
 id: act3/corruption_event
+title: Pulso de Corrupção
 chapter: 3
 choices:
   - text: "Tocar o cristal"

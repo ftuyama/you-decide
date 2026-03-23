@@ -1,5 +1,6 @@
 ---
 id: act4/pact_vigil_skirmish
+title: Escaramuça da Vigília
 chapter: 4
 choices:
   - text: "Responder ao aço da Vigília"

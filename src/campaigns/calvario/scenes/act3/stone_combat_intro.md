@@ -1,5 +1,6 @@
 ---
 id: act3/stone_combat_intro
+title: Pedra Contra Carne
 chapter: 3
 choices:
   - text: "Lutar!"

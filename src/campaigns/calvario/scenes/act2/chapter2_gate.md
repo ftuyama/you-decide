@@ -1,5 +1,6 @@
 ---
 id: act2/chapter2_gate
+title: Limiar do Capítulo II
 chapter: 2
 chapterGate:
   minSupply: 1

@@ -925,6 +925,24 @@ button.hamburger:hover {
   color: #a8b8c8;
 }
 
+.sidebar-spells .sidebar-spell-line.sidebar-line--with-icon {
+  gap: 0.35rem;
+}
+
+.sidebar-spells .sidebar-spell-line.sidebar-line--with-icon > .ui-icon-wrap {
+  margin-top: 0.16rem;
+}
+
+.spell-emoji {
+  width: 1rem;
+  min-width: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  font-size: 0.9rem;
+}
+
 .sidebar-spells .sidebar-spell-line:first-child {
   margin-top: 0;
 }
@@ -1625,6 +1643,9 @@ button.combat-spell {
   font-size: 0.78rem;
   padding: 0.35rem 0.5rem;
   margin: 0.2rem 0.35rem 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   cursor: pointer;
   background: #1a1e28;
   color: #c8d0e8;

@@ -1,5 +1,6 @@
 ---
 id: act2/circle_ritual
+title: Ritual do Círculo
 chapter: 2
 choices:
   - text: "Participar"

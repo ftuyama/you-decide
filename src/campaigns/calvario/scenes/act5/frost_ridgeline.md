@@ -1,5 +1,6 @@
 ---
 id: act5/frost_ridgeline
+title: Crista da Cordilheira Gelada
 chapter: 5
 choices:
   - text: "Seguir o rasto de garras na neve"

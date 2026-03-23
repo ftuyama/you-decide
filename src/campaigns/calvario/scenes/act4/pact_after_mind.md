@@ -1,5 +1,6 @@
 ---
 id: act4/pact_after_mind
+title: Eco Domesticado
 chapter: 4
 choices:
   - text: "Atravessar a praça sem vacilar"

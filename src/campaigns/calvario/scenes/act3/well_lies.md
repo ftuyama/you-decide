@@ -1,5 +1,6 @@
 ---
 id: act3/well_lies
+title: O Poço que Mentiu
 chapter: 3
 skillCheck:
   id: well

@@ -1,5 +1,6 @@
 ---
 id: act3/cult_passage
+title: Passagem do Culto
 chapter: 3
 choices:
   - text: "Seguir"

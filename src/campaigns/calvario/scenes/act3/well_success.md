@@ -1,5 +1,6 @@
 ---
 id: act3/well_success
+title: Verdade no Espelho
 chapter: 3
 choices:
   - text: "Avançar"

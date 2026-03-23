@@ -1,5 +1,6 @@
 ---
 id: act2/recruit_offer
+title: A Oferta de Mira
 chapter: 2
 choices:
   - text: "Recrutar Mira"

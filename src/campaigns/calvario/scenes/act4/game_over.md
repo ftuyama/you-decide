@@ -1,5 +1,6 @@
 ---
 id: act4/game_over
+title: Fim de Jornada
 chapter: 4
 choices:
   - text: "Recomeçar"

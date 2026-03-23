@@ -1,5 +1,6 @@
 ---
 id: act3/ascii_explore
+title: Exploração pelo Mini-Mapa
 chapter: 3
 choices:
   - text: "Sair do mapa"

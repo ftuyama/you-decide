@@ -47,11 +47,24 @@
     "playerAdvantage": false,
     "enemyAdvantage": false
   },
+  "boss_morvayn_1_disadv": {
+    "id": "boss_morvayn_1_disadv",
+    "enemies": ["morvayn_p1"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true
+  },
   "boss_morvayn_2": {
     "id": "boss_morvayn_2",
     "enemies": ["morvayn_p2"],
     "playerAdvantage": true,
     "enemyAdvantage": false,
+    "xpReward": 120
+  },
+  "boss_morvayn_2_disadv": {
+    "id": "boss_morvayn_2_disadv",
+    "enemies": ["morvayn_p2"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
     "xpReward": 120
   },
   "vigil_hunter_fight": {

@@ -1,5 +1,6 @@
 ---
 id: act4/sino_puzzle
+title: Enigma do Sino ao Luar
 chapter: 4
 choices:
   - text: "◇ ◈ ◇ (sequência do Terceiro Sino)"

@@ -1,5 +1,6 @@
 ---
 id: act2/recruit_mira
+title: Mira Junta-se ao Grupo
 chapter: 2
 choices:
   - text: "Continuar"

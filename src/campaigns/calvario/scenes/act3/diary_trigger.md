@@ -1,5 +1,6 @@
 ---
 id: act3/diary_trigger
+title: Registro no Diário
 chapter: 3
 choices:
   - text: "Voltar"

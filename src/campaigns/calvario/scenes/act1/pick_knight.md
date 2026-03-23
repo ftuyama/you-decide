@@ -1,5 +1,6 @@
 ---
 id: act1/pick_knight
+title: Juramento do Cavaleiro
 chapter: 1
 artKey: pick_knight
 choices:

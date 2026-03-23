@@ -321,6 +321,10 @@ function applyOne(
     case 'setPath': {
       const lead = state.party[0];
       if (!lead) return state;
+      let s: GameState = {
+        ...state,
+        party: state.party.map((p, i) => (i === 0 ? { ...p, path: e.path } : p)),
+      };
       if (e.path) {
         bus.emit({
           type: 'statusHighlight',
@@ -328,11 +332,29 @@ function applyOne(
           title: ctx.data.heroNarrative.getHeroClassLabel(lead.class, e.path),
           subtitle: 'Novo arquétipo narrativo',
         });
+        const bonus = ctx.data.heroNarrative.getPathUnlockBonus(lead.class, e.path);
+        if (bonus) {
+          if (bonus.stats) {
+            for (const key of ['str', 'agi', 'mind', 'luck'] as const) {
+              const delta = bonus.stats[key];
+              if (delta !== undefined && delta !== 0) {
+                s = applyOne(s, { op: 'adjustLeadStat', attr: key, delta }, ctx);
+              }
+            }
+          }
+          if (bonus.addXp !== undefined && bonus.addXp > 0) {
+            s = applyOne(s, { op: 'addXp', amount: bonus.addXp }, ctx);
+          }
+          if (bonus.addResource) {
+            s = applyOne(s, {
+              op: 'addResource',
+              resource: bonus.addResource.resource,
+              delta: bonus.addResource.delta,
+            }, ctx);
+          }
+        }
       }
-      return {
-        ...state,
-        party: state.party.map((p, i) => (i === 0 ? { ...p, path: e.path } : p)),
-      };
+      return s;
     }
     case 'adjustLeadStat': {
       const lead = state.party[0];

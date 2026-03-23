@@ -281,6 +281,19 @@ export type SceneFrontmatter = z.infer<typeof SceneFrontmatterSchema>;
 export const EnemyTypeSchema = z.enum(['normal', 'undead', 'armored', 'cultist']);
 export type EnemyType = z.infer<typeof EnemyTypeSchema>;
 
+export const EnemyLootDropSchema = z.union([
+  z.object({
+    chance: z.number().min(0).max(1),
+    itemId: z.string(),
+  }),
+  z.object({
+    chance: z.number().min(0).max(1),
+    resource: z.enum(['gold', 'supply']),
+    amount: z.number().int().positive().default(1),
+  }),
+]);
+export type EnemyLootDrop = z.infer<typeof EnemyLootDropSchema>;
+
 export const EnemyDefSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -300,6 +313,8 @@ export const EnemyDefSchema = z.object({
   xp: z.number().int().min(0).optional(),
   /** Probabilidade de confirmar crítico após 6+6 em 2d6 (ou equivalente 3d6dl); padrão no engine se omitido */
   critConfirm: z.number().min(0).max(1).optional(),
+  /** Loot opcional por inimigo; cada entrada testa chance independentemente */
+  lootDrops: z.array(EnemyLootDropSchema).optional(),
 });
 
 export type EnemyDef = z.infer<typeof EnemyDefSchema>;

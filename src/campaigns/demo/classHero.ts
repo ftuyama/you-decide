@@ -1,4 +1,5 @@
 import type { ClassId } from '../../engine/schema';
+import type { PathUnlockBonus } from '../../engine/gameData';
 
 const CLASS_LABEL: Record<ClassId, string> = {
   knight: 'Cavaleiro',
@@ -26,4 +27,8 @@ export function getHeroClassLabel(classId: ClassId, _path: string | null | undef
 
 export function getHeroLore(classId: ClassId, _path: string | null | undefined): string {
   return LORE[classId];
+}
+
+export function getPathUnlockBonus(_classId: ClassId, _path: string | null | undefined): PathUnlockBonus | null {
+  return null;
 }

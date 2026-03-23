@@ -11,6 +11,7 @@ import type {
   Character,
   CombatLogEntry,
   CombatState,
+  EnemyLootDrop,
   EnemyInstance,
   Encounter,
   GameState,
@@ -767,6 +768,7 @@ function finishCombat(
     : pick(c.onDefeat, 'act4/game_over');
   let s = state;
   if (victory) {
+    s = applyEnemyLootOnVictory(s, c, data);
     let xpGain = 0;
     let lastCombatLevelUps: GameState['lastCombatLevelUps'] = null;
     const enc = data.encounters[c.encounterId];
@@ -794,6 +796,43 @@ function finishCombat(
     combat: null,
     sceneId: next,
   });
+}
+
+function applyEnemyLootOnVictory(state: GameState, c: CombatState, data: GameData): GameState {
+  let s = state;
+  const rng = mulberry32(state.rngSeed + c.round * 131 + c.enemies.length * 17);
+  for (const inst of c.enemies) {
+    const def = data.enemies[inst.defId];
+    if (!def?.lootDrops?.length) continue;
+    for (const drop of def.lootDrops) {
+      if (rng() >= drop.chance) continue;
+      s = applySingleLootDrop(s, drop, data);
+    }
+  }
+  return s;
+}
+
+function applySingleLootDrop(state: GameState, drop: EnemyLootDrop, data: GameData): GameState {
+  if ('itemId' in drop) {
+    const item = data.items[drop.itemId];
+    if (!item) return state;
+    const stackable = item.slot === 'consumable';
+    if (!stackable && state.inventory.includes(drop.itemId)) return state;
+    return { ...state, inventory: [...state.inventory, drop.itemId] };
+  }
+  const amount = drop.amount ?? 1;
+  if (drop.resource === 'gold') {
+    const before = state.resources.gold ?? 0;
+    return {
+      ...state,
+      resources: { ...state.resources, gold: Math.max(0, Math.min(999, before + amount)) },
+    };
+  }
+  const before = state.resources.supply;
+  return {
+    ...state,
+    resources: { ...state.resources, supply: Math.max(0, Math.min(10, before + amount)) },
+  };
 }
 
 function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData, bus?: EventBus): GameState {

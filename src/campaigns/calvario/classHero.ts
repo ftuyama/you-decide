@@ -1,4 +1,5 @@
 import type { ClassId } from '../../engine/schema';
+import type { PathUnlockBonus } from '../../engine/gameData';
 
 /** Rótulo curto da classe (PT-BR). */
 export const CLASS_LABEL_PT: Record<ClassId, string> = {
@@ -36,6 +37,13 @@ const PATH_LABEL_PT: Partial<Record<string, string>> = {
   'cleric:penitent': 'Clérigo penitente',
 };
 
+/** Bónus de jogo ao desbloquear arquétipo (`classId:path`). Mago/clérigo já recebem magia nas cenas de path. */
+const PATH_UNLOCK_BONUS: Partial<Record<string, PathUnlockBonus>> = {
+  'knight:fallen': { stats: { str: 1, luck: 1 } },
+  'mage:dark': { stats: { mind: 1 } },
+  'cleric:penitent': { stats: { mind: 1 }, addResource: { resource: 'faith', delta: 1 } },
+};
+
 const PATH_LORE_PT: Partial<Record<string, string>> = {
   'knight:fallen': `O juramento quebrou-se antes da espada. Não foi cobardia — foi o peso de ver o que não devia ser visto nas galerias. Ainda carrega o ferro; já não carrega a ilusão de que a honra lava o que a escuridão mancha.
 
@@ -64,4 +72,12 @@ export function getHeroLore(classId: ClassId, path: string | null | undefined): 
     if (lore) return lore;
   }
   return CLASS_LORE_PT[classId];
+}
+
+export function getPathUnlockBonus(
+  classId: ClassId,
+  path: string | null | undefined
+): PathUnlockBonus | null {
+  if (!path) return null;
+  return PATH_UNLOCK_BONUS[`${classId}:${path}`] ?? null;
 }

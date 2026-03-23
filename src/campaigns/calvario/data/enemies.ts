@@ -32,6 +32,10 @@ export const enemies: Record<string, EnemyDef> = {
       '  .__)(__.)(__.)(__.',
       ' /~~~~~~~~~~~~~~~~~~\\',
     ].join('\n'),
+    lootDrops: [
+      { chance: 0.01, itemId: 'potion_hp' },
+      { chance: 0.05, resource: 'gold', amount: 1 },
+    ],
   },
   skeleton: {
     id: 'skeleton',
@@ -66,6 +70,10 @@ export const enemies: Record<string, EnemyDef> = {
       '  ~~   /   \\   ~~',
       '     /_______\\',
     ].join('\n'),
+    lootDrops: [
+      { chance: 0.05, itemId: 'iron_dagger' },
+      { chance: 0.05, resource: 'gold', amount: 1 },
+    ],
   },
   cultist: {
     id: 'cultist',
@@ -89,6 +97,7 @@ export const enemies: Record<string, EnemyDef> = {
       '     / | | | \\',
       '    "~~" "~"~~"',
     ].join('\n'),
+    lootDrops: [{ chance: 0.05, resource: 'gold', amount: 1 }],
   },
   stone_guard: {
     id: 'stone_guard',
@@ -112,6 +121,10 @@ export const enemies: Record<string, EnemyDef> = {
       '   |:::::::::::::::|',
       '    \\_____________/',
     ].join('\n'),
+    lootDrops: [
+      { chance: 0.25, resource: 'gold', amount: 1 },
+      { chance: 0.25, resource: 'supply', amount: 1 },
+    ],
   },
   morvayn_p1: {
     id: 'morvayn_p1',
@@ -124,22 +137,42 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 2,
     type: 'cultist',
     armorChips: 0,
-    sprite: `   .:::.
-  ╔|☠|╗   manto
-  ║ ◊ ║   de noite
-  ║ ~ ║   e osso
-  ╚═╦═╝
-   ║ ║
-  ╱   ╲
- ╱~~~~~╲`,
-    spriteWounded: `   .:::.
-  ╔|☠|╗   ferido
-  ║ ░ ║   o véu
-  ║ ~ ║   verde
-  ╚═╦═╝
-   ║ ║
-  ╱   ╲
- ╱~~~~~╲`,
+    sprite: [
+      '      · ☠ · ☠ ·     almas',
+      '       ╲│╱ ╲│╱      presas',
+      '    ....:::::::....',
+      '   ╱~~~~~~~~~~~~~~~╲',
+      '  ╔═════════════════╗',
+      '  ║     ╔|☠|╗       ║  coroa',
+      '  ║     ║ ◊ ║       ║  de',
+      '  ║     ║ ~ ║       ║  breu',
+      '  ║     ╚═╦═╝       ║',
+      '  ╚═══════╬════════╝',
+      '         ║║',
+      '        ╱  ╲',
+      '       ╱~~~~╲',
+      '      ╱~~~~~~╲',
+    ].join('\n'),
+    spriteWounded: [
+      '      · ☠ · ☠ ·     almas',
+      '       ╲│╱ ╲│╱      presas',
+      '    ....:::::::....',
+      '   ╱~~~~~~~~~~~~~~~╲',
+      '  ╔═════════════════╗',
+      '  ║ ░   ╔|☠|╗   ░   ║',
+      '  ║░░  ║ ░ ║  ░░    ║  ferido',
+      '  ║ ░  ║ ~ ║    ░   ║  o véu',
+      '  ║    ╚═╦═╝      ║  verde',
+      '  ╚══════╬════════╝',
+      '         ║║',
+      '        ╱  ╲',
+      '       ╱~~~~╲',
+      '      ╱~~~~~~╲',
+    ].join('\n'),
+    lootDrops: [
+      { chance: 1, resource: 'gold', amount: 2 },
+      { chance: 1, itemId: 'potion_mana' },
+    ],
   },
   morvayn_p2: {
     id: 'morvayn_p2',
@@ -198,6 +231,10 @@ export const enemies: Record<string, EnemyDef> = {
       '        |     |',
       '       _|     |_',
     ].join('\n'),
+    lootDrops: [
+      { chance: 0.75, resource: 'supply', amount: 1 },
+      { chance: 0.15, itemId: 'potion_hp' },
+    ],
   },
   vigil_hunter: {
     id: 'vigil_hunter',

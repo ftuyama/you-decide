@@ -57,6 +57,7 @@ export class GameApp {
   private readonly saveKey: string;
   private readonly sidebarKey: string;
   private readonly fontKey: string;
+  private readonly quickNavKey: string;
   private readonly devModeKey: string;
   private registry: ContentRegistry;
   private bus = new EventBus();
@@ -69,6 +70,8 @@ export class GameApp {
   private fontStep = 0;
   /** Memórias (cenas visitadas), caminho do ficheiro da cena, etc. */
   private devMode = false;
+  /** Modo de navegação rápida: mostra números clicáveis antes das escolhas. */
+  private quickNavMode = false;
   private readonly choiceHotkeyHandler: (e: KeyboardEvent) => void;
   /** Secções colapsáveis (recursos, faccoes, diario) — persistido em sessionStorage */
   private sidebarSections: Record<string, boolean> = {};
@@ -85,10 +88,12 @@ export class GameApp {
     this.saveKey = `${campaignId}_save_v1`;
     this.sidebarKey = `${campaignId}_sidebar_sections_v1`;
     this.fontKey = `${campaignId}_font_step_v1`;
+    this.quickNavKey = `${campaignId}_quick_nav_mode_v1`;
     this.devModeKey = `${campaignId}_dev_mode`;
     this.registry = new ContentRegistry(campaignId);
     this.audio = new GameAudio(campaignId);
     this.fontStep = this.loadFontStep();
+    this.quickNavMode = this.loadQuickNavMode();
     this.devMode = this.loadDevMode();
     this.choiceHotkeyHandler = (e: KeyboardEvent): void => {
       if (this.state.mode !== 'story') return;
@@ -167,6 +172,22 @@ export class GameApp {
       return localStorage.getItem(this.devModeKey) === '1';
     } catch {
       return false;
+    }
+  }
+
+  private loadQuickNavMode(): boolean {
+    try {
+      return localStorage.getItem(this.quickNavKey) === '1';
+    } catch {
+      return false;
+    }
+  }
+
+  private saveQuickNavMode(): void {
+    try {
+      localStorage.setItem(this.quickNavKey, this.quickNavMode ? '1' : '0');
+    } catch {
+      /* noop */
     }
   }
 
@@ -588,6 +609,20 @@ export class GameApp {
     devRow.appendChild(devCb);
     devRow.appendChild(document.createTextNode(' Modo desenvolvedor'));
 
+    const quickNavRow = document.createElement('label');
+    quickNavRow.className = 'menu-item menu-sound menu-dev';
+    const quickNavCb = document.createElement('input');
+    quickNavCb.type = 'checkbox';
+    quickNavCb.checked = this.quickNavMode;
+    quickNavCb.addEventListener('change', () => {
+      this.quickNavMode = quickNavCb.checked;
+      this.saveQuickNavMode();
+      this.closeMenu();
+      this.render();
+    });
+    quickNavRow.appendChild(quickNavCb);
+    quickNavRow.appendChild(document.createTextNode(' Navegação rápida (números clicáveis)'));
+
     const fontBtn = document.createElement('button');
     fontBtn.type = 'button';
     fontBtn.className = 'menu-item';
@@ -611,6 +646,7 @@ export class GameApp {
     drawer.appendChild(exportBtn);
     drawer.appendChild(soundRow);
     drawer.appendChild(devRow);
+    drawer.appendChild(quickNavRow);
     drawer.appendChild(fontBtn);
     drawer.appendChild(creditsBtn);
     frame.appendChild(drawer);
@@ -1235,18 +1271,20 @@ export class GameApp {
     chWrap.className = 'choices';
 
     choices.forEach((ch, i) => {
+      const runChoice = (): void => this.applyChoice(ch);
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'choice';
       if (i < 9) btn.title = `Tecla ${i + 1}`;
-      btn.appendChild(document.createTextNode(ch.text));
+      const labelText = `${i + 1} - ${ch.text}`;
+      btn.appendChild(document.createTextNode(labelText));
       if (ch.preview) {
         const span = document.createElement('span');
         span.className = 'preview';
         span.textContent = ch.preview;
         btn.appendChild(span);
       }
-      btn.addEventListener('click', () => this.applyChoice(ch));
+      btn.addEventListener('click', runChoice);
       chWrap.appendChild(btn);
     });
     inner.appendChild(chWrap);

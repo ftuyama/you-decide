@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="docs/readme-banner.svg" alt="Calvário Subterrâneo — escadaria sob a cidade, brilho esverdeado" width="100%"/>
-
 **Um jogo de texto onde cada clique pesa como uma lâmina.**
 
 [Jogar online](#jogar-online-github-pages) · [Como jogar](#como-jogar) · [O que te espera](#o-que-te-espera-lá-embaixo) · [Dicas](#dicas-de-sobrevivência)
@@ -21,7 +19,7 @@ Seja por honra, ganância ou desespero, o primeiro passo é sempre o mesmo: **de
 ///// # /// # /// # /// # /// # /// # /// # /// # /// # /// # ///
 ////////////////////////////////////////////////////////////////
 
-                        *     .        *       .
+                    *        .        *       .
            /\      /\       /\       /\       /\
       /\  //\  /\ //\  /\ //\  /\ //\  /\ //\
      /  ^\/  ^\/  ^\/  ^\/  ^\/  ^\/  ^\/  ^\/  ^\
@@ -53,8 +51,6 @@ O projeto está preparado para **GitHub Pages** (URLs relativas na build; não d
 3. O jogo fica disponível em `https://<teu-utilizador>.github.io/<nome-do-repo>/` (ex.: `https://ftuyama.github.io/you-decide/`).
 
 Se o repositório tiver outro nome, o mesmo URL relativo continua a funcionar — não é preciso alterar o `base` do Vite.
-
-**Se no browser vires erros como `GET …/src/main.ts` (404):** o GitHub está a servir o **`index.html` da raiz do repo** (modo desenvolvimento), não a pasta **`dist`** da build. Abre **Settings → Pages** e confirma que **Source** é só **GitHub Actions** — desativa **“Deploy from a branch”** (por exemplo `main` / `/ (root)`), porque isso publica o código-fonte em vez do artefacto do workflow. Depois, em **Actions**, volta a correr o último workflow (ou faz um push vazio) para voltar a publicar.
 
 ---
 

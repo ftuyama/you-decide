@@ -1,7 +1,9 @@
-export type AmbientTheme = 'explore' | 'combat' | 'camp' | 'boss';
+import { BOSS_LEAD_MELODY, CAMP_MELODY, EXPLORE_PIANO_MELODY } from './melodies.ts';
+import { playOneShotTone, triggerArp, triggerHat, triggerKick, triggerPluck, triggerSnare } from './primitives.ts';
+import type { AmbientTheme } from './types.ts';
 
 /**
- * Áudio retro: tons simples + música de fundo procedural (Web Audio).
+ * Audio retro: tons simples + música de fundo procedural (Web Audio).
  * Temas: exploração, combate (batida), acampamento, chefe.
  */
 export class GameAudio {
@@ -295,7 +297,7 @@ export class GameAudio {
   }
 
   /**
-   * Exploração: pad em lá menor com pulsação lenta.
+   * Exploração: pad em lá menor com pulsação lenta + piano discreto.
    */
   private playAmbientExplore(): void {
     if (this.muted || this.bgCleanup) return;
@@ -347,10 +349,23 @@ export class GameAudio {
       }
     }, 380);
 
+    let melodyStep = 0;
+    this.bgRhythmTimer = setInterval(() => {
+      if (this.muted || !this.ctx) return;
+      const note = EXPLORE_PIANO_MELODY[melodyStep % EXPLORE_PIANO_MELODY.length];
+      melodyStep++;
+      const when = this.ctx.currentTime + 0.02;
+      triggerPluck(ctx, master, when, note, this.gain(0.018), 'triangle', 1.8);
+    }, 1500);
+
     this.bgCleanup = () => {
       if (this.bgPulseTimer) {
         clearInterval(this.bgPulseTimer);
         this.bgPulseTimer = null;
+      }
+      if (this.bgRhythmTimer) {
+        clearInterval(this.bgRhythmTimer);
+        this.bgRhythmTimer = null;
       }
       for (const o of oscillators) {
         try {
@@ -391,20 +406,20 @@ export class GameAudio {
     const eighth = 125;
     this.bgRhythmTimer = setInterval(() => {
       if (this.muted || !this.ctx) return;
-      const t = ctx.currentTime;
+      const tNow = ctx.currentTime;
       const s = step % 8;
       if (s === 0 || s === 4) {
-        this.triggerKick(ctx, master, t);
-        bassGain.gain.setTargetAtTime(this.gain(0.18), t, 0.02);
-        bassGain.gain.setTargetAtTime(0, t + 0.12, 0.05);
+        triggerKick(ctx, master, tNow, this.gain(0.14));
+        bassGain.gain.setTargetAtTime(this.gain(0.18), tNow, 0.02);
+        bassGain.gain.setTargetAtTime(0, tNow + 0.12, 0.05);
       } else if (s === 2 || s === 6) {
-        this.triggerSnare(ctx, master, t);
+        triggerSnare(ctx, master, tNow, this.gain(0.11));
       }
       if (s % 2 === 0) {
-        this.triggerHat(ctx, master, t, s === 0 || s === 4 ? 0.04 : 0.025);
+        triggerHat(ctx, master, tNow, this.gain(s === 0 || s === 4 ? 0.04 : 0.025));
       }
       if (s === 0) {
-        this.triggerArp(ctx, master, t);
+        triggerArp(ctx, master, tNow, this.gain(0.045));
       }
       step++;
     }, eighth);
@@ -423,80 +438,8 @@ export class GameAudio {
     };
   }
 
-  private triggerKick(ctx: AudioContext, dest: AudioNode, t: number): void {
-    const g = this.gain(0.14);
-    if (g <= 0) return;
-    const o = ctx.createOscillator();
-    const gn = ctx.createGain();
-    o.type = 'sine';
-    o.frequency.setValueAtTime(120, t);
-    o.frequency.exponentialRampToValueAtTime(55, t + 0.06);
-    gn.gain.setValueAtTime(g, t);
-    gn.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
-    o.connect(gn);
-    gn.connect(dest);
-    o.start(t);
-    o.stop(t + 0.11);
-  }
-
-  private triggerSnare(ctx: AudioContext, dest: AudioNode, t: number): void {
-    const g = this.gain(0.11);
-    if (g <= 0) return;
-    const len = 4096;
-    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
-    const d = buf.getChannelData(0);
-    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
-    const src = ctx.createBufferSource();
-    src.buffer = buf;
-    const bp = ctx.createBiquadFilter();
-    bp.type = 'bandpass';
-    bp.frequency.value = 1800;
-    const gn = ctx.createGain();
-    gn.gain.setValueAtTime(g, t);
-    gn.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
-    src.connect(bp);
-    bp.connect(gn);
-    gn.connect(dest);
-    src.start(t);
-    src.stop(t + 0.12);
-  }
-
-  private triggerHat(ctx: AudioContext, dest: AudioNode, t: number, vol: number): void {
-    const g = this.gain(vol);
-    if (g <= 0) return;
-    const o = ctx.createOscillator();
-    const gn = ctx.createGain();
-    o.type = 'square';
-    o.frequency.value = 8000 + Math.random() * 400;
-    gn.gain.setValueAtTime(g, t);
-    gn.gain.exponentialRampToValueAtTime(0.01, t + 0.03);
-    o.connect(gn);
-    gn.connect(dest);
-    o.start(t);
-    o.stop(t + 0.04);
-  }
-
-  /** Arpejo curto (pentatónica menor) no compasso */
-  private triggerArp(ctx: AudioContext, dest: AudioNode, t: number): void {
-    const g = this.gain(0.045);
-    if (g <= 0) return;
-    const notes = [220, 261.63, 293.66, 329.63];
-    notes.forEach((f, i) => {
-      const o = ctx.createOscillator();
-      const gn = ctx.createGain();
-      o.type = 'square';
-      o.frequency.value = f;
-      gn.gain.setValueAtTime(g, t + i * 0.05);
-      gn.gain.exponentialRampToValueAtTime(0.01, t + i * 0.05 + 0.08);
-      o.connect(gn);
-      gn.connect(dest);
-      o.start(t + i * 0.05);
-      o.stop(t + i * 0.05 + 0.09);
-    });
-  }
-
   /**
-   * Acampamento: mais lento, acordes mais abertos, menos agressivo.
+   * Acampamento: cama harmónica quente + melodia lenta e contemplativa.
    */
   private playAmbientCamp(): void {
     if (this.muted || this.bgCleanup) return;
@@ -540,10 +483,25 @@ export class GameAudio {
       }
     }, 520);
 
+    let melodyStep = 0;
+    this.bgRhythmTimer = setInterval(() => {
+      if (this.muted || !this.ctx) return;
+      const note = CAMP_MELODY[melodyStep % CAMP_MELODY.length];
+      melodyStep++;
+      const when = this.ctx.currentTime + 0.02;
+      triggerPluck(ctx, master, when, note, this.gain(0.02), 'sine', 2.2);
+      // Uma oitava acima, quase imperceptível, para dar "brilho" ao acampamento.
+      triggerPluck(ctx, master, when + 0.05, note * 2, this.gain(0.008), 'triangle', 1.8);
+    }, 1900);
+
     this.bgCleanup = () => {
       if (this.bgPulseTimer) {
         clearInterval(this.bgPulseTimer);
         this.bgPulseTimer = null;
+      }
+      if (this.bgRhythmTimer) {
+        clearInterval(this.bgRhythmTimer);
+        this.bgRhythmTimer = null;
       }
       for (const o of oscillators) {
         try {
@@ -562,50 +520,62 @@ export class GameAudio {
   }
 
   /**
-   * Boss: metade do tempo, drones graves, pouca percussão.
+   * Boss: batida mais agressiva + baixo contínuo + lead heroico.
    */
   private playAmbientBoss(): void {
     if (this.muted || this.bgCleanup) return;
     const ctx = this.ensureContext();
     const master = ctx.createGain();
-    master.gain.value = this.gain(0.11);
-    master.connect(ctx.destination);
+    master.gain.value = this.gain(0.12);
+
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -24;
+    comp.knee.value = 10;
+    comp.ratio.value = 5;
+    comp.attack.value = 0.005;
+    comp.release.value = 0.2;
+    master.connect(comp);
+    comp.connect(ctx.destination);
 
     const drones: OscillatorNode[] = [];
-    for (const freq of [55, 82.41, 103.83]) {
+    for (const freq of [55, 82.41, 110]) {
       const o = ctx.createOscillator();
       const g = ctx.createGain();
-      o.type = 'sine';
+      o.type = 'sawtooth';
       o.frequency.value = freq;
-      o.detune.value = (Math.random() - 0.5) * 6;
-      g.gain.value = freq === 55 ? 0.22 : 0.14;
+      o.detune.value = (Math.random() - 0.5) * 8;
+      g.gain.value = freq === 55 ? 0.18 : 0.12;
       o.connect(g);
       g.connect(master);
       o.start();
       drones.push(o);
     }
 
+    const bassPattern = [55, 55, 65.41, 73.42, 82.41, 73.42, 65.41, 55];
     let step = 0;
-    const eighth = 250;
+    const eighth = 125;
     this.bgRhythmTimer = setInterval(() => {
       if (this.muted || !this.ctx) return;
-      const t = ctx.currentTime;
-      const s = step % 8;
-      if (s === 0 || s === 4) {
-        this.triggerKick(ctx, master, t);
-        this.triggerSnare(ctx, master, t + 0.05);
+      const tNow = ctx.currentTime;
+      const s = step % 16;
+
+      if (s === 0 || s === 3 || s === 8 || s === 11 || s === 14) {
+        triggerKick(ctx, master, tNow, this.gain(0.16));
       }
-      if (s === 0) {
-        const o = ctx.createOscillator();
-        const gn = ctx.createGain();
-        o.type = 'sawtooth';
-        o.frequency.value = 123;
-        gn.gain.setValueAtTime(this.gain(0.05), t);
-        gn.gain.exponentialRampToValueAtTime(0.01, t + 0.4);
-        o.connect(gn);
-        gn.connect(master);
-        o.start(t);
-        o.stop(t + 0.45);
+      if (s === 4 || s === 12) {
+        triggerSnare(ctx, master, tNow, this.gain(0.12));
+      }
+      if (s % 2 === 0) {
+        triggerHat(ctx, master, tNow, this.gain(s % 4 === 0 ? 0.038 : 0.03));
+      }
+
+      const bassFreq = bassPattern[step % bassPattern.length];
+      triggerPluck(ctx, master, tNow, bassFreq, this.gain(0.05), 'sawtooth', 0.22);
+
+      if (s % 4 === 0) {
+        const note = BOSS_LEAD_MELODY[(step / 4) % BOSS_LEAD_MELODY.length];
+        triggerPluck(ctx, master, tNow + 0.01, note, this.gain(0.03), 'triangle', 0.5);
+        triggerPluck(ctx, master, tNow + 0.08, note * 1.5, this.gain(0.012), 'triangle', 0.35);
       }
       step++;
     }, eighth);
@@ -624,6 +594,7 @@ export class GameAudio {
       }
       try {
         master.disconnect();
+        comp.disconnect();
       } catch {
         /* noop */
       }
@@ -637,15 +608,6 @@ export class GameAudio {
   private playTone(freq: number, dur: number, vol: number, type: OscillatorType = 'sine'): void {
     const ctx = this.ensureContext();
     const g = this.gain(vol);
-    if (g <= 0) return;
-    const o = ctx.createOscillator();
-    const gn = ctx.createGain();
-    o.type = type;
-    o.frequency.value = freq;
-    gn.gain.value = g;
-    o.connect(gn);
-    gn.connect(ctx.destination);
-    o.start();
-    o.stop(ctx.currentTime + dur);
+    playOneShotTone(ctx, ctx.destination, freq, dur, g, type);
   }
 }

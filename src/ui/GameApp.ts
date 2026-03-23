@@ -1582,7 +1582,7 @@ export class GameApp {
     }
 
     const flee = document.createElement('button');
-    flee.className = 'choice combat-flee-btn';
+    flee.className = 'combat-flee-btn';
     flee.textContent = 'Tentar fugir';
     flee.addEventListener('click', () => {
       this.unlockAudio();

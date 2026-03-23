@@ -1,6 +1,7 @@
 ---
 id: act1/pick_mage
 chapter: 1
+artKey: pick_mage
 choices:
   - text: "Avançar para a boca da masmorra"
     next: act1/dungeon_mouth

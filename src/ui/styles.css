@@ -1237,11 +1237,23 @@ button.camp-equip-btn:hover {
   margin: 0.35rem 0 0.35rem;
 }
 
-button.choice.combat-flee-btn {
+button.combat-flee-btn {
+  font: inherit;
+  font-size: 0.78rem;
+  text-align: left;
+  cursor: pointer;
+  padding: 0.35rem 0.5rem;
+  background: #161f22;
+  color: #b8e0c8;
+  border: 1px solid #4a6a58;
   display: block;
   width: 100%;
   margin-top: 0.55rem;
   box-sizing: border-box;
+}
+
+button.combat-flee-btn:hover {
+  border-color: #5ac890;
 }
 
 /** Log ao lado do campo de batalha; sticky para acompanhar scroll sem ficar “embaixo” do layout */

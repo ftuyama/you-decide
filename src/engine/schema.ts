@@ -208,13 +208,15 @@ export const SkillCheckSchema = z.object({
 
 export type SkillCheck = z.infer<typeof SkillCheckSchema>;
 
-/** 2d6 + mod(sorte efetiva) vs TN — paralelo a skillCheck */
+/** 2d6 + mod(sorte efetiva) − luckPenalty vs TN — paralelo a skillCheck */
 export const LuckCheckSchema = z.object({
   id: z.string(),
   tn: z.number().int(),
   successNext: z.string(),
   failNext: z.string(),
   label: z.string().optional(),
+  /** Penalidade ao total do lance (ex.: aposta amaldiçoada). Default 0. */
+  luckPenalty: z.number().int().min(0).max(5).optional(),
 });
 
 export type LuckCheck = z.infer<typeof LuckCheckSchema>;

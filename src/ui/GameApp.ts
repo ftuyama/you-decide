@@ -17,6 +17,7 @@ import type {
   ClassId,
   CombatLogEntry,
   GameState,
+  ItemDef,
   LevelUpStatDeltas,
   SpellDef,
 } from '../engine/schema';
@@ -362,6 +363,97 @@ export class GameApp {
     return undefined;
   }
 
+  /** Acampamento da Vigília: troca de equipamento fora do combate. */
+  private isCampEquipmentScene(): boolean {
+    return this.state.sceneId.includes('vigilia_camp');
+  }
+
+  private inventoryEquipmentIdsForSlot(slot: 'weapon' | 'armor' | 'relic'): string[] {
+    const seen = new Set<string>();
+    const out: string[] = [];
+    for (const id of this.state.inventory) {
+      const def = this.registry.data.items[id];
+      if (!def || def.slot !== slot) continue;
+      if (seen.has(id)) continue;
+      seen.add(id);
+      out.push(id);
+    }
+    return out;
+  }
+
+  private applyCampEquip(itemId: string): void {
+    this.unlockAudio();
+    this.audio.playUiClick();
+    const s = applyEffects(this.state, [{ op: 'equipItem', itemId }], this.ctx());
+    this.state = this.stabilize(s);
+    this.render();
+  }
+
+  private appendCampEquipmentPanel(parent: HTMLElement): void {
+    if (!this.isCampEquipmentScene() || !this.state.party[0]) return;
+
+    const lead = this.state.party[0];
+    const items = this.registry.data.items;
+
+    const panel = document.createElement('div');
+    panel.className = 'camp-equip-panel';
+    const hdr = document.createElement('div');
+    hdr.className = 'camp-equip-hdr';
+    hdr.textContent = 'Equipamento no acampamento';
+    panel.appendChild(hdr);
+
+    const slotDefs: { key: 'weapon' | 'armor' | 'relic'; label: string; cur: string | null }[] = [
+      { key: 'weapon', label: 'Arma', cur: lead.weaponId },
+      { key: 'armor', label: 'Armadura', cur: lead.armorId },
+      { key: 'relic', label: 'Relíquia', cur: lead.relicId },
+    ];
+
+    for (const { key, label, cur } of slotDefs) {
+      const row = document.createElement('div');
+      row.className = 'camp-equip-slot';
+      const lab = document.createElement('div');
+      lab.className = 'camp-equip-slot-label';
+      lab.textContent = label;
+      row.appendChild(lab);
+
+      const curEl = document.createElement('div');
+      curEl.className = 'camp-equip-current';
+      if (cur) {
+        const def = items[cur];
+        curEl.textContent = def?.name ?? cur;
+      } else {
+        curEl.classList.add('camp-equip-current--empty');
+        curEl.textContent = '— vazio —';
+      }
+      row.appendChild(curEl);
+
+      const candidates = this.inventoryEquipmentIdsForSlot(key);
+      if (candidates.length === 0) {
+        const hint = document.createElement('div');
+        hint.className = 'camp-equip-hint';
+        hint.textContent = 'Sem peças deste tipo no inventário.';
+        row.appendChild(hint);
+      } else {
+        const actions = document.createElement('div');
+        actions.className = 'camp-equip-actions';
+        for (const itemId of candidates) {
+          const def = items[itemId];
+          if (!def) continue;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'camp-equip-btn';
+          btn.textContent = `Equipar ${def.name}`;
+          btn.addEventListener('click', () => this.applyCampEquip(itemId));
+          actions.appendChild(btn);
+        }
+        row.appendChild(actions);
+      }
+      panel.appendChild(row);
+    }
+
+    parent.appendChild(panel);
+  }
+
   private render(): void {
     if (this.timedTimer) {
       clearTimeout(this.timedTimer);
@@ -578,6 +670,31 @@ export class GameApp {
     return ` <span class="stat-build-bonus">(${sign}${n})</span>`;
   }
 
+  /** Resumo mecânico do item (dano, armadura, atributos) para a secção Equipamento. */
+  private formatItemEquipmentStatsHtml(it: ItemDef): string {
+    const parts: string[] = [];
+    if (it.damage !== 0) {
+      parts.push(it.damage > 0 ? `Dano +${it.damage}` : `Dano ${it.damage}`);
+    }
+    if (it.armor !== 0) {
+      parts.push(it.armor > 0 ? `Armadura +${it.armor}` : `Armadura ${it.armor}`);
+    }
+    const attrs: [keyof ItemDef, string][] = [
+      ['bonusStr', 'STR'],
+      ['bonusAgi', 'AGI'],
+      ['bonusMind', 'MEN'],
+      ['bonusLuck', 'SOR'],
+    ];
+    for (const [key, label] of attrs) {
+      const v = it[key];
+      if (typeof v !== 'number' || v === 0) continue;
+      parts.push(`${label} ${v > 0 ? '+' : ''}${v}`);
+    }
+    if (it.cursed) parts.push('Amaldiçoado');
+    if (parts.length === 0) return '';
+    return `<span class="sidebar-equip-stats">${parts.map((s) => this.escHtml(s)).join(' · ')}</span>`;
+  }
+
   /** CA, STR, AGI, MEN, SOR com totais e (+X) da build. */
   private formatStatAttrsLineHtml(c: Character, opts?: { compact?: boolean }): string {
     const data = this.registry.data;
@@ -739,7 +856,8 @@ export class GameApp {
             }
             const it = d[id];
             const name = it?.name ?? id;
-            return `<p class="sidebar-equip-line"><strong>${label}</strong> — ${this.escHtml(name)}</p>`;
+            const stats = it ? this.formatItemEquipmentStatsHtml(it) : '';
+            return `<p class="sidebar-equip-line"><strong>${label}</strong> — ${this.escHtml(name)}${stats ? `<br>${stats}` : ''}</p>`;
           };
           const equipBody = `${line('Arma', p.weaponId)}${line('Armadura', p.armorId)}${line('Relíquia', p.relicId)}`;
           return `<details class="sidebar-collapse sidebar-equip"${openEquip} data-section="personagem_equip">
@@ -1018,6 +1136,8 @@ export class GameApp {
       }
     }
 
+    this.appendCampEquipmentPanel(inner);
+
     if (scene.frontmatter.skillCheck) {
       const row = document.createElement('div');
       row.className = 'skill-row';
@@ -1035,7 +1155,9 @@ export class GameApp {
       const b = document.createElement('button');
       b.className = 'choice';
       const lc = scene.frontmatter.luckCheck;
-      b.textContent = `Rolar sorte: ${lc.label ?? '2d6 + mod(SOR)'} vs TN ${lc.tn}`;
+      const curse =
+        lc.luckPenalty && lc.luckPenalty > 0 ? ` · maldição −${lc.luckPenalty}` : '';
+      b.textContent = `Rolar sorte: ${lc.label ?? '2d6 + mod(SOR)'} vs TN ${lc.tn}${curse}`;
       b.addEventListener('click', () => this.onLuckRoll(scene));
       row.appendChild(b);
       inner.appendChild(row);
@@ -1129,6 +1251,134 @@ export class GameApp {
       panel.appendChild(pre);
       left.appendChild(panel);
     }
+
+    const lead = this.state.party[0];
+
+    const actionsPanel = document.createElement('div');
+    actionsPanel.className = 'combat-actions-panel';
+    const actionsHdr = document.createElement('div');
+    actionsHdr.className = 'combat-actions-panel-hdr';
+    actionsHdr.textContent = 'Ações';
+    actionsPanel.appendChild(actionsHdr);
+
+    if (c.phase === 'choose_stance' && lead) {
+      if (this.state.party.length > 1) {
+        const allyHint = document.createElement('div');
+        allyHint.className = 'combat-allies-hint';
+        allyHint.textContent =
+          'Cada companheiro ataca em seguida (mesma postura), contra o primeiro inimigo vivo.';
+        actionsPanel.appendChild(allyHint);
+      }
+      const bar = document.createElement('div');
+      bar.className = 'stance-bar';
+      const stances: Stance[] = ['aggressive', 'defensive', 'focus'];
+      const labels: Record<Stance, string> = {
+        aggressive: 'Agressivo (+atk / −def)',
+        defensive: 'Defensivo (−atk / +def)',
+        focus: 'Foco (magia: Mente)',
+      };
+      for (const st of stances) {
+        const btn = document.createElement('button');
+        btn.className = 'stance';
+        btn.textContent = labels[st];
+        btn.addEventListener('click', () => {
+          this.unlockAudio();
+          this.audio.playDice();
+          this.state = executePlayerTurn(this.state, st, this.registry.data, false, this.bus);
+          this.render();
+        });
+        bar.appendChild(btn);
+      }
+      const sp = document.createElement('button');
+      sp.className = 'stance special';
+      sp.textContent = lead.specialUsedThisCombat ? 'Especial já usado' : 'Golpe especial (+2, +Stress)';
+      sp.disabled = lead.specialUsedThisCombat;
+      sp.addEventListener('click', () => {
+        if (!lead.specialUsedThisCombat) {
+          this.unlockAudio();
+          this.audio.playDice();
+          this.state = executePlayerTurn(this.state, 'aggressive', this.registry.data, true, this.bus);
+          this.render();
+        }
+      });
+      bar.appendChild(sp);
+      actionsPanel.appendChild(bar);
+
+      if (lead.maxMana > 0) {
+        const spellBar = document.createElement('div');
+        spellBar.className = 'combat-spell-bar';
+        const spellHdr = document.createElement('div');
+        spellHdr.className = 'combat-spell-hdr';
+        spellHdr.textContent = 'Magias';
+        spellBar.appendChild(spellHdr);
+        const spells = this.registry.data.spells;
+        for (const [spellId, spellDef] of Object.entries(spells)) {
+          if (!this.state.knownSpells.includes(spellId)) continue;
+          if (spellDef.classId !== 'any' && spellDef.classId !== lead.class) continue;
+          if (this.state.level < spellDef.minLevel) continue;
+          const btn = document.createElement('button');
+          btn.className = 'combat-spell';
+          btn.type = 'button';
+          btn.textContent = `${spellDef.name} (${spellDef.manaCost})`;
+          const castOk = canCastSpell(this.state, spellId, this.registry.data);
+          btn.disabled = !castOk;
+          btn.addEventListener('click', () => {
+            if (!canCastSpell(this.state, spellId, this.registry.data)) return;
+            this.unlockAudio();
+            this.audio.playDice();
+            this.state = executeSpellTurn(this.state, spellId, this.registry.data, this.bus);
+            this.render();
+          });
+          spellBar.appendChild(btn);
+        }
+        actionsPanel.appendChild(spellBar);
+      }
+
+      const potionIds = [...new Set(this.state.inventory)].filter((id) => {
+        const d = this.registry.data.items[id];
+        return d?.slot === 'consumable';
+      });
+      if (potionIds.length) {
+        const potionBar = document.createElement('div');
+        potionBar.className = 'combat-potion-bar';
+        const potionHdr = document.createElement('div');
+        potionHdr.className = 'combat-potion-hdr';
+        potionHdr.textContent = 'Itens';
+        potionBar.appendChild(potionHdr);
+        for (const itemId of potionIds) {
+          const def = this.registry.data.items[itemId];
+          if (!def) continue;
+          const count = this.state.inventory.filter((x) => x === itemId).length;
+          const btn = document.createElement('button');
+          btn.className = 'combat-potion';
+          btn.type = 'button';
+          btn.textContent = count > 1 ? `${def.name} (${count})` : def.name;
+          const ok = canUseCombatConsumable(this.state, itemId, this.registry.data);
+          btn.disabled = !ok;
+          btn.addEventListener('click', () => {
+            if (!canUseCombatConsumable(this.state, itemId, this.registry.data)) return;
+            this.unlockAudio();
+            this.audio.playDice();
+            this.state = useCombatConsumable(this.state, itemId, this.registry.data, this.bus);
+            this.render();
+          });
+          potionBar.appendChild(btn);
+        }
+        actionsPanel.appendChild(potionBar);
+      }
+    }
+
+    const flee = document.createElement('button');
+    flee.className = 'choice combat-flee-btn';
+    flee.textContent = 'Tentar fugir';
+    flee.addEventListener('click', () => {
+      this.unlockAudio();
+      this.state = fleeCombat(this.state, this.bus);
+      this.render();
+    });
+    actionsPanel.appendChild(flee);
+
+    left.appendChild(actionsPanel);
     layout.appendChild(left);
 
     const right = document.createElement('div');
@@ -1219,124 +1469,6 @@ export class GameApp {
     right.appendChild(logOuter);
     layout.appendChild(right);
     inner.appendChild(layout);
-
-    const lead = this.state.party[0];
-    if (c.phase === 'choose_stance' && lead) {
-      if (this.state.party.length > 1) {
-        const allyHint = document.createElement('div');
-        allyHint.className = 'combat-allies-hint';
-        allyHint.textContent =
-          'Cada companheiro ataca em seguida (mesma postura), contra o primeiro inimigo vivo.';
-        inner.appendChild(allyHint);
-      }
-      const bar = document.createElement('div');
-      bar.className = 'stance-bar';
-      const stances: Stance[] = ['aggressive', 'defensive', 'focus'];
-      const labels: Record<Stance, string> = {
-        aggressive: 'Agressivo (+atk / −def)',
-        defensive: 'Defensivo (−atk / +def)',
-        focus: 'Foco (magia: Mente)',
-      };
-      for (const st of stances) {
-        const btn = document.createElement('button');
-        btn.className = 'stance';
-        btn.textContent = labels[st];
-        btn.addEventListener('click', () => {
-          this.unlockAudio();
-          this.audio.playDice();
-          this.state = executePlayerTurn(this.state, st, this.registry.data, false, this.bus);
-          this.render();
-        });
-        bar.appendChild(btn);
-      }
-      const sp = document.createElement('button');
-      sp.className = 'stance special';
-      sp.textContent = lead.specialUsedThisCombat ? 'Especial já usado' : 'Golpe especial (+2, +Stress)';
-      sp.disabled = lead.specialUsedThisCombat;
-      sp.addEventListener('click', () => {
-        if (!lead.specialUsedThisCombat) {
-          this.unlockAudio();
-          this.audio.playDice();
-          this.state = executePlayerTurn(this.state, 'aggressive', this.registry.data, true, this.bus);
-          this.render();
-        }
-      });
-      bar.appendChild(sp);
-      inner.appendChild(bar);
-
-      if (lead.maxMana > 0) {
-        const spellBar = document.createElement('div');
-        spellBar.className = 'combat-spell-bar';
-        const spellHdr = document.createElement('div');
-        spellHdr.className = 'combat-spell-hdr';
-        spellHdr.textContent = 'Magias';
-        spellBar.appendChild(spellHdr);
-        const spells = this.registry.data.spells;
-        for (const [spellId, sp] of Object.entries(spells)) {
-          if (!this.state.knownSpells.includes(spellId)) continue;
-          if (sp.classId !== 'any' && sp.classId !== lead.class) continue;
-          if (this.state.level < sp.minLevel) continue;
-          const btn = document.createElement('button');
-          btn.className = 'combat-spell';
-          btn.type = 'button';
-          btn.textContent = `${sp.name} (${sp.manaCost})`;
-          const castOk = canCastSpell(this.state, spellId, this.registry.data);
-          btn.disabled = !castOk;
-          btn.addEventListener('click', () => {
-            if (!canCastSpell(this.state, spellId, this.registry.data)) return;
-            this.unlockAudio();
-            this.audio.playDice();
-            this.state = executeSpellTurn(this.state, spellId, this.registry.data, this.bus);
-            this.render();
-          });
-          spellBar.appendChild(btn);
-        }
-        inner.appendChild(spellBar);
-      }
-
-      const potionIds = [...new Set(this.state.inventory)].filter((id) => {
-        const d = this.registry.data.items[id];
-        return d?.slot === 'consumable';
-      });
-      if (potionIds.length) {
-        const potionBar = document.createElement('div');
-        potionBar.className = 'combat-potion-bar';
-        const potionHdr = document.createElement('div');
-        potionHdr.className = 'combat-potion-hdr';
-        potionHdr.textContent = 'Itens';
-        potionBar.appendChild(potionHdr);
-        for (const itemId of potionIds) {
-          const def = this.registry.data.items[itemId];
-          if (!def) continue;
-          const count = this.state.inventory.filter((x) => x === itemId).length;
-          const btn = document.createElement('button');
-          btn.className = 'combat-potion';
-          btn.type = 'button';
-          btn.textContent = count > 1 ? `${def.name} (${count})` : def.name;
-          const ok = canUseCombatConsumable(this.state, itemId, this.registry.data);
-          btn.disabled = !ok;
-          btn.addEventListener('click', () => {
-            if (!canUseCombatConsumable(this.state, itemId, this.registry.data)) return;
-            this.unlockAudio();
-            this.audio.playDice();
-            this.state = useCombatConsumable(this.state, itemId, this.registry.data, this.bus);
-            this.render();
-          });
-          potionBar.appendChild(btn);
-        }
-        inner.appendChild(potionBar);
-      }
-    }
-
-    const flee = document.createElement('button');
-    flee.className = 'choice';
-    flee.textContent = 'Tentar fugir';
-    flee.addEventListener('click', () => {
-      this.unlockAudio();
-      this.state = fleeCombat(this.state, this.bus);
-      this.render();
-    });
-    inner.appendChild(flee);
 
     shell.appendChild(inner);
   }

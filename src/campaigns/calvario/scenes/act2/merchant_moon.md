@@ -35,12 +35,9 @@ choices:
       - { op: addDiary, text: "O mercador hesitou quando falei da Vigília — interesse compra silêncio." }
     preview: "Diário · rumor de respeito"
   - text: "Sussurrar símbolos do Círculo"
-    next: act2/hub_catacomb
+    next: act2/merchant_circle_bet
     condition: { rep: { faction: circulo, gte: 1 } }
-    effects:
-      - { op: addResource, resource: gold, delta: 1 }
-      - { op: addDiary, text: "O capuz inclinou-se: o Círculo paga em moeda e em olhos." }
-    preview: "+1 ouro"
+    preview: "Teste de sorte · aposta amaldiçoada"
   - text: "Deixar o Terceiro Sino nomear o preço"
     next: act2/hub_catacomb
     condition: { rep: { faction: culto, gte: 1 } }

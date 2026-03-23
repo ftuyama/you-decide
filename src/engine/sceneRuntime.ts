@@ -124,10 +124,13 @@ export function resolveLuckCheck(
   const lead = state.party[0];
   const effLuck = lead ? getEffectiveLuck(lead, data, state) : 8;
   const mod = Math.floor((effLuck - 6) / 2);
-  const total = d1 + d2 + mod;
+  const penalty = lc.luckPenalty ?? 0;
+  const total = d1 + d2 + mod - penalty;
   const ok = total >= lc.tn;
   const next = ok ? lc.successNext : lc.failNext;
-  const rollLog = `Sorte: [${d1}][${d2}] +${mod} = ${total} vs TN ${lc.tn} → ${ok ? 'sucesso' : 'falha'}.`;
+  const curseBit =
+    penalty > 0 ? ` −${penalty} (maldição)` : '';
+  const rollLog = `Sorte: [${d1}][${d2}] +${mod}${curseBit} = ${total} vs TN ${lc.tn} → ${ok ? 'sucesso' : 'falha'}.`;
   const newState = tickActiveBuffs({
     ...state,
     rngSeed: (state.rngSeed + 19) >>> 0,

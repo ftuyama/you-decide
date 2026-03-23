@@ -5,7 +5,7 @@ import { beginEncounter } from './combat';
 import type { GameData } from './gameData';
 import { addXp } from './progression';
 import { initialKnownSpellIds } from './spellsKnown';
-import { createInitialState, createPlayerCharacter, startingEquipmentInventoryIds } from './state';
+import { createInitialState, createPlayerCharacter } from './state';
 import { DEFAULT_HERO_NAME, getHeroClassLabel } from '../campaigns/calvario/classHero';
 import campaignIndex from '../campaigns/calvario/index.json';
 import { clampLeadStat, tickActiveBuffs, type LeadStatAttr } from './leadStats';
@@ -273,11 +273,6 @@ function applyOne(
       const heroName = DEFAULT_HERO_NAME[e.class];
       const pc = createPlayerCharacter(heroName, e.class);
       const knownSpells = initialKnownSpellIds(pc, ctx.data);
-      const startIds = startingEquipmentInventoryIds(e.class);
-      const inv = [...state.inventory];
-      for (const id of startIds) {
-        if (!inv.includes(id)) inv.push(id);
-      }
       return {
         ...state,
         party: [pc],
@@ -285,7 +280,7 @@ function applyOne(
         level: 1,
         xp: 0,
         knownSpells,
-        inventory: inv,
+        inventory: state.inventory,
       };
     }
     case 'learnSpell': {

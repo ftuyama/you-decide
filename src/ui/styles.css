@@ -1321,16 +1321,39 @@ button.choice.combat-flee-btn {
   background: rgba(30, 50, 35, 0.2);
 }
 
-.combat-log-entry.combat-log-damage.combat-damage-to-hero .combat-log-msg {
-  color: #e89898;
-}
-
+/**
+ * Dano no herói (inimigo acerta): verde — leitura de “golpe certeiro”, não panfleto de erro.
+ * Crítico: amarelo (mesma família do crítico em dano a inimigo).
+ */
 .combat-log-entry.combat-log-damage.combat-damage-to-hero {
-  border-color: #6b3d3d;
-  background: rgba(50, 25, 25, 0.25);
+  border-color: #3d6b48;
+  background: rgba(35, 65, 40, 0.28);
 }
 
-.combat-log-entry.combat-log-damage.combat-damage-crit .combat-log-msg {
+.combat-log-entry.combat-log-damage.combat-damage-to-hero .combat-log-msg {
+  color: #b8e8c4;
+}
+
+.combat-log-entry.combat-log-damage.combat-damage-to-hero .combat-log-meta--attack-roll {
+  color: #9ec9a8;
+}
+
+.combat-log-entry.combat-log-damage.combat-damage-to-hero.combat-damage-crit {
+  border-color: #8a7a28;
+  background: rgba(65, 55, 20, 0.35);
+}
+
+.combat-log-entry.combat-log-damage.combat-damage-to-hero.combat-damage-crit .combat-log-msg {
+  color: #e6c200;
+  font-weight: 600;
+}
+
+.combat-log-entry.combat-log-damage.combat-damage-to-hero.combat-damage-crit .combat-log-meta--attack-roll {
+  color: #e0c860;
+  font-weight: 600;
+}
+
+.combat-log-entry.combat-log-damage.combat-damage-crit:not(.combat-damage-to-hero) .combat-log-msg {
   color: #e6c200;
   font-weight: 600;
 }
@@ -1400,16 +1423,32 @@ button.choice.combat-flee-btn {
   color: #f0c0c0;
 }
 
+/** Dados ASCII: fonte pequena para caber mais no painel */
 .dice-ascii-block {
-  margin: 0.22rem 0 0.08rem;
-  padding: 0.22rem 0.3rem;
-  font-size: 0.48rem;
-  line-height: 1.05;
+  margin: 0;
+  padding: 0.12rem 0.2rem;
+  font-size: 0.34rem;
+  line-height: 1;
   white-space: pre;
   color: #b8c4b0;
   background: #0a0c0a;
   border: 1px dashed #333630;
   overflow-x: auto;
+  flex: 0 0 auto;
+}
+
+.dice-ascii-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.35rem;
+  margin: 0.12rem 0 0.06rem;
+}
+
+.combat-log-msg--sub {
+  font-size: 0.72em;
+  opacity: 0.92;
+  margin-top: 0.12rem;
 }
 
 .combat-allies-hint {

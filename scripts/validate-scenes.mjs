@@ -1,13 +1,29 @@
 /**
  * Valida referências entre cenas (next, onVictory, onFlee, skillCheck, etc.).
- * Uso: node scripts/validate-scenes.mjs
+ * Uso: node scripts/validate-scenes.mjs [--campaign <id>]
+ * Default: calvario
  */
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const scenesDir = path.join(__dirname, '..', 'src', 'campaigns', 'calvario', 'scenes');
+
+const argv = process.argv.slice(2);
+let campaignId = 'calvario';
+for (let i = 0; i < argv.length; i++) {
+  if (argv[i] === '--campaign' && argv[i + 1]) {
+    campaignId = argv[i + 1];
+    i++;
+  }
+}
+
+const scenesDir = path.join(__dirname, '..', 'src', 'campaigns', campaignId, 'scenes');
+
+if (!fs.existsSync(scenesDir)) {
+  console.error(`Pasta de cenas não encontrada: ${scenesDir}`);
+  process.exit(1);
+}
 
 function walkMd(dir) {
   const out = [];
@@ -64,4 +80,4 @@ if (missing.length) {
   process.exit(1);
 }
 
-console.log(`OK: ${ids.size} cenas, referências cruzadas válidas.`);
+console.log(`OK [${campaignId}]: ${ids.size} cenas, referências cruzadas válidas.`);

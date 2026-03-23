@@ -2,5 +2,6 @@
   "id": "calvario",
   "name": "Calvário Subterrâneo",
   "entryScene": "act1/title",
+  "startingCompanionPool": ["rogue_mira", "squire_tomas"],
   "scenes": []
 }

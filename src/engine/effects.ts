@@ -1,13 +1,11 @@
 import type { Effect, GameState } from './schema';
-import { CampaignIndexSchema, GameStateSchema } from './schema';
+import { GameStateSchema } from './schema';
 import type { EventBus } from './eventBus';
 import { beginEncounter } from './combat';
 import type { GameData } from './gameData';
 import { addXp } from './progression';
 import { initialKnownSpellIds } from './spellsKnown';
 import { createInitialState, createPlayerCharacter } from './state';
-import { DEFAULT_HERO_NAME, getHeroClassLabel } from '../campaigns/calvario/classHero';
-import campaignIndex from '../campaigns/calvario/index.json';
 import { clampLeadStat, tickActiveBuffs, type LeadStatAttr } from './leadStats';
 import { applyConsumableToCharacter, isConsumable, removeOneInventoryItem } from './consumables';
 
@@ -270,7 +268,7 @@ function applyOne(
     case 'clearAsciiMap':
       return { ...state, asciiMap: null };
     case 'initClass': {
-      const heroName = DEFAULT_HERO_NAME[e.class];
+      const heroName = ctx.data.heroNarrative.defaultHeroName(e.class);
       const pc = createPlayerCharacter(heroName, e.class);
       const knownSpells = initialKnownSpellIds(pc, ctx.data);
       return {
@@ -314,7 +312,7 @@ function applyOne(
         bus.emit({
           type: 'statusHighlight',
           variant: 'neutral',
-          title: getHeroClassLabel(lead.class, e.path),
+          title: ctx.data.heroNarrative.getHeroClassLabel(lead.class, e.path),
           subtitle: 'Novo arquétipo narrativo',
         });
       }
@@ -390,8 +388,7 @@ function applyOne(
       return { ...state, inventory: inv, party };
     }
     case 'resetRun': {
-      const idx = CampaignIndexSchema.parse(campaignIndex);
-      return createInitialState(idx.entryScene, state.rngSeed);
+      return createInitialState(ctx.data.campaign, state.rngSeed);
     }
     default:
       return state;

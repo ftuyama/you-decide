@@ -265,7 +265,7 @@ export const SceneFrontmatterSchema = z.object({
   chapterGate: ChapterGateSchema.optional(),
   /** Arte ASCII inline (multilinha no YAML) */
   art: z.string().optional(),
-  /** Chave para arte em `campaigns/calvario/ascii/art.ts` */
+  /** Chave para arte na tabela `sceneArt` da campanha ativa */
   artKey: z.string().optional(),
   /** Combate embutido: após texto, se encounterId presente */
   encounterId: z.string().optional(),
@@ -484,6 +484,8 @@ export type LevelUpStep = z.infer<typeof LevelUpStepSchema>;
 
 export const GameStateSchema = z.object({
   schemaVersion: z.string(),
+  /** Which campaign this save belongs to (multi-campaign). Legacy saves default to calvario in deserializeState. */
+  campaignId: z.string().default('calvario'),
   rngSeed: z.number(),
   chapter: z.number().int().min(1),
   narrativeTier: z.number().int().min(1).max(4).default(2),
@@ -545,6 +547,8 @@ export const CampaignIndexSchema = z.object({
   id: z.string(),
   name: z.string(),
   entryScene: z.string(),
+  /** IDs still available to recruit at a new run */
+  startingCompanionPool: z.array(z.string()).default([]),
   scenes: z.array(
     z.object({
       id: z.string(),

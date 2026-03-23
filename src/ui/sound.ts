@@ -1,5 +1,3 @@
-const STORAGE_MUTE = 'calvario_sound_muted';
-
 export type AmbientTheme = 'explore' | 'combat' | 'camp' | 'boss';
 
 /**
@@ -7,6 +5,7 @@ export type AmbientTheme = 'explore' | 'combat' | 'camp' | 'boss';
  * Temas: exploração, combate (batida), acampamento, chefe.
  */
 export class GameAudio {
+  private readonly storageMuteKey: string;
   private ctx: AudioContext | null = null;
   private muted = false;
   private bgCleanup: (() => void) | null = null;
@@ -14,9 +13,10 @@ export class GameAudio {
   private bgRhythmTimer: ReturnType<typeof setInterval> | null = null;
   private currentTheme: AmbientTheme | null = null;
 
-  constructor() {
+  constructor(campaignId: string) {
+    this.storageMuteKey = `${campaignId}_sound_muted`;
     try {
-      this.muted = localStorage.getItem(STORAGE_MUTE) === '1';
+      this.muted = localStorage.getItem(this.storageMuteKey) === '1';
     } catch {
       /* noop */
     }
@@ -29,7 +29,7 @@ export class GameAudio {
   setMuted(m: boolean): void {
     this.muted = m;
     try {
-      localStorage.setItem(STORAGE_MUTE, m ? '1' : '0');
+      localStorage.setItem(this.storageMuteKey, m ? '1' : '0');
     } catch {
       /* noop */
     }

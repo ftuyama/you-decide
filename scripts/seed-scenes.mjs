@@ -1,9 +1,24 @@
+/**
+ * Gera ficheiros .md em src/campaigns/<id>/scenes/ a partir das strings embebidas.
+ * Uso: node scripts/seed-scenes.mjs [--campaign <id>]
+ * Default: calvario
+ */
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const root = path.join(__dirname, '..', 'src', 'campaigns', 'calvario', 'scenes');
+
+const argv = process.argv.slice(2);
+let campaignId = 'calvario';
+for (let i = 0; i < argv.length; i++) {
+  if (argv[i] === '--campaign' && argv[i + 1]) {
+    campaignId = argv[i + 1];
+    i++;
+  }
+}
+
+const root = path.join(__dirname, '..', 'src', 'campaigns', campaignId, 'scenes');
 
 const scenes = [];
 
@@ -908,4 +923,4 @@ for (const [rel, body] of scenes) {
   fs.writeFileSync(p, body);
 }
 
-console.log('Wrote', scenes.length, 'scenes');
+console.log(`Wrote ${scenes.length} scenes → campaigns/${campaignId}/scenes`);

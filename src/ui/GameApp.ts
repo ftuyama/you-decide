@@ -1,4 +1,4 @@
-import { ContentRegistry, getCampaignIndex } from '../content/registry';
+import { ContentRegistry } from '../content/registry';
 import { createInitialState, deserializeState, serializeState } from '../engine/state';
 import { EventBus, type GameEvent } from '../engine/eventBus';
 import {
@@ -36,23 +36,20 @@ import {
 } from '../engine/combat';
 import { MAX_LEVEL, xpToNextLevel } from '../engine/progression';
 import type { Stance } from '../engine/schema';
-import { canWalk, renderMap } from '../campaigns/calvario/maps';
-import { SCENE_ART } from '../campaigns/calvario/ascii/art';
-import { getHeroClassLabel, getHeroLore } from '../campaigns/calvario/classHero';
 import { formatDiceAscii } from './diceAscii';
 import { GameAudio, type AmbientTheme } from './sound';
 import './styles.css';
 import pkg from '../../package.json' with { type: 'json' };
 
-const SAVE_KEY = 'calvario_save_v1';
-const SIDEBAR_KEY = 'calvario_sidebar_sections_v1';
-const FONT_KEY = 'calvario_font_step_v1';
-const DEV_MODE_KEY = 'calvario_dev_mode';
-
 export class GameApp {
+  private readonly campaignId: string;
+  private readonly saveKey: string;
+  private readonly sidebarKey: string;
+  private readonly fontKey: string;
+  private readonly devModeKey: string;
   private registry: ContentRegistry;
   private bus = new EventBus();
-  private audio = new GameAudio();
+  private audio: GameAudio;
   private state: GameState;
   private root: HTMLElement;
   private timedTimer: ReturnType<typeof setTimeout> | null = null;
@@ -71,8 +68,15 @@ export class GameApp {
   /** Só reproduz efeitos de som para entradas novas do log de combate */
   private combatLogSoundCursor: { encounterId: string; index: number } = { encounterId: '', index: 0 };
 
-  constructor(root: HTMLElement) {
+  constructor(root: HTMLElement, campaignId: string) {
     this.root = root;
+    this.campaignId = campaignId;
+    this.saveKey = `${campaignId}_save_v1`;
+    this.sidebarKey = `${campaignId}_sidebar_sections_v1`;
+    this.fontKey = `${campaignId}_font_step_v1`;
+    this.devModeKey = `${campaignId}_dev_mode`;
+    this.registry = new ContentRegistry(campaignId);
+    this.audio = new GameAudio(campaignId);
     this.fontStep = this.loadFontStep();
     this.devMode = this.loadDevMode();
     this.choiceHotkeyHandler = (e: KeyboardEvent): void => {
@@ -91,8 +95,6 @@ export class GameApp {
     };
     document.addEventListener('keydown', this.choiceHotkeyHandler, true);
 
-    this.registry = new ContentRegistry();
-    const idx = getCampaignIndex();
     this.bus.subscribe((ev) => {
       if (ev.type === 'combat.end' && ev.victory) {
         this.audio.playVictory();
@@ -109,7 +111,7 @@ export class GameApp {
         this.statusHighlightQueue.push(ev);
       }
     });
-    this.state = createInitialState(idx.entryScene);
+    this.state = createInitialState(this.registry.data.campaign);
     this.state = this.stabilize(this.state);
     this.sidebarSections = this.loadSidebarSections();
     window.addEventListener('keydown', (e) => this.onMapKey(e));
@@ -132,7 +134,7 @@ export class GameApp {
 
   private loadFontStep(): number {
     try {
-      const raw = localStorage.getItem(FONT_KEY);
+      const raw = localStorage.getItem(this.fontKey);
       const n = raw != null ? parseInt(raw, 10) : 0;
       if (n === 1 || n === 2) return n;
       return 0;
@@ -143,7 +145,7 @@ export class GameApp {
 
   private saveFontStep(): void {
     try {
-      localStorage.setItem(FONT_KEY, String(this.fontStep));
+      localStorage.setItem(this.fontKey, String(this.fontStep));
     } catch {
       /* noop */
     }
@@ -151,7 +153,7 @@ export class GameApp {
 
   private loadDevMode(): boolean {
     try {
-      return localStorage.getItem(DEV_MODE_KEY) === '1';
+      return localStorage.getItem(this.devModeKey) === '1';
     } catch {
       return false;
     }
@@ -159,7 +161,7 @@ export class GameApp {
 
   private saveDevMode(): void {
     try {
-      localStorage.setItem(DEV_MODE_KEY, this.devMode ? '1' : '0');
+      localStorage.setItem(this.devModeKey, this.devMode ? '1' : '0');
     } catch {
       /* noop */
     }
@@ -191,14 +193,14 @@ export class GameApp {
     this.unlockAudio();
     const v = (pkg as { version?: string }).version ?? '?';
     alert(
-      `Calvário Subterrâneo\nYou Decide · v${v}\n\nMotor: TypeScript, Vite.\nTexto narrativo em Markdown.\n\nObrigado por jogar.`
+      `${this.registry.data.campaign.name}\nYou Decide · v${v}\n\nMotor: TypeScript, Vite.\nTexto narrativo em Markdown.\n\nObrigado por jogar.`
     );
     this.closeMenu();
   }
 
   private loadSidebarSections(): Record<string, boolean> {
     try {
-      const raw = sessionStorage.getItem(SIDEBAR_KEY);
+      const raw = sessionStorage.getItem(this.sidebarKey);
       if (!raw) return {};
       const o = JSON.parse(raw) as unknown;
       return typeof o === 'object' && o !== null ? (o as Record<string, boolean>) : {};
@@ -209,7 +211,7 @@ export class GameApp {
 
   private saveSidebarSections(): void {
     try {
-      sessionStorage.setItem(SIDEBAR_KEY, JSON.stringify(this.sidebarSections));
+      sessionStorage.setItem(this.sidebarKey, JSON.stringify(this.sidebarSections));
     } catch {
       /* noop */
     }
@@ -318,7 +320,7 @@ export class GameApp {
     else if (e.key === 'ArrowRight') nx += 1;
     else return;
     e.preventDefault();
-    if (!canWalk(mapId, x, y, nx, ny)) {
+    if (!this.registry.ui.canWalk(mapId, x, y, nx, ny)) {
       this.audio.playBlocked();
       return;
     }
@@ -335,7 +337,7 @@ export class GameApp {
   private save(): void {
     this.unlockAudio();
     try {
-      localStorage.setItem(SAVE_KEY, serializeState(this.state));
+      localStorage.setItem(this.saveKey, serializeState(this.state));
     } catch {
       /* noop */
     }
@@ -345,9 +347,17 @@ export class GameApp {
   private load(): void {
     this.unlockAudio();
     try {
-      const raw = localStorage.getItem(SAVE_KEY);
+      const raw = localStorage.getItem(this.saveKey);
       if (!raw) return;
-      this.state = deserializeState(raw);
+      const parsed = deserializeState(raw);
+      if (parsed.campaignId !== this.campaignId) {
+        alert(
+          `Esta gravação é da campanha "${parsed.campaignId}". Campanha ativa: "${this.campaignId}".`
+        );
+        this.closeMenu();
+        return;
+      }
+      this.state = parsed;
       this.state = this.stabilize(this.state);
       this.render();
     } catch {
@@ -383,7 +393,8 @@ export class GameApp {
     const inline = fm.art?.trim();
     if (inline) return inline;
     const key = fm.artKey;
-    if (key && SCENE_ART[key]) return SCENE_ART[key];
+    const art = this.registry.ui.sceneArt;
+    if (key && art[key]) return art[key];
     return undefined;
   }
 
@@ -665,6 +676,75 @@ export class GameApp {
    * Resumo compacto sob os dados: ataques = resultado vs CA + bônus;
    * dano/cura = totais com rótulos em português.
    */
+  /** Ataque físico com dano: uma linha com resultado vs CA, bônus e dano. */
+  private appendCombatLogMergedHitMeta(
+    wrap: HTMLElement,
+    attack: CombatLogEntry,
+    damage: CombatLogEntry
+  ): void {
+    if (attack.final === undefined || attack.vsDefense === undefined) return;
+    const meta = document.createElement('div');
+    meta.className = 'combat-log-meta combat-log-meta--attack-roll';
+    let line = `${attack.final} vs CA ${attack.vsDefense}`;
+    if (attack.modifier !== undefined) {
+      line += ` · bônus ${this.fmtSignedMod(attack.modifier)}`;
+    }
+    if (damage.final !== undefined) {
+      line += ` · dano ${damage.final}`;
+    }
+    if (damage.damageKind === 'crit') {
+      line += ' · crítico';
+    }
+    meta.textContent = line;
+    wrap.appendChild(meta);
+  }
+
+  /**
+   * Junta ataque + dano num único bloco visual (uma linha de totais; dados lado a lado).
+   * Ignora magias e armadura: só `attack` hit seguido opcionalmente de “Quase crítico…” e `damage`.
+   */
+  private buildCombatLogDisplayItems(log: CombatLogEntry[]): Array<
+    | { mode: 'single'; entry: CombatLogEntry }
+    | {
+        mode: 'merged_hit';
+        attack: CombatLogEntry;
+        damage: CombatLogEntry;
+        quaseCritico?: CombatLogEntry;
+      }
+  > {
+    const out: Array<
+      | { mode: 'single'; entry: CombatLogEntry }
+      | {
+          mode: 'merged_hit';
+          attack: CombatLogEntry;
+          damage: CombatLogEntry;
+          quaseCritico?: CombatLogEntry;
+        }
+    > = [];
+    let i = 0;
+    while (i < log.length) {
+      const e = log[i]!;
+      if (e.kind === 'attack' && e.outcome === 'hit') {
+        let j = i + 1;
+        let quase: CombatLogEntry | undefined;
+        const next = log[j];
+        if (next?.kind === 'info' && next.message === 'Quase crítico…') {
+          quase = next;
+          j++;
+        }
+        const dmg = log[j];
+        if (dmg?.kind === 'damage') {
+          out.push({ mode: 'merged_hit', attack: e, damage: dmg, quaseCritico: quase });
+          i = j + 1;
+          continue;
+        }
+      }
+      out.push({ mode: 'single', entry: e });
+      i++;
+    }
+    return out;
+  }
+
   private appendCombatLogMeta(wrap: HTMLElement, entry: CombatLogEntry): void {
     if (entry.kind === 'attack' && entry.final !== undefined && entry.vsDefense !== undefined) {
       const meta = document.createElement('div');
@@ -815,7 +895,7 @@ export class GameApp {
   /** Bloco lateral por companheiro (party[1..]). */
   private companionCardMarkup(c: Character): string {
     const cid = c.class as ClassId;
-    const clsLabel = getHeroClassLabel(cid, c.path);
+    const clsLabel = this.registry.ui.getHeroClassLabel(cid, c.path);
     const def = this.registry.data.companions[c.id];
     const lore = def?.lorePt;
     const openKey = `companion_lore_${c.id}`;
@@ -902,7 +982,7 @@ export class GameApp {
         <div class="sidebar-line">Nível <strong>${this.state.level}</strong> · XP <strong>${this.state.xp}</strong></div>`;
       }
       const cid = p.class as ClassId;
-      const loreHtml = getHeroLore(cid, p.path)
+      const loreHtml = this.registry.ui.getHeroLore(cid, p.path)
         .split('\n\n')
         .map((para) => `<p>${this.escHtml(para)}</p>`)
         .join('');
@@ -920,7 +1000,7 @@ export class GameApp {
               .join(' · ')}</div>`
           : '';
       return `<div class="sidebar-line">Nome <strong>${this.escHtml(p.name)}</strong></div>
-        <div class="sidebar-line sidebar-class-line">${this.escHtml(getHeroClassLabel(cid, p.path))}</div>
+        <div class="sidebar-line sidebar-class-line">${this.escHtml(this.registry.ui.getHeroClassLabel(cid, p.path))}</div>
         ${xpLine}
         <div class="sidebar-line">HP <strong>${p.hp}/${p.maxHp}</strong></div>
         ${this.hpBarMarkup(p.hp, p.maxHp, 'hp-bar-resource', 'hp')}
@@ -1062,7 +1142,7 @@ export class GameApp {
     if (this.devMode) {
       const bc = document.createElement('div');
       bc.className = 'breadcrumb';
-      bc.textContent = `📁 campaigns/calvario/scenes/${scene.id}.md`;
+      bc.textContent = `📁 campaigns/${this.campaignId}/scenes/${scene.id}.md`;
       inner.appendChild(bc);
     }
 
@@ -1203,7 +1283,7 @@ export class GameApp {
     inner.appendChild(body);
 
     if (this.state.asciiMap) {
-      const rm = renderMap(
+      const rm = this.registry.ui.renderMap(
         this.state.asciiMap.mapId,
         this.state.asciiMap.playerX,
         this.state.asciiMap.playerY
@@ -1480,7 +1560,56 @@ export class GameApp {
 
     const partyNames = new Set(this.state.party.map((x) => x.name));
 
-    for (const entry of c.log.slice(-64)) {
+    const displayItems = this.buildCombatLogDisplayItems(c.log.slice(-64));
+
+    for (const item of displayItems) {
+      if (item.mode === 'merged_hit') {
+        const { attack, damage, quaseCritico } = item;
+        const wrap = document.createElement('div');
+        wrap.className = 'combat-log-entry combat-log-attack combat-outcome-hit combat-log-damage';
+        if (damage.target) {
+          wrap.classList.add(
+            partyNames.has(damage.target) ? 'combat-damage-to-hero' : 'combat-damage-to-enemy'
+          );
+        }
+        if (damage.damageKind === 'crit') {
+          wrap.classList.add('combat-damage-crit');
+        }
+
+        const msg = document.createElement('div');
+        msg.className = 'combat-log-msg';
+        msg.textContent = attack.message;
+        wrap.appendChild(msg);
+
+        if (quaseCritico) {
+          const qc = document.createElement('div');
+          qc.className = 'combat-log-msg combat-log-msg--sub';
+          qc.textContent = quaseCritico.message;
+          wrap.appendChild(qc);
+        }
+
+        const diceRow = document.createElement('div');
+        diceRow.className = 'dice-ascii-row';
+        if (attack.dice?.length) {
+          const preAtk = document.createElement('pre');
+          preAtk.className = 'dice-ascii-block';
+          preAtk.textContent = formatDiceAscii(attack.dice);
+          diceRow.appendChild(preAtk);
+        }
+        if (damage.dice?.length) {
+          const preDmg = document.createElement('pre');
+          preDmg.className = 'dice-ascii-block';
+          preDmg.textContent = formatDiceAscii(damage.dice);
+          diceRow.appendChild(preDmg);
+        }
+        if (diceRow.childElementCount) wrap.appendChild(diceRow);
+
+        this.appendCombatLogMergedHitMeta(wrap, attack, damage);
+        logScroll.appendChild(wrap);
+        continue;
+      }
+
+      const entry = item.entry;
       const wrap = document.createElement('div');
       wrap.className = `combat-log-entry combat-log-${entry.kind}`;
       if (entry.kind === 'attack' && entry.outcome) {

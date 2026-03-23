@@ -1,21 +1,22 @@
-import { SCHEMA_VERSION, type ClassId, type GameState } from './schema';
+import { SCHEMA_VERSION, type CampaignIndex, type ClassId, type GameState } from './schema';
 import { parseSeedFromSearch } from './rng';
 
 const defaultRep = { vigilia: 0, circulo: 0, culto: 0 } as GameState['reputation'];
 
-export function createInitialState(entryScene: string, seed?: number): GameState {
+export function createInitialState(campaign: CampaignIndex, seed?: number): GameState {
   const rngSeed = (seed ?? parseSeedFromSearch() ?? Date.now()) >>> 0;
   return {
     schemaVersion: SCHEMA_VERSION,
+    campaignId: campaign.id,
     rngSeed,
     chapter: 1,
     narrativeTier: 1,
-    sceneId: entryScene,
+    sceneId: campaign.entryScene,
     playerName: 'Viajante',
     level: 1,
     xp: 0,
     party: [],
-    companionsAvailable: ['rogue_mira', 'squire_tomas'],
+    companionsAvailable: [...campaign.startingCompanionPool],
     inventory: [],
     reputation: { ...defaultRep },
     flags: {},
@@ -124,8 +125,12 @@ export function deserializeState(json: string): GameState {
     corruption: typeof rawRes?.corruption === 'number' ? rawRes.corruption : 0,
     gold: typeof rawRes?.gold === 'number' ? rawRes.gold : 0,
   };
+  const legacyId = (o as Partial<GameState>).campaignId;
+  const campaignId = typeof legacyId === 'string' && legacyId.length > 0 ? legacyId : 'calvario';
+
   const merged: GameState = {
     ...(o as GameState),
+    campaignId,
     resources,
     level: typeof (o as GameState).level === 'number' ? (o as GameState).level : 1,
     xp: typeof (o as GameState).xp === 'number' ? (o as GameState).xp : 0,

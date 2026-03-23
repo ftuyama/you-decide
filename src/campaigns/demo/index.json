@@ -1,0 +1,7 @@
+{
+  "id": "demo",
+  "name": "Demo (stub)",
+  "entryScene": "act1/start",
+  "startingCompanionPool": [],
+  "scenes": []
+}

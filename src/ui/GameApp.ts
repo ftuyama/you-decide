@@ -79,6 +79,8 @@ export class GameApp {
   private statusHighlightQueue: Extract<GameEvent, { type: 'statusHighlight' }>[] = [];
   /** Itens recém-adquiridos (grantItem) — mostra banner até o jogador fechar */
   private itemAcquireQueue: string[] = [];
+  /** Milagre de fé após quase-morte em combate — banner até fechar */
+  private faithMiraclePending = false;
   /** Só reproduz efeitos de som para entradas novas do log de combate */
   private combatLogSoundCursor: { encounterId: string; index: number } = { encounterId: '', index: 0 };
 
@@ -117,6 +119,11 @@ export class GameApp {
       }
       if (ev.type === 'combat.end' && !ev.victory) {
         this.audio.playDefeat();
+      }
+      if (ev.type === 'faith.miracle') {
+        this.faithMiraclePending = true;
+        this.unlockAudio();
+        this.audio.playFaithMiracle();
       }
       if (ev.type === 'item.acquired') {
         this.itemAcquireQueue.push(ev.itemId);
@@ -1017,6 +1024,7 @@ export class GameApp {
           <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.gold)}<span>Gold <strong>${gold}</strong></span></div>
           <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.supply)}<span>Suprimento <strong>${r.supply}</strong> <span class="sidebar-resource-hint">(mapa, acampamento)</span></span></div>
           <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.faith)}<span>Fé <strong>${r.faith}</strong></span></div>
+          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.tier)}<span>Vida extra <strong>${this.state.extraLifeReady ? 'Disponível' : 'Indisponível'}</strong> <span class="sidebar-resource-hint">(5 fé)</span></span></div>
           <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.corruption)}<span>Corrupção <strong>${r.corruption}</strong></span></div>
         </div>
       </details>
@@ -1084,6 +1092,35 @@ export class GameApp {
       bc.className = 'breadcrumb';
       bc.textContent = `📁 campaigns/${this.campaignId}/scenes/${scene.id}.md`;
       inner.appendChild(bc);
+    }
+
+    if (this.faithMiraclePending) {
+      const miracle = document.createElement('div');
+      miracle.className = 'faith-miracle-banner';
+      const kicker = document.createElement('div');
+      kicker.className = 'faith-miracle-kicker';
+      kicker.textContent = 'Intercessão';
+      miracle.appendChild(kicker);
+      const titleEl = document.createElement('div');
+      titleEl.className = 'faith-miracle-title';
+      titleEl.textContent = 'A fé recusa-te à morte.';
+      miracle.appendChild(titleEl);
+      const sub = document.createElement('div');
+      sub.className = 'faith-miracle-subtitle';
+      sub.textContent =
+        'Algo em ti não cede — acordas ferido, mas de pé. Cinco medidas de convicção consumiram-se para te manter no mundo.';
+      miracle.appendChild(sub);
+      const btnM = document.createElement('button');
+      btnM.type = 'button';
+      btnM.className = 'faith-miracle-dismiss';
+      btnM.textContent = 'Continuar';
+      btnM.addEventListener('click', () => {
+        this.faithMiraclePending = false;
+        this.audio.playUiClick();
+        this.render();
+      });
+      miracle.appendChild(btnM);
+      inner.appendChild(miracle);
     }
 
     if (this.statusHighlightQueue.length > 0) {
@@ -1276,7 +1313,7 @@ export class GameApp {
       btn.type = 'button';
       btn.className = 'choice';
       if (i < 9) btn.title = `Tecla ${i + 1}`;
-      const labelText = `${i + 1} - ${ch.text}`;
+      const labelText = this.quickNavMode ? `${i + 1} - ${ch.text}` : ch.text;
       btn.appendChild(document.createTextNode(labelText));
       if (ch.preview) {
         const span = document.createElement('span');

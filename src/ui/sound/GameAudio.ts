@@ -215,6 +215,47 @@ export class GameAudio {
     });
   }
 
+  /** Milagre de fé — arpejo suave, tom “angelical” (Web Audio). */
+  playFaithMiracle(): void {
+    const ctx = this.ensureContext();
+    const g = this.gain(0.09);
+    if (g <= 0) return;
+    const t0 = ctx.currentTime;
+    const notes = [
+      { f: 523.25, t: 0, dur: 0.35 },
+      { f: 659.25, t: 0.12, dur: 0.38 },
+      { f: 783.99, t: 0.26, dur: 0.42 },
+      { f: 1046.5, t: 0.42, dur: 0.55 },
+    ];
+    for (const { f, t, dur } of notes) {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = f;
+      gn.gain.setValueAtTime(0.001, t0 + t);
+      gn.gain.exponentialRampToValueAtTime(g * 0.85, t0 + t + 0.04);
+      gn.gain.exponentialRampToValueAtTime(0.001, t0 + t + dur);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(t0 + t);
+      o.stop(t0 + t + dur + 0.05);
+    }
+    const chordT = t0 + 0.55;
+    for (const f of [392, 523.25, 659.25]) {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'triangle';
+      o.frequency.value = f;
+      gn.gain.setValueAtTime(0.001, chordT);
+      gn.gain.exponentialRampToValueAtTime(g * 0.25, chordT + 0.08);
+      gn.gain.exponentialRampToValueAtTime(0.001, chordT + 1.1);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(chordT);
+      o.stop(chordT + 1.2);
+    }
+  }
+
   playVictory(): void {
     const ctx = this.ensureContext();
     const g = this.gain(0.08);

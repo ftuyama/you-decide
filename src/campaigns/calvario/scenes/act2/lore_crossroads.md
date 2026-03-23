@@ -29,10 +29,9 @@ choices:
     effects:
       - { op: addDiary, text: "Sombras não pedem permissão — eu dei mesma assim." }
   - text: "Recordar o penitente (eco do path)"
-    next: act2/hub_catacomb
+    next: act2/lore_penitent_recall_mind
     condition: { path: penitent }
-    effects:
-      - { op: addDiary, text: "Cada pedra aqui confessa melhor do que eu." }
+    preview: "Mente — sustentar a memória (TN 8)"
   - text: "Regressar ao cruzeiro"
     next: act2/hub_catacomb
 onEnter: []

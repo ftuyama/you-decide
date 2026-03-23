@@ -5,7 +5,7 @@ import { beginEncounter } from './combat';
 import type { GameData } from './gameData';
 import { addXp } from './progression';
 import { initialKnownSpellIds } from './spellsKnown';
-import { createInitialState, createPlayerCharacter } from './state';
+import { createInitialState, createPlayerCharacter, extraLifeReadyFromFaith } from './state';
 import { clampLeadStat, tickActiveBuffs, type LeadStatAttr } from './leadStats';
 import { applyConsumableToCharacter, isConsumable, removeOneInventoryItem } from './consumables';
 
@@ -165,7 +165,11 @@ function applyOne(
           subtitle: isDebuff ? resourceDebuffSubtitle(res) : resourceGainSubtitle(res),
         });
       }
-      return { ...state, resources: r };
+      return {
+        ...state,
+        resources: r,
+        extraLifeReady: extraLifeReadyFromFaith(r.faith),
+      };
     }
     case 'campRest': {
       if (state.resources.supply < 1) return state;

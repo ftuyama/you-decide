@@ -554,6 +554,11 @@ export const GameStateSchema = z.object({
   lastCombatLevelUps: z.array(LevelUpStepSchema).nullable().default(null),
   /** Bónus temporários (poções); decrementa ao mudar de cena */
   activeBuffs: z.array(TemporaryBuffSchema).default([]),
+  /**
+   * Vida extra por fé: disponível quando fé >= 5.
+   * Mantido em sincronia com `resources.faith` (addResource, combate, load).
+   */
+  extraLifeReady: z.boolean().default(false),
 });
 
 export type GameState = z.infer<typeof GameStateSchema>;

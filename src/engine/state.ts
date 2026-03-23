@@ -3,6 +3,11 @@ import { parseSeedFromSearch } from './rng';
 
 const defaultRep = { vigilia: 0, circulo: 0, culto: 0 } as GameState['reputation'];
 
+/** Vida extra automática: fé >= 5 (sem acúmulo além da disponibilidade). */
+export function extraLifeReadyFromFaith(faith: number): boolean {
+  return faith >= 5;
+}
+
 export function createInitialState(campaign: CampaignIndex, seed?: number): GameState {
   const rngSeed = (seed ?? parseSeedFromSearch() ?? Date.now()) >>> 0;
   return {
@@ -22,6 +27,7 @@ export function createInitialState(campaign: CampaignIndex, seed?: number): Game
     flags: {},
     marks: [],
     resources: { supply: 5, faith: 3, corruption: 0, gold: 8 },
+    extraLifeReady: false,
     combat: null,
     mode: 'story',
     modal: null,
@@ -132,6 +138,7 @@ export function deserializeState(json: string): GameState {
     ...(o as GameState),
     campaignId,
     resources,
+    extraLifeReady: extraLifeReadyFromFaith(resources.faith),
     level: typeof (o as GameState).level === 'number' ? (o as GameState).level : 1,
     xp: typeof (o as GameState).xp === 'number' ? (o as GameState).xp : 0,
     lastCombatXpGain: null,

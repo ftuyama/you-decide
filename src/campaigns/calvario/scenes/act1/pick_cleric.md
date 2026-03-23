@@ -9,6 +9,7 @@ choices:
     effects:
       - { op: initClass, class: cleric }
       - { op: addRep, faction: vigilia, delta: 1 }
+      - { op: addResource, resource: faith, delta: 1 }
 onEnter: []
 ---
 O emblema queima frio na palma. Palavras antigas repelhem o véu.

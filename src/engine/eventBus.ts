@@ -3,6 +3,8 @@ export type GameEvent =
   | { type: 'reputation.changed'; faction: string; value: number }
   | { type: 'combat.start'; encounterId: string }
   | { type: 'combat.end'; victory: boolean }
+  /** Combate terminou por milagre de fé: herói salvo, sem game over. */
+  | { type: 'faith.miracle' }
   | { type: 'effect.applied'; op: string }
   | { type: 'xp.gained'; amount: number }
   | { type: 'level.up'; level: number }

@@ -18,6 +18,7 @@ import type {
   Stance,
 } from './schema';
 import type { GameData } from './gameData';
+import { extraLifeReadyFromFaith } from './state';
 import { effectiveLeadAttr, tickActiveBuffs } from './leadStats';
 import { addXp, computeCombatXp } from './progression';
 import type { EventBus } from './eventBus';
@@ -751,6 +752,39 @@ export function playerAttack(
   );
 }
 
+/** Milagre: −5 fé, HP a metade do máximo, combate termina em narrativa em returnScene (sem vitória nem derrota). */
+function finishCombatFaithRescue(
+  state: GameState,
+  c: CombatState,
+  data: GameData,
+  bus?: EventBus
+): GameState {
+  const lead = state.party[0];
+  if (!lead) {
+    return finishCombat(state, c, false, data, bus);
+  }
+  const newFaith = Math.max(0, state.resources.faith - 5);
+  const newHp = Math.max(1, Math.ceil(lead.maxHp / 2));
+  const party = state.party.map((p, i) => (i === 0 ? { ...p, hp: newHp } : p));
+  const resources = { ...state.resources, faith: newFaith };
+  bus?.emit({ type: 'faith.miracle' });
+  let s: GameState = {
+    ...state,
+    party,
+    resources,
+    extraLifeReady: extraLifeReadyFromFaith(resources.faith),
+    lastCombatXpGain: null,
+    lastCombatLevelUps: null,
+  };
+  s = tickActiveBuffs({
+    ...s,
+    mode: 'story',
+    combat: null,
+    sceneId: c.returnScene,
+  });
+  return s;
+}
+
 function finishCombat(
   state: GameState,
   c: CombatState,
@@ -945,14 +979,12 @@ function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData, bu
 
   const leadDead = party[0]!.hp <= 0;
   if (leadDead) {
+    const sWithParty = { ...state, party };
+    if (sWithParty.resources.faith >= 5) {
+      return finishCombatFaithRescue(sWithParty, { ...c, enemies, log, phase: 'ended' }, data, bus);
+    }
     log.push({ kind: 'info', message: 'Fim de linha.' });
-    return finishCombat(
-      { ...state, party },
-      { ...c, enemies, log, phase: 'ended' },
-      false,
-      data,
-      bus
-    );
+    return finishCombat(sWithParty, { ...c, enemies, log, phase: 'ended' }, false, data, bus);
   }
 
   const nextRound = c.round + 1;

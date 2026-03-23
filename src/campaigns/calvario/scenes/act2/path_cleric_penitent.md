@@ -5,6 +5,7 @@ title: Clérigo penitente
 onEnter:
   - { op: setPath, path: penitent }
   - { op: learnSpell, spellId: pilgrims_benediction }
+  - { op: addResource, resource: faith, delta: 1 }
   - { op: addDiary, text: "A Vigília pede provas; eu ofereço cicatrizes que já rezei em voz baixa." }
 choices:
   - text: "Voltar ao cruzeiro"

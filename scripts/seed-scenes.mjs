@@ -256,6 +256,8 @@ choices:
     next: act3/corruption_event
   - text: "Nota no diário"
     next: act3/diary_trigger
+    effects:
+      - { op: addDiary, text: "O ar cheira a cobre podre." }
 onEnter: []
 ---
 A escada **afunda**. O pulso verde pulsa no tempo do teu coração.
@@ -364,10 +366,6 @@ id: act3/hub_depths
 chapter: 3
 artKey: depths
 choices:
-  - text: "Voltar ao Cruzeiro — hub"
-    next: act2/hub_catacomb
-    effects:
-      - { op: setChapter, chapter: 2 }
   - text: "Rumo ao trono de ossos"
     next: act4/throne_gate
     effects:
@@ -375,6 +373,10 @@ choices:
       - { op: addDiary, text: "O trono chama." }
   - text: "Lado do guardião (opcional)"
     next: act3/stone_corridor
+  - text: "Voltar ao Cruzeiro — hub"
+    next: act2/hub_catacomb
+    effects:
+      - { op: setChapter, chapter: 2 }
 onEnter:
   - { op: clearAsciiMap }
 ---
@@ -794,8 +796,7 @@ chapter: 3
 choices:
   - text: "Voltar"
     next: act3/hub_depths
-onEnter:
-  - { op: addDiary, text: "O ar cheira a cobre podre." }
+onEnter: []
 ---
 Uma sensação **grava** no diário.`);
 

@@ -1489,7 +1489,9 @@ export class GameApp {
         btn.addEventListener('click', () => {
           this.unlockAudio();
           this.audio.playDice();
-          this.state = executePlayerTurn(this.state, st, this.registry.data, false, this.bus);
+          this.state = this.stabilize(
+            executePlayerTurn(this.state, st, this.registry.data, false, this.bus)
+          );
           this.render();
         });
         bar.appendChild(btn);
@@ -1502,7 +1504,9 @@ export class GameApp {
         if (!lead.specialUsedThisCombat) {
           this.unlockAudio();
           this.audio.playDice();
-          this.state = executePlayerTurn(this.state, 'aggressive', this.registry.data, true, this.bus);
+          this.state = this.stabilize(
+            executePlayerTurn(this.state, 'aggressive', this.registry.data, true, this.bus)
+          );
           this.render();
         }
       });
@@ -1531,7 +1535,9 @@ export class GameApp {
             if (!canCastSpell(this.state, spellId, this.registry.data)) return;
             this.unlockAudio();
             this.audio.playDice();
-            this.state = executeSpellTurn(this.state, spellId, this.registry.data, this.bus);
+            this.state = this.stabilize(
+              executeSpellTurn(this.state, spellId, this.registry.data, this.bus)
+            );
             this.render();
           });
           spellBar.appendChild(btn);
@@ -1564,7 +1570,9 @@ export class GameApp {
             if (!canUseCombatConsumable(this.state, itemId, this.registry.data)) return;
             this.unlockAudio();
             this.audio.playDice();
-            this.state = useCombatConsumable(this.state, itemId, this.registry.data, this.bus);
+            this.state = this.stabilize(
+              useCombatConsumable(this.state, itemId, this.registry.data, this.bus)
+            );
             this.render();
           });
           potionBar.appendChild(btn);
@@ -1578,7 +1586,7 @@ export class GameApp {
     flee.textContent = 'Tentar fugir';
     flee.addEventListener('click', () => {
       this.unlockAudio();
-      this.state = fleeCombat(this.state, this.bus);
+      this.state = this.stabilize(fleeCombat(this.state, this.bus));
       this.render();
     });
     actionsPanel.appendChild(flee);

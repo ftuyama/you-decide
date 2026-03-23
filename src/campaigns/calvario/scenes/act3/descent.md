@@ -13,6 +13,8 @@ choices:
     next: act3/corruption_event
   - text: "Nota no diário"
     next: act3/diary_trigger
+    effects:
+      - { op: addDiary, text: "O ar cheira a cobre podre." }
 onEnter: []
 ---
 A escada **afunda**. O pulso verde pulsa no tempo do teu coração.

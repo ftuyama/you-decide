@@ -21,10 +21,19 @@ choices:
         onDefeat: act2/lore_crossroads
         onFlee: act2/lore_crossroads
     preview: "Combate · vantagem do inimigo"
+  - text: "Enfrentar o anjo com a fé (clérigo)"
+    condition: { class: cleric }
+    effects:
+      - op: startCombat
+        encounterId: boss_fallen_angel_trial
+        onVictory: act2/path_cleric_penitent
+        onDefeat: act2/lore_crossroads
+        onFlee: act2/lore_crossroads
+    preview: "Combate · vantagem do inimigo"
 onEnter: []
 ---
 Do **cinza** do cruzeiro ergue-se uma **silhueta** que já foi luz demais para um só corpo. Não pede **perdão** — pede **prova**.
 
-"Quem quiser **nome** de queda ou de **treva**", diz sem boca, "que **vença** o que caiu antes e ainda **corta**."
+"Quem quiser **nome** de queda, de **treva** ou de **penitência**", diz sem boca, "que **vença** o que caiu antes e ainda **corta**."
 
-Não há **atalho**: ou o **ferro** e o **arcano** aguentam o véu, ou **volta** sem título.
+Não há **atalho**: ou o **ferro**, o **arcano** e a **oração** aguentam o véu, ou **volta** sem título.

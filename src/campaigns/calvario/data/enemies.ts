@@ -165,9 +165,9 @@ export const enemies: Record<string, EnemyDef> = {
     hp: 32,
     maxHp: 32,
     str: 12,
-    agi: 11,
+    agi: 10,
     mind: 13,
-    armor: 2,
+    armor: 1,
     type: 'armored',
     armorChips: 2,
     sprite: [

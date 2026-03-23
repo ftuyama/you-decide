@@ -104,7 +104,7 @@ export function beginEncounter(
 
   log.push({
     kind: 'info',
-    message: `Ordem: ${combat.turnOrder.join(' → ')}`,
+    message: formatTurnOrderForLog(combat.turnOrder, state, combat, data),
   });
   log.push({
     kind: 'turn_banner',
@@ -143,6 +143,35 @@ function buildTurnOrder(
   }
   rolls.sort((a, b) => b.score - a.score);
   return rolls.map((r) => r.id);
+}
+
+/** Texto legível para o log (nomes em vez de p:rogue_mira, e:0…). */
+function formatTurnOrderForLog(
+  turnOrder: string[],
+  state: GameState,
+  combat: CombatState,
+  data: GameData
+): string {
+  const enemyNameSeen = new Map<string, number>();
+  const labels = turnOrder.map((token) => {
+    if (token.startsWith('p:')) {
+      const pid = token.slice(2);
+      const c = state.party.find((x) => x.id === pid);
+      return c?.name ?? pid;
+    }
+    if (token.startsWith('e:')) {
+      const idx = Number(token.slice(2));
+      const inst = combat.enemies[idx];
+      if (!inst) return `Inimigo ${idx + 1}`;
+      const def = data.enemies[inst.defId];
+      const base = def?.name ?? `Inimigo ${idx + 1}`;
+      const seen = enemyNameSeen.get(base) ?? 0;
+      enemyNameSeen.set(base, seen + 1);
+      return seen === 0 ? base : `${base} (${seen + 1})`;
+    }
+    return token;
+  });
+  return `Ordem de iniciativa: ${labels.join(' → ')}`;
 }
 
 function getLead(state: GameState): Character {
@@ -728,8 +757,14 @@ function finishCombat(
   data: GameData,
   bus?: EventBus
 ): GameState {
-  const next =
-    victory ? (c.onVictory ?? c.returnScene) : (c.onDefeat ?? 'act4/game_over');
+  /** `??` não trata string vazia; cena inválida travaria a navegação. */
+  const pick = (id: string | undefined, fallback: string): string => {
+    const t = id?.trim();
+    return t && t.length > 0 ? t : fallback;
+  };
+  const next = victory
+    ? pick(c.onVictory ?? c.returnScene, c.returnScene)
+    : pick(c.onDefeat, 'act4/game_over');
   let s = state;
   if (victory) {
     let xpGain = 0;

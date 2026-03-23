@@ -18,7 +18,6 @@ import type {
   CombatLogEntry,
   GameState,
   ItemDef,
-  LevelUpStatDeltas,
   SpellDef,
 } from '../engine/schema';
 import { migrateLegacyKnownSpells } from '../engine/spellsKnown';
@@ -37,6 +36,17 @@ import {
 import { MAX_LEVEL, xpToNextLevel } from '../engine/progression';
 import type { Stance } from '../engine/schema';
 import { formatDiceAscii } from './diceAscii';
+import {
+  buildCombatLogDisplayItems,
+  escHtml,
+  fmtSignedMod,
+  formatLevelUpDeltaLine,
+  hpBarMarkup,
+  manaBarMarkup,
+  spellEmoji,
+  statBonusParen,
+  stressBarMarkup,
+} from './gameAppUtils';
 import { GameAudio, type AmbientTheme } from './sound';
 import { collapseTriggerStart, iconWrap, icons } from './icons';
 import './styles.css';
@@ -660,38 +670,6 @@ export class GameApp {
     }
   }
 
-  private escHtml(s: string): string {
-    return s
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
-  }
-
-  /** Emoji por magia para leitura rápida no menu (ex.: Centelha -> fogo). */
-  private spellEmoji(spellId: string, spellDef: SpellDef): string {
-    const byId: Partial<Record<string, string>> = {
-      ember_spark: '🔥',
-      arcane_bolt: '✨',
-      silver_bolt: '⚡',
-      lesser_heal: '💚',
-      merciful_light: '🕯️',
-      whisper_cache: '🫧',
-      pilgrims_benediction: '🙏',
-    };
-    const byKind: Record<SpellDef['spellKind'], string> = {
-      damage: '✨',
-      heal_self: '💚',
-    };
-    return byId[spellId] ?? byKind[spellDef.spellKind] ?? '✦';
-  }
-
-  /** Formata modificador numérico com sinal (ex.: +2, −1 com sinal tipográfico). */
-  private fmtSignedMod(n: number): string {
-    if (n >= 0) return `+${n}`;
-    return `−${Math.abs(n)}`;
-  }
-
   /**
    * Resumo compacto sob os dados: ataques = resultado vs CA + bônus;
    * dano/cura = totais com rótulos em português.
@@ -707,7 +685,7 @@ export class GameApp {
     meta.className = 'combat-log-meta combat-log-meta--attack-roll';
     let line = `${attack.final} vs CA ${attack.vsDefense}`;
     if (attack.modifier !== undefined) {
-      line += ` · bônus ${this.fmtSignedMod(attack.modifier)}`;
+      line += ` · bônus ${fmtSignedMod(attack.modifier)}`;
     }
     if (damage.final !== undefined) {
       line += ` · dano ${damage.final}`;
@@ -719,59 +697,13 @@ export class GameApp {
     wrap.appendChild(meta);
   }
 
-  /**
-   * Junta ataque + dano num único bloco visual (uma linha de totais; dados lado a lado).
-   * Ignora magias e armadura: só `attack` hit seguido opcionalmente de “Quase crítico…” e `damage`.
-   */
-  private buildCombatLogDisplayItems(log: CombatLogEntry[]): Array<
-    | { mode: 'single'; entry: CombatLogEntry }
-    | {
-        mode: 'merged_hit';
-        attack: CombatLogEntry;
-        damage: CombatLogEntry;
-        quaseCritico?: CombatLogEntry;
-      }
-  > {
-    const out: Array<
-      | { mode: 'single'; entry: CombatLogEntry }
-      | {
-          mode: 'merged_hit';
-          attack: CombatLogEntry;
-          damage: CombatLogEntry;
-          quaseCritico?: CombatLogEntry;
-        }
-    > = [];
-    let i = 0;
-    while (i < log.length) {
-      const e = log[i]!;
-      if (e.kind === 'attack' && e.outcome === 'hit') {
-        let j = i + 1;
-        let quase: CombatLogEntry | undefined;
-        const next = log[j];
-        if (next?.kind === 'info' && next.message === 'Quase crítico…') {
-          quase = next;
-          j++;
-        }
-        const dmg = log[j];
-        if (dmg?.kind === 'damage') {
-          out.push({ mode: 'merged_hit', attack: e, damage: dmg, quaseCritico: quase });
-          i = j + 1;
-          continue;
-        }
-      }
-      out.push({ mode: 'single', entry: e });
-      i++;
-    }
-    return out;
-  }
-
   private appendCombatLogMeta(wrap: HTMLElement, entry: CombatLogEntry): void {
     if (entry.kind === 'attack' && entry.final !== undefined && entry.vsDefense !== undefined) {
       const meta = document.createElement('div');
       meta.className = 'combat-log-meta combat-log-meta--attack-roll';
       let line = `${entry.final} vs CA ${entry.vsDefense}`;
       if (entry.modifier !== undefined) {
-        line += ` · bônus ${this.fmtSignedMod(entry.modifier)}`;
+        line += ` · bônus ${fmtSignedMod(entry.modifier)}`;
       }
       meta.textContent = line;
       wrap.appendChild(meta);
@@ -780,7 +712,7 @@ export class GameApp {
 
     const parts: string[] = [];
     if (entry.modifier !== undefined) {
-      parts.push(`Modificador ${this.fmtSignedMod(entry.modifier)}`);
+      parts.push(`Modificador ${fmtSignedMod(entry.modifier)}`);
     }
     if (entry.kind === 'damage' && entry.final !== undefined) {
       parts.push(`Dano ${entry.final}`);
@@ -795,60 +727,6 @@ export class GameApp {
     meta.className = 'combat-log-meta';
     meta.textContent = parts.join(' · ');
     wrap.appendChild(meta);
-  }
-
-  /** Resumo dos ganhos por subida de nível (texto da vitória). */
-  private formatLevelUpDeltaLine(d: LevelUpStatDeltas): string {
-    const parts: string[] = [];
-    if (d.str) parts.push(`Força +${d.str}`);
-    if (d.agi) parts.push(`Agilidade +${d.agi}`);
-    if (d.mind) parts.push(`Mente +${d.mind}`);
-    if (d.maxHp) parts.push(`HP máx +${d.maxHp}`);
-    if (d.hp) parts.push(`HP +${d.hp}`);
-    if (d.maxMana) parts.push(`Mana máx +${d.maxMana}`);
-    if (d.mana) parts.push(`Mana +${d.mana}`);
-    return parts.join(' · ');
-  }
-
-  /** `fill`: xp = verde (barra de XP), hp = vermelho (HP do herói) */
-  private hpBarMarkup(
-    cur: number,
-    max: number,
-    trackClass?: string,
-    fill: 'xp' | 'hp' = 'xp'
-  ): string {
-    const trackCls = trackClass ? `hp-bar-track ${trackClass}` : 'hp-bar-track';
-    const fillCls = fill === 'hp' ? 'hp-bar-fill hp-bar-fill--hp' : 'hp-bar-fill hp-bar-fill--xp';
-    if (max <= 0) return `<div class="${trackCls} empty"></div>`;
-    const pct = Math.min(100, Math.max(0, Math.round((cur / max) * 100)));
-    const label = fill === 'hp' ? 'HP' : 'XP';
-    return `<div class="${trackCls}" title="${label} ${cur} / ${max}">
-      <div class="${fillCls}" style="width:${pct}%"></div>
-    </div>`;
-  }
-
-  private manaBarMarkup(cur: number, max: number): string {
-    if (max <= 0) return '';
-    const pct = Math.min(100, Math.max(0, Math.round((cur / max) * 100)));
-    return `<div class="mana-bar-track" title="Mana ${cur} / ${max}">
-      <div class="mana-bar-fill" style="width:${pct}%"></div>
-    </div>`;
-  }
-
-  /** Stress 0–4 (máx. do personagem). */
-  private stressBarMarkup(cur: number): string {
-    const max = 4;
-    const pct = Math.min(100, Math.max(0, Math.round((cur / max) * 100)));
-    return `<div class="stress-bar-track" title="Stress ${cur} / ${max}">
-      <div class="stress-bar-fill" style="width:${pct}%"></div>
-    </div>`;
-  }
-
-  /** Bônus só de equipamento; omitido se 0. */
-  private statBonusParen(n: number): string {
-    if (n === 0) return '';
-    const sign = n > 0 ? '+' : '';
-    return ` <span class="stat-build-bonus">(${sign}${n})</span>`;
   }
 
   /** Resumo mecânico do item (dano, armadura, atributos) para a secção Equipamento. */
@@ -873,7 +751,7 @@ export class GameApp {
     }
     if (it.cursed) parts.push('Amaldiçoado');
     if (parts.length === 0) return '';
-    return `<span class="sidebar-equip-stats">${parts.map((s) => this.escHtml(s)).join(' · ')}</span>`;
+    return `<span class="sidebar-equip-stats">${parts.map((s) => escHtml(s)).join(' · ')}</span>`;
   }
 
   /** CA, STR, AGI, MEN, SOR com totais e (+X) da build. */
@@ -888,7 +766,7 @@ export class GameApp {
     const ca = getCharacterArmorClass(data, c, state);
     const caEq = getEquippedArmorPoints(data, c);
     const cls = opts?.compact ? 'sidebar-line attrs party-member-card-stats' : 'sidebar-line attrs';
-    return `<div class="${cls}">CA <strong>${ca}</strong>${this.statBonusParen(caEq)} · STR <strong>${str}</strong>${this.statBonusParen(eq.str)} · AGI <strong>${agi}</strong>${this.statBonusParen(eq.agi)} · MEN <strong>${men}</strong>${this.statBonusParen(eq.mind)} · SOR <strong>${sor}</strong>${this.statBonusParen(eq.luck)}</div>`;
+    return `<div class="${cls}">CA <strong>${ca}</strong>${statBonusParen(caEq)} · STR <strong>${str}</strong>${statBonusParen(eq.str)} · AGI <strong>${agi}</strong>${statBonusParen(eq.agi)} · MEN <strong>${men}</strong>${statBonusParen(eq.mind)} · SOR <strong>${sor}</strong>${statBonusParen(eq.luck)}</div>`;
   }
 
   private inventoryMarkup(): string {
@@ -906,7 +784,7 @@ export class GameApp {
       const label = def?.name ?? id;
       const suffix = n > 1 ? ` ×${n}` : '';
       lines.push(
-        `<div class="sidebar-line sidebar-inventory-item sidebar-line--with-icon">${iconWrap(icons.item, 'ui-icon-wrap ui-icon-wrap--sm')}<span>${this.escHtml(label)}${this.escHtml(suffix)}</span></div>`
+        `<div class="sidebar-line sidebar-inventory-item sidebar-line--with-icon">${iconWrap(icons.item, 'ui-icon-wrap ui-icon-wrap--sm')}<span>${escHtml(label)}${escHtml(suffix)}</span></div>`
       );
     }
     return lines.join('');
@@ -923,16 +801,16 @@ export class GameApp {
     const loreHtml = lore
       ? lore
           .split('\n\n')
-          .map((para) => `<p>${this.escHtml(para)}</p>`)
+          .map((para) => `<p>${escHtml(para)}</p>`)
           .join('')
       : `<p class="sidebar-muted">Sem história gravada.</p>`;
     return `<div class="companion-sidebar-card">
-      <div class="companion-sidebar-name">${this.escHtml(c.name)}</div>
-      <div class="companion-sidebar-class">${this.escHtml(clsLabel)}</div>
+      <div class="companion-sidebar-name">${escHtml(c.name)}</div>
+      <div class="companion-sidebar-class">${escHtml(clsLabel)}</div>
       <div class="sidebar-line">HP <strong>${c.hp}</strong> / <strong>${c.maxHp}</strong></div>
-      ${this.hpBarMarkup(c.hp, c.maxHp, 'hp-bar-resource', 'hp')}
+      ${hpBarMarkup(c.hp, c.maxHp, 'hp-bar-resource', 'hp')}
       <div class="sidebar-line sidebar-stress-label">Stress <strong>${c.stress}</strong> / 4</div>
-      ${this.stressBarMarkup(c.stress)}
+      ${stressBarMarkup(c.stress)}
       ${this.formatStatAttrsLineHtml(c, { compact: true })}
       <details class="sidebar-collapse companion-lore"${open} data-section="${openKey}">
         <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.scroll, 'História')}</summary>
@@ -957,7 +835,7 @@ export class GameApp {
   ): string {
     const pct = Math.min(100, Math.max(0, Math.round(((value + 3) / 6) * 100)));
     return `<div class="faction-rep-row">
-    <div class="sidebar-line faction-rep-label sidebar-line--with-icon">${iconWrap(icons.factions)}<span>${this.escHtml(label)} <strong>${value}</strong></span></div>
+    <div class="sidebar-line faction-rep-label sidebar-line--with-icon">${iconWrap(icons.factions)}<span>${escHtml(label)} <strong>${value}</strong></span></div>
     <div class="faction-rep-track faction-rep-track--${variant}" title="${label}: ${value} (−3 a +3)">
       <div class="faction-rep-fill faction-rep-fill--${variant}" style="width:${pct}%"></div>
     </div>
@@ -1004,7 +882,7 @@ export class GameApp {
       const cid = p.class as ClassId;
       const loreHtml = this.registry.ui.getHeroLore(cid, p.path)
         .split('\n\n')
-        .map((para) => `<p>${this.escHtml(para)}</p>`)
+        .map((para) => `<p>${escHtml(para)}</p>`)
         .join('');
       const lv = this.state.level;
       const need = lv >= MAX_LEVEL ? 0 : xpToNextLevel(lv);
@@ -1012,21 +890,21 @@ export class GameApp {
         lv >= MAX_LEVEL
           ? `<div class="sidebar-line">Nível <strong>${lv}</strong> · <em>Máx.</em></div>`
           : `<div class="sidebar-line">Nível <strong>${lv}</strong> · XP <strong>${this.state.xp}</strong> / <strong>${need}</strong></div>
-        ${this.hpBarMarkup(this.state.xp, need)}`;
+        ${hpBarMarkup(this.state.xp, need)}`;
       const buffHint =
         this.state.activeBuffs.length > 0
           ? `<div class="sidebar-line sidebar-buffs">${this.state.activeBuffs
               .map((b) => `${b.attr.toUpperCase()} ${b.delta >= 0 ? '+' : ''}${b.delta} (${b.remainingScenes} cena(s))`)
               .join(' · ')}</div>`
           : '';
-      return `<div class="sidebar-line">Nome <strong>${this.escHtml(p.name)}</strong></div>
-        <div class="sidebar-line sidebar-class-line">${this.escHtml(this.registry.ui.getHeroClassLabel(cid, p.path))}</div>
+      return `<div class="sidebar-line">Nome <strong>${escHtml(p.name)}</strong></div>
+        <div class="sidebar-line sidebar-class-line">${escHtml(this.registry.ui.getHeroClassLabel(cid, p.path))}</div>
         ${xpLine}
         <div class="sidebar-line">HP <strong>${p.hp}/${p.maxHp}</strong></div>
-        ${this.hpBarMarkup(p.hp, p.maxHp, 'hp-bar-resource', 'hp')}
-        ${p.maxMana > 0 ? `<div class="sidebar-line">Mana <strong>${p.mana}</strong> / <strong>${p.maxMana}</strong></div>${this.manaBarMarkup(p.mana, p.maxMana)}` : ''}
+        ${hpBarMarkup(p.hp, p.maxHp, 'hp-bar-resource', 'hp')}
+        ${p.maxMana > 0 ? `<div class="sidebar-line">Mana <strong>${p.mana}</strong> / <strong>${p.maxMana}</strong></div>${manaBarMarkup(p.mana, p.maxMana)}` : ''}
         <div class="sidebar-line sidebar-stress-label">Stress <strong>${p.stress}</strong> / 4</div>
-        ${this.stressBarMarkup(p.stress)}
+        ${stressBarMarkup(p.stress)}
         ${buffHint}
         ${this.formatStatAttrsLineHtml(p)}
         ${(() => {
@@ -1044,7 +922,7 @@ export class GameApp {
             const it = d[id];
             const name = it?.name ?? id;
             const stats = it ? this.formatItemEquipmentStatsHtml(it) : '';
-            return `<p class="sidebar-equip-line">${iconWrap(ic)}<span><strong>${label}</strong> — ${this.escHtml(name)}${stats ? `<br>${stats}` : ''}</span></p>`;
+            return `<p class="sidebar-equip-line">${iconWrap(ic)}<span><strong>${label}</strong> — ${escHtml(name)}${stats ? `<br>${stats}` : ''}</span></p>`;
           };
           const equipBody = `${line('Arma', p.weaponId)}${line('Armadura', p.armorId)}${line('Relíquia', p.relicId)}`;
           return `<details class="sidebar-collapse sidebar-equip"${openEquip} data-section="personagem_equip">
@@ -1062,7 +940,7 @@ export class GameApp {
               : spellLines
                   .map(
                     (sp) =>
-                      `<p class="sidebar-spell-line sidebar-line--with-icon"><span class="spell-emoji" aria-hidden="true">${this.spellEmoji(sp.id, sp)}</span><span><strong>${this.escHtml(sp.name)}</strong> — ${sp.manaCost} mana · ${sp.spellKind === 'damage' ? 'dano' : 'cura'} (${sp.dice}d6 + Mente)</span></p>`
+                      `<p class="sidebar-spell-line sidebar-line--with-icon"><span class="spell-emoji" aria-hidden="true">${spellEmoji(sp.id, sp)}</span><span><strong>${escHtml(sp.name)}</strong> — ${sp.manaCost} mana · ${sp.spellKind === 'damage' ? 'dano' : 'cura'} (${sp.dice}d6 + Mente)</span></p>`
                   )
                   .join('');
           return `<details class="sidebar-collapse sidebar-spells"${openSpells} data-section="personagem_spells">
@@ -1129,7 +1007,7 @@ export class GameApp {
       const max = 48;
       const shown = visitedIds.slice(0, max);
       const rest = visitedIds.length - shown.length;
-      const memHtml = shown.map((id) => `<div class="sidebar-line"><code>${this.escHtml(id)}</code></div>`).join('');
+      const memHtml = shown.map((id) => `<div class="sidebar-line"><code>${escHtml(id)}</code></div>`).join('');
       const more =
         rest > 0 ? `<div class="sidebar-line sidebar-muted">… e mais ${rest} cena(s)</div>` : '';
       const mem = document.createElement('details');
@@ -1283,7 +1161,7 @@ export class GameApp {
           block.appendChild(title);
           const attrs = document.createElement('div');
           attrs.className = 'level-up-attrs';
-          attrs.textContent = this.formatLevelUpDeltaLine(step.deltas);
+          attrs.textContent = formatLevelUpDeltaLine(step.deltas);
           block.appendChild(attrs);
           wrap.appendChild(block);
         }
@@ -1542,7 +1420,7 @@ export class GameApp {
           const btn = document.createElement('button');
           btn.className = 'combat-spell';
           btn.type = 'button';
-          btn.innerHTML = `<span class="spell-emoji" aria-hidden="true">${this.spellEmoji(spellId, spellDef)}</span><span>${this.escHtml(spellDef.name)} (${spellDef.manaCost})</span>`;
+          btn.innerHTML = `<span class="spell-emoji" aria-hidden="true">${spellEmoji(spellId, spellDef)}</span><span>${escHtml(spellDef.name)} (${spellDef.manaCost})</span>`;
           const castOk = canCastSpell(this.state, spellId, this.registry.data);
           btn.disabled = !castOk;
           btn.addEventListener('click', () => {
@@ -1624,7 +1502,7 @@ export class GameApp {
 
     const partyNames = new Set(this.state.party.map((x) => x.name));
 
-    const displayItems = this.buildCombatLogDisplayItems(c.log.slice(-64));
+    const displayItems = buildCombatLogDisplayItems(c.log.slice(-64));
 
     for (const item of displayItems) {
       if (item.mode === 'merged_hit') {

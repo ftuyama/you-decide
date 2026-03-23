@@ -4,15 +4,17 @@ import type { Encounter } from './schema';
 import type { EventBus } from './eventBus';
 import { unlockSpellsForNewLevel } from './spellsKnown';
 
-/** XP necessário para sair do nível `level` e ir para `level + 1` */
-export const XP_PER_LEVEL_BASE = 100;
-
 /** Nível máximo; acima disso o XP não aumenta nível */
 export const MAX_LEVEL = 30;
 
+/** XP para o primeiro nível (1→2); cada nível seguinte exige isto a mais que o anterior. */
+const XP_TO_NEXT_LEVEL_START = 50;
+const XP_TO_NEXT_LEVEL_STEP = 10;
+
+/** XP necessário para sair do nível `level` e ir para `level + 1` */
 export function xpToNextLevel(level: number): number {
   if (level >= MAX_LEVEL) return 0;
-  return XP_PER_LEVEL_BASE * level;
+  return XP_TO_NEXT_LEVEL_START + (level - 1) * XP_TO_NEXT_LEVEL_STEP;
 }
 
 function defaultXpFromEnemyDef(maxHp: number): number {

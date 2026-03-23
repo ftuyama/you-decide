@@ -38,6 +38,7 @@ import { MAX_LEVEL, xpToNextLevel } from '../engine/progression';
 import type { Stance } from '../engine/schema';
 import { formatDiceAscii } from './diceAscii';
 import { GameAudio, type AmbientTheme } from './sound';
+import { collapseTriggerStart, iconWrap, icons } from './icons';
 import './styles.css';
 import pkg from '../../package.json' with { type: 'json' };
 
@@ -433,8 +434,8 @@ export class GameApp {
     const panel = document.createElement('div');
     panel.className = 'camp-equip-panel';
     const hdr = document.createElement('div');
-    hdr.className = 'camp-equip-hdr';
-    hdr.textContent = 'Equipamento no acampamento';
+    hdr.className = 'camp-equip-hdr camp-equip-hdr--with-icon';
+    hdr.innerHTML = `${iconWrap(icons.equipment)}<span>Equipamento no acampamento</span>`;
     panel.appendChild(hdr);
 
     const slotDefs: { key: 'weapon' | 'armor' | 'relic'; label: string; cur: string | null }[] = [
@@ -442,13 +443,18 @@ export class GameApp {
       { key: 'armor', label: 'Armadura', cur: lead.armorId },
       { key: 'relic', label: 'Relíquia', cur: lead.relicId },
     ];
+    const slotSvg: Record<'weapon' | 'armor' | 'relic', string> = {
+      weapon: icons.weapon,
+      armor: icons.armor,
+      relic: icons.relic,
+    };
 
     for (const { key, label, cur } of slotDefs) {
       const row = document.createElement('div');
       row.className = 'camp-equip-slot';
       const lab = document.createElement('div');
-      lab.className = 'camp-equip-slot-label';
-      lab.textContent = label;
+      lab.className = 'camp-equip-slot-label camp-equip-slot-label--with-icon';
+      lab.innerHTML = `${iconWrap(slotSvg[key])}<span>${label}</span>`;
       row.appendChild(lab);
 
       const curEl = document.createElement('div');
@@ -874,7 +880,7 @@ export class GameApp {
   private inventoryMarkup(): string {
     const inv = this.state.inventory;
     if (!inv.length) {
-      return `<div class="sidebar-line inventory-empty">Nenhum item ainda.</div>`;
+      return `<div class="sidebar-line inventory-empty sidebar-line--with-icon">${iconWrap(icons.inventory)}<span>Nenhum item ainda.</span></div>`;
     }
     const counts = new Map<string, number>();
     for (const id of inv) {
@@ -886,7 +892,7 @@ export class GameApp {
       const label = def?.name ?? id;
       const suffix = n > 1 ? ` ×${n}` : '';
       lines.push(
-        `<div class="sidebar-line inventory-item">· ${this.escHtml(label)}${this.escHtml(suffix)}</div>`
+        `<div class="sidebar-line sidebar-inventory-item sidebar-line--with-icon">${iconWrap(icons.item, 'ui-icon-wrap ui-icon-wrap--sm')}<span>${this.escHtml(label)}${this.escHtml(suffix)}</span></div>`
       );
     }
     return lines.join('');
@@ -915,7 +921,7 @@ export class GameApp {
       ${this.stressBarMarkup(c.stress)}
       ${this.formatStatAttrsLineHtml(c, { compact: true })}
       <details class="sidebar-collapse companion-lore"${open} data-section="${openKey}">
-        <summary class="sidebar-collapse-trigger">História</summary>
+        <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.scroll, 'História')}</summary>
         <div class="sidebar-collapse-body sidebar-lore-body">${loreHtml}</div>
       </details>
     </div>`;
@@ -937,7 +943,7 @@ export class GameApp {
   ): string {
     const pct = Math.min(100, Math.max(0, Math.round(((value + 3) / 6) * 100)));
     return `<div class="faction-rep-row">
-    <div class="sidebar-line faction-rep-label">${label} <strong>${value}</strong></div>
+    <div class="sidebar-line faction-rep-label sidebar-line--with-icon">${iconWrap(icons.factions)}<span>${this.escHtml(label)} <strong>${value}</strong></span></div>
     <div class="faction-rep-track faction-rep-track--${variant}" title="${label}: ${value} (−3 a +3)">
       <div class="faction-rep-fill faction-rep-fill--${variant}" style="width:${pct}%"></div>
     </div>
@@ -1011,18 +1017,24 @@ export class GameApp {
         ${this.formatStatAttrsLineHtml(p)}
         ${(() => {
           const d = this.registry.data.items;
+          const slotIcon: Record<string, string> = {
+            Arma: icons.weapon,
+            Armadura: icons.armor,
+            Relíquia: icons.relic,
+          };
           const line = (label: string, id: string | null) => {
+            const ic = slotIcon[label] ?? icons.equipment;
             if (!id) {
-              return `<p class="sidebar-muted"><strong>${label}</strong> — —</p>`;
+              return `<p class="sidebar-equip-line sidebar-equip-line--empty">${iconWrap(ic)}<span class="sidebar-muted"><strong>${label}</strong> — —</span></p>`;
             }
             const it = d[id];
             const name = it?.name ?? id;
             const stats = it ? this.formatItemEquipmentStatsHtml(it) : '';
-            return `<p class="sidebar-equip-line"><strong>${label}</strong> — ${this.escHtml(name)}${stats ? `<br>${stats}` : ''}</p>`;
+            return `<p class="sidebar-equip-line">${iconWrap(ic)}<span><strong>${label}</strong> — ${this.escHtml(name)}${stats ? `<br>${stats}` : ''}</span></p>`;
           };
           const equipBody = `${line('Arma', p.weaponId)}${line('Armadura', p.armorId)}${line('Relíquia', p.relicId)}`;
           return `<details class="sidebar-collapse sidebar-equip"${openEquip} data-section="personagem_equip">
-          <summary class="sidebar-collapse-trigger">Equipamento</summary>
+          <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.equipment, 'Equipamento')}</summary>
           <div class="sidebar-collapse-body sidebar-lore-body">${equipBody}</div>
         </details>`;
         })()}
@@ -1040,12 +1052,12 @@ export class GameApp {
                   )
                   .join('');
           return `<details class="sidebar-collapse sidebar-spells"${openSpells} data-section="personagem_spells">
-          <summary class="sidebar-collapse-trigger">Magias aprendidas</summary>
+          <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.spellbook, 'Magias aprendidas')}</summary>
           <div class="sidebar-collapse-body sidebar-lore-body">${body}</div>
         </details>`;
         })()}
         <details class="sidebar-collapse sidebar-lore"${openLore} data-section="personagem_lore">
-          <summary class="sidebar-collapse-trigger">História do herói</summary>
+          <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.scroll, 'História do herói')}</summary>
           <div class="sidebar-collapse-body sidebar-lore-body">${loreHtml}</div>
         </details>`;
     })();
@@ -1053,41 +1065,41 @@ export class GameApp {
     hud.innerHTML = `
       <h2 class="sidebar-title">Herói</h2>
       <div class="sidebar-static">
-        <div class="sidebar-static-title">Progresso</div>
+        <div class="sidebar-static-title sidebar-static-title--with-icon">${iconWrap(icons.progress)}<span>Progresso</span></div>
         <div class="sidebar-static-body">
-          <div class="sidebar-line">Capítulo <strong>${this.state.chapter}</strong></div>
-          <div class="sidebar-line">Tier <strong>${this.state.narrativeTier}</strong></div>
+          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.progress)}<span>Capítulo <strong>${this.state.chapter}</strong></span></div>
+          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.tier)}<span>Tier <strong>${this.state.narrativeTier}</strong></span></div>
         </div>
       </div>
       <div class="sidebar-static">
-        <div class="sidebar-static-title">Personagem</div>
+        <div class="sidebar-static-title sidebar-static-title--with-icon">${iconWrap(icons.person)}<span>Personagem</span></div>
         <div class="sidebar-static-body sidebar-stats">
           ${personagemBlock}
         </div>
       </div>
       <div class="sidebar-static">
-        <div class="sidebar-static-title">Companheiros</div>
+        <div class="sidebar-static-title sidebar-static-title--with-icon">${iconWrap(icons.companions)}<span>Companheiros</span></div>
         <div class="sidebar-static-body sidebar-stats">
           ${this.companionsSectionMarkup()}
         </div>
       </div>
       <details class="sidebar-collapse"${openRec} data-section="recursos">
-        <summary class="sidebar-collapse-trigger">Recursos</summary>
+        <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.resources, 'Recursos')}</summary>
         <div class="sidebar-collapse-body">
-          <div class="sidebar-line">Gold <strong>${gold}</strong></div>
-          <div class="sidebar-line">Suprimento <strong>${r.supply}</strong> <span class="sidebar-resource-hint">(mapa, acampamento)</span></div>
-          <div class="sidebar-line">Fé <strong>${r.faith}</strong></div>
-          <div class="sidebar-line">Corrupção <strong>${r.corruption}</strong></div>
+          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.gold)}<span>Gold <strong>${gold}</strong></span></div>
+          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.supply)}<span>Suprimento <strong>${r.supply}</strong> <span class="sidebar-resource-hint">(mapa, acampamento)</span></span></div>
+          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.faith)}<span>Fé <strong>${r.faith}</strong></span></div>
+          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.corruption)}<span>Corrupção <strong>${r.corruption}</strong></span></div>
         </div>
       </details>
       <details class="sidebar-collapse"${openInv} data-section="inventario">
-        <summary class="sidebar-collapse-trigger">Inventário</summary>
+        <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.inventory, 'Inventário')}</summary>
         <div class="sidebar-collapse-body sidebar-inventory">
           ${this.inventoryMarkup()}
         </div>
       </details>
       <details class="sidebar-collapse"${openFac} data-section="faccoes">
-        <summary class="sidebar-collapse-trigger">Facções</summary>
+        <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.factions, 'Facções')}</summary>
         <div class="sidebar-collapse-body sidebar-faccoes">
           ${this.repBarMarkup('Vigília', rep.vigilia, 'vigilia')}
           ${this.repBarMarkup('Círculo', rep.circulo, 'circulo')}
@@ -1111,7 +1123,7 @@ export class GameApp {
       if (openMem) mem.setAttribute('open', '');
       mem.dataset.section = 'memorias';
       mem.innerHTML = `
-        <summary class="sidebar-collapse-trigger">Memórias (cenas visitadas)</summary>
+        <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.memories, 'Memórias (cenas visitadas)')}</summary>
         <div class="sidebar-collapse-body memories-list">${memHtml}${more}</div>
       `;
       hud.appendChild(mem);
@@ -1123,7 +1135,7 @@ export class GameApp {
       if (openDiary) diary.setAttribute('open', '');
       diary.dataset.section = 'diario';
       diary.innerHTML = `
-        <summary class="sidebar-collapse-trigger">Diário</summary>
+        <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.diary, 'Diário')}</summary>
         <div class="sidebar-collapse-body diary-box">
           ${this.state.diary.map((x) => `<p>“${x}”</p>`).join('')}
         </div>
@@ -1290,7 +1302,7 @@ export class GameApp {
       );
       if (rm) {
         const wrap = document.createElement('div');
-        wrap.innerHTML = `<div class="map-hint">Mapa (setas; −1 suprimento por passo)</div>`;
+        wrap.innerHTML = `<div class="map-hint sidebar-line--with-icon">${iconWrap(icons.map)}<span>Mapa (setas; −1 suprimento por passo)</span></div>`;
         const pre = document.createElement('pre');
         pre.className = 'ascii-map';
         pre.textContent = rm.lines.join('\n');

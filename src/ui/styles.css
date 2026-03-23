@@ -266,6 +266,73 @@ button.hamburger:hover {
   font-weight: 600;
 }
 
+/** Linha com ícone à esquerda (recursos, facções, mapa, inventário, progresso). */
+.sidebar-line--with-icon {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+}
+
+.sidebar-line--with-icon > .ui-icon-wrap {
+  flex-shrink: 0;
+  margin-top: 0.12rem;
+}
+
+.ui-icon-wrap {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ui-icon-wrap svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+
+.ui-icon-wrap--sm {
+  width: 11px;
+  height: 11px;
+  margin-top: 0.18rem;
+}
+
+.ui-icon-wrap--sm svg {
+  width: 11px;
+  height: 11px;
+}
+
+.sidebar-static-title--with-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.sidebar-collapse-trigger-start {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.sidebar-equip-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  margin: 0.35rem 0;
+}
+
+.sidebar-equip-line .ui-icon-wrap {
+  margin-top: 0.08rem;
+}
+
+.sidebar-equip-line span {
+  min-width: 0;
+}
+
 .sidebar-buffs {
   font-size: 0.68rem;
   color: #a89860;
@@ -297,6 +364,10 @@ button.hamburger:hover {
   padding: 0.45rem 0.55rem;
   background: #121410;
   border-bottom: 1px dashed var(--border);
+}
+
+.sidebar-static-title--with-icon .ui-icon-wrap {
+  margin-top: 0;
 }
 
 .sidebar-static-body {
@@ -794,6 +865,10 @@ button.hamburger:hover {
   margin: 0.35rem 0 0.2rem;
 }
 
+.sidebar-faccoes .faction-rep-label.sidebar-line--with-icon > .ui-icon-wrap {
+  margin-top: 0.1rem;
+}
+
 .sidebar-faccoes .faction-rep-row:first-child .faction-rep-label {
   margin-top: 0;
 }
@@ -1011,6 +1086,16 @@ button.choice .preview {
   margin-bottom: 0.65rem;
 }
 
+.camp-equip-hdr--with-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.camp-equip-hdr--with-icon .ui-icon-wrap {
+  margin-top: 0;
+}
+
 .camp-equip-slot {
   margin-bottom: 0.75rem;
 }
@@ -1023,6 +1108,16 @@ button.choice .preview {
   font-size: 0.7rem;
   color: var(--magic);
   margin-bottom: 0.2rem;
+}
+
+.camp-equip-slot-label--with-icon {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.camp-equip-slot-label--with-icon .ui-icon-wrap {
+  margin-top: 0;
 }
 
 .camp-equip-current {
@@ -1605,6 +1700,14 @@ button.combat-potion:disabled {
   font-size: 0.78rem;
   color: var(--muted);
   margin-bottom: 0.35rem;
+}
+
+.map-hint.sidebar-line--with-icon {
+  align-items: center;
+}
+
+.map-hint.sidebar-line--with-icon .ui-icon-wrap {
+  margin-top: 0;
 }
 
 .diary-box {

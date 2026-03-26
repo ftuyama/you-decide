@@ -412,7 +412,7 @@ export class GameAudio {
       const note = EXPLORE_PIANO_MELODY[melodyStep % EXPLORE_PIANO_MELODY.length];
       melodyStep++;
       const when = this.ctx.currentTime + 0.02;
-      triggerPluck(ctx, master, when, note, this.gain(0.018), 'triangle', 1.8);
+      triggerPluck(ctx, master, when, note, this.gain(0.118), 'triangle', 1.8);
     }, 1500);
 
     this.bgCleanup = () => {
@@ -546,9 +546,9 @@ export class GameAudio {
       const note = CAMP_MELODY[melodyStep % CAMP_MELODY.length];
       melodyStep++;
       const when = this.ctx.currentTime + 0.02;
-      triggerPluck(ctx, master, when, note, this.gain(0.02), 'sine', 2.2);
-      // Uma oitava acima, quase imperceptível, para dar "brilho" ao acampamento.
-      triggerPluck(ctx, master, when + 0.05, note * 2, this.gain(0.008), 'triangle', 1.8);
+      triggerPluck(ctx, master, when, note, this.gain(0.182), 'sine', 2.2);
+      // Uma oitava acima, sutil, para dar "brilho" ao acampamento.
+      triggerPluck(ctx, master, when + 0.05, note * 2, this.gain(0.143), 'triangle', 1.8);
     }, 1900);
 
     this.bgCleanup = () => {
@@ -620,19 +620,19 @@ export class GameAudio {
         triggerKick(ctx, master, tNow, this.gain(0.16));
       }
       if (s === 4 || s === 12) {
-        triggerSnare(ctx, master, tNow, this.gain(0.12));
+        triggerSnare(ctx, master, tNow, this.gain(0.15));
       }
       if (s % 2 === 0) {
-        triggerHat(ctx, master, tNow, this.gain(s % 4 === 0 ? 0.038 : 0.03));
+        triggerHat(ctx, master, tNow, this.gain(s % 4 === 0 ? 0.138 : 0.13));
       }
 
       const bassFreq = bassPattern[step % bassPattern.length];
-      triggerPluck(ctx, master, tNow, bassFreq, this.gain(0.05), 'sawtooth', 0.22);
+      triggerPluck(ctx, master, tNow, bassFreq, this.gain(0.15), 'sawtooth', 0.22);
 
       if (s % 4 === 0) {
         const note = BOSS_LEAD_MELODY[(step / 4) % BOSS_LEAD_MELODY.length];
-        triggerPluck(ctx, master, tNow + 0.01, note, this.gain(0.03), 'triangle', 0.5);
-        triggerPluck(ctx, master, tNow + 0.08, note * 1.5, this.gain(0.012), 'triangle', 0.35);
+        triggerPluck(ctx, master, tNow + 0.01, note, this.gain(0.18), 'triangle', 0.5);
+        triggerPluck(ctx, master, tNow + 0.08, note * 1.5, this.gain(0.142), 'triangle', 0.35);
       }
       step++;
     }, eighth);
@@ -698,7 +698,7 @@ export class GameAudio {
     this.bgPulseTimer = setInterval(() => {
       if (this.muted || !this.ctx) return;
       t += 0.03;
-      const freezeBreathe = 0.08 + Math.sin(t * 0.55) * 0.022 + Math.sin(t * 0.13) * 0.01;
+      const freezeBreathe = 0.18 + Math.sin(t * 0.55) * 0.122 + Math.sin(t * 0.13) * 0.01;
       try {
         master.gain.setTargetAtTime(this.gain(freezeBreathe), this.ctx.currentTime, 0.7);
       } catch {
@@ -712,8 +712,8 @@ export class GameAudio {
       const note = ACT5_ICE_MELODY[melodyStep % ACT5_ICE_MELODY.length];
       melodyStep++;
       const when = this.ctx.currentTime + 0.03;
-      triggerPluck(ctx, master, when, note, this.gain(0.017), 'triangle', 2.6);
-      triggerPluck(ctx, master, when + 0.09, note * 2, this.gain(0.007), 'sine', 1.4);
+      triggerPluck(ctx, master, when, note, this.gain(0.187), 'triangle', 2.6);
+      triggerPluck(ctx, master, when + 0.09, note * 2, this.gain(0.107), 'sine', 1.4);
     }, 1800);
 
     this.bgCleanup = () => {
@@ -771,12 +771,12 @@ export class GameAudio {
       const tNow = ctx.currentTime + 0.01;
       const s = step % 8;
       const note = MERCHANT_LUTE_MELODY[step % MERCHANT_LUTE_MELODY.length];
-      triggerPluck(ctx, master, tNow, note, this.gain(0.022), 'triangle', 0.7);
+      triggerPluck(ctx, master, tNow, note, this.gain(0.122), 'triangle', 0.7);
       if (s % 2 === 0) {
-        triggerHat(ctx, master, tNow + 0.015, this.gain(0.016));
+        triggerHat(ctx, master, tNow + 0.015, this.gain(0.116));
       }
       if (s === 0 || s === 4) {
-        triggerKick(ctx, master, tNow, this.gain(0.07));
+        triggerKick(ctx, master, tNow, this.gain(0.17));
       }
       step++;
     }, 310);
@@ -823,7 +823,7 @@ export class GameAudio {
     if (this.muted || this.bgCleanup) return;
     const ctx = this.ensureContext();
     const master = ctx.createGain();
-    master.gain.value = this.gain(0.08);
+    master.gain.value = this.gain(0.25);
     const comp = ctx.createDynamicsCompressor();
     comp.threshold.value = -32;
     comp.knee.value = 8;
@@ -832,9 +832,9 @@ export class GameAudio {
     comp.connect(ctx.destination);
 
     const layers: { freq: number; level: number; type: OscillatorType }[] = [
-      { freq: 46.25, level: 0.22, type: 'sine' },
-      { freq: 69.3, level: 0.16, type: 'triangle' },
-      { freq: 92.5, level: 0.11, type: 'sine' },
+      { freq: 46.25, level: 0.42, type: 'sine' },
+      { freq: 69.3, level: 0.36, type: 'triangle' },
+      { freq: 92.5, level: 0.31, type: 'sine' },
     ];
 
     const oscillators: OscillatorNode[] = [];
@@ -845,7 +845,7 @@ export class GameAudio {
       o.type = type;
       o.frequency.value = freq;
       o.detune.value = (Math.random() - 0.5) * 18;
-      g.gain.value = level * 0.35;
+      g.gain.value = level;
       o.connect(g);
       g.connect(master);
       o.start();
@@ -859,13 +859,13 @@ export class GameAudio {
       t += 0.025;
       try {
         master.gain.setTargetAtTime(
-          this.gain(0.06 + Math.sin(t * 0.31) * 0.02 + Math.sin(t * 0.09) * 0.01),
+          this.gain(0.26 + Math.sin(t * 0.31) * 0.22 + Math.sin(t * 0.09) * 0.21),
           this.ctx.currentTime,
           0.9
         );
         for (let i = 0; i < gains.length; i++) {
-          const mod = 0.26 + Math.sin(t * (0.5 + i * 0.18)) * 0.1;
-          gains[i]!.gain.setTargetAtTime(mod * (layers[i]!.level * 0.35), this.ctx.currentTime, 1.1);
+          const mod = 0.56 + Math.sin(t * (0.5 + i * 0.18)) * 0.4;
+          gains[i]!.gain.setTargetAtTime(mod * (layers[i]!.level), this.ctx.currentTime, 1.1);
         }
       } catch {
         /* noop */
@@ -878,8 +878,8 @@ export class GameAudio {
       const note = VOID_DRONE_MELODY[melodyStep % VOID_DRONE_MELODY.length]!;
       melodyStep++;
       const when = this.ctx.currentTime + 0.03;
-      triggerPluck(ctx, master, when, note, this.gain(0.014), 'sine', 1.8);
-      triggerPluck(ctx, master, when + 0.11, note * 0.5, this.gain(0.009), 'triangle', 1.5);
+      triggerPluck(ctx, master, when, note, this.gain(0.354), 'sine', 1.8);
+      triggerPluck(ctx, master, when + 0.11, note * 0.5, this.gain(0.459), 'triangle', 1.5);
     }, 2100);
 
     this.bgCleanup = () => {

@@ -204,6 +204,11 @@ export class GameApp {
     }
   }
 
+  private isLocalhostHost(): boolean {
+    const host = window.location.hostname;
+    return host === 'localhost' || host === '127.0.0.1' || host === '::1';
+  }
+
   private cycleFontSize(): void {
     this.fontStep = (this.fontStep + 1) % 3;
     this.saveFontStep();
@@ -222,6 +227,47 @@ export class GameApp {
       () => {
         prompt('Copia manualmente o estado:', json);
         this.closeMenu();
+      }
+    );
+  }
+
+  private importSaveFromClipboard(): void {
+    this.unlockAudio();
+    const applyRawSave = (raw: string): void => {
+      const parsed = deserializeState(raw);
+      if (parsed.campaignId !== this.campaignId) {
+        alert(
+          `Esta gravação é da campanha "${parsed.campaignId}". Campanha ativa: "${this.campaignId}".`
+        );
+        return;
+      }
+      this.state = this.stabilize(parsed);
+      this.render();
+      this.closeMenu();
+    };
+    void navigator.clipboard.readText().then(
+      (raw) => {
+        if (!raw?.trim()) {
+          alert('Área de transferência vazia.');
+          return;
+        }
+        try {
+          applyRawSave(raw);
+        } catch {
+          alert('JSON inválido na área de transferência.');
+        }
+      },
+      () => {
+        const pasted = prompt('Cole aqui o JSON da gravação:');
+        if (!pasted?.trim()) {
+          this.closeMenu();
+          return;
+        }
+        try {
+          applyRawSave(pasted);
+        } catch {
+          alert('JSON inválido.');
+        }
       }
     );
   }
@@ -429,9 +475,13 @@ export class GameApp {
     return undefined;
   }
 
-  /** Acampamento da Vigília: troca de equipamento fora do combate. */
+  /** Acampamentos/cenas de gestão: troca de equipamento fora do combate. */
   private isCampEquipmentScene(): boolean {
-    return this.state.sceneId.includes('vigilia_camp');
+    const campEquipmentScenes = new Set([
+      'act2/manage_equip',
+      'act5/manage_equip',
+    ]);
+    return campEquipmentScenes.has(this.state.sceneId);
   }
 
   private inventoryEquipmentIdsForSlot(slot: 'weapon' | 'armor' | 'relic'): string[] {
@@ -688,6 +738,12 @@ export class GameApp {
     exportBtn.textContent = 'Exportar gravação (JSON)';
     exportBtn.addEventListener('click', () => this.exportSaveToClipboard());
 
+    const importBtn = document.createElement('button');
+    importBtn.type = 'button';
+    importBtn.className = 'menu-item';
+    importBtn.textContent = 'Importar gravação (clipboard)';
+    importBtn.addEventListener('click', () => this.importSaveFromClipboard());
+
     const creditsBtn = document.createElement('button');
     creditsBtn.type = 'button';
     creditsBtn.className = 'menu-item';
@@ -701,13 +757,18 @@ export class GameApp {
     const saveSection = createMenuSection('Partida');
     saveSection.appendChild(saveBtn);
     saveSection.appendChild(loadBtn);
+    if (this.devMode) {
+      saveSection.appendChild(importBtn);
+    }
     saveSection.appendChild(exportBtn);
 
     const settingsSection = createMenuSection('Configurações');
     settingsSection.appendChild(soundRow);
     settingsSection.appendChild(fontBtn);
     settingsSection.appendChild(quickNavRow);
-    settingsSection.appendChild(devRow);
+    if (this.isLocalhostHost()) {
+      settingsSection.appendChild(devRow);
+    }
 
     const aboutSection = createMenuSection('Sobre');
     aboutSection.appendChild(creditsBtn);
@@ -1283,26 +1344,26 @@ export class GameApp {
       }
       const canSacrificeChoice =
         this.state.flags.act6_void_pact && this.state.resources.corruption >= SACRIFICE_MIN_CORRUPTION;
-      const sacrifice = document.createElement('button');
-      sacrifice.className = 'stance special';
-      decorateCombatQuickNav(sacrifice, (n, quickLabel) => {
-        const corr = this.state.resources.corruption;
-        const base = canSacrificeChoice
-          ? `Selo do Vazio (Corr ${corr})`
-          : `Selo do Vazio (req Corr ${SACRIFICE_MIN_CORRUPTION}+ e pacto)`;
-        sacrifice.textContent = quickLabel ? `${n} - ${base}` : base;
-      });
-      sacrifice.disabled = !canSacrificeChoice || lead.hp <= 1;
-      sacrifice.addEventListener('click', () => {
-        if (!canSacrificeChoice || lead.hp <= 1) return;
-        this.unlockAudio();
-        this.audio.playDice();
-        this.state = this.stabilize(
-          executePlayerTurn(this.state, 'aggressive', this.registry.data, false, true, this.bus)
-        );
-        this.render();
-      });
-      bar.appendChild(sacrifice);
+      if (canSacrificeChoice) {
+        const sacrifice = document.createElement('button');
+        sacrifice.className = 'stance special';
+        decorateCombatQuickNav(sacrifice, (n, quickLabel) => {
+          const corr = this.state.resources.corruption;
+          const base = `Selo do Vazio (Corr ${corr})`;
+          sacrifice.textContent = quickLabel ? `${n} - ${base}` : base;
+        });
+        sacrifice.disabled = lead.hp <= 1;
+        sacrifice.addEventListener('click', () => {
+          if (lead.hp <= 1) return;
+          this.unlockAudio();
+          this.audio.playDice();
+          this.state = this.stabilize(
+            executePlayerTurn(this.state, 'aggressive', this.registry.data, false, true, this.bus)
+          );
+          this.render();
+        });
+        bar.appendChild(sacrifice);
+      }
       const sp = document.createElement('button');
       sp.className = 'stance special';
       decorateCombatQuickNav(sp, (n, quickLabel) => {

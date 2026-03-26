@@ -3,6 +3,7 @@ id: act2/vigilia_camp
 title: Acampamento da Vigília
 chapter: 2
 ambientTheme: camp
+artKey: vigilia_camp
 choices:
   - text: "Descansar no acampamento (−1 suprimento)"
     next: act2/hub_catacomb
@@ -35,6 +36,8 @@ choices:
   - text: "Trocar duas palavras com o grupo"
     next: act2/camp_companion_chat
     condition: { companionCount: { gte: 1 } }
+  - text: "Manusear equipamento no acampamento"
+    next: act2/manage_equip
   - text: "Continuar"
     next: act2/hub_catacomb
 onEnter:

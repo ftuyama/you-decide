@@ -2,7 +2,8 @@
 id: act5/frost_camp
 title: Brasas sob a tempestade
 chapter: 5
-ambientTheme: act5
+ambientTheme: camp
+artKey: frost_camp
 choices:
   - text: "Descansar junto ao fogareiro (−1 suprimento)"
     next: act5/frost_hub
@@ -35,6 +36,8 @@ choices:
   - text: "Trocar duas palavras com o grupo"
     next: act5/frost_companion_chat
     condition: { companionCount: { gte: 1 } }
+  - text: "Manusear equipamento no acampamento"
+    next: act5/manage_equip
   - text: "Continuar"
     next: act5/frost_hub
 onEnter:

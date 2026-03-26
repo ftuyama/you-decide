@@ -36,7 +36,7 @@ export const DEFAULT_ENEMY_CRIT_CONFIRM = 0.25;
 export const DEFAULT_FOCUS_LEADER_WEIGHT = 0.72;
 /** Chance de um inimigo com falas proferir uma linha no turno. */
 export const DEFAULT_ENEMY_COMBAT_LINE_CHANCE = 0.22;
-export const SACRIFICE_MIN_CORRUPTION = 3;
+export const SACRIFICE_MIN_CORRUPTION = 5;
 
 function getSacrificeValues(state: GameState): { hpCost: number; damageBonus: number } | null {
   if (!state.flags.act6_void_pact) return null;

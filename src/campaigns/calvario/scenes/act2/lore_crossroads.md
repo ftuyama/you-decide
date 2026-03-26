@@ -12,9 +12,13 @@ choices:
     condition: { class: mage }
     preview: "Provação · anjo caído; título só se venceres"
   - text: "Voltar-se ao Clérigo penitente"
-    next: act2/path_cleric_penitent
-    condition: { class: cleric }
-    preview: Arquétipo narrativo
+    next: act2/trial_fallen_angel_gate
+    condition:
+      all:
+        - { class: cleric }
+        - not:
+            path: penitent
+    preview: "Provação · anjo caído; título só se venceres"
   - text: "Mergulhar o braço no lodo que sussurra"
     next: act2/luck_mire
     preview: Sorte — 2d6 + SOR

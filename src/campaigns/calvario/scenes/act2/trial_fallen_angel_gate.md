@@ -22,7 +22,11 @@ choices:
         onFlee: act2/lore_crossroads
     preview: "Combate · vantagem do inimigo"
   - text: "Enfrentar o anjo com a fé (clérigo)"
-    condition: { class: cleric }
+    condition:
+      all:
+        - { class: cleric }
+        - not:
+            path: penitent
     effects:
       - op: startCombat
         encounterId: boss_fallen_angel_trial

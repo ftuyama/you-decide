@@ -370,7 +370,7 @@ export const CompanionDefSchema = z.object({
 
 export type CompanionDef = z.infer<typeof CompanionDefSchema>;
 
-/** Magias de campanha — dano ou cura em si mesmo; N d6 + mod Mente */
+/** Magias de campanha — dano ou cura em si mesmo; base + N d6 + mod Mente */
 export const SpellDefSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -380,6 +380,8 @@ export const SpellDefSchema = z.object({
   spellKind: z.enum(['damage', 'heal_self']),
   /** Número de dados d6 */
   dice: z.number().int().min(1),
+  /** Valor fixo somado aos dados e ao mod Mente */
+  base: z.number().int().min(0).default(0),
   /** Só via narrativa (learnSpell), não no nível 1 nem ao subir de nível */
   learnOnly: z.boolean().optional(),
 });

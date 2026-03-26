@@ -1,0 +1,13 @@
+export { sprite as iron_dagger } from './iron_dagger.ts';
+export { sprite as rusty_sword } from './rusty_sword.ts';
+export { sprite as oak_staff } from './oak_staff.ts';
+export { sprite as mace } from './mace.ts';
+export { sprite as leather } from './leather.ts';
+export { sprite as cloth_robe } from './cloth_robe.ts';
+export { sprite as chain_shirt } from './chain_shirt.ts';
+export { sprite as third_bell } from './third_bell.ts';
+export { sprite as rumor_map } from './rumor_map.ts';
+export { sprite as frost_wyrm_scale } from './frost_wyrm_scale.ts';
+export { sprite as potion_hp } from './potion_hp.ts';
+export { sprite as potion_mana } from './potion_mana.ts';
+export { sprite as potion_stress } from './potion_stress.ts';

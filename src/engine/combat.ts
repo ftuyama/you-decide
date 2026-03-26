@@ -298,7 +298,7 @@ export function castSpell(
       diceRolls.push(d);
       sum += d;
     }
-    const dmg = Math.max(0, sum + mindMod);
+    const dmg = Math.max(0, sp.base + sum + mindMod);
     const chipTarget = newEnemies[enemyIndex]!;
     if (def.type === 'armored' && chipTarget.armorChipsRemaining > 0) {
       chipTarget.armorChipsRemaining -= 1;
@@ -328,7 +328,7 @@ export function castSpell(
       diceRolls.push(d);
       sum += d;
     }
-    const healTotal = Math.max(0, sum + mindMod);
+    const healTotal = Math.max(0, sp.base + sum + mindMod);
     const healed = Math.min(newLead.maxHp - newLead.hp, healTotal);
     const nh = newLead.hp + healed;
     newLead = { ...newLead, hp: nh };

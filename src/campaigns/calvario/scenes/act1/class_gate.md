@@ -2,6 +2,7 @@
 id: act1/class_gate
 title: O espelho d'água
 chapter: 1
+ambientTheme: explore
 artKey: class_gate
 choices:
   - text: "[#] Forjar o caminho como Cavaleiro"

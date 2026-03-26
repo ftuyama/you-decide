@@ -2,6 +2,7 @@
 id: act5/frost_ridgeline
 title: Crista da Cordilheira Gelada
 chapter: 5
+ambientTheme: act5
 choices:
   - text: "Seguir o rasto de garras na neve"
     next: act5/frost_whelp_pack

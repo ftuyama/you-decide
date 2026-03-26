@@ -14,6 +14,7 @@ import { items as itemsTs } from './data/items';
 import encounters from './data/encounters.json';
 import companions from './data/companions.json';
 import { spells as spellsTs } from './data/spells';
+import { passives as passivesTs } from './data/passives';
 import { calvarioHeroNarrative } from './heroNarrative';
 import { canWalk, renderMap } from './maps';
 import { SCENE_ART } from './ascii/art';
@@ -41,5 +42,6 @@ export function loadCalvarioContent() {
   data.items = itemsTs as Record<string, ItemDef>;
   data.companions = companions as Record<string, CompanionDef>;
   data.spells = spellsTs as Record<string, SpellDef>;
+  data.passives = passivesTs;
   return { data, sceneFiles: sceneRaw, ui: calvarioUI };
 }

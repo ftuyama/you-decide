@@ -1,6 +1,7 @@
 ---
 id: act3/depths_stub
 chapter: 3
+ambientTheme: explore
 title: Dobra nas profundezas
 choices:
   - text: "Voltar ao átrio das profundezas"

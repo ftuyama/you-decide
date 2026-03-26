@@ -1,6 +1,7 @@
 ---
 id: act2/merchant_circle_win
 chapter: 2
+ambientTheme: merchant
 artKey: merchant
 title: O capuz paga
 onEnter: []

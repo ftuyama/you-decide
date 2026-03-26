@@ -2,6 +2,7 @@
 id: act1/pick_mage
 title: Juramento do Mago
 chapter: 1
+ambientTheme: explore
 artKey: pick_mage
 choices:
   - text: "Avançar para a boca da masmorra"

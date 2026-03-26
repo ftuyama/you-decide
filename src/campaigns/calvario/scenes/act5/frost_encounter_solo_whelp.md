@@ -2,6 +2,7 @@
 id: act5/frost_encounter_solo_whelp
 title: Cria perdida
 chapter: 5
+ambientTheme: act5
 choices:
   - text: "Enfrentar a cria isolada"
     effects:

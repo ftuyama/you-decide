@@ -28,3 +28,25 @@ export const BOSS_LEAD_MELODY: number[] = [
   493.88, // B4
   440.0, // A4
 ];
+
+export const ACT5_ICE_MELODY: number[] = [
+  293.66, // D4
+  369.99, // F#4
+  440.0, // A4
+  493.88, // B4
+  440.0, // A4
+  369.99, // F#4
+  329.63, // E4
+  246.94, // B3
+];
+
+export const MERCHANT_LUTE_MELODY: number[] = [
+  220.0, // A3
+  246.94, // B3
+  261.63, // C4
+  293.66, // D4
+  329.63, // E4
+  293.66, // D4
+  261.63, // C4
+  246.94, // B3
+];

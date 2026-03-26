@@ -2,6 +2,7 @@
 id: act4/throne_observe_mind_fail
 title: Letra presa
 chapter: 4
+ambientTheme: explore
 choices:
   - text: "Desistir da leitura e continuar a observar"
     next: act4/throne_observe

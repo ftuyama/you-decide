@@ -2,6 +2,7 @@
 id: act4/pact_after_mind_fail
 title: Mordida do Eco
 chapter: 4
+ambientTheme: explore
 choices:
   - text: "Atravessar na mesma — à força"
     next: act4/pact_vigil_skirmish

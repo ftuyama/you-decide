@@ -2,6 +2,7 @@
 id: act1/map_tutorial
 title: Tutorial do Mapa ASCII
 chapter: 1
+ambientTheme: explore
 choices:
   - text: "Sair"
     next: act1/dungeon_mouth

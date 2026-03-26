@@ -2,6 +2,7 @@
 id: act1/title
 title: Abertura
 chapter: 1
+ambientTheme: explore
 artKey: title
 choices:
   - text: "Descer os degraus rumo ao texto gravado na pedra"

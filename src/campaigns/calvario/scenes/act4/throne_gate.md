@@ -1,6 +1,7 @@
 ---
 id: act4/throne_gate
 chapter: 4
+ambientTheme: explore
 artKey: throne
 title: Ante-sala do trono
 choices:

@@ -2,6 +2,7 @@
 id: act1/pick_cleric
 title: Juramento da Clériga
 chapter: 1
+ambientTheme: explore
 artKey: pick_cleric
 choices:
   - text: "Avançar para a boca da masmorra"

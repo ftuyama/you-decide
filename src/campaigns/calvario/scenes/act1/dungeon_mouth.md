@@ -2,6 +2,7 @@
 id: act1/dungeon_mouth
 title: Boca da masmorra
 chapter: 1
+ambientTheme: explore
 artKey: dungeon_mouth
 choices:
   - text: "Entrar na catacumba"

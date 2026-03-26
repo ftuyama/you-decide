@@ -2,6 +2,7 @@
 id: act5/frost_lair_approach
 title: Aproximação ao Covil de Gelo
 chapter: 5
+ambientTheme: act5
 artKey: ice_dragon
 choices:
   - text: "Entrar na câmara do hálito branco"

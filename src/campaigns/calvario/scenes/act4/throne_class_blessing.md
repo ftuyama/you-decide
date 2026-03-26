@@ -2,6 +2,7 @@
 id: act4/throne_class_blessing
 title: Ofício no salão
 chapter: 4
+ambientTheme: explore
 choices:
   - text: "Traçar um sinal breve no ar — bênção contida"
     next: act4/throne_gate

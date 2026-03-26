@@ -2,6 +2,7 @@
 id: act4/throne_arcane_fail
 title: Letra que morde
 chapter: 4
+ambientTheme: explore
 choices:
   - text: "Soltar o olhar e voltar à ante-sala"
     next: act4/throne_gate

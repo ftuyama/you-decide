@@ -2,6 +2,7 @@
 id: act5/frost_opening
 title: Cimeiras do Vento Cinzento
 chapter: 5
+ambientTheme: act5
 artKey: frost_peaks
 choices:
   - text: "Encontrar abrigo e traçar plano na neve"

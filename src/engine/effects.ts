@@ -282,6 +282,7 @@ function applyOne(
         weaponId: null,
         armorId: null,
         relicId: null,
+        critRatio: 0,
         specialUsedThisCombat: false,
         path: null,
       };

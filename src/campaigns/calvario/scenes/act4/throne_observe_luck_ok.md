@@ -2,6 +2,7 @@
 id: act4/throne_observe_luck_ok
 title: Gota cativa
 chapter: 4
+ambientTheme: explore
 choices:
   - text: "Continuar a observar o trono"
     next: act4/throne_observe

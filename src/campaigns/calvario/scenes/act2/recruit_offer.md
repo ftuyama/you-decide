@@ -2,6 +2,7 @@
 id: act2/recruit_offer
 title: A Oferta de Mira
 chapter: 2
+ambientTheme: explore
 choices:
   - text: "Recrutar Mira"
     next: act2/recruit_mira

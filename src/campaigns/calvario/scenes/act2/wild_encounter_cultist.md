@@ -1,6 +1,7 @@
 ---
 id: act2/wild_encounter_cultist
 chapter: 2
+ambientTheme: explore
 title: Patrulha solitária
 choices:
   - text: "Bater no cultista isolado"

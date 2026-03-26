@@ -2,6 +2,7 @@
 id: act4/throne_nerves_ok
 title: Firmeza
 chapter: 4
+ambientTheme: explore
 choices:
   - text: "Voltar à ante-sala"
     next: act4/throne_gate

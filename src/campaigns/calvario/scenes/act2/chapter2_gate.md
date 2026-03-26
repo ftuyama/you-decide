@@ -2,6 +2,7 @@
 id: act2/chapter2_gate
 title: Limiar do Capítulo II
 chapter: 2
+ambientTheme: explore
 chapterGate:
   minSupply: 1
   passNext: act2/hub_catacomb

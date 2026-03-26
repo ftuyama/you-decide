@@ -1,6 +1,7 @@
 ---
 id: act2/trial_fallen_angel_gate
 chapter: 2
+ambientTheme: explore
 title: Provação do véu
 choices:
   - text: "Enfrentar o anjo com o aço (cavaleiro)"

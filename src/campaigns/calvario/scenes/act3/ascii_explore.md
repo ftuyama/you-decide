@@ -2,6 +2,7 @@
 id: act3/ascii_explore
 title: Exploração pelo Mini-Mapa
 chapter: 3
+ambientTheme: explore
 choices:
   - text: "Sair do mapa"
     next: act3/hub_depths

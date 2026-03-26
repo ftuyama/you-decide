@@ -2,6 +2,7 @@
 id: act4/victory_peace
 title: Vitória em Silêncio
 chapter: 4
+ambientTheme: explore
 choices:
   - text: "Epílogo"
     next: act4/epilogue_modular

@@ -2,12 +2,13 @@
 id: act3/stone_combat_intro
 title: Pedra Contra Carne
 chapter: 3
+ambientTheme: explore
 choices:
   - text: "Lutar!"
     effects:
       - op: startCombat
         encounterId: stone_guard_fight
-        onVictory: act3/hub_depths
+        onVictory: act3/stone_guard_victory
         onDefeat: act4/game_over
 onEnter: []
 ---

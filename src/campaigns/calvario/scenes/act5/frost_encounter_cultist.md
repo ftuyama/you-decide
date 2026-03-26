@@ -2,6 +2,7 @@
 id: act5/frost_encounter_cultist
 title: Estranho no gelo
 chapter: 5
+ambientTheme: act5
 choices:
   - text: "Responder ao cultista perdido no desfiladeiro"
     effects:

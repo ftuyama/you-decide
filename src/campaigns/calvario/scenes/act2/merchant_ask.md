@@ -2,6 +2,7 @@
 id: act2/merchant_ask
 title: Origem
 chapter: 2
+ambientTheme: merchant
 choices:
   - text: "Aceitar o mapa (−1 ouro)"
     next: act2/hub_catacomb

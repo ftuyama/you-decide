@@ -1,6 +1,7 @@
 ---
 id: act5/frost_companion_chat
 chapter: 5
+ambientTheme: act5
 title: Palavra ao lado do fogo
 choices:
   - text: "Voltar ao acampamento gelado"

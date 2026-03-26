@@ -266,6 +266,8 @@ export const SceneFrontmatterSchema = z.object({
   title: z.string().optional(),
   chapter: z.number().int().min(1).default(1),
   type: z.enum(['story', 'hub', 'combat_intro']).default('story'),
+  /** Tema ambiente da cena (música/ambiente no UI). */
+  ambientTheme: z.enum(['explore', 'combat', 'camp', 'boss', 'act5', 'merchant']).optional(),
   /** Efeitos ao entrar na cena (após primeira renderização; idempotência por visit) */
   onEnter: z.array(EffectSchema).default([]),
   choices: z.array(ChoiceSchema).default([]),
@@ -421,6 +423,8 @@ export const CharacterSchema = z.object({
   weaponId: z.string().nullable(),
   armorId: z.string().nullable(),
   relicId: z.string().nullable(),
+  /** Bônus de crítico adicional (0..1), somado às regras normais de crítico pelos dados. */
+  critRatio: z.number().min(0).max(1).default(0),
   specialUsedThisCombat: z.boolean().default(false),
   /** Arquétipo narrativo (Cavaleiro caído, Mago das trevas, …); mecânica continua em `class` */
   path: z.string().nullable().default(null),

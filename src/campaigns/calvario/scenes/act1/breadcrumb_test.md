@@ -2,6 +2,7 @@
 id: act1/breadcrumb_test
 title: Teste de Breadcrumb
 chapter: 1
+ambientTheme: explore
 choices:
   - text: "Voltar"
     next: act1/title

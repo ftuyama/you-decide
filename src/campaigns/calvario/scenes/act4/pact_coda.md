@@ -2,6 +2,7 @@
 id: act4/pact_coda
 title: Coda do Pacto
 chapter: 4
+ambientTheme: explore
 choices:
   - text: "Aceitar o que ficou escrito em ti"
     next: act4/epilogue_modular

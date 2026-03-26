@@ -2,6 +2,7 @@
 id: act4/throne_nerves
 title: Prova de nervos
 chapter: 4
+ambientTheme: explore
 luckCheck:
   id: throne_nerves_steady
   tn: 10

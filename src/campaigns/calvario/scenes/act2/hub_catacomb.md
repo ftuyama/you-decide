@@ -2,6 +2,7 @@
 id: act2/hub_catacomb
 chapter: 2
 type: hub
+ambientTheme: explore
 artKey: hub
 title: Cruzeiro — hub
 choices:

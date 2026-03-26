@@ -1,6 +1,7 @@
 ---
 id: act2/wild_encounter_mixed
 chapter: 2
+ambientTheme: explore
 title: Cella mista
 choices:
   - text: "Lutar contra ratos e osso"

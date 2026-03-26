@@ -2,6 +2,7 @@
 id: act5/frost_encounter_howl_horde
 title: Uivo da tempestade
 chapter: 5
+ambientTheme: act5
 choices:
   - text: "Segurar a linha contra a horda"
     effects:

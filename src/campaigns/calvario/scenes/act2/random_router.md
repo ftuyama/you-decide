@@ -2,6 +2,7 @@
 id: act2/random_router
 title: Ramo Aleatório da Catacumba
 chapter: 2
+ambientTheme: explore
 randomBranch:
   id: rb1
   branches:

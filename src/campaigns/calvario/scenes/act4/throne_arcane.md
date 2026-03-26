@@ -2,6 +2,7 @@
 id: act4/throne_arcane
 title: Runas sob o pulso verde
 chapter: 4
+ambientTheme: explore
 skillCheck:
   id: throne_arcane_read
   attr: mind

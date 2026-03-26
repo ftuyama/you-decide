@@ -2,6 +2,7 @@
 id: act2/skeleton_room
 title: Sala dos Ossos Armados
 chapter: 2
+ambientTheme: explore
 artKey: skeleton
 choices:
   - text: "Forçar a porta"

@@ -2,6 +2,7 @@
 id: act1/dungeon_door
 title: Batentes
 chapter: 1
+ambientTheme: explore
 choices:
   - text: "Entrar na catacumba"
     next: act2/catacomb_entry

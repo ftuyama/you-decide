@@ -2,6 +2,7 @@
 id: act4/throne_observe_luck
 title: Gotejar da corrente
 chapter: 4
+ambientTheme: explore
 luckCheck:
   id: throne_observe_drip
   tn: 9

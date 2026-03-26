@@ -2,6 +2,7 @@
 id: act5/frost_camp
 title: Brasas sob a tempestade
 chapter: 5
+ambientTheme: act5
 choices:
   - text: "Descansar junto ao fogareiro (−1 suprimento)"
     next: act5/frost_hub

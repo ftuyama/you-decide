@@ -1,6 +1,7 @@
 ---
 id: act2/merchant_moon
 chapter: 2
+ambientTheme: merchant
 artKey: merchant
 title: Mercador sem rosto
 choices:

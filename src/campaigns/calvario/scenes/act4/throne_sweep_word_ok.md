@@ -2,6 +2,8 @@
 id: act4/throne_sweep_word_ok
 title: Eco subtraído
 chapter: 4
+ambientTheme: explore
+artKey: throne_sweep
 choices:
   - text: "À segunda fase — trono!"
     next: act4/fight_morvayn_2

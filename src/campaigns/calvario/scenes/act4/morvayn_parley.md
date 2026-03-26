@@ -2,6 +2,7 @@
 id: act4/morvayn_parley
 title: Parlamento com Morvayn
 chapter: 4
+ambientTheme: explore
 choices:
   - text: "Recusar o pacto e lutar"
     next: act4/fight_morvayn

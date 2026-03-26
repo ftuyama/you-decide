@@ -2,6 +2,8 @@
 id: act4/throne_sweep_cat_fail
 title: Contagem que foge
 chapter: 4
+ambientTheme: explore
+artKey: throne_sweep
 choices:
   - text: "À segunda fase — trono!"
     next: act4/fight_morvayn_2

@@ -204,6 +204,52 @@ function getLead(state: GameState): Character {
   return state.party[0]!;
 }
 
+function applyStartOfPlayerTurnPassive(
+  party: Character[],
+  log: CombatLogEntry[]
+): { party: Character[]; log: CombatLogEntry[] } {
+  const lead = party[0];
+  if (!lead || lead.hp <= 0) return { party, log };
+
+  if (lead.class === 'cleric') {
+    const regen = Math.max(1, Math.ceil(lead.maxHp * 0.01));
+    const healed = Math.min(regen, Math.max(0, lead.maxHp - lead.hp));
+    if (healed > 0) {
+      const nextLead = { ...lead, hp: lead.hp + healed };
+      const nextParty = party.map((p, i) => (i === 0 ? nextLead : p));
+      return {
+        party: nextParty,
+        log: [
+          ...log,
+          {
+            kind: 'heal',
+            message: `${lead.name} regenera ${healed} HP (passivo).`,
+            final: healed,
+            actor: lead.name,
+            target: lead.name,
+          },
+        ],
+      };
+    }
+    return { party, log };
+  }
+
+  if (lead.class === 'mage' && lead.maxMana > 0) {
+    const regen = Math.max(1, Math.ceil(lead.maxMana * 0.01));
+    const restored = Math.min(regen, Math.max(0, lead.maxMana - lead.mana));
+    if (restored > 0) {
+      const nextLead = { ...lead, mana: lead.mana + restored };
+      const nextParty = party.map((p, i) => (i === 0 ? nextLead : p));
+      return {
+        party: nextParty,
+        log: [...log, { kind: 'info', message: `${lead.name} regenera ${restored} mana (passivo).` }],
+      };
+    }
+  }
+
+  return { party, log };
+}
+
 function statMod(attr: number): number {
   return Math.floor((attr - 6) / 2);
 }
@@ -631,7 +677,16 @@ function physicalAttackForCharacter(
     if (wd === 0 && !attacker.weaponId) wd = 1;
     const baseFlat = wd + (stance === 'aggressive' ? 1 : 0);
     const holyBonus = def.type === 'undead' && attacker.class === 'cleric' ? 1 : 0;
-    const isPlayerCrit = special === 'crit';
+    let isPlayerCrit = special === 'crit';
+    if (!isPlayerCrit && hit && attacker.critRatio > 0 && rng() < attacker.critRatio) {
+      isPlayerCrit = true;
+      logOut.push({
+        kind: 'info',
+        message: `${attacker.name} encontra uma abertura perfeita (crítico passivo)!`,
+        actor: attacker.name,
+        target: def.name,
+      });
+    }
     const chipTarget = newEnemies[enemyIndex]!;
     if (def.type === 'armored' && chipTarget.armorChipsRemaining > 0) {
       const ct = {
@@ -1013,10 +1068,15 @@ function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData, bu
   }
 
   const nextRound = c.round + 1;
-  log.push({
-    kind: 'turn_banner',
-    message: `Rodada ${nextRound} — sua vez (postura e ataque)`,
-  });
+  const roundPrep = applyStartOfPlayerTurnPassive(party, log);
+  party = roundPrep.party;
+  const nextLog = [
+    ...roundPrep.log,
+    {
+      kind: 'turn_banner' as const,
+      message: `Rodada ${nextRound} — sua vez (postura e ataque)`,
+    },
+  ];
 
   return {
     ...state,
@@ -1024,7 +1084,7 @@ function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData, bu
     combat: {
       ...c,
       enemies,
-      log,
+      log: nextLog,
       phase: 'choose_stance',
       round: nextRound,
       pendingStance: undefined,

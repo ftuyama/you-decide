@@ -2,6 +2,7 @@
 id: act4/throne_chains
 title: Correntes vivas
 chapter: 4
+ambientTheme: explore
 choices:
   - text: "Recolher um fragmento preso ao metal (−1 suprimento, +2 ouro)"
     next: act4/throne_gate

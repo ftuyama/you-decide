@@ -2,6 +2,7 @@
 id: act2/hub_observe
 title: Marcas
 chapter: 2
+ambientTheme: explore
 choices:
   - text: "Voltar ao hub"
     next: act2/hub_catacomb

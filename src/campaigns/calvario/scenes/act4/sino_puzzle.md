@@ -2,6 +2,7 @@
 id: act4/sino_puzzle
 title: Enigma do Sino ao Luar
 chapter: 4
+ambientTheme: explore
 choices:
   - text: "◇ ◈ ◇ (sequência do Terceiro Sino)"
     next: act4/throne_gate

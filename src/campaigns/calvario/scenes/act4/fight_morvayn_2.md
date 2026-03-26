@@ -2,6 +2,7 @@
 id: act4/fight_morvayn_2
 title: Despertar do Trono
 chapter: 4
+ambientTheme: explore
 choices:
   - text: "Segunda fase — trono!"
     condition: { noMark: soul_scarred_by_seal }

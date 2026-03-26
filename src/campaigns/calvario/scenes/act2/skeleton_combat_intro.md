@@ -2,6 +2,7 @@
 id: act2/skeleton_combat_intro
 title: Crânio e Ferrugem
 chapter: 2
+ambientTheme: explore
 artKey: skeleton
 choices:
   - text: "Lutar!"

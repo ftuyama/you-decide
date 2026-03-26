@@ -1,6 +1,7 @@
 ---
 id: act4/late_merchant
 chapter: 4
+ambientTheme: merchant
 artKey: merchant
 title: Mercador do trono
 choices:

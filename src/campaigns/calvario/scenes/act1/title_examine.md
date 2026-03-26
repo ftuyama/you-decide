@@ -2,6 +2,7 @@
 id: act1/title_examine
 title: Inscrições
 chapter: 1
+ambientTheme: explore
 artKey: crawl
 choices:
   - text: "Voltar à entrada"

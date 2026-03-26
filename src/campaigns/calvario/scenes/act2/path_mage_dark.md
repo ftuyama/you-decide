@@ -1,6 +1,7 @@
 ---
 id: act2/path_mage_dark
 chapter: 2
+ambientTheme: explore
 title: Mago das trevas
 onEnter:
   - { op: setPath, path: dark }

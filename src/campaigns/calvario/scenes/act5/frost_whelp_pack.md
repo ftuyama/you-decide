@@ -2,6 +2,7 @@
 id: act5/frost_whelp_pack
 title: Ninho das Crias Gélidas
 chapter: 5
+ambientTheme: act5
 choices:
   - text: "Lutar contra as crias de geada"
     effects:

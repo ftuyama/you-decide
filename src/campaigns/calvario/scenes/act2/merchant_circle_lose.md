@@ -1,6 +1,7 @@
 ---
 id: act2/merchant_circle_lose
 chapter: 2
+ambientTheme: merchant
 artKey: merchant
 title: Preço fora do bolso
 onEnter: []

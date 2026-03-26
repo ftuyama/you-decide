@@ -2,6 +2,7 @@
 id: act1/pick_knight
 title: Juramento do Cavaleiro
 chapter: 1
+ambientTheme: explore
 artKey: pick_knight
 choices:
   - text: "Avançar para a boca da masmorra"

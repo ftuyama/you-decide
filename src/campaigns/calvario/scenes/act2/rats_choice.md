@@ -1,6 +1,7 @@
 ---
 id: act2/rats_choice
 chapter: 2
+ambientTheme: explore
 artKey: rats
 title: Chiar no escuro
 choices:

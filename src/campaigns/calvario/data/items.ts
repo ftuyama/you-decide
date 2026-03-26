@@ -94,6 +94,14 @@ export const items: Record<string, ItemDef> = {
     armor: 1,
     sprite: itemSprites.frost_wyrm_scale,
   }),
+  morvayn_heart_shard: z({
+    id: 'morvayn_heart_shard',
+    name: 'Fragmento do Trono de Morvayn',
+    slot: 'relic',
+    bonusMind: 0,
+    bonusLuck: 0,
+    armor: 0,
+  }),
   potion_hp: z({
     id: 'potion_hp',
     name: 'Poção Rubra',

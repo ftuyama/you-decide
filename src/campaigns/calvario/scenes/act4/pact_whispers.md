@@ -2,6 +2,7 @@
 id: act4/pact_whispers
 title: Sussurros do Pacto
 chapter: 4
+ambientTheme: explore
 choices:
   - text: "Deixar o sussurro completar-se"
     next: act4/pact_trial_mind

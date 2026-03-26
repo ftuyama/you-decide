@@ -2,6 +2,7 @@
 id: act2/circle_ritual
 title: Ritual do Círculo
 chapter: 2
+ambientTheme: explore
 choices:
   - text: "Participar"
     next: act2/hub_catacomb

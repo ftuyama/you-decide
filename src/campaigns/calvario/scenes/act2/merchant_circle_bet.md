@@ -1,6 +1,7 @@
 ---
 id: act2/merchant_circle_bet
 chapter: 2
+ambientTheme: merchant
 artKey: merchant
 title: Símbolos que mordem
 luckCheck:

@@ -2,6 +2,7 @@
 id: act5/frost_random_router
 title: Neve que escolhe por ti
 chapter: 5
+ambientTheme: act5
 randomBranch:
   id: frost_rb
   branches:

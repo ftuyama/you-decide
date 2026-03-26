@@ -1,6 +1,7 @@
 ---
 id: act5/frost_merchant
 chapter: 5
+ambientTheme: merchant
 artKey: merchant
 title: Tenda do comerciante de geada
 choices:

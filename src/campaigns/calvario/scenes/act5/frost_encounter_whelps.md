@@ -2,6 +2,7 @@
 id: act5/frost_encounter_whelps
 title: Crias na nevasca
 chapter: 5
+ambientTheme: act5
 choices:
   - text: "Afastar as crias de geada"
     effects:

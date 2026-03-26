@@ -2,6 +2,8 @@
 id: act4/throne_sweep_catalog
 title: Inventário impiedoso
 chapter: 4
+ambientTheme: explore
+artKey: throne_sweep
 skillCheck:
   id: throne_sweep_bones
   attr: mind

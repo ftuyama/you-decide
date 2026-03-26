@@ -1,6 +1,7 @@
 ---
 id: act4/final_stub
 chapter: 4
+ambientTheme: explore
 title: Antes do trono visível
 choices:
   - text: "Seguir para o trono de ossos"

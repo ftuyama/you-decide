@@ -1,6 +1,7 @@
 ---
 id: act2/encounter_stub_a
 chapter: 2
+ambientTheme: explore
 title: Corredor sem mapa
 choices:
   - text: "Voltar ao cruzeiro"

@@ -85,7 +85,7 @@ export const enemies: Record<string, EnemyDef> = {
     attackStrategy: 'random',
     lootDrops: [
       { chance: 0.25, resource: 'gold', amount: 1 },
-      { chance: 0.25, resource: 'supply', amount: 1 },
+      { chance: 0.5, resource: 'supply', amount: 1 },
     ],
   },
   morvayn_p1: {

@@ -2,6 +2,7 @@
 id: act5/frost_epilogue
 title: Epílogo de Geada
 chapter: 5
+ambientTheme: act5
 choices:
   - text: "Guardar este fim nas montanhas e encerrar o diário"
     next: act4/epilogue_close

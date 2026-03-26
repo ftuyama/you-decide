@@ -53,6 +53,8 @@ import { collapseTriggerStart, iconWrap, icons } from './icons';
 import './styles.css';
 import pkg from '../../package.json' with { type: 'json' };
 
+const PASSIVE_UNLOCK_ITEM_ID = 'morvayn_heart_shard';
+
 export class GameApp {
   private readonly campaignId: string;
   private readonly saveKey: string;
@@ -99,14 +101,20 @@ export class GameApp {
     this.quickNavMode = this.loadQuickNavMode();
     this.devMode = this.loadDevMode();
     this.choiceHotkeyHandler = (e: KeyboardEvent): void => {
-      if (this.state.mode !== 'story') return;
       const el = e.target;
       if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || el instanceof HTMLSelectElement) {
         return;
       }
       if (!/^[1-9]$/.test(e.key)) return;
       const idx = parseInt(e.key, 10) - 1;
-      const btns = this.root.querySelectorAll<HTMLButtonElement>('.story-shell .choices .choice');
+      const selector =
+        this.state.mode === 'story'
+          ? '.story-shell .choices .choice'
+          : this.state.mode === 'combat'
+            ? '.story-shell .combat-actions-panel button[data-quick-nav-combat]'
+            : '';
+      if (!selector) return;
+      const btns = this.root.querySelectorAll<HTMLButtonElement>(selector);
       const btn = btns[idx];
       if (!btn || btn.disabled) return;
       e.preventDefault();
@@ -268,9 +276,8 @@ export class GameApp {
       if (id.startsWith('boss_') || id.includes('boss')) return 'boss';
       return 'combat';
     }
-    const sid = this.state.sceneId;
-    if (sid.includes('vigilia_camp') || sid.includes('acamp')) return 'camp';
-    if (sid.includes('act5') || sid.includes('frost')) return 'camp';
+    const sceneTheme = this.registry.getScene(this.state.sceneId)?.frontmatter.ambientTheme;
+    if (sceneTheme) return sceneTheme;
     return 'explore';
   }
 
@@ -981,6 +988,7 @@ export class GameApp {
     const openLore = this.sidebarSections['personagem_lore'] ? ' open' : '';
     const openSpells = this.sidebarSections['personagem_spells'] ? ' open' : '';
     const openEquip = this.sidebarSections['personagem_equip'] ? ' open' : '';
+    const openPassive = this.sidebarSections['personagem_passivos'] ? ' open' : '';
     const openMem = this.sidebarSections['memorias'] ? ' open' : '';
 
     const personagemBlock = (() => {
@@ -1006,6 +1014,16 @@ export class GameApp {
               .map((b) => `${b.attr.toUpperCase()} ${b.delta >= 0 ? '+' : ''}${b.delta} (${b.remainingScenes} cena(s))`)
               .join(' · ')}</div>`
           : '';
+      const passiveUnlocked =
+        this.state.inventory.includes(PASSIVE_UNLOCK_ITEM_ID) ||
+        p.weaponId === PASSIVE_UNLOCK_ITEM_ID ||
+        p.armorId === PASSIVE_UNLOCK_ITEM_ID ||
+        p.relicId === PASSIVE_UNLOCK_ITEM_ID;
+      const passiveDef = this.registry.data.passives[cid];
+      const passiveExtra =
+        cid === 'knight' && p.critRatio > 0
+          ? `<p class="sidebar-line sidebar-muted">Chance crítica adicional: <strong>${Math.round(p.critRatio * 100)}%</strong></p>`
+          : '';
       return `<div class="sidebar-line">Nome <strong>${escHtml(p.name)}</strong></div>
         <div class="sidebar-line sidebar-class-line">${escHtml(this.registry.ui.getHeroClassLabel(cid, p.path))}</div>
         ${xpLine}
@@ -1023,6 +1041,14 @@ export class GameApp {
           <div class="sidebar-collapse-body sidebar-lore-body">${equipBody}</div>
         </details>`;
         })()}
+        ${passiveUnlocked ? `<details class="sidebar-collapse sidebar-spells"${openPassive} data-section="personagem_passivos">
+          <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.tier, 'Passivos')}</summary>
+          <div class="sidebar-collapse-body sidebar-lore-body">
+            <p class="sidebar-line"><strong>${escHtml(passiveDef?.name ?? 'Passivo de classe')}</strong></p>
+            <p class="sidebar-line sidebar-muted">${escHtml(passiveDef?.description ?? 'Sem descrição.')}</p>
+            ${passiveExtra}
+          </div>
+        </details>` : ''}
         ${(() => {
           const spellLines = this.state.knownSpells
             .map((id) => this.registry.data.spells[id])
@@ -1482,6 +1508,18 @@ export class GameApp {
     actionsHdr.className = 'combat-actions-panel-hdr';
     actionsHdr.textContent = 'Ações';
     actionsPanel.appendChild(actionsHdr);
+    let combatQuickNavIndex = 0;
+    const decorateCombatQuickNav = (
+      btn: HTMLButtonElement,
+      setLabel: (n: number, quickLabel: boolean) => void
+    ): void => {
+      if (combatQuickNavIndex >= 9) return;
+      const n = combatQuickNavIndex + 1;
+      btn.dataset.quickNavCombat = String(n);
+      btn.title = `Tecla ${n}`;
+      setLabel(n, this.quickNavMode);
+      combatQuickNavIndex += 1;
+    };
 
     if (c.phase === 'choose_stance' && lead) {
       if (this.state.party.length > 1) {
@@ -1502,7 +1540,9 @@ export class GameApp {
       for (const st of stances) {
         const btn = document.createElement('button');
         btn.className = 'stance';
-        btn.textContent = labels[st];
+        decorateCombatQuickNav(btn, (n, quickLabel) => {
+          btn.textContent = quickLabel ? `${n} - ${labels[st]}` : labels[st];
+        });
         btn.addEventListener('click', () => {
           this.unlockAudio();
           this.audio.playDice();
@@ -1515,7 +1555,10 @@ export class GameApp {
       }
       const sp = document.createElement('button');
       sp.className = 'stance special';
-      sp.textContent = lead.specialUsedThisCombat ? 'Especial já usado' : 'Golpe especial (+2, +Stress)';
+      decorateCombatQuickNav(sp, (n, quickLabel) => {
+        const base = lead.specialUsedThisCombat ? 'Especial já usado' : 'Golpe especial (+2, +Stress)';
+        sp.textContent = quickLabel ? `${n} - ${base}` : base;
+      });
       sp.disabled = lead.specialUsedThisCombat;
       sp.addEventListener('click', () => {
         if (!lead.specialUsedThisCombat) {
@@ -1545,7 +1588,12 @@ export class GameApp {
           const btn = document.createElement('button');
           btn.className = 'combat-spell';
           btn.type = 'button';
-          btn.innerHTML = `<span class="spell-emoji" aria-hidden="true">${spellEmoji(spellId, spellDef)}</span><span>${escHtml(spellDef.name)} (${spellDef.manaCost})</span>`;
+          decorateCombatQuickNav(btn, (n, quickLabel) => {
+            const name = quickLabel
+              ? `${n} - ${spellDef.name} (${spellDef.manaCost})`
+              : `${spellDef.name} (${spellDef.manaCost})`;
+            btn.innerHTML = `<span class="spell-emoji" aria-hidden="true">${spellEmoji(spellId, spellDef)}</span><span>${escHtml(name)}</span>`;
+          });
           const castOk = canCastSpell(this.state, spellId, this.registry.data);
           btn.disabled = !castOk;
           btn.addEventListener('click', () => {
@@ -1580,7 +1628,10 @@ export class GameApp {
           const btn = document.createElement('button');
           btn.className = 'combat-potion';
           btn.type = 'button';
-          btn.textContent = count > 1 ? `${def.name} (${count})` : def.name;
+          decorateCombatQuickNav(btn, (n, quickLabel) => {
+            const base = count > 1 ? `${def.name} (${count})` : def.name;
+            btn.textContent = quickLabel ? `${n} - ${base}` : base;
+          });
           const ok = canUseCombatConsumable(this.state, itemId, this.registry.data);
           btn.disabled = !ok;
           btn.addEventListener('click', () => {
@@ -1600,7 +1651,9 @@ export class GameApp {
 
     const flee = document.createElement('button');
     flee.className = 'combat-flee-btn';
-    flee.textContent = 'Tentar fugir';
+    decorateCombatQuickNav(flee, (n, quickLabel) => {
+      flee.textContent = quickLabel ? `${n} - Tentar fugir` : 'Tentar fugir';
+    });
     flee.addEventListener('click', () => {
       this.unlockAudio();
       this.state = this.stabilize(fleeCombat(this.state, this.bus));

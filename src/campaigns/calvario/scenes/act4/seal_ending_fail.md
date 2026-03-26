@@ -2,6 +2,7 @@
 id: act4/seal_ending_fail
 title: Ruptura da Paz
 chapter: 4
+ambientTheme: explore
 choices:
   - text: "O selo quebra. Lutar contra Morvayn"
     next: act4/fight_morvayn

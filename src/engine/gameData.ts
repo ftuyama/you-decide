@@ -30,6 +30,7 @@ export type GameData = {
   items: Record<string, ItemDef>;
   companions: Record<string, CompanionDef>;
   spells: Record<string, SpellDef>;
+  passives: Record<ClassId, { id: string; name: string; description: string }>;
 };
 
 export function emptyGameData(campaign: CampaignIndex, heroNarrative: HeroNarrative): GameData {
@@ -41,5 +42,18 @@ export function emptyGameData(campaign: CampaignIndex, heroNarrative: HeroNarrat
     items: {},
     companions: {},
     spells: {},
+    passives: {
+      knight: { id: 'knight_crit_edge', name: 'Aço Implacável', description: '+3% de chance crítica.' },
+      cleric: {
+        id: 'cleric_sacred_pulse',
+        name: 'Pulso Devoto',
+        description: 'No início do teu turno, regeneras 1% do HP máximo (arredondado para cima).',
+      },
+      mage: {
+        id: 'mage_ley_trickle',
+        name: 'Fio Arcano',
+        description: 'No início do teu turno, regeneras 1% da mana máxima (arredondado para cima).',
+      },
+    },
   };
 }

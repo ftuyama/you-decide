@@ -2,6 +2,7 @@
 id: act4/epilogue_modular
 title: Epílogo
 chapter: 4
+ambientTheme: explore
 choices:
   - text: "Partir para as Cimeiras do Vento Cinzento — seguir o rumor do gelo"
     next: act5/frost_opening

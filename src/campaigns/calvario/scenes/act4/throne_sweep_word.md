@@ -2,6 +2,8 @@
 id: act4/throne_sweep_word
 title: Sílaba no vácuo
 chapter: 4
+ambientTheme: explore
+artKey: throne_sweep
 luckCheck:
   id: throne_sweep_taboo
   tn: 10

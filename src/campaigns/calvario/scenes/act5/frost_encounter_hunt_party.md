@@ -2,6 +2,7 @@
 id: act5/frost_encounter_hunt_party
 title: Matilha de caça
 chapter: 5
+ambientTheme: act5
 choices:
   - text: "Enfrentar o bando de caça"
     effects:

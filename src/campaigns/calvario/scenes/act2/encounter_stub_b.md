@@ -1,6 +1,7 @@
 ---
 id: act2/encounter_stub_b
 chapter: 2
+ambientTheme: explore
 title: Câmara de respiração falsa
 choices:
   - text: "Regressar ao cruzeiro"

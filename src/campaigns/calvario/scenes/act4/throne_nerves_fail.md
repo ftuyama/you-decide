@@ -2,6 +2,7 @@
 id: act4/throne_nerves_fail
 title: Tropeção
 chapter: 4
+ambientTheme: explore
 choices:
   - text: "Aceitar o susto e voltar à ante-sala"
     next: act4/throne_gate

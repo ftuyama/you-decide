@@ -2,6 +2,7 @@
 id: act4/pact_ascent
 title: Ascensão do Pacto
 chapter: 4
+ambientTheme: explore
 choices:
   - text: "Subir à cidade com o eco na nuca"
     next: act4/pact_whispers

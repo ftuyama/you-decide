@@ -1,6 +1,7 @@
 ---
 id: act2/path_knight_fallen
 chapter: 2
+ambientTheme: explore
 title: Cavaleiro caído
 onEnter:
   - { op: setPath, path: fallen }

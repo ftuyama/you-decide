@@ -2,6 +2,7 @@
 id: act2/catacomb_observe
 title: Tecto
 chapter: 2
+ambientTheme: explore
 choices:
   - text: "Voltar ao cruzeiro"
     next: act2/catacomb_entry

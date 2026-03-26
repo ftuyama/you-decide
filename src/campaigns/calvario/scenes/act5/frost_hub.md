@@ -2,6 +2,7 @@
 id: act5/frost_hub
 chapter: 5
 type: hub
+ambientTheme: act5
 artKey: frost_peaks
 title: Desfiladeiro — acampamento improvisado
 choices:

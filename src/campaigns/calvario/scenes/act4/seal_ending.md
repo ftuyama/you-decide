@@ -2,6 +2,7 @@
 id: act4/seal_ending
 title: Final do Selo
 chapter: 4
+ambientTheme: explore
 skillCheck:
   id: seal_calvario
   attr: mind

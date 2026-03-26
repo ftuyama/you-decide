@@ -1,6 +1,7 @@
 ---
 id: act2/catacomb_entry
 chapter: 2
+ambientTheme: explore
 artKey: catacomb
 title: Cruzeiro de ossos
 choices:

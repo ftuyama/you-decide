@@ -2,6 +2,7 @@
 id: act1/crawl_entrada
 title: Primeiro degrau
 chapter: 1
+ambientTheme: explore
 artKey: crawl
 choices:
   - text: "Aceitar o chamado e seguir"

@@ -2,6 +2,7 @@
 id: act3/descent
 title: Descida ao Calvário
 chapter: 3
+ambientTheme: explore
 choices:
   - text: "Seguir até o poço"
     next: act3/well_lies

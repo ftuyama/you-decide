@@ -2,6 +2,7 @@
 id: act3/cult_ambush_scene
 title: Emboscada dos Cultistas
 chapter: 3
+ambientTheme: explore
 choices:
   - text: "Lutar na emboscada!"
     effects:

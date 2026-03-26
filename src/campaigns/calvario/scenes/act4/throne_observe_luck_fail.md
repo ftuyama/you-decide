@@ -2,6 +2,7 @@
 id: act4/throne_observe_luck_fail
 title: Gota traída
 chapter: 4
+ambientTheme: explore
 choices:
   - text: "Sacudir a mão e continuar a observar"
     next: act4/throne_observe

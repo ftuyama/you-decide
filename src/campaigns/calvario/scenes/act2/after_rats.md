@@ -2,6 +2,7 @@
 id: act2/after_rats
 title: Após os Ratos
 chapter: 2
+ambientTheme: explore
 choices:
   - text: "Continuar"
     next: act2/hub_catacomb

@@ -2,6 +2,7 @@
 id: act2/circle_ritual_refuse_fail
 title: Olhar preso
 chapter: 2
+ambientTheme: explore
 choices:
   - text: "Voltar ao cruzeiro"
     next: act2/hub_catacomb

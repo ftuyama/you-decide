@@ -2,6 +2,7 @@
 id: act1/class_gate_listen
 title: Escuta
 chapter: 1
+ambientTheme: explore
 choices:
   - text: "Voltar e escolher o juramento"
     next: act1/class_gate

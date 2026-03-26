@@ -1,6 +1,7 @@
 ---
 id: act2/camp_companion_chat
 chapter: 2
+ambientTheme: explore
 title: Palavra ao lado do fogo
 choices:
   - text: "Voltar ao acampamento"

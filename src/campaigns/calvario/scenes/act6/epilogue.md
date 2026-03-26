@@ -2,7 +2,8 @@
 id: act6/epilogue
 title: Epílogo do Espelho Quebrado
 chapter: 6
-ambientTheme: explore
+ambientTheme: void
+artKey: void_threshold
 choices:
   - text: "Fechar o diário por agora"
     next: act4/epilogue_close

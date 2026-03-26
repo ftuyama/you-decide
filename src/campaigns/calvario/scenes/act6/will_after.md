@@ -2,7 +2,8 @@
 id: act6/will_after
 title: Juramento sem Testemunhas
 chapter: 6
-ambientTheme: explore
+ambientTheme: void
+artKey: void_altar
 choices:
   - text: "Descer para a nave fraturada"
     next: act6/hub_fractured_nave

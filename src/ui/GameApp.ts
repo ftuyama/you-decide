@@ -24,6 +24,7 @@ import {
   executePlayerTurn,
   executeSpellTurn,
   fleeCombat,
+  SACRIFICE_MIN_CORRUPTION,
   useCombatConsumable,
 } from '../engine/combat';
 import type { Stance } from '../engine/schema';
@@ -1230,12 +1231,34 @@ export class GameApp {
           this.unlockAudio();
           this.audio.playDice();
           this.state = this.stabilize(
-            executePlayerTurn(this.state, st, this.registry.data, false, this.bus)
+            executePlayerTurn(this.state, st, this.registry.data, false, false, this.bus)
           );
           this.render();
         });
         bar.appendChild(btn);
       }
+      const canSacrificeChoice =
+        this.state.flags.act6_void_pact && this.state.resources.corruption >= SACRIFICE_MIN_CORRUPTION;
+      const sacrifice = document.createElement('button');
+      sacrifice.className = 'stance special';
+      decorateCombatQuickNav(sacrifice, (n, quickLabel) => {
+        const corr = this.state.resources.corruption;
+        const base = canSacrificeChoice
+          ? `Selo do Vazio (Corr ${corr})`
+          : `Selo do Vazio (req Corr ${SACRIFICE_MIN_CORRUPTION}+ e pacto)`;
+        sacrifice.textContent = quickLabel ? `${n} - ${base}` : base;
+      });
+      sacrifice.disabled = !canSacrificeChoice || lead.hp <= 1;
+      sacrifice.addEventListener('click', () => {
+        if (!canSacrificeChoice || lead.hp <= 1) return;
+        this.unlockAudio();
+        this.audio.playDice();
+        this.state = this.stabilize(
+          executePlayerTurn(this.state, 'aggressive', this.registry.data, false, true, this.bus)
+        );
+        this.render();
+      });
+      bar.appendChild(sacrifice);
       const sp = document.createElement('button');
       sp.className = 'stance special';
       decorateCombatQuickNav(sp, (n, quickLabel) => {
@@ -1248,7 +1271,7 @@ export class GameApp {
           this.unlockAudio();
           this.audio.playDice();
           this.state = this.stabilize(
-            executePlayerTurn(this.state, 'aggressive', this.registry.data, true, this.bus)
+            executePlayerTurn(this.state, 'aggressive', this.registry.data, true, false, this.bus)
           );
           this.render();
         }

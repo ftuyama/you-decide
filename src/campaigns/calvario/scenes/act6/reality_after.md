@@ -2,7 +2,8 @@
 id: act6/reality_after
 title: Cicatriz do Real
 chapter: 6
-ambientTheme: explore
+ambientTheme: void
+artKey: fractured_nave
 choices:
   - text: "Voltar à nave fraturada"
     next: act6/hub_fractured_nave

@@ -1,4 +1,11 @@
-import { ACT5_ICE_MELODY, BOSS_LEAD_MELODY, CAMP_MELODY, EXPLORE_PIANO_MELODY, MERCHANT_LUTE_MELODY } from './melodies.ts';
+import {
+  ACT5_ICE_MELODY,
+  BOSS_LEAD_MELODY,
+  CAMP_MELODY,
+  EXPLORE_PIANO_MELODY,
+  MERCHANT_LUTE_MELODY,
+  VOID_DRONE_MELODY,
+} from './melodies.ts';
 import { playOneShotTone, triggerArp, triggerHat, triggerKick, triggerPluck, triggerSnare } from './primitives.ts';
 import type { AmbientTheme } from './types.ts';
 
@@ -88,6 +95,9 @@ export class GameAudio {
         break;
       case 'merchant':
         this.playAmbientMerchant();
+        break;
+      case 'void':
+        this.playAmbientVoid();
         break;
     }
   }
@@ -798,6 +808,97 @@ export class GameAudio {
       try {
         drone.disconnect();
         droneGain.disconnect();
+        master.disconnect();
+        comp.disconnect();
+      } catch {
+        /* noop */
+      }
+    };
+  }
+
+  /**
+   * Void: atmosfera irreal e ameaçadora, sem batida definida.
+   */
+  private playAmbientVoid(): void {
+    if (this.muted || this.bgCleanup) return;
+    const ctx = this.ensureContext();
+    const master = ctx.createGain();
+    master.gain.value = this.gain(0.08);
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -32;
+    comp.knee.value = 8;
+    comp.ratio.value = 2.8;
+    master.connect(comp);
+    comp.connect(ctx.destination);
+
+    const layers: { freq: number; level: number; type: OscillatorType }[] = [
+      { freq: 46.25, level: 0.22, type: 'sine' },
+      { freq: 69.3, level: 0.16, type: 'triangle' },
+      { freq: 92.5, level: 0.11, type: 'sine' },
+    ];
+
+    const oscillators: OscillatorNode[] = [];
+    const gains: GainNode[] = [];
+    for (const { freq, level, type } of layers) {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      o.detune.value = (Math.random() - 0.5) * 18;
+      g.gain.value = level * 0.35;
+      o.connect(g);
+      g.connect(master);
+      o.start();
+      oscillators.push(o);
+      gains.push(g);
+    }
+
+    let t = 0;
+    this.bgPulseTimer = setInterval(() => {
+      if (this.muted || !this.ctx) return;
+      t += 0.025;
+      try {
+        master.gain.setTargetAtTime(
+          this.gain(0.06 + Math.sin(t * 0.31) * 0.02 + Math.sin(t * 0.09) * 0.01),
+          this.ctx.currentTime,
+          0.9
+        );
+        for (let i = 0; i < gains.length; i++) {
+          const mod = 0.26 + Math.sin(t * (0.5 + i * 0.18)) * 0.1;
+          gains[i]!.gain.setTargetAtTime(mod * (layers[i]!.level * 0.35), this.ctx.currentTime, 1.1);
+        }
+      } catch {
+        /* noop */
+      }
+    }, 500);
+
+    let melodyStep = 0;
+    this.bgRhythmTimer = setInterval(() => {
+      if (this.muted || !this.ctx) return;
+      const note = VOID_DRONE_MELODY[melodyStep % VOID_DRONE_MELODY.length]!;
+      melodyStep++;
+      const when = this.ctx.currentTime + 0.03;
+      triggerPluck(ctx, master, when, note, this.gain(0.014), 'sine', 1.8);
+      triggerPluck(ctx, master, when + 0.11, note * 0.5, this.gain(0.009), 'triangle', 1.5);
+    }, 2100);
+
+    this.bgCleanup = () => {
+      if (this.bgPulseTimer) {
+        clearInterval(this.bgPulseTimer);
+        this.bgPulseTimer = null;
+      }
+      if (this.bgRhythmTimer) {
+        clearInterval(this.bgRhythmTimer);
+        this.bgRhythmTimer = null;
+      }
+      for (const o of oscillators) {
+        try {
+          o.stop();
+        } catch {
+          /* noop */
+        }
+      }
+      try {
         master.disconnect();
         comp.disconnect();
       } catch {

@@ -243,9 +243,9 @@ export const enemies: Record<string, EnemyDef> = {
     spriteWounded: E.fallen_angel.spriteWounded,
     attackStrategy: 'focus_leader',
     combatLines: [
-      'Tu chamas isto de mundo porque ainda nao viste as costuras.',
-      'Toda certeza e uma cela com paredes invisiveis.',
-      'A verdade nao consola. Ela exige.',
+      'Tu chamas isto de mundo porque ainda não viste as costuras.',
+      'Toda certeza é uma cela com paredes invisíveis.',
+      'A verdade não consola. Ela exige.',
     ],
   },
   act6_echo_chorus: {
@@ -263,8 +263,8 @@ export const enemies: Record<string, EnemyDef> = {
     attackStrategy: 'random',
     combatLines: [
       'Lembrar e reescrever.',
-      'A memoria mente para proteger quem a consulta.',
-      'Qual de nos e o original?',
+      'A memória mente para proteger quem a consulta.',
+      'Qual de nós é o original?',
     ],
   },
   act6_penitent_blade: {
@@ -282,9 +282,9 @@ export const enemies: Record<string, EnemyDef> = {
     spriteWounded: E.vigil_hunter.spriteWounded,
     attackStrategy: 'focus_leader',
     combatLines: [
-      'Vontade sem limite e so fome com armadura.',
+      'Vontade sem limite é só fome com armadura.',
       'Tu tremes porque ainda tens algo a perder.',
-      'Nao e poder. E abstinencia de misericordia.',
+      'Não é poder. É abstinência de misericórdia.',
     ],
   },
   act6_shadow_self: {
@@ -302,8 +302,27 @@ export const enemies: Record<string, EnemyDef> = {
     attackStrategy: 'focus_leader',
     combatLines: [
       'Eu sou tu sem a tua culpa.',
-      'Tu pedes sentido; eu imponho direcao.',
-      'Se eu vencer, tu sobrevives. So nao escolhes mais.',
+      'Tu pedes sentido; eu imponho direção.',
+      'Se eu vencer, tu sobrevives. Só não escolhes mais.',
+    ],
+  },
+  act6_shade_fragment: {
+    id: 'act6_shade_fragment',
+    name: 'Fragmento de Sombra',
+    hp: 76,
+    maxHp: 76,
+    str: 21,
+    agi: 19,
+    mind: 17,
+    armor: 1,
+    type: 'normal',
+    armorChips: 0,
+    sprite: E.cultist.sprite,
+    attackStrategy: 'random',
+    combatLines: [
+      'Eu sou uma decisão tua que continuou viva.',
+      'Toda renúncia deixa filhos no escuro.',
+      'Não me mates. Assume-me.',
     ],
   },
 };

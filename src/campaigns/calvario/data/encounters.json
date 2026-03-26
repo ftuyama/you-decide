@@ -29,6 +29,18 @@
     "playerAdvantage": true,
     "enemyAdvantage": false
   },
+  "act2_rare_bone_sentinel": {
+    "id": "act2_rare_bone_sentinel",
+    "enemies": ["skeleton", "skeleton", "skeleton"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true
+  },
+  "act2_rare_lone_swarm": {
+    "id": "act2_rare_lone_swarm",
+    "enemies": ["rat_swarm", "rat_swarm", "rat_swarm", "rat_swarm", "rat_swarm"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true
+  },
   "cult_ambush": {
     "id": "cult_ambush",
     "enemies": ["cultist", "cultist"],
@@ -150,5 +162,12 @@
     "playerAdvantage": false,
     "enemyAdvantage": true,
     "xpReward": 280
+  },
+  "act6_will_horde": {
+    "id": "act6_will_horde",
+    "enemies": ["act6_penitent_blade", "act6_shade_fragment"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 245
   }
 }

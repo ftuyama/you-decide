@@ -36,6 +36,16 @@ export const DEFAULT_ENEMY_CRIT_CONFIRM = 0.25;
 export const DEFAULT_FOCUS_LEADER_WEIGHT = 0.72;
 /** Chance de um inimigo com falas proferir uma linha no turno. */
 export const DEFAULT_ENEMY_COMBAT_LINE_CHANCE = 0.22;
+export const SACRIFICE_MIN_CORRUPTION = 3;
+
+function getSacrificeValues(state: GameState): { hpCost: number; damageBonus: number } | null {
+  if (!state.flags.act6_void_pact) return null;
+  const c = state.resources.corruption;
+  if (c < SACRIFICE_MIN_CORRUPTION) return null;
+  if (c >= 5) return { hpCost: 3, damageBonus: 3 };
+  if (c === 4) return { hpCost: 2, damageBonus: 2 };
+  return { hpCost: 1, damageBonus: 1 };
+}
 
 /** Índice no grupo a atacar (líder vs companheiro) conforme o def do inimigo. */
 function pickEnemyMeleeTarget(party: Character[], def: EnemyDef, rng: () => number): number {
@@ -122,6 +132,8 @@ export function beginEncounter(
     log,
     playerAdvantage: enc.playerAdvantage,
     enemyAdvantage: enc.enemyAdvantage,
+    pendingSacrificeDamage: 0,
+    pendingSacrificeCost: 0,
     returnScene: opts.returnScene,
     onVictory: opts.onVictory,
     onFlee: opts.onFlee,
@@ -536,12 +548,20 @@ export function useCombatConsumable(
   );
 }
 
-export function applyPlayerStance(state: GameState, stance: Stance, _data: GameData): GameState {
+export function applyPlayerStance(
+  state: GameState,
+  stance: Stance,
+  _data: GameData,
+  opts?: { useSacrifice?: boolean }
+): GameState {
   void _data;
   const c = state.combat;
   if (!c || c.phase !== 'choose_stance') return state;
   const lead = getLead(state);
-  const log = [
+  let party = state.party.map((p) => ({ ...p }));
+  let pendingSacrificeDamage = 0;
+  let pendingSacrificeCost = 0;
+  const log: CombatLogEntry[] = [
     ...c.log,
     {
       kind: 'stance' as const,
@@ -549,9 +569,41 @@ export function applyPlayerStance(state: GameState, stance: Stance, _data: GameD
       actor: lead.name,
     },
   ];
+  if (opts?.useSacrifice) {
+    const sacrifice = getSacrificeValues(state);
+    if (sacrifice) {
+      const currentLead = party[0]!;
+      const maxLoss = Math.max(0, currentLead.hp - 1);
+      const hpLoss = Math.min(sacrifice.hpCost, maxLoss);
+      if (hpLoss > 0) {
+        party[0] = { ...currentLead, hp: currentLead.hp - hpLoss };
+        pendingSacrificeDamage = sacrifice.damageBonus;
+        pendingSacrificeCost = hpLoss;
+        log.push({
+          kind: 'info',
+          message: `Selo do Vazio: ${currentLead.name} sacrifica ${hpLoss} HP para ganhar +${sacrifice.damageBonus} dano neste turno.`,
+          actor: currentLead.name,
+        });
+      } else {
+        log.push({
+          kind: 'info',
+          message: 'Selo do Vazio inativo: HP insuficiente para sacrificar sem cair.',
+          actor: currentLead.name,
+        });
+      }
+    }
+  }
   return {
     ...state,
-    combat: { ...c, pendingStance: stance, phase: 'choose_target', log },
+    party,
+    combat: {
+      ...c,
+      pendingStance: stance,
+      phase: 'choose_target',
+      log,
+      pendingSacrificeDamage,
+      pendingSacrificeCost,
+    },
   };
 }
 
@@ -677,7 +729,8 @@ function physicalAttackForCharacter(
     const luckBonus = statMod(effLuck);
     let wd = getWeaponDamage(data, attacker);
     if (wd === 0 && !attacker.weaponId) wd = 1;
-    const baseFlat = wd + (stance === 'aggressive' ? 1 : 0);
+    const sacrificeBonus = attackerIndex === 0 ? c.pendingSacrificeDamage ?? 0 : 0;
+    const baseFlat = wd + (stance === 'aggressive' ? 1 : 0) + sacrificeBonus;
     const holyBonus = def.type === 'undead' && attacker.class === 'cleric' ? 1 : 0;
     let isPlayerCrit = special === 'crit';
     if (!isPlayerCrit && hit && attacker.critRatio > 0 && rng() < attacker.critRatio) {
@@ -710,8 +763,8 @@ function physicalAttackForCharacter(
       logOut.push({
         kind: 'damage',
         message: isPlayerCrit
-          ? `${def.name} sofre ${dmg} de dano (crítico)!`
-          : `${def.name} sofre ${dmg} de dano.`,
+          ? `${def.name} sofre ${dmg} de dano (crítico)!${sacrificeBonus > 0 ? ` [sacrificio +${sacrificeBonus}]` : ''}`
+          : `${def.name} sofre ${dmg} de dano.${sacrificeBonus > 0 ? ` [sacrificio +${sacrificeBonus}]` : ''}`,
         dice: [dDmg],
         final: dmg,
         target: def.name,
@@ -827,7 +880,15 @@ export function playerAttack(
       party,
       rngSeed,
     },
-    { ...c, enemies, log, phase: 'enemy', pendingStance: undefined },
+    {
+      ...c,
+      enemies,
+      log,
+      phase: 'enemy',
+      pendingStance: undefined,
+      pendingSacrificeDamage: 0,
+      pendingSacrificeCost: 0,
+    },
     data,
     bus
   );
@@ -1122,9 +1183,10 @@ export function executePlayerTurn(
   stance: Stance,
   data: GameData,
   useSpecial: boolean,
+  useSacrifice: boolean,
   bus?: EventBus
 ): GameState {
-  let s = applyPlayerStance(state, stance, data);
+  let s = applyPlayerStance(state, stance, data, { useSacrifice });
   const c = s.combat;
   if (!c) return s;
   let idx = c.enemies.findIndex((e) => e.hp > 0);

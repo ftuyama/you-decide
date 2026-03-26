@@ -2,7 +2,8 @@
 id: act6/opening_void_threshold
 title: Umbral do Vazio
 chapter: 6
-ambientTheme: boss
+ambientTheme: void
+artKey: void_threshold
 choices:
   - text: "Entrar na nave fraturada e ouvir o que resta do mundo"
     next: act6/hub_fractured_nave

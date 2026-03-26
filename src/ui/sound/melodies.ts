@@ -50,3 +50,14 @@ export const MERCHANT_LUTE_MELODY: number[] = [
   261.63, // C4
   246.94, // B3
 ];
+
+export const VOID_DRONE_MELODY: number[] = [
+  116.54, // A#2
+  130.81, // C3
+  155.56, // D#3
+  174.61, // F3
+  155.56, // D#3
+  130.81, // C3
+  123.47, // B2
+  92.5, // F#2
+];

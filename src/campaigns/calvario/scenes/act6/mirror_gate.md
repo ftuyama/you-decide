@@ -2,7 +2,8 @@
 id: act6/mirror_gate
 title: Portão do Espelho Interior
 chapter: 6
-ambientTheme: boss
+ambientTheme: void
+artKey: mirror_chamber
 choices:
   - text: "Entrar e encarar quem me habita"
     next: act6/mirror_boss_intro

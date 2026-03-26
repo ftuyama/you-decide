@@ -2,12 +2,18 @@
 id: act6/memory_trial
 title: Prova da Memória
 chapter: 6
-ambientTheme: combat
+ambientTheme: void
+artKey: void_well
+luckCheck:
+  id: act6_memory_anchor
+  tn: 10
+  successNext: act6/memory_trial_safe
+  failNext: act6/memory_trial_bleed
 choices:
-  - text: "Mergulhar no poço e enfrentar o coro de ecos"
-    effects:
-      - { op: addResource, resource: corruption, delta: 1 }
-      - { op: startCombat, encounterId: act6_echo_chorus, onVictory: act6/memory_after, onDefeat: act4/game_over, onFlee: act6/hub_fractured_nave }
+  - text: "Manter um nome na lingua antes de mergulhar"
+    next: act6/memory_trial_safe
+  - text: "Cair no poço sem amarras"
+    next: act6/memory_trial_bleed
 onEnter: []
 ---
 No poço, vês cenas da tua vida em camadas, como sonhos dentro de sonhos. Quando tentas tocar uma lembrança, outra acorda por baixo dela e pergunta quem escreveu a primeira.

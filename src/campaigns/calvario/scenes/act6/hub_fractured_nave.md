@@ -3,7 +3,8 @@ id: act6/hub_fractured_nave
 title: Nave Fraturada
 chapter: 6
 type: hub
-ambientTheme: explore
+ambientTheme: void
+artKey: fractured_nave
 choices:
   - text: "Seguir o corredor dos espelhos partidos (Prova da Realidade)"
     next: act6/reality_trial
@@ -21,6 +22,12 @@ choices:
         - { flag: act6_reality_done }
         - { flag: act6_memory_done }
         - { flag: act6_will_done }
+  - text: "Ouvir o sussurro sob as colunas (rota de corrupção)"
+    next: act6/void_secret_entry
+    condition:
+      all:
+        - { resource: { corruption: { gte: 4 } } }
+        - { noFlag: act6_void_pact }
 onEnter: []
 ---
 Três corredores respiram à tua frente, cada um com uma mentira diferente sobre o que é viver. Não há mapa aqui; só **versões**.

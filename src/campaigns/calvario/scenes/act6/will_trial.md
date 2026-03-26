@@ -2,9 +2,12 @@
 id: act6/will_trial
 title: Prova da Vontade
 chapter: 6
-ambientTheme: combat
+ambientTheme: void
+artKey: void_altar
 choices:
-  - text: "Recusar a coroa de sombra e lutar"
+  - text: "Submeter o impulso ao acaso do altar"
+    next: act6/will_random_router
+  - text: "Forcar confronto direto contra o penitente"
     effects:
       - { op: addResource, resource: supply, delta: -1 }
       - { op: startCombat, encounterId: act6_penitent_blade, onVictory: act6/will_after, onDefeat: act4/game_over, onFlee: act6/hub_fractured_nave }

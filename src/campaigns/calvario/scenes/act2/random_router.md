@@ -1,17 +1,17 @@
 ---
 id: act2/random_router
-title: Ramo Aleatório da Catacumba
+title: Escaramuças da Catacumba
 chapter: 2
 ambientTheme: explore
 randomBranch:
-  id: rb1
+  id: act2_random_combat
   branches:
-    - { weight: 1, next: act2/recruit_offer, condition: { noFlag: mira_recruited } }
-    - { weight: 1, next: act2/merchant_moon, condition: { noItem: rumor_map } }
     - { weight: 1, next: act2/wild_encounter_rats }
     - { weight: 1, next: act2/wild_encounter_mixed }
     - { weight: 1, next: act2/wild_encounter_cultist }
-    - { weight: 1, next: act2/hub_catacomb }
+    - { weight: 0.2, next: act2/wild_encounter_bones_rare }
+    - { weight: 0.2, next: act2/wild_encounter_lone_swarm_rare }
 choices: []
 onEnter: []
 ---
+Cada passo ecoa como um dado lançado na pedra. A catacumba responde com lâmina, osso e fome.

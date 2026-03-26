@@ -2,7 +2,8 @@
 id: act6/memory_after
 title: Lastro de Memória
 chapter: 6
-ambientTheme: explore
+ambientTheme: void
+artKey: void_well
 choices:
   - text: "Subir de volta à nave fraturada"
     next: act6/hub_fractured_nave

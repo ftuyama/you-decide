@@ -34,6 +34,8 @@ export const DEFAULT_ENEMY_CRIT_CONFIRM = 0.25;
 
 /** Com `attackStrategy: focus_leader` e `focusLeaderWeight` omitido no def */
 export const DEFAULT_FOCUS_LEADER_WEIGHT = 0.72;
+/** Chance de um inimigo com falas proferir uma linha no turno. */
+export const DEFAULT_ENEMY_COMBAT_LINE_CHANCE = 0.22;
 
 /** Índice no grupo a atacar (líder vs companheiro) conforme o def do inimigo. */
 function pickEnemyMeleeTarget(party: Character[], def: EnemyDef, rng: () => number): number {
@@ -975,6 +977,17 @@ function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData, bu
     if (inst.hp <= 0) continue;
     const def = data.enemies[inst.defId];
     if (!def) continue;
+    if (
+      def.combatLines &&
+      def.combatLines.length > 0 &&
+      rng() < DEFAULT_ENEMY_COMBAT_LINE_CHANCE
+    ) {
+      const idx = Math.floor(rng() * def.combatLines.length);
+      const line = def.combatLines[idx];
+      if (line) {
+        log.push({ kind: 'info', message: `${def.name}: "${line}"` });
+      }
+    }
     const targetIndex = pickEnemyMeleeTarget(party, def, rng);
     const target = party[targetIndex]!;
     let atk = 0;

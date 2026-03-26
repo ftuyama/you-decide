@@ -2,6 +2,8 @@ import { SCHEMA_VERSION, type CampaignIndex, type ClassId, type GameState } from
 import { parseSeedFromSearch } from './rng';
 
 const defaultRep = { vigilia: 0, circulo: 0, culto: 0 } as GameState['reputation'];
+export const PASSIVE_UNLOCK_ITEM_ID = 'morvayn_heart_shard';
+const KNIGHT_PASSIVE_CRIT_RATIO_BONUS = 0.03;
 
 /** Vida extra automática: fé >= 5 (sem acúmulo além da disponibilidade). */
 export function extraLifeReadyFromFaith(faith: number): boolean {
@@ -115,6 +117,37 @@ export function createPlayerCharacter(name: string, cls: ClassId): GameState['pa
   };
 }
 
+function baseCritRatioForClass(cls: ClassId): number {
+  if (cls === 'knight') return 0.03;
+  if (cls === 'mage') return 0.01;
+  return 0.01;
+}
+
+function isLeadPassiveUnlocked(state: GameState): boolean {
+  const lead = state.party[0];
+  if (!lead) return false;
+  return (
+    state.inventory.includes(PASSIVE_UNLOCK_ITEM_ID) ||
+    lead.weaponId === PASSIVE_UNLOCK_ITEM_ID ||
+    lead.armorId === PASSIVE_UNLOCK_ITEM_ID ||
+    lead.relicId === PASSIVE_UNLOCK_ITEM_ID
+  );
+}
+
+export function syncLeadPassiveStats(state: GameState): GameState {
+  const lead = state.party[0];
+  if (!lead) return state;
+  const baseCritRatio = baseCritRatioForClass(lead.class);
+  const passiveCritBonus =
+    lead.class === 'knight' && isLeadPassiveUnlocked(state) ? KNIGHT_PASSIVE_CRIT_RATIO_BONUS : 0;
+  const nextCritRatio = baseCritRatio + passiveCritBonus;
+  if (lead.critRatio === nextCritRatio) return state;
+  return {
+    ...state,
+    party: [{ ...lead, critRatio: nextCritRatio }, ...state.party.slice(1)],
+  };
+}
+
 export function serializeState(state: GameState): string {
   const { lastCombatXpGain: _x, lastCombatLevelUps: _l, ...rest } = state;
   return JSON.stringify(rest);
@@ -158,5 +191,5 @@ export function deserializeState(json: string): GameState {
       path: typeof p.path === 'string' ? p.path : null,
     })),
   };
-  return merged;
+  return syncLeadPassiveStats(merged);
 }

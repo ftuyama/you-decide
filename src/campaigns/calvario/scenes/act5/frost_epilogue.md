@@ -4,8 +4,8 @@ title: Epílogo de Geada
 chapter: 5
 ambientTheme: act5
 choices:
-  - text: "Guardar este fim nas montanhas e encerrar o diário"
-    next: act4/epilogue_close
+  - text: "Seguir o eco sob o gelo — atravessar o Umbral do Vazio"
+    next: act6/opening_void_threshold
 onEnter:
   - { op: grantItem, itemId: frost_wyrm_scale }
   - { op: addMark, mark: vetrnax_slain }

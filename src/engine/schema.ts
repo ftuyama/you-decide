@@ -334,6 +334,8 @@ export const EnemyDefSchema = z.object({
   attackStrategy: EnemyAttackStrategySchema.default('random'),
   /** Com `focus_leader`: probabilidade de mirar o líder se estiver vivo; padrão no engine se omitido */
   focusLeaderWeight: z.number().min(0).max(1).optional(),
+  /** Frases opcionais ditas pelo inimigo durante o turno dele. */
+  combatLines: z.array(z.string()).optional(),
 });
 
 export type EnemyDef = z.infer<typeof EnemyDefSchema>;

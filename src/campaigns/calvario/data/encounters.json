@@ -122,5 +122,33 @@
     "playerAdvantage": true,
     "enemyAdvantage": false,
     "xpReward": 145
+  },
+  "act6_veil_herald": {
+    "id": "act6_veil_herald",
+    "enemies": ["act6_veil_herald"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 180
+  },
+  "act6_echo_chorus": {
+    "id": "act6_echo_chorus",
+    "enemies": ["act6_echo_chorus"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 190
+  },
+  "act6_penitent_blade": {
+    "id": "act6_penitent_blade",
+    "enemies": ["act6_penitent_blade"],
+    "playerAdvantage": false,
+    "enemyAdvantage": false,
+    "xpReward": 210
+  },
+  "act6_shadow_self": {
+    "id": "act6_shadow_self",
+    "enemies": ["act6_shadow_self"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 280
   }
 }

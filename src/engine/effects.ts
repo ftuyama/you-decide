@@ -5,7 +5,12 @@ import { beginEncounter } from './combat';
 import type { GameData } from './gameData';
 import { addXp } from './progression';
 import { initialKnownSpellIds } from './spellsKnown';
-import { createInitialState, createPlayerCharacter, extraLifeReadyFromFaith } from './state';
+import {
+  createInitialState,
+  createPlayerCharacter,
+  extraLifeReadyFromFaith,
+  syncLeadPassiveStats,
+} from './state';
 import { clampLeadStat, tickActiveBuffs, type LeadStatAttr } from './leadStats';
 import { applyConsumableToCharacter, isConsumable, removeOneInventoryItem } from './consumables';
 
@@ -83,6 +88,7 @@ export function applyEffects(
   let s: GameState = { ...state, party: state.party.map((p) => ({ ...p })) };
   for (const e of effects) {
     s = applyOne(s, e, ctx);
+    s = syncLeadPassiveStats(s);
   }
   return GameStateSchema.parse(s);
 }

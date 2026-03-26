@@ -1,5 +1,6 @@
 import type { Character, ClassId, GameState, ItemDef, SpellDef } from '../engine/schema';
 import { effectiveLeadAttr } from '../engine/leadStats';
+import { PASSIVE_UNLOCK_ITEM_ID } from '../engine/state';
 import {
   getCharacterArmorClass,
   getEffectiveLuck,
@@ -17,8 +18,6 @@ import {
   stressBarMarkup,
 } from './gameAppUtils';
 import { collapseTriggerStart, iconWrap, icons } from './icons';
-
-const PASSIVE_UNLOCK_ITEM_ID = 'morvayn_heart_shard';
 
 type SidebarBuilderParams = {
   state: GameState;
@@ -286,7 +285,7 @@ export function buildGameSidebar({
     const passiveDef = registry.data.passives[cid];
     const passiveExtra =
       cid === 'knight' && p.critRatio > 0
-        ? `<p class="sidebar-line sidebar-muted">Chance crítica adicional: <strong>${Math.round(p.critRatio * 100)}%</strong></p>`
+        ? `<p class="sidebar-line sidebar-muted">Bônus do passivo: <strong>+3%</strong> · Total de crítico: <strong>${Math.round(p.critRatio * 100)}%</strong></p>`
         : '';
     return `<div class="sidebar-line">Nome <strong>${escHtml(p.name)}</strong></div>
         <div class="sidebar-line sidebar-class-line">${escHtml(registry.ui.getHeroClassLabel(cid, p.path))}</div>

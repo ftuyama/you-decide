@@ -10,16 +10,12 @@ import {
   type LoadedScene,
 } from '../engine/sceneRuntime';
 import { applyEffects } from '../engine/effects';
-import { effectiveLeadAttr, tickActiveBuffs } from '../engine/leadStats';
+import { tickActiveBuffs } from '../engine/leadStats';
 import type {
-  Character,
   Choice,
-  ClassId,
   CombatLogEntry,
   Effect,
   GameState,
-  ItemDef,
-  SpellDef,
 } from '../engine/schema';
 import { migrateLegacyKnownSpells } from '../engine/spellsKnown';
 import {
@@ -29,12 +25,7 @@ import {
   executeSpellTurn,
   fleeCombat,
   useCombatConsumable,
-  getCharacterArmorClass,
-  getEffectiveLuck,
-  getEquippedArmorPoints,
-  sumEquippedItemBonuses,
 } from '../engine/combat';
-import { MAX_LEVEL, xpToNextLevel } from '../engine/progression';
 import type { Stance } from '../engine/schema';
 import { formatDiceAscii } from './diceAscii';
 import {
@@ -42,18 +33,15 @@ import {
   escHtml,
   fmtSignedMod,
   formatLevelUpDeltaLine,
-  hpBarMarkup,
-  manaBarMarkup,
   spellEmoji,
-  statBonusParen,
-  stressBarMarkup,
 } from './gameAppUtils';
 import { GameAudio, type AmbientTheme } from './sound';
-import { collapseTriggerStart, iconWrap, icons } from './icons';
+import { iconWrap, icons } from './icons';
+import { buildGameSidebar } from './gameAppSidebar';
 import './styles.css';
-import pkg from '../../package.json' with { type: 'json' };
+import gameVersionRaw from '../../VERSION?raw';
 
-const PASSIVE_UNLOCK_ITEM_ID = 'morvayn_heart_shard';
+const GAME_VERSION = gameVersionRaw.trim() || '?';
 
 export class GameApp {
   private readonly campaignId: string;
@@ -239,9 +227,8 @@ export class GameApp {
 
   private showCredits(): void {
     this.unlockAudio();
-    const v = (pkg as { version?: string }).version ?? '?';
     alert(
-      `${this.registry.data.campaign.name}\nYou Decide · v${v}\n\nMotor: TypeScript, Vite.\nTexto narrativo em Markdown.\n\nObrigado por jogar.`
+      `${this.registry.data.campaign.name}\nYou Decide · v${GAME_VERSION}\n\nMotor: TypeScript, Vite.\nTexto narrativo em Markdown.\n\nObrigado por jogar.`
     );
     this.closeMenu();
   }
@@ -618,6 +605,19 @@ export class GameApp {
     const drawer = document.createElement('aside');
     drawer.className = 'menu-drawer';
     drawer.setAttribute('aria-hidden', 'true');
+    const createMenuSection = (titleText: string): HTMLDivElement => {
+      const section = document.createElement('section');
+      section.className = 'menu-section';
+      const titleEl = document.createElement('h3');
+      titleEl.className = 'menu-section-title';
+      titleEl.textContent = titleText;
+      const body = document.createElement('div');
+      body.className = 'menu-section-body';
+      section.appendChild(titleEl);
+      section.appendChild(body);
+      drawer.appendChild(section);
+      return body;
+    };
 
     const saveBtn = document.createElement('button');
     saveBtn.type = 'button';
@@ -693,14 +693,28 @@ export class GameApp {
     creditsBtn.textContent = 'Créditos';
     creditsBtn.addEventListener('click', () => this.showCredits());
 
-    drawer.appendChild(saveBtn);
-    drawer.appendChild(loadBtn);
-    drawer.appendChild(exportBtn);
-    drawer.appendChild(soundRow);
-    drawer.appendChild(devRow);
-    drawer.appendChild(quickNavRow);
-    drawer.appendChild(fontBtn);
-    drawer.appendChild(creditsBtn);
+    const versionLabel = document.createElement('div');
+    versionLabel.className = 'menu-version';
+    versionLabel.textContent = `You Decide v${GAME_VERSION}`;
+
+    const saveSection = createMenuSection('Partida');
+    saveSection.appendChild(saveBtn);
+    saveSection.appendChild(loadBtn);
+    saveSection.appendChild(exportBtn);
+
+    const settingsSection = createMenuSection('Configurações');
+    settingsSection.appendChild(soundRow);
+    settingsSection.appendChild(fontBtn);
+    settingsSection.appendChild(quickNavRow);
+    settingsSection.appendChild(devRow);
+
+    const aboutSection = createMenuSection('Sobre');
+    aboutSection.appendChild(creditsBtn);
+
+    const footer = document.createElement('div');
+    footer.className = 'menu-drawer-footer';
+    footer.appendChild(versionLabel);
+    drawer.appendChild(footer);
     frame.appendChild(drawer);
 
     const bodyRow = document.createElement('div');
@@ -708,7 +722,18 @@ export class GameApp {
 
     const sidebar = document.createElement('aside');
     sidebar.className = 'player-sidebar';
-    sidebar.appendChild(this.buildSidebar());
+    sidebar.appendChild(
+      buildGameSidebar({
+        state: this.state,
+        registry: this.registry,
+        sidebarSections: this.sidebarSections,
+        devMode: this.devMode,
+        onSectionToggle: (key, open) => {
+          this.sidebarSections[key] = open;
+          this.saveSidebarSections();
+        },
+      })
+    );
 
     const main = document.createElement('main');
     main.className = 'story-shell';
@@ -815,348 +840,6 @@ export class GameApp {
     meta.className = 'combat-log-meta';
     meta.textContent = parts.join(' · ');
     wrap.appendChild(meta);
-  }
-
-  /** Resumo mecânico do item (dano, armadura, atributos) para a secção Equipamento. */
-  private formatItemEquipmentStatsHtml(it: ItemDef): string {
-    const parts: string[] = [];
-    if (it.damage !== 0) {
-      parts.push(it.damage > 0 ? `Dano +${it.damage}` : `Dano ${it.damage}`);
-    }
-    if (it.armor !== 0) {
-      parts.push(it.armor > 0 ? `Armadura +${it.armor}` : `Armadura ${it.armor}`);
-    }
-    const attrs: [keyof ItemDef, string][] = [
-      ['bonusStr', 'STR'],
-      ['bonusAgi', 'AGI'],
-      ['bonusMind', 'MEN'],
-      ['bonusLuck', 'SOR'],
-    ];
-    for (const [key, label] of attrs) {
-      const v = it[key];
-      if (typeof v !== 'number' || v === 0) continue;
-      parts.push(`${label} ${v > 0 ? '+' : ''}${v}`);
-    }
-    if (it.cursed) parts.push('Amaldiçoado');
-    if (parts.length === 0) return '';
-    return `<span class="sidebar-equip-stats">${parts.map((s) => escHtml(s)).join(' · ')}</span>`;
-  }
-
-  /** Três linhas Arma / Armadura / Relíquia (herói e companheiros). */
-  private sidebarEquipBodyHtml(c: Character): string {
-    const d = this.registry.data.items;
-    const slotIcon: Record<string, string> = {
-      Arma: icons.weapon,
-      Armadura: icons.armor,
-      Relíquia: icons.relic,
-    };
-    const line = (label: string, id: string | null) => {
-      const ic = slotIcon[label] ?? icons.equipment;
-      if (!id) {
-        return `<p class="sidebar-equip-line sidebar-equip-line--empty">${iconWrap(ic)}<span class="sidebar-muted"><strong>${label}</strong> — —</span></p>`;
-      }
-      const it = d[id];
-      const name = it?.name ?? id;
-      const stats = it ? this.formatItemEquipmentStatsHtml(it) : '';
-      return `<p class="sidebar-equip-line">${iconWrap(ic)}<span><strong>${label}</strong> — ${escHtml(name)}${stats ? `<br>${stats}` : ''}</span></p>`;
-    };
-    return `${line('Arma', c.weaponId)}${line('Armadura', c.armorId)}${line('Relíquia', c.relicId)}`;
-  }
-
-  /** CA, STR, AGI, MEN, SOR com totais e (+X) da build. */
-  private formatStatAttrsLineHtml(c: Character, opts?: { compact?: boolean }): string {
-    const data = this.registry.data;
-    const state = this.state;
-    const eq = sumEquippedItemBonuses(data, c);
-    const str = effectiveLeadAttr(state, c, 'str') + eq.str;
-    const agi = effectiveLeadAttr(state, c, 'agi') + eq.agi;
-    const men = effectiveLeadAttr(state, c, 'mind') + eq.mind;
-    const sor = getEffectiveLuck(c, data, state);
-    const ca = getCharacterArmorClass(data, c, state);
-    const caEq = getEquippedArmorPoints(data, c);
-    const cls = opts?.compact ? 'sidebar-line attrs party-member-card-stats' : 'sidebar-line attrs';
-    return `<div class="${cls}">CA <strong>${ca}</strong>${statBonusParen(caEq)} · STR <strong>${str}</strong>${statBonusParen(eq.str)} · AGI <strong>${agi}</strong>${statBonusParen(eq.agi)} · MEN <strong>${men}</strong>${statBonusParen(eq.mind)} · SOR <strong>${sor}</strong>${statBonusParen(eq.luck)}</div>`;
-  }
-
-  private inventoryMarkup(): string {
-    const inv = this.state.inventory;
-    if (!inv.length) {
-      return `<div class="sidebar-line inventory-empty sidebar-line--with-icon">${iconWrap(icons.inventory)}<span>Nenhum item ainda.</span></div>`;
-    }
-    const counts = new Map<string, number>();
-    for (const id of inv) {
-      counts.set(id, (counts.get(id) ?? 0) + 1);
-    }
-    const lines: string[] = [];
-    for (const [id, n] of counts) {
-      const def = this.registry.data.items[id];
-      const label = def?.name ?? id;
-      const suffix = n > 1 ? ` ×${n}` : '';
-      lines.push(
-        `<div class="sidebar-line sidebar-inventory-item sidebar-line--with-icon">${iconWrap(icons.item, 'ui-icon-wrap ui-icon-wrap--sm')}<span>${escHtml(label)}${escHtml(suffix)}</span></div>`
-      );
-    }
-    return lines.join('');
-  }
-
-  /** Bloco lateral por companheiro (party[1..]). */
-  private companionCardMarkup(c: Character): string {
-    const cid = c.class as ClassId;
-    const clsLabel = this.registry.ui.getHeroClassLabel(cid, c.path);
-    const def = this.registry.data.companions[c.id];
-    const lore = def?.lorePt;
-    const openKey = `companion_lore_${c.id}`;
-    const open = this.sidebarSections[openKey] ? ' open' : '';
-    const openEquipKey = `companion_equip_${c.id}`;
-    const openEquip = this.sidebarSections[openEquipKey] ? ' open' : '';
-    const equipBody = this.sidebarEquipBodyHtml(c);
-    const loreHtml = lore
-      ? lore
-          .split('\n\n')
-          .map((para) => `<p>${escHtml(para)}</p>`)
-          .join('')
-      : `<p class="sidebar-muted">Sem história gravada.</p>`;
-    return `<div class="companion-sidebar-card">
-      <div class="companion-sidebar-name">${escHtml(c.name)}</div>
-      <div class="companion-sidebar-class">${escHtml(clsLabel)}</div>
-      <div class="sidebar-line">HP <strong>${c.hp}</strong> / <strong>${c.maxHp}</strong></div>
-      ${hpBarMarkup(c.hp, c.maxHp, 'hp-bar-resource', 'hp')}
-      <div class="sidebar-line sidebar-stress-label">Stress <strong>${c.stress}</strong> / 4</div>
-      ${stressBarMarkup(c.stress)}
-      ${this.formatStatAttrsLineHtml(c, { compact: true })}
-      <details class="sidebar-collapse sidebar-equip"${openEquip} data-section="${openEquipKey}">
-        <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.equipment, 'Equipamento')}</summary>
-        <div class="sidebar-collapse-body sidebar-lore-body">${equipBody}</div>
-      </details>
-      <details class="sidebar-collapse companion-lore"${open} data-section="${openKey}">
-        <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.scroll, 'História')}</summary>
-        <div class="sidebar-collapse-body sidebar-lore-body">${loreHtml}</div>
-      </details>
-    </div>`;
-  }
-
-  private companionsSectionMarkup(): string {
-    const rest = this.state.party.slice(1);
-    if (!rest.length) {
-      return `<div class="sidebar-line sidebar-muted">Nenhum companheiro no grupo.</div>`;
-    }
-    return rest.map((ch) => this.companionCardMarkup(ch)).join('');
-  }
-
-  /** Reputação −3…+3 como barra (0% = −3, 100% = +3). */
-  private repBarMarkup(
-    label: string,
-    value: number,
-    variant: 'vigilia' | 'circulo' | 'culto'
-  ): string {
-    const pct = Math.min(100, Math.max(0, Math.round(((value + 3) / 6) * 100)));
-    return `<div class="faction-rep-row">
-    <div class="sidebar-line faction-rep-label sidebar-line--with-icon">${iconWrap(icons.factions)}<span>${escHtml(label)} <strong>${value}</strong></span></div>
-    <div class="faction-rep-track faction-rep-track--${variant}" title="${label}: ${value} (−3 a +3)">
-      <div class="faction-rep-fill faction-rep-fill--${variant}" style="width:${pct}%"></div>
-    </div>
-  </div>`;
-  }
-
-  private wireSidebarDetails(hud: HTMLElement): void {
-    hud.querySelectorAll('details[data-section]').forEach((el) => {
-      const d = el as HTMLDetailsElement;
-      const key = d.dataset.section;
-      if (!key) return;
-      if (this.sidebarSections[key] !== undefined) {
-        d.open = this.sidebarSections[key]!;
-      }
-      d.addEventListener('toggle', () => {
-        this.sidebarSections[key] = d.open;
-        this.saveSidebarSections();
-      });
-    });
-  }
-
-  private buildSidebar(): HTMLElement {
-    const hud = document.createElement('div');
-    hud.className = 'sidebar-inner';
-    const r = this.state.resources;
-    const gold = r.gold ?? 0;
-    const p = this.state.party[0];
-    const rep = this.state.reputation;
-
-    const openRec = this.sidebarSections['recursos'] ? ' open' : '';
-    const openInv = this.sidebarSections['inventario'] ? ' open' : '';
-    const openFac = this.sidebarSections['faccoes'] ? ' open' : '';
-    const openDiary = this.sidebarSections['diario'] ? ' open' : '';
-    const openLore = this.sidebarSections['personagem_lore'] ? ' open' : '';
-    const openSpells = this.sidebarSections['personagem_spells'] ? ' open' : '';
-    const openEquip = this.sidebarSections['personagem_equip'] ? ' open' : '';
-    const openPassive = this.sidebarSections['personagem_passivos'] ? ' open' : '';
-    const openMem = this.sidebarSections['memorias'] ? ' open' : '';
-
-    const personagemBlock = (() => {
-      if (!p) {
-        return `<div class="sidebar-line">Escolha uma classe na narrativa.</div>
-        <div class="sidebar-line">Nível <strong>${this.state.level}</strong> · XP <strong>${this.state.xp}</strong></div>`;
-      }
-      const cid = p.class as ClassId;
-      const loreHtml = this.registry.ui.getHeroLore(cid, p.path)
-        .split('\n\n')
-        .map((para) => `<p>${escHtml(para)}</p>`)
-        .join('');
-      const lv = this.state.level;
-      const need = lv >= MAX_LEVEL ? 0 : xpToNextLevel(lv);
-      const xpLine =
-        lv >= MAX_LEVEL
-          ? `<div class="sidebar-line">Nível <strong>${lv}</strong> · <em>Máx.</em></div>`
-          : `<div class="sidebar-line">Nível <strong>${lv}</strong> · XP <strong>${this.state.xp}</strong> / <strong>${need}</strong></div>
-        ${hpBarMarkup(this.state.xp, need)}`;
-      const buffHint =
-        this.state.activeBuffs.length > 0
-          ? `<div class="sidebar-line sidebar-buffs">${this.state.activeBuffs
-              .map((b) => `${b.attr.toUpperCase()} ${b.delta >= 0 ? '+' : ''}${b.delta} (${b.remainingScenes} cena(s))`)
-              .join(' · ')}</div>`
-          : '';
-      const passiveUnlocked =
-        this.state.inventory.includes(PASSIVE_UNLOCK_ITEM_ID) ||
-        p.weaponId === PASSIVE_UNLOCK_ITEM_ID ||
-        p.armorId === PASSIVE_UNLOCK_ITEM_ID ||
-        p.relicId === PASSIVE_UNLOCK_ITEM_ID;
-      const passiveDef = this.registry.data.passives[cid];
-      const passiveExtra =
-        cid === 'knight' && p.critRatio > 0
-          ? `<p class="sidebar-line sidebar-muted">Chance crítica adicional: <strong>${Math.round(p.critRatio * 100)}%</strong></p>`
-          : '';
-      return `<div class="sidebar-line">Nome <strong>${escHtml(p.name)}</strong></div>
-        <div class="sidebar-line sidebar-class-line">${escHtml(this.registry.ui.getHeroClassLabel(cid, p.path))}</div>
-        ${xpLine}
-        <div class="sidebar-line">HP <strong>${p.hp}/${p.maxHp}</strong></div>
-        ${hpBarMarkup(p.hp, p.maxHp, 'hp-bar-resource', 'hp')}
-        ${p.maxMana > 0 ? `<div class="sidebar-line">Mana <strong>${p.mana}</strong> / <strong>${p.maxMana}</strong></div>${manaBarMarkup(p.mana, p.maxMana)}` : ''}
-        <div class="sidebar-line sidebar-stress-label">Stress <strong>${p.stress}</strong> / 4</div>
-        ${stressBarMarkup(p.stress)}
-        ${buffHint}
-        ${this.formatStatAttrsLineHtml(p)}
-        ${(() => {
-          const equipBody = this.sidebarEquipBodyHtml(p);
-          return `<details class="sidebar-collapse sidebar-equip"${openEquip} data-section="personagem_equip">
-          <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.equipment, 'Equipamento')}</summary>
-          <div class="sidebar-collapse-body sidebar-lore-body">${equipBody}</div>
-        </details>`;
-        })()}
-        ${passiveUnlocked ? `<details class="sidebar-collapse sidebar-spells"${openPassive} data-section="personagem_passivos">
-          <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.tier, 'Passivos')}</summary>
-          <div class="sidebar-collapse-body sidebar-lore-body">
-            <p class="sidebar-line"><strong>${escHtml(passiveDef?.name ?? 'Passivo de classe')}</strong></p>
-            <p class="sidebar-line sidebar-muted">${escHtml(passiveDef?.description ?? 'Sem descrição.')}</p>
-            ${passiveExtra}
-          </div>
-        </details>` : ''}
-        ${(() => {
-          const spellLines = this.state.knownSpells
-            .map((id) => this.registry.data.spells[id])
-            .filter((sp): sp is SpellDef => !!sp);
-          const body =
-            spellLines.length === 0
-              ? `<p class="sidebar-muted">Nenhuma magia aprendida.</p>`
-              : spellLines
-                  .map(
-                    (sp) =>
-                      `<p class="sidebar-spell-line sidebar-line--with-icon"><span class="spell-emoji" aria-hidden="true">${spellEmoji(sp.id, sp)}</span><span><strong>${escHtml(sp.name)}</strong> — ${sp.manaCost} mana · ${sp.spellKind === 'damage' ? 'dano' : 'cura'} (${sp.base > 0 ? `${sp.base} + ` : ''}${sp.dice}d6 + Mente)</span></p>`
-                  )
-                  .join('');
-          return `<details class="sidebar-collapse sidebar-spells"${openSpells} data-section="personagem_spells">
-          <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.spellbook, 'Magias aprendidas')}</summary>
-          <div class="sidebar-collapse-body sidebar-lore-body">${body}</div>
-        </details>`;
-        })()}
-        <details class="sidebar-collapse sidebar-lore"${openLore} data-section="personagem_lore">
-          <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.scroll, 'História do herói')}</summary>
-          <div class="sidebar-collapse-body sidebar-lore-body">${loreHtml}</div>
-        </details>`;
-    })();
-
-    hud.innerHTML = `
-      <h2 class="sidebar-title">Herói</h2>
-      <div class="sidebar-static">
-        <div class="sidebar-static-title sidebar-static-title--with-icon">${iconWrap(icons.progress)}<span>Progresso</span></div>
-        <div class="sidebar-static-body">
-          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.progress)}<span>Capítulo <strong>${this.state.chapter}</strong></span></div>
-          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.tier)}<span>Tier <strong>${this.state.narrativeTier}</strong></span></div>
-        </div>
-      </div>
-      <div class="sidebar-static">
-        <div class="sidebar-static-title sidebar-static-title--with-icon">${iconWrap(icons.person)}<span>Personagem</span></div>
-        <div class="sidebar-static-body sidebar-stats">
-          ${personagemBlock}
-        </div>
-      </div>
-      <div class="sidebar-static">
-        <div class="sidebar-static-title sidebar-static-title--with-icon">${iconWrap(icons.companions)}<span>Companheiros</span></div>
-        <div class="sidebar-static-body sidebar-stats">
-          ${this.companionsSectionMarkup()}
-        </div>
-      </div>
-      <details class="sidebar-collapse"${openRec} data-section="recursos">
-        <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.resources, 'Recursos')}</summary>
-        <div class="sidebar-collapse-body">
-          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.gold)}<span>Gold <strong>${gold}</strong></span></div>
-          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.supply)}<span>Suprimento <strong>${r.supply}</strong> <span class="sidebar-resource-hint">(mapa, acampamento)</span></span></div>
-          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.faith)}<span>Fé <strong>${r.faith}</strong></span></div>
-          ${this.state.extraLifeReady ? `<div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.tier)}<span>Vida extra <strong>disponível</strong> <span class="sidebar-resource-hint">(5 fé)</span></span></div>` : ''}
-          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.corruption)}<span>Corrupção <strong>${r.corruption}</strong></span></div>
-        </div>
-      </details>
-      <details class="sidebar-collapse"${openInv} data-section="inventario">
-        <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.inventory, 'Inventário')}</summary>
-        <div class="sidebar-collapse-body sidebar-inventory">
-          ${this.inventoryMarkup()}
-        </div>
-      </details>
-      <details class="sidebar-collapse"${openFac} data-section="faccoes">
-        <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.factions, 'Facções')}</summary>
-        <div class="sidebar-collapse-body sidebar-faccoes">
-          ${this.repBarMarkup('Vigília', rep.vigilia, 'vigilia')}
-          ${this.repBarMarkup('Círculo', rep.circulo, 'circulo')}
-          ${this.repBarMarkup('Culto', rep.culto, 'culto')}
-        </div>
-      </details>
-    `;
-
-    const visitedIds = Object.keys(this.state.visitedScenes)
-      .filter((k) => this.state.visitedScenes[k])
-      .sort();
-    if (this.devMode && visitedIds.length > 0) {
-      const max = 48;
-      const shown = visitedIds.slice(0, max);
-      const rest = visitedIds.length - shown.length;
-      const memHtml = shown.map((id) => `<div class="sidebar-line"><code>${escHtml(id)}</code></div>`).join('');
-      const more =
-        rest > 0 ? `<div class="sidebar-line sidebar-muted">… e mais ${rest} cena(s)</div>` : '';
-      const mem = document.createElement('details');
-      mem.className = 'sidebar-collapse';
-      if (openMem) mem.setAttribute('open', '');
-      mem.dataset.section = 'memorias';
-      mem.innerHTML = `
-        <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.memories, 'Memórias (cenas visitadas)')}</summary>
-        <div class="sidebar-collapse-body memories-list">${memHtml}${more}</div>
-      `;
-      hud.appendChild(mem);
-    }
-
-    if (this.state.diary.length) {
-      const diary = document.createElement('details');
-      diary.className = 'sidebar-collapse';
-      if (openDiary) diary.setAttribute('open', '');
-      diary.dataset.section = 'diario';
-      diary.innerHTML = `
-        <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.diary, 'Diário')}</summary>
-        <div class="sidebar-collapse-body diary-box">
-          ${this.state.diary.map((x) => `<p>“${x}”</p>`).join('')}
-        </div>
-      `;
-      hud.appendChild(diary);
-    }
-
-    this.wireSidebarDetails(hud);
-    return hud;
   }
 
   private renderStoryInto(shell: HTMLElement, scene: LoadedScene): void {

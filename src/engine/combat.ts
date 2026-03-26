@@ -855,6 +855,7 @@ function finishCombatFaithRescue(
     lastCombatXpGain: null,
     lastCombatLevelUps: null,
   };
+  s = reducePartyStressAfterCombat(s);
   s = tickActiveBuffs({
     ...s,
     mode: 'story',
@@ -862,6 +863,14 @@ function finishCombatFaithRescue(
     sceneId: c.returnScene,
   });
   return s;
+}
+
+function reducePartyStressAfterCombat(state: GameState): GameState {
+  const party = state.party.map((member) => ({
+    ...member,
+    stress: Math.max(0, member.stress - 1),
+  }));
+  return { ...state, party };
 }
 
 function finishCombat(
@@ -903,6 +912,7 @@ function finishCombat(
     s = { ...s, lastCombatXpGain: null, lastCombatLevelUps: null };
     bus?.emit({ type: 'combat.end', victory: false });
   }
+  s = reducePartyStressAfterCombat(s);
   return tickActiveBuffs({
     ...s,
     mode: 'story',
@@ -1113,8 +1123,9 @@ export function fleeCombat(state: GameState, bus?: EventBus): GameState {
   const c = state.combat;
   if (!c) return state;
   bus?.emit({ type: 'combat.end', victory: false });
+  const stateAfterStress = reducePartyStressAfterCombat(state);
   return tickActiveBuffs({
-    ...state,
+    ...stateAfterStress,
     lastCombatXpGain: null,
     lastCombatLevelUps: null,
     mode: 'story',

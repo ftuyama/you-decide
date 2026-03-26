@@ -843,6 +843,43 @@ export class GameApp {
     wrap.appendChild(meta);
   }
 
+  private static escapeRegExp(text: string): string {
+    return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  private appendCombatLogMessageWithBoldNames(
+    container: HTMLElement,
+    message: string,
+    combatantNames: readonly string[]
+  ): void {
+    if (!combatantNames.length) {
+      container.textContent = message;
+      return;
+    }
+    const unique = [...new Set(combatantNames)].filter((name) => name.trim().length > 0);
+    if (!unique.length) {
+      container.textContent = message;
+      return;
+    }
+    const sorted = unique.sort((a, b) => b.length - a.length);
+    const namesSet = new Set(sorted);
+    const pattern = new RegExp(
+      `(${sorted.map((name) => GameApp.escapeRegExp(name)).join('|')})`,
+      'g'
+    );
+    const parts = message.split(pattern);
+    for (const part of parts) {
+      if (!part) continue;
+      if (namesSet.has(part)) {
+        const strong = document.createElement('strong');
+        strong.textContent = part;
+        container.appendChild(strong);
+        continue;
+      }
+      container.appendChild(document.createTextNode(part));
+    }
+  }
+
   private renderStoryInto(shell: HTMLElement, scene: LoadedScene): void {
     const inner = document.createElement('div');
     inner.className = 'shell';
@@ -1175,10 +1212,17 @@ export class GameApp {
       const pre = document.createElement('pre');
       pre.className = 'enemy-sprite';
       pre.textContent = sprite;
-      const hpBar = `[${'█'.repeat(Math.ceil((inst.hp / inst.maxHp) * 10))}${'░'.repeat(10 - Math.ceil((inst.hp / inst.maxHp) * 10))}]`;
-      panel.innerHTML = `<div><strong>${def.name}</strong> · ${hpBar} ${inst.hp}/${inst.maxHp}</div>`;
-      if (def.type === 'armored' && inst.armorChipsRemaining > 0) {
-        panel.innerHTML += `<div>Armadura: ${inst.armorChipsRemaining} camadas</div>`;
+      const hpPct = Math.max(0, Math.min(100, Math.round((inst.hp / inst.maxHp) * 100)));
+      panel.innerHTML = `<div class="enemy-panel-header"><strong>${def.name}</strong><span class="enemy-hp-text">${inst.hp}/${inst.maxHp}</span></div>
+      <div class="enemy-hp-track" title="HP ${inst.hp}/${inst.maxHp}">
+        <div class="enemy-hp-fill" style="width:${hpPct}%"></div>
+      </div>`;
+      if (def.type === 'armored') {
+        const armorChips = Math.max(0, Math.min(2, inst.armorChipsRemaining));
+        const armorLine = document.createElement('div');
+        armorLine.className = 'enemy-armor-line';
+        armorLine.innerHTML = `Armadura <span class="enemy-armor-slot${armorChips >= 1 ? ' enemy-armor-slot--filled' : ''}">■</span><span class="enemy-armor-slot${armorChips >= 2 ? ' enemy-armor-slot--filled' : ''}">■</span>`;
+        panel.appendChild(armorLine);
       }
       panel.appendChild(pre);
       left.appendChild(panel);
@@ -1385,6 +1429,12 @@ export class GameApp {
     logScroll.className = 'combat-log-scroll';
 
     const partyNames = new Set(this.state.party.map((x) => x.name));
+    const combatantNames = [
+      ...this.state.party.map((member) => member.name),
+      ...c.enemies
+        .map((enemy) => this.registry.data.enemies[enemy.defId]?.name)
+        .filter((name): name is string => Boolean(name)),
+    ];
 
     const displayItems = buildCombatLogDisplayItems(c.log.slice(-64));
 
@@ -1404,13 +1454,13 @@ export class GameApp {
 
         const msg = document.createElement('div');
         msg.className = 'combat-log-msg';
-        msg.textContent = attack.message;
+        this.appendCombatLogMessageWithBoldNames(msg, attack.message, combatantNames);
         wrap.appendChild(msg);
 
         if (quaseCritico) {
           const qc = document.createElement('div');
           qc.className = 'combat-log-msg combat-log-msg--sub';
-          qc.textContent = quaseCritico.message;
+          this.appendCombatLogMessageWithBoldNames(qc, quaseCritico.message, combatantNames);
           wrap.appendChild(qc);
         }
 
@@ -1452,7 +1502,7 @@ export class GameApp {
 
       const msg = document.createElement('div');
       msg.className = 'combat-log-msg';
-      msg.textContent = entry.message;
+      this.appendCombatLogMessageWithBoldNames(msg, entry.message, combatantNames);
       wrap.appendChild(msg);
 
       if (entry.dice?.length) {

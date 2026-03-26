@@ -12,4 +12,6 @@ choices:
         onFlee: act5/frost_hub
 onEnter: []
 ---
-Do **branco** saltam duas silhuetas famintas — não é a emboscada da missão; é a montanha a **cobrar** visita.
+Do **branco** saltam duas silhuetas famintas — não é a emboscada da missão; é a montanha a **cobrar** visita. Os dentes **tilintam** como vidro; o hálito cheira a **tempestade** adiada.
+
+Se venceres, aprendes uma regra rústica: na cordilheira, **fome** é mais fiel que mapa.

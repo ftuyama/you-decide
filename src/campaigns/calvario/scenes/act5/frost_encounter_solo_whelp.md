@@ -12,4 +12,6 @@ choices:
         onFlee: act5/frost_hub
 onEnter: []
 ---
-Uma só **cria** te seguiu pelo eco dos teus passos — curiosidade ou **fome**, o resultado é o mesmo.
+Uma só **cria** te seguiu pelo eco dos teus passos — curiosidade ou **fome**, o resultado é o mesmo. Olha-te como quem lê **preço** numa vitrine: não há vergonha, só **cálculo** gelado.
+
+Se a deixares ir, ela não te agradece — **aprende** o teu cheiro para a próxima vez.

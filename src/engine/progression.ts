@@ -5,7 +5,7 @@ import type { EventBus } from './eventBus';
 import { unlockSpellsForNewLevel } from './spellsKnown';
 
 /** Nível máximo; acima disso o XP não aumenta nível */
-export const MAX_LEVEL = 30;
+export const MAX_LEVEL = 40;
 
 /** XP para o primeiro nível (1→2); cada nível seguinte exige isto a mais que o anterior. */
 const XP_TO_NEXT_LEVEL_START = 50;

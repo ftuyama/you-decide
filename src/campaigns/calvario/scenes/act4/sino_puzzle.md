@@ -22,6 +22,6 @@ choices:
       - { op: addDiary, text: "Forcei a sequência. O metal lembrou-me que pressa também é erro." }
 onEnter: []
 ---
-**Sino ao Luar**: alinhas runas numa pedra que **respira**. O eco agradece, **morde**, ou finge obediça — conforme a ordem em que tocas o silêncio.
+**Sino ao Luar**: alinhas runas numa pedra que **respira**. O eco agradece, **morde**, ou finge obediência — conforme a ordem em que tocas o silêncio.
 
 Cada padrão é uma **promessa** diferente ao trono.

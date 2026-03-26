@@ -26,4 +26,6 @@ O **Trono de Ossos** ergue-se como onda fossilizada — costelas de gigantes ent
 
 **Morvayn** está sentado antes de existir cadeira: primeiro a **sombra**, depois a forma. Sorri **sem lábios** — ou com lábios de outra pessoa.
 
-O pulso verde **bate** ao ritmo do teu coração, como um **médico** que não cura.
+O pulso verde **bate** ao ritmo do teu coração, como um **médico** que não cura. O salão **inventa** ecos: cada passo te devolve um **sussurro** que não é teu — e mesmo assim conhece o teu nome.
+
+Se quiseres **tabela** em vez de teatro, há tempo para **inspecionar** o osso, **testar** o nervo e **negociar** com quem vende silêncio em frascos. Se não, o aço **espera** — frio como estatística.

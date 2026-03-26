@@ -39,6 +39,6 @@ choices:
 onEnter:
   - { op: addRep, faction: culto, delta: 1 }
 ---
-Peregrinos e **forasteiros** partilham o que não têm: calor em **pedaços**. O fogo não julga — só **consome**.
+Peregrinos e **forasteiros** partilham o que não têm: calor em **pedaços**. O fogo não julga — só **consome**. Entre duas histórias, a verdade é sempre a mesma: **ninguém** sobe inteiro.
 
-**Suprimento** aqui compra **descanso**: recuperas HP e alivias 1 de stress (custa 1 suprimento).
+**Suprimento** aqui compra **descanso**: recuperas HP e alivias 1 de stress (custa 1 suprimento). Se o vento parar de sussurrar, desconfia: às vezes o silêncio é só **emboscada** a afinar o arco.

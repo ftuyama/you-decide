@@ -13,6 +13,6 @@ onEnter: []
 ---
 O dragão **rasga** o próprio rugido e deixa entrar um **silêncio** pior que o barulho.
 
-No peito dele, algo **pulsar** — não sangue, mas uma **nota** presa, como um sino fundido ao osso.
+No peito dele, algo **pulsa** — não sangue, mas uma **nota** presa, como um sino fundido ao osso.
 
 Se o partires, o Terceiro Sino ouve — ou **cala** para sempre.

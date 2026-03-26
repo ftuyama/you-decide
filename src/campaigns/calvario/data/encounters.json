@@ -86,27 +86,41 @@
     "enemies": ["frost_whelp", "frost_whelp"],
     "playerAdvantage": false,
     "enemyAdvantage": false,
-    "xpReward": 35
+    "xpReward": 45
   },
   "frost_whelp_solo": {
     "id": "frost_whelp_solo",
     "enemies": ["frost_whelp"],
     "playerAdvantage": false,
     "enemyAdvantage": false,
-    "xpReward": 18
+    "xpReward": 28
+  },
+  "frost_hunt_party": {
+    "id": "frost_hunt_party",
+    "enemies": ["frost_whelp", "frost_whelp", "frost_cultist"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 65
+  },
+  "frost_howl_horde": {
+    "id": "frost_howl_horde",
+    "enemies": ["frost_whelp", "frost_whelp", "frost_whelp", "frost_reaver"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 90
   },
   "boss_ice_dragon_1": {
     "id": "boss_ice_dragon_1",
     "enemies": ["ice_dragon_p1"],
     "playerAdvantage": false,
     "enemyAdvantage": false,
-    "xpReward": 100
+    "xpReward": 115
   },
   "boss_ice_dragon_2": {
     "id": "boss_ice_dragon_2",
     "enemies": ["ice_dragon_p2"],
     "playerAdvantage": true,
     "enemyAdvantage": false,
-    "xpReward": 130
+    "xpReward": 145
   }
 }

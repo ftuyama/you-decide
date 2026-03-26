@@ -9,4 +9,4 @@ onEnter: []
 ---
 {{companionLine}}
 
-Se estiveres **só**, o vento ocupa o lugar do outro — e mesmo assim parece **réplica** de conversa.
+Se estiveres **só**, o vento ocupa o lugar do outro — e mesmo assim parece **réplica** de conversa. O **céu** baixo ajuda: ninguém exige bravura quando o frio **parece** ter opinião.

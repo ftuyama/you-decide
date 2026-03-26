@@ -14,4 +14,5 @@ onEnter: []
 ---
 Cada osso do trono tem **um nome** raspado — não consegues ler todos. Um deles é o teu **primeiro medo** em letras pequenas.
 
-As correntes **pingam** algo espesso. Não é sangue. É **memória** demasiado densa para escorrer.
+As correntes **pingam** algo espesso. Não é sangue. É **memória** demasiado densa para escorrer. Se ficares demasiado tempo a olhar, o trono **aprende** o formato do teu medo — e isso não se apaga com oração.
+

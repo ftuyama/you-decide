@@ -15,6 +15,6 @@ onEnter:
 
 O mapa que trazes não é de estradas — é de **sombras** sobre neve. Cada marco é um aviso: *aqui o vento corta quem fala alto*.
 
-Se carregas **eco**, **ferida** ou **promessa**, tanto faz: o altitude **iguala**. O que sobra é o rumor de **Vetrnax** — não uma fera qualquer, mas um **fio** de geada tão antigo quanto a primeira noite em que o mundo aprendeu a ter medo do céu.
+Se carregas **eco**, **ferida** ou **promessa**, tanto faz: a altitude **iguala**. O que sobra é o rumor de **Vetrnax** — não uma fera qualquer, mas um **fio** de geada tão antigo quanto a primeira noite em que o mundo aprendeu a ter medo do céu.
 
-À tua frente, o desfiladeiro abre como uma **ferida branca**; por trás, só o caminho que já não te devolve ao trono.
+À tua frente, o desfiladeiro abre como uma **ferida branca**; por trás, só o caminho que já não te devolve ao trono. Cada respiração paga **juros** ao frio: quanto mais subes, mais o ar **exige** silêncio como moeda.

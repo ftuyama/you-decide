@@ -11,4 +11,5 @@ choices:
         onDefeat: act4/game_over
 onEnter: []
 ---
-**Vetrnax** desenrola o pescoço como uma **corda** de trovão. O primeiro assalto não é dente — é **frio** que rouba o som da língua.
+**Vetrnax** desenrola o pescoço como uma **corda** de trovão. O primeiro assalto não é dente — é **frio** que rouba o som da língua. O ar **vibra** antes do golpe: o dragão não ataca só o corpo; ataca a **certeza** de que ainda estás vivo.
+

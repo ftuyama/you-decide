@@ -102,7 +102,16 @@ export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
   z.object({ op: z.literal('setNarrativeTier'), tier: z.number().int().min(1).max(4) }),
   z.object({ op: z.literal('grantItem'), itemId: z.string() }),
   z.object({ op: z.literal('removeItem'), itemId: z.string() }),
-  z.object({ op: z.literal('equipItem'), itemId: z.string() }),
+  z.object({
+    op: z.literal('equipItem'),
+    itemId: z.string(),
+    partyIndex: z.number().int().min(0).max(2).optional(),
+  }),
+  z.object({
+    op: z.literal('unequipSlot'),
+    slot: z.enum(['weapon', 'armor', 'relic']),
+    partyIndex: z.number().int().min(0).max(2).optional(),
+  }),
   z.object({ op: z.literal('goto'), sceneId: z.string() }),
   z.object({ op: z.literal('addDiary'), text: z.string() }),
   z.object({
@@ -153,7 +162,8 @@ export type Effect =
   | { op: 'setNarrativeTier'; tier: number }
   | { op: 'grantItem'; itemId: string }
   | { op: 'removeItem'; itemId: string }
-  | { op: 'equipItem'; itemId: string }
+  | { op: 'equipItem'; itemId: string; partyIndex?: number }
+  | { op: 'unequipSlot'; slot: 'weapon' | 'armor' | 'relic'; partyIndex?: number }
   | { op: 'goto'; sceneId: string }
   | { op: 'addDiary'; text: string }
   | {
@@ -294,6 +304,9 @@ export const EnemyLootDropSchema = z.union([
 ]);
 export type EnemyLootDrop = z.infer<typeof EnemyLootDropSchema>;
 
+export const EnemyAttackStrategySchema = z.enum(['random', 'focus_leader']);
+export type EnemyAttackStrategy = z.infer<typeof EnemyAttackStrategySchema>;
+
 export const EnemyDefSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -315,6 +328,10 @@ export const EnemyDefSchema = z.object({
   critConfirm: z.number().min(0).max(1).optional(),
   /** Loot opcional por inimigo; cada entrada testa chance independentemente */
   lootDrops: z.array(EnemyLootDropSchema).optional(),
+  /** Quem o inimigo tenta atingir no corpo-a-corpo (turno inimigo) */
+  attackStrategy: EnemyAttackStrategySchema.default('random'),
+  /** Com `focus_leader`: probabilidade de mirar o líder se estiver vivo; padrão no engine se omitido */
+  focusLeaderWeight: z.number().min(0).max(1).optional(),
 });
 
 export type EnemyDef = z.infer<typeof EnemyDefSchema>;

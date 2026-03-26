@@ -11,6 +11,7 @@ import type {
   Character,
   CombatLogEntry,
   CombatState,
+  EnemyDef,
   EnemyLootDrop,
   EnemyInstance,
   Encounter,
@@ -30,6 +31,29 @@ import {
 
 /** Confirmação de crítico inimigo após 6+6 (padrão ~25%) */
 export const DEFAULT_ENEMY_CRIT_CONFIRM = 0.25;
+
+/** Com `attackStrategy: focus_leader` e `focusLeaderWeight` omitido no def */
+export const DEFAULT_FOCUS_LEADER_WEIGHT = 0.72;
+
+/** Índice no grupo a atacar (líder vs companheiro) conforme o def do inimigo. */
+function pickEnemyMeleeTarget(party: Character[], def: EnemyDef, rng: () => number): number {
+  const alive = party.map((p, i) => (p.hp > 0 ? i : -1)).filter((i): i is number => i >= 0);
+  if (alive.length === 0) return 0;
+  if (alive.length === 1) return alive[0]!;
+
+  const strategy = def.attackStrategy ?? 'random';
+  if (strategy === 'random') {
+    return alive[Math.floor(rng() * alive.length)]!;
+  }
+
+  const w = def.focusLeaderWeight ?? DEFAULT_FOCUS_LEADER_WEIGHT;
+  const leadAlive = party[0]!.hp > 0;
+  if (leadAlive && rng() < w) return 0;
+
+  const others = alive.filter((i) => i !== 0);
+  if (others.length === 0) return 0;
+  return others[Math.floor(rng() * others.length)]!;
+}
 
 function toRollOutcome(
   s: AttackRollSpecial
@@ -886,7 +910,8 @@ function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData, bu
     if (inst.hp <= 0) continue;
     const def = data.enemies[inst.defId];
     if (!def) continue;
-    const target = party[0]!;
+    const targetIndex = pickEnemyMeleeTarget(party, def, rng);
+    const target = party[targetIndex]!;
     let atk = 0;
     let dice: number[] = [];
     let special: AttackRollSpecial = 'normal';
@@ -960,7 +985,7 @@ function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData, bu
         ? Math.max(1, dDmg * 2 + strMod - reduc)
         : Math.max(1, dDmg + strMod - reduc);
       const nh = Math.max(0, target.hp - dmg);
-      party[0] = { ...target, hp: nh };
+      party[targetIndex] = { ...target, hp: nh };
       log.push({
         kind: 'damage',
         message: enemyCritDmg
@@ -973,7 +998,7 @@ function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData, bu
       });
       let st = target.stress;
       st = Math.min(4, st + 1);
-      party[0] = { ...party[0]!, stress: st };
+      party[targetIndex] = { ...party[targetIndex]!, stress: st };
     }
   }
 

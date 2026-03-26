@@ -1176,6 +1176,20 @@ button.choice .preview {
   margin-top: 0;
 }
 
+.camp-equip-member-name {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.55rem;
+}
+
+.camp-equip-member + .camp-equip-member {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
 .camp-equip-slot {
   margin-bottom: 0.75rem;
 }
@@ -1222,6 +1236,10 @@ button.choice .preview {
   gap: 0.35rem;
 }
 
+.camp-equip-unequip {
+  margin: 0.35rem 0 0.25rem;
+}
+
 button.camp-equip-btn {
   font: inherit;
   font-size: 0.78rem;
@@ -1237,6 +1255,17 @@ button.camp-equip-btn {
 button.camp-equip-btn:hover {
   border-color: var(--accent);
   background: #151a16;
+}
+
+button.camp-equip-btn--unequip {
+  border-color: #4a4540;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+button.camp-equip-btn--unequip:hover {
+  border-color: #6a6358;
+  color: var(--fg);
 }
 
 /** ~55% / ~45% no desktop — coluna dos inimigos ligeiramente maior */

@@ -1,0 +1,44 @@
+---
+id: act5/frost_camp
+title: Brasas sob a tempestade
+chapter: 5
+choices:
+  - text: "Descansar junto ao fogareiro (−1 suprimento)"
+    next: act5/frost_hub
+    condition: { resource: { supply: { gte: 1 } } }
+    effects:
+      - { op: campRest }
+  - text: "Beber poção rubra (ti)"
+    next: act5/frost_camp
+    condition: { hasItem: potion_hp }
+    effects:
+      - { op: useConsumable, itemId: potion_hp, targetIndex: 0 }
+  - text: "Dar poção rubra ao companheiro"
+    next: act5/frost_camp
+    condition: { all: [{ hasItem: potion_hp }, { companionCount: { gte: 1 } }] }
+    effects:
+      - { op: useConsumable, itemId: potion_hp, targetIndex: 1 }
+  - text: "Beber tônico azul (mana)"
+    next: act5/frost_camp
+    condition:
+      all:
+        - { hasItem: potion_mana }
+        - { any: [{ class: mage }, { class: cleric }] }
+    effects:
+      - { op: useConsumable, itemId: potion_mana, targetIndex: 0 }
+  - text: "Beber infusão serena (stress)"
+    next: act5/frost_camp
+    condition: { hasItem: potion_stress }
+    effects:
+      - { op: useConsumable, itemId: potion_stress, targetIndex: 0 }
+  - text: "Trocar duas palavras com o grupo"
+    next: act5/frost_companion_chat
+    condition: { companionCount: { gte: 1 } }
+  - text: "Continuar"
+    next: act5/frost_hub
+onEnter:
+  - { op: addRep, faction: culto, delta: 1 }
+---
+Peregrinos e **forasteiros** partilham o que não têm: calor em **pedaços**. O fogo não julga — só **consome**.
+
+**Suprimento** aqui compra **descanso**: recuperas HP e alivias 1 de stress (custa 1 suprimento).

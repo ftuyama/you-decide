@@ -4,6 +4,10 @@ title: O trono
 chapter: 4
 artKey: morvayn
 choices:
+  - text: "Tentar ler um nome completo (teste de Mente)"
+    next: act4/throne_observe_mind
+  - text: "Interceptar o gotejar das correntes (sorte)"
+    next: act4/throne_observe_luck
   - text: "Voltar ao momento da decisão"
     next: act4/throne_gate
 onEnter: []

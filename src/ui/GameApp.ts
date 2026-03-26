@@ -16,6 +16,7 @@ import type {
   Choice,
   ClassId,
   CombatLogEntry,
+  Effect,
   GameState,
   ItemDef,
   SpellDef,
@@ -451,18 +452,27 @@ export class GameApp {
     return out;
   }
 
-  private applyCampEquip(itemId: string): void {
+  private applyCampEquip(itemId: string, partyIndex: number): void {
     this.unlockAudio();
     this.audio.playUiClick();
-    const s = applyEffects(this.state, [{ op: 'equipItem', itemId }], this.ctx());
+    const eff: Effect = { op: 'equipItem', itemId, partyIndex };
+    const s = applyEffects(this.state, [eff], this.ctx());
+    this.state = this.stabilize(s);
+    this.render();
+  }
+
+  private applyCampUnequip(slot: 'weapon' | 'armor' | 'relic', partyIndex: number): void {
+    this.unlockAudio();
+    this.audio.playUiClick();
+    const eff: Effect = { op: 'unequipSlot', slot, partyIndex };
+    const s = applyEffects(this.state, [eff], this.ctx());
     this.state = this.stabilize(s);
     this.render();
   }
 
   private appendCampEquipmentPanel(parent: HTMLElement): void {
-    if (!this.isCampEquipmentScene() || !this.state.party[0]) return;
+    if (!this.isCampEquipmentScene() || this.state.party.length === 0) return;
 
-    const lead = this.state.party[0];
     const items = this.registry.data.items;
 
     const panel = document.createElement('div');
@@ -472,58 +482,86 @@ export class GameApp {
     hdr.innerHTML = `${iconWrap(icons.equipment)}<span>Equipamento no acampamento</span>`;
     panel.appendChild(hdr);
 
-    const slotDefs: { key: 'weapon' | 'armor' | 'relic'; label: string; cur: string | null }[] = [
-      { key: 'weapon', label: 'Arma', cur: lead.weaponId },
-      { key: 'armor', label: 'Armadura', cur: lead.armorId },
-      { key: 'relic', label: 'Relíquia', cur: lead.relicId },
-    ];
     const slotSvg: Record<'weapon' | 'armor' | 'relic', string> = {
       weapon: icons.weapon,
       armor: icons.armor,
       relic: icons.relic,
     };
 
-    for (const { key, label, cur } of slotDefs) {
-      const row = document.createElement('div');
-      row.className = 'camp-equip-slot';
-      const lab = document.createElement('div');
-      lab.className = 'camp-equip-slot-label camp-equip-slot-label--with-icon';
-      lab.innerHTML = `${iconWrap(slotSvg[key])}<span>${label}</span>`;
-      row.appendChild(lab);
+    for (let partyIndex = 0; partyIndex < this.state.party.length; partyIndex++) {
+      const member = this.state.party[partyIndex]!;
+      const memberWrap = document.createElement('div');
+      memberWrap.className = 'camp-equip-member';
+      const nameEl = document.createElement('div');
+      nameEl.className = 'camp-equip-member-name';
+      nameEl.textContent = member.name;
+      memberWrap.appendChild(nameEl);
 
-      const curEl = document.createElement('div');
-      curEl.className = 'camp-equip-current';
-      if (cur) {
-        const def = items[cur];
-        curEl.textContent = def?.name ?? cur;
-      } else {
-        curEl.classList.add('camp-equip-current--empty');
-        curEl.textContent = '— vazio —';
-      }
-      row.appendChild(curEl);
+      const slotDefs: { key: 'weapon' | 'armor' | 'relic'; label: string; cur: string | null }[] = [
+        { key: 'weapon', label: 'Arma', cur: member.weaponId },
+        { key: 'armor', label: 'Armadura', cur: member.armorId },
+        { key: 'relic', label: 'Relíquia', cur: member.relicId },
+      ];
 
-      const candidates = this.inventoryEquipmentIdsForSlot(key);
-      if (candidates.length === 0) {
-        const hint = document.createElement('div');
-        hint.className = 'camp-equip-hint';
-        hint.textContent = 'Sem peças deste tipo no inventário.';
-        row.appendChild(hint);
-      } else {
-        const actions = document.createElement('div');
-        actions.className = 'camp-equip-actions';
-        for (const itemId of candidates) {
-          const def = items[itemId];
-          if (!def) continue;
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'camp-equip-btn';
-          btn.textContent = `Equipar ${def.name}`;
-          btn.addEventListener('click', () => this.applyCampEquip(itemId));
-          actions.appendChild(btn);
+      for (const { key, label, cur } of slotDefs) {
+        const row = document.createElement('div');
+        row.className = 'camp-equip-slot';
+        const lab = document.createElement('div');
+        lab.className = 'camp-equip-slot-label camp-equip-slot-label--with-icon';
+        lab.innerHTML = `${iconWrap(slotSvg[key])}<span>${label}</span>`;
+        row.appendChild(lab);
+
+        const curEl = document.createElement('div');
+        curEl.className = 'camp-equip-current';
+        if (cur) {
+          const def = items[cur];
+          curEl.textContent = def?.name ?? cur;
+        } else {
+          curEl.classList.add('camp-equip-current--empty');
+          curEl.textContent = '— vazio —';
         }
-        row.appendChild(actions);
+        row.appendChild(curEl);
+
+        if (cur) {
+          const unequipWrap = document.createElement('div');
+          unequipWrap.className = 'camp-equip-unequip';
+          const unequipBtn = document.createElement('button');
+          unequipBtn.type = 'button';
+          unequipBtn.className = 'camp-equip-btn camp-equip-btn--unequip';
+          unequipBtn.textContent = 'Retirar ao inventário';
+          const pi = partyIndex;
+          const sk = key;
+          unequipBtn.addEventListener('click', () => this.applyCampUnequip(sk, pi));
+          unequipWrap.appendChild(unequipBtn);
+          row.appendChild(unequipWrap);
+        }
+
+        const candidates = this.inventoryEquipmentIdsForSlot(key);
+        if (candidates.length === 0) {
+          const hint = document.createElement('div');
+          hint.className = 'camp-equip-hint';
+          hint.textContent = 'Sem peças deste tipo no inventário.';
+          row.appendChild(hint);
+        } else {
+          const actions = document.createElement('div');
+          actions.className = 'camp-equip-actions';
+          for (const itemId of candidates) {
+            const def = items[itemId];
+            if (!def) continue;
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'camp-equip-btn';
+            btn.textContent = `Equipar ${def.name}`;
+            const pi = partyIndex;
+            btn.addEventListener('click', () => this.applyCampEquip(itemId, pi));
+            actions.appendChild(btn);
+          }
+          row.appendChild(actions);
+        }
+        memberWrap.appendChild(row);
       }
-      panel.appendChild(row);
+
+      panel.appendChild(memberWrap);
     }
 
     parent.appendChild(panel);
@@ -797,6 +835,27 @@ export class GameApp {
     return `<span class="sidebar-equip-stats">${parts.map((s) => escHtml(s)).join(' · ')}</span>`;
   }
 
+  /** Três linhas Arma / Armadura / Relíquia (herói e companheiros). */
+  private sidebarEquipBodyHtml(c: Character): string {
+    const d = this.registry.data.items;
+    const slotIcon: Record<string, string> = {
+      Arma: icons.weapon,
+      Armadura: icons.armor,
+      Relíquia: icons.relic,
+    };
+    const line = (label: string, id: string | null) => {
+      const ic = slotIcon[label] ?? icons.equipment;
+      if (!id) {
+        return `<p class="sidebar-equip-line sidebar-equip-line--empty">${iconWrap(ic)}<span class="sidebar-muted"><strong>${label}</strong> — —</span></p>`;
+      }
+      const it = d[id];
+      const name = it?.name ?? id;
+      const stats = it ? this.formatItemEquipmentStatsHtml(it) : '';
+      return `<p class="sidebar-equip-line">${iconWrap(ic)}<span><strong>${label}</strong> — ${escHtml(name)}${stats ? `<br>${stats}` : ''}</span></p>`;
+    };
+    return `${line('Arma', c.weaponId)}${line('Armadura', c.armorId)}${line('Relíquia', c.relicId)}`;
+  }
+
   /** CA, STR, AGI, MEN, SOR com totais e (+X) da build. */
   private formatStatAttrsLineHtml(c: Character, opts?: { compact?: boolean }): string {
     const data = this.registry.data;
@@ -841,6 +900,9 @@ export class GameApp {
     const lore = def?.lorePt;
     const openKey = `companion_lore_${c.id}`;
     const open = this.sidebarSections[openKey] ? ' open' : '';
+    const openEquipKey = `companion_equip_${c.id}`;
+    const openEquip = this.sidebarSections[openEquipKey] ? ' open' : '';
+    const equipBody = this.sidebarEquipBodyHtml(c);
     const loreHtml = lore
       ? lore
           .split('\n\n')
@@ -855,6 +917,10 @@ export class GameApp {
       <div class="sidebar-line sidebar-stress-label">Stress <strong>${c.stress}</strong> / 4</div>
       ${stressBarMarkup(c.stress)}
       ${this.formatStatAttrsLineHtml(c, { compact: true })}
+      <details class="sidebar-collapse sidebar-equip"${openEquip} data-section="${openEquipKey}">
+        <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.equipment, 'Equipamento')}</summary>
+        <div class="sidebar-collapse-body sidebar-lore-body">${equipBody}</div>
+      </details>
       <details class="sidebar-collapse companion-lore"${open} data-section="${openKey}">
         <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.scroll, 'História')}</summary>
         <div class="sidebar-collapse-body sidebar-lore-body">${loreHtml}</div>
@@ -951,23 +1017,7 @@ export class GameApp {
         ${buffHint}
         ${this.formatStatAttrsLineHtml(p)}
         ${(() => {
-          const d = this.registry.data.items;
-          const slotIcon: Record<string, string> = {
-            Arma: icons.weapon,
-            Armadura: icons.armor,
-            Relíquia: icons.relic,
-          };
-          const line = (label: string, id: string | null) => {
-            const ic = slotIcon[label] ?? icons.equipment;
-            if (!id) {
-              return `<p class="sidebar-equip-line sidebar-equip-line--empty">${iconWrap(ic)}<span class="sidebar-muted"><strong>${label}</strong> — —</span></p>`;
-            }
-            const it = d[id];
-            const name = it?.name ?? id;
-            const stats = it ? this.formatItemEquipmentStatsHtml(it) : '';
-            return `<p class="sidebar-equip-line">${iconWrap(ic)}<span><strong>${label}</strong> — ${escHtml(name)}${stats ? `<br>${stats}` : ''}</span></p>`;
-          };
-          const equipBody = `${line('Arma', p.weaponId)}${line('Armadura', p.armorId)}${line('Relíquia', p.relicId)}`;
+          const equipBody = this.sidebarEquipBodyHtml(p);
           return `<details class="sidebar-collapse sidebar-equip"${openEquip} data-section="personagem_equip">
           <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.equipment, 'Equipamento')}</summary>
           <div class="sidebar-collapse-body sidebar-lore-body">${equipBody}</div>

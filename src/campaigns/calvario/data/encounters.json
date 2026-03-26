@@ -88,6 +88,13 @@
     "enemyAdvantage": false,
     "xpReward": 35
   },
+  "frost_whelp_solo": {
+    "id": "frost_whelp_solo",
+    "enemies": ["frost_whelp"],
+    "playerAdvantage": false,
+    "enemyAdvantage": false,
+    "xpReward": 18
+  },
   "boss_ice_dragon_1": {
     "id": "boss_ice_dragon_1",
     "enemies": ["ice_dragon_p1"],

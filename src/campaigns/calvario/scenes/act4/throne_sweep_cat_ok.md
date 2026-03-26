@@ -1,0 +1,13 @@
+---
+id: act4/throne_sweep_cat_ok
+title: Mapa de osso
+chapter: 4
+choices:
+  - text: "À segunda fase — trono!"
+    next: act4/fight_morvayn_2
+    effects:
+      - { op: grantTemporaryBuff, attr: agi, delta: 1, remainingScenes: 2 }
+      - { op: addDiary, text: "Contei até o salão ficar pequeno — espaço é mentira quando sabes onde pisa." }
+onEnter: []
+---
+O número **fecha** um círculo: não és mais visitante — és **medida** dentro da sala.

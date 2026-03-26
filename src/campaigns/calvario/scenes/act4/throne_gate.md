@@ -12,6 +12,14 @@ choices:
     next: act4/throne_observe
   - text: "Negociar com o mercador à sombra das correntes"
     next: act4/late_merchant
+  - text: "Inspeção arcana — ler runas sem ceder ao trono"
+    next: act4/throne_arcane
+  - text: "Prova de nervos — o chão que mente"
+    next: act4/throne_nerves
+  - text: "Sondar correntes e gotejar"
+    next: act4/throne_chains
+  - text: "Ofício no salão: bênção, postura ou fórmula"
+    next: act4/throne_class_blessing
 onEnter: []
 ---
 O **Trono de Ossos** ergue-se como onda fossilizada — costelas de gigantes entrelaçadas, **correntes** vivas que range sem vento.

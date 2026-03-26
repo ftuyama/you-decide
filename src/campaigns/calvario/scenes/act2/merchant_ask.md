@@ -12,7 +12,7 @@ choices:
     effects:
       - { op: grantItem, itemId: rumor_map }
       - { op: addResource, resource: gold, delta: -1 }
-  - text: "Comprar adaga de ferro e empunhar na hora (−3 ouro)"
+  - text: "Comprar adaga de ferro (−3 ouro)"
     next: act2/hub_catacomb
     condition:
       all:
@@ -20,9 +20,8 @@ choices:
         - { noItem: iron_dagger }
     effects:
       - { op: grantItem, itemId: iron_dagger }
-      - { op: equipItem, itemId: iron_dagger }
       - { op: addResource, resource: gold, delta: -3 }
-    preview: "Arma · entra equipada"
+    preview: "Arma · para o inventário"
   - text: "Recusar e voltar ao hub"
     next: act2/hub_catacomb
 onEnter: []

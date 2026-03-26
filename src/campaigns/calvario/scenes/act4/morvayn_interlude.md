@@ -3,6 +3,8 @@ id: act4/morvayn_interlude
 chapter: 4
 title: Trégua mentirosa
 choices:
+  - text: "Fazer uma última varredura ao salão"
+    next: act4/throne_sweep
   - text: "Enterrar o medo na mente (+Mente, 3 cenas)"
     next: act4/fight_morvayn_2
     effects:

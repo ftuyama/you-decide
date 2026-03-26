@@ -15,6 +15,7 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 0,
     sprite: E.rat_swarm.sprite,
     spriteWounded: E.rat_swarm.spriteWounded,
+    attackStrategy: 'random',
     lootDrops: [
       { chance: 0.01, itemId: 'potion_hp' },
       { chance: 0.05, resource: 'gold', amount: 1 },
@@ -33,6 +34,7 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 0,
     sprite: E.skeleton.sprite,
     spriteWounded: E.skeleton.spriteWounded,
+    attackStrategy: 'random',
     lootDrops: [
       { chance: 0.05, itemId: 'iron_dagger' },
       { chance: 0.05, resource: 'gold', amount: 1 },
@@ -50,6 +52,7 @@ export const enemies: Record<string, EnemyDef> = {
     type: 'cultist',
     armorChips: 0,
     sprite: E.cultist.sprite,
+    attackStrategy: 'random',
     lootDrops: [{ chance: 0.05, resource: 'gold', amount: 1 }],
   },
   stone_guard: {
@@ -64,6 +67,7 @@ export const enemies: Record<string, EnemyDef> = {
     type: 'armored',
     armorChips: 3,
     sprite: E.stone_guard.sprite,
+    attackStrategy: 'random',
     lootDrops: [
       { chance: 0.25, resource: 'gold', amount: 1 },
       { chance: 0.25, resource: 'supply', amount: 1 },
@@ -82,6 +86,7 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 0,
     sprite: E.morvayn_p1.sprite,
     spriteWounded: E.morvayn_p1.spriteWounded,
+    attackStrategy: 'focus_leader',
     lootDrops: [
       { chance: 1, resource: 'gold', amount: 2 },
       { chance: 1, itemId: 'potion_mana' },
@@ -99,6 +104,7 @@ export const enemies: Record<string, EnemyDef> = {
     type: 'armored',
     armorChips: 2,
     sprite: E.morvayn_p2.sprite,
+    attackStrategy: 'focus_leader',
     lootDrops: [
       { chance: 1, resource: 'gold', amount: 2 },
       { chance: 1, itemId: 'potion_mana' },
@@ -117,6 +123,7 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 2,
     sprite: E.fallen_angel.sprite,
     spriteWounded: E.fallen_angel.spriteWounded,
+    attackStrategy: 'focus_leader',
     lootDrops: [
       { chance: 0.75, resource: 'supply', amount: 1 },
       { chance: 0.15, itemId: 'potion_hp' },
@@ -135,6 +142,7 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 1,
     sprite: E.vigil_hunter.sprite,
     spriteWounded: E.vigil_hunter.spriteWounded,
+    attackStrategy: 'random',
   },
   frost_whelp: {
     id: 'frost_whelp',
@@ -149,6 +157,7 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 0,
     sprite: E.frost_whelp.sprite,
     spriteWounded: E.frost_whelp.spriteWounded,
+    attackStrategy: 'random',
   },
   ice_dragon_p1: {
     id: 'ice_dragon_p1',
@@ -163,6 +172,7 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 2,
     sprite: E.ice_dragon_p1.sprite,
     spriteWounded: E.ice_dragon_p1.spriteWounded,
+    attackStrategy: 'focus_leader',
   },
   ice_dragon_p2: {
     id: 'ice_dragon_p2',
@@ -176,5 +186,6 @@ export const enemies: Record<string, EnemyDef> = {
     type: 'armored',
     armorChips: 3,
     sprite: E.ice_dragon_p2.sprite,
+    attackStrategy: 'focus_leader',
   },
 };

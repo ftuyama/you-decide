@@ -199,29 +199,48 @@ function applyOne(
       return { ...state, inventory: next };
     }
     case 'equipItem': {
-      const lead = state.party[0];
-      if (!lead) return state;
+      const idx = e.partyIndex ?? 0;
+      const target = state.party[idx];
+      if (!target) return state;
       const def = ctx.data.items[e.itemId];
       if (!def) return state;
       if (def.slot === 'consumable') return state;
       const inInv = state.inventory.includes(e.itemId);
       const alreadyEquipped =
-        lead.weaponId === e.itemId || lead.armorId === e.itemId || lead.relicId === e.itemId;
+        target.weaponId === e.itemId ||
+        target.armorId === e.itemId ||
+        target.relicId === e.itemId;
       if (!inInv && !alreadyEquipped) return state;
       const key =
         def.slot === 'weapon' ? 'weaponId' : def.slot === 'armor' ? 'armorId' : 'relicId';
-      if (lead[key] === e.itemId) return state;
+      if (target[key] === e.itemId) return state;
       let inv = [...state.inventory];
       if (inInv) {
         const ix = inv.indexOf(e.itemId);
         if (ix >= 0) inv = [...inv.slice(0, ix), ...inv.slice(ix + 1)];
       }
-      const prev = lead[key];
+      const prev = target[key];
       if (prev && prev !== e.itemId) inv = [...inv, prev];
       return {
         ...state,
         inventory: inv,
-        party: state.party.map((p, i) => (i === 0 ? { ...p, [key]: e.itemId } : p)),
+        party: state.party.map((p, i) => (i === idx ? { ...p, [key]: e.itemId } : p)),
+      };
+    }
+    case 'unequipSlot': {
+      const idx = e.partyIndex ?? 0;
+      const target = state.party[idx];
+      if (!target) return state;
+      const key =
+        e.slot === 'weapon' ? 'weaponId' : e.slot === 'armor' ? 'armorId' : 'relicId';
+      const prev = target[key];
+      if (!prev) return state;
+      let inv = [...state.inventory];
+      if (!inv.includes(prev)) inv = [...inv, prev];
+      return {
+        ...state,
+        inventory: inv,
+        party: state.party.map((p, i) => (i === idx ? { ...p, [key]: null } : p)),
       };
     }
     case 'goto':

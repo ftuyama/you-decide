@@ -3,18 +3,15 @@ id: act4/epilogue_modular
 title: Epílogo
 chapter: 4
 choices:
-  - text: "Partir para as Cimeiras do Vento Cinzento — caçar o rumor do gelo"
+  - text: "Partir para as Cimeiras do Vento Cinzento — seguir o rumor do gelo"
     next: act5/frost_opening
-    condition: { mark: pact_bound }
-    preview: "Capítulo 5. O culto não perdoa rivais nem altitude."
-  - text: "Apagar a luz desta memória e encerrar o diário"
-    next: act4/epilogue_close
+    preview: "Capítulo 5. Longe do trono, o frio ainda pergunta quem manda no silêncio."
 onEnter: []
 ---
 ## Epílogo
 
 Marcas: **{{corruption}}** de corrupção ecoam na carne.
 
-Diário final: o mundo continua — **menos** um necromante, ou **mais** um trono.
+O que ficou por baixo — **selo**, **pacto** ou **cadáver no trono** — não apaga o mapa: empurra-te para a **orla** do mundo, onde o vento ensaia nomes que ainda não são teus.
 
-Se o Terceiro Sino te **nomeou**, o frio longínquo pode ser o único sítio onde o som não te alcança — ou onde **aprendes** a tocá-lo de outra forma.
+Há um rumor que não pede testemunhas: nas **Cimeiras**, algo antigo respira geada como quem guarda a última palavra de uma guerra velha.

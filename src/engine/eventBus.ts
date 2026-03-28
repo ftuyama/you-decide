@@ -9,6 +9,7 @@ export type GameEvent =
   | { type: 'xp.gained'; amount: number }
   | { type: 'level.up'; level: number }
   | { type: 'item.acquired'; itemId: string }
+  | { type: 'camp.rest' }
   | {
       type: 'statusHighlight';
       variant: 'good' | 'bad' | 'neutral' | 'debuff';

@@ -187,6 +187,7 @@ function applyOne(
     }
     case 'campRest': {
       if (state.resources.supply < 1) return state;
+      bus.emit({ type: 'camp.rest' });
       const res = { ...state.resources, supply: state.resources.supply - 1 };
       const party = state.party.map((p) => ({
         ...p,

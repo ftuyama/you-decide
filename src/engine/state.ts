@@ -41,6 +41,7 @@ export function createInitialState(campaign: CampaignIndex, seed?: number): Game
     timedChoiceDeadline: null,
     lastCombatXpGain: null,
     lastCombatLevelUps: null,
+    lastCombatLootLines: null,
     activeBuffs: [],
   };
 }
@@ -150,7 +151,8 @@ export function syncLeadPassiveStats(state: GameState): GameState {
 }
 
 export function serializeState(state: GameState): string {
-  const { lastCombatXpGain: _x, lastCombatLevelUps: _l, ...rest } = state;
+  const { lastCombatXpGain: _x, lastCombatLevelUps: _l, lastCombatLootLines: _loot, ...rest } =
+    state;
   return JSON.stringify(rest);
 }
 
@@ -181,6 +183,7 @@ export function deserializeState(json: string): GameState {
     xp: typeof (o as GameState).xp === 'number' ? (o as GameState).xp : 0,
     lastCombatXpGain: null,
     lastCombatLevelUps: null,
+    lastCombatLootLines: null,
     activeBuffs: Array.isArray((o as GameState).activeBuffs) ? (o as GameState).activeBuffs : [],
     knownSpells: Array.isArray((o as GameState).knownSpells) ? (o as GameState).knownSpells : [],
     party: rawParty.map((p) => ({

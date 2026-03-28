@@ -245,6 +245,28 @@ export class GameAudio {
     this.playTone(880, 0.08, 0.04, 'sine');
   }
 
+  /** Descanso no acampamento — acorde suave (recuperação). */
+  playCampRest(): void {
+    const ctx = this.ensureContext();
+    const g = this.gain(0.08);
+    if (g <= 0) return;
+    const t0 = ctx.currentTime;
+    const freqs = [130.81, 261.63, 329.63, 392.0];
+    for (const f of freqs) {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = f;
+      gn.gain.setValueAtTime(0.001, t0);
+      gn.gain.exponentialRampToValueAtTime(g * (f < 200 ? 0.35 : 0.42), t0 + 0.06);
+      gn.gain.exponentialRampToValueAtTime(0.001, t0 + 0.52);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(t0);
+      o.stop(t0 + 0.55);
+    }
+  }
+
   /** Item novo no inventário (fanfarra curta em três notas). */
   playItemAcquire(): void {
     const ctx = this.ensureContext();

@@ -132,7 +132,9 @@ export class GameApp {
       if (this.state.mode === 'story') {
         if (!/^[1-9]$/.test(e.key)) return;
         const idx = parseInt(e.key, 10) - 1;
-        const btns = this.root.querySelectorAll<HTMLButtonElement>('.story-shell .choices .choice');
+        const btns = this.root.querySelectorAll<HTMLButtonElement>(
+          '.story-shell .skill-row .choice, .story-shell .choices .choice'
+        );
         const btn = btns[idx];
         if (!btn || btn.disabled) return;
         e.preventDefault();
@@ -171,6 +173,10 @@ export class GameApp {
         this.itemAcquireQueue.push(ev.itemId);
         this.unlockAudio();
         this.audio.playItemAcquire();
+      }
+      if (ev.type === 'camp.rest') {
+        this.unlockAudio();
+        this.audio.playCampRest();
       }
       if (ev.type === 'statusHighlight') {
         this.statusHighlightQueue.push(ev);
@@ -1109,11 +1115,16 @@ export class GameApp {
     frame.appendChild(bodyRow);
 
     this.root.appendChild(frame);
-    if (this.state.lastCombatXpGain != null || this.state.lastCombatLevelUps != null) {
+    if (
+      this.state.lastCombatXpGain != null ||
+      this.state.lastCombatLevelUps != null ||
+      this.state.lastCombatLootLines != null
+    ) {
       this.state = {
         ...this.state,
         lastCombatXpGain: null,
         lastCombatLevelUps: null,
+        lastCombatLootLines: null,
       };
     }
     this.syncAmbientTheme();
@@ -1366,17 +1377,36 @@ export class GameApp {
 
     const xpGain = this.state.lastCombatXpGain;
     const levelUps = this.state.lastCombatLevelUps;
-    if ((xpGain != null && xpGain > 0) || (levelUps != null && levelUps.length > 0)) {
+    const lootLines = this.state.lastCombatLootLines;
+    const hasLootLines = lootLines != null && lootLines.length > 0;
+    if (
+      (xpGain != null && xpGain > 0) ||
+      (levelUps != null && levelUps.length > 0) ||
+      hasLootLines
+    ) {
       const wrap = document.createElement('div');
       wrap.className =
         levelUps != null && levelUps.length > 0
           ? 'victory-progress-banner victory-progress-banner--level-up'
           : 'victory-progress-banner';
-      if (xpGain != null && xpGain > 0) {
-        const xpEl = document.createElement('div');
-        xpEl.className = 'victory-xp-line';
-        xpEl.textContent = `+${xpGain} XP ganhos nesta batalha.`;
-        wrap.appendChild(xpEl);
+      if ((xpGain != null && xpGain > 0) || hasLootLines) {
+        const rewardsWrap = document.createElement('div');
+        rewardsWrap.className = 'victory-combat-rewards';
+        if (xpGain != null && xpGain > 0) {
+          const xpEl = document.createElement('div');
+          xpEl.className = 'victory-xp-line';
+          xpEl.textContent = `+${xpGain} XP ganhos nesta batalha.`;
+          rewardsWrap.appendChild(xpEl);
+        }
+        if (hasLootLines) {
+          for (const line of lootLines) {
+            const lootEl = document.createElement('div');
+            lootEl.className = 'victory-loot-line';
+            lootEl.textContent = line;
+            rewardsWrap.appendChild(lootEl);
+          }
+        }
+        wrap.appendChild(rewardsWrap);
       }
       if (levelUps != null && levelUps.length > 0) {
         this.unlockAudio();
@@ -1440,18 +1470,24 @@ export class GameApp {
 
     this.appendCampEquipmentPanel(inner);
 
+    let storyNavIndex = 0;
+
     if (scene.frontmatter.skillCheck) {
+      storyNavIndex += 1;
       const row = document.createElement('div');
       row.className = 'skill-row';
       const b = document.createElement('button');
       b.className = 'choice';
-      b.textContent = `Rolar teste: ${scene.frontmatter.skillCheck.label ?? scene.frontmatter.skillCheck.attr} (2d6)`;
+      const base = `Rolar teste: ${scene.frontmatter.skillCheck.label ?? scene.frontmatter.skillCheck.attr} (2d6)`;
+      b.textContent = this.quickNavMode ? `${storyNavIndex} - ${base}` : base;
+      if (storyNavIndex < 10) b.title = `Tecla ${storyNavIndex}`;
       b.addEventListener('click', () => this.onSkillRoll(scene));
       row.appendChild(b);
       inner.appendChild(row);
     }
 
     if (scene.frontmatter.luckCheck) {
+      storyNavIndex += 1;
       const row = document.createElement('div');
       row.className = 'skill-row';
       const b = document.createElement('button');
@@ -1459,7 +1495,9 @@ export class GameApp {
       const lc = scene.frontmatter.luckCheck;
       const curse =
         lc.luckPenalty && lc.luckPenalty > 0 ? ` · maldição −${lc.luckPenalty}` : '';
-      b.textContent = `Rolar sorte: ${lc.label ?? '2d6 + mod(SOR)'} vs TN ${lc.tn}${curse}`;
+      const base = `Rolar sorte: ${lc.label ?? '2d6 + mod(SOR)'} vs TN ${lc.tn}${curse}`;
+      b.textContent = this.quickNavMode ? `${storyNavIndex} - ${base}` : base;
+      if (storyNavIndex < 10) b.title = `Tecla ${storyNavIndex}`;
       b.addEventListener('click', () => this.onLuckRoll(scene));
       row.appendChild(b);
       inner.appendChild(row);
@@ -1474,8 +1512,9 @@ export class GameApp {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'choice';
-      if (i < 9) btn.title = `Tecla ${i + 1}`;
-      const labelText = this.quickNavMode ? `${i + 1} - ${ch.text}` : ch.text;
+      const navNum = storyNavIndex + i + 1;
+      if (navNum < 10) btn.title = `Tecla ${navNum}`;
+      const labelText = this.quickNavMode ? `${navNum} - ${ch.text}` : ch.text;
       btn.appendChild(document.createTextNode(labelText));
       if (ch.preview) {
         const span = document.createElement('span');

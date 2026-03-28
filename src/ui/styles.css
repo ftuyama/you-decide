@@ -575,15 +575,31 @@ button.hamburger:hover {
   }
 }
 
-.victory-xp-line {
+.victory-combat-rewards {
   margin-bottom: 0.35rem;
+}
+
+.victory-xp-line {
+  margin-bottom: 0.25rem;
   font-size: 0.82rem;
   font-weight: 600;
   color: #c8d8a8;
   letter-spacing: 0.03em;
 }
 
-.victory-progress-banner--level-up .victory-xp-line {
+.victory-loot-line {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #d4c898;
+  letter-spacing: 0.03em;
+  line-height: 1.35;
+}
+
+.victory-loot-line + .victory-loot-line {
+  margin-top: 0.12rem;
+}
+
+.victory-progress-banner--level-up .victory-combat-rewards {
   margin-bottom: 0.55rem;
   padding-bottom: 0.45rem;
   border-bottom: 1px solid rgba(140, 160, 80, 0.35);

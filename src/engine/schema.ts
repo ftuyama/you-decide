@@ -581,6 +581,8 @@ export const GameStateSchema = z.object({
   lastCombatXpGain: z.number().int().min(0).nullable().default(null),
   /** Subidas de nível na última vitória (com deltas) — mostrado uma vez na narrativa (omitido no save). */
   lastCombatLevelUps: z.array(LevelUpStepSchema).nullable().default(null),
+  /** Linhas de loot da última vitória (texto UI) — mostrado uma vez na narrativa (omitido no save). */
+  lastCombatLootLines: z.array(z.string()).nullable().default(null),
   /** Bónus temporários (poções); decrementa ao mudar de cena */
   activeBuffs: z.array(TemporaryBuffSchema).default([]),
   /**

@@ -920,6 +920,7 @@ function finishCombatFaithRescue(
     extraLifeReady: extraLifeReadyFromFaith(resources.faith),
     lastCombatXpGain: null,
     lastCombatLevelUps: null,
+    lastCombatLootLines: null,
   };
   s = reducePartyStressAfterCombat(s);
   s = tickActiveBuffs({
@@ -956,7 +957,8 @@ function finishCombat(
     : pick(c.onDefeat, 'act4/game_over');
   let s = state;
   if (victory) {
-    s = applyEnemyLootOnVictory(s, c, data);
+    const { state: afterLoot, lootLines } = applyEnemyLootOnVictory(s, c, data);
+    s = afterLoot;
     let xpGain = 0;
     let lastCombatLevelUps: GameState['lastCombatLevelUps'] = null;
     const enc = data.encounters[c.encounterId];
@@ -972,10 +974,16 @@ function finishCombat(
       ...s,
       lastCombatXpGain: xpGain > 0 ? xpGain : null,
       lastCombatLevelUps,
+      lastCombatLootLines: lootLines.length > 0 ? lootLines : null,
     };
     bus?.emit({ type: 'combat.end', victory: true });
   } else {
-    s = { ...s, lastCombatXpGain: null, lastCombatLevelUps: null };
+    s = {
+      ...s,
+      lastCombatXpGain: null,
+      lastCombatLevelUps: null,
+      lastCombatLootLines: null,
+    };
     bus?.emit({ type: 'combat.end', victory: false });
   }
   s = reducePartyStressAfterCombat(s);
@@ -987,18 +995,48 @@ function finishCombat(
   });
 }
 
-function applyEnemyLootOnVictory(state: GameState, c: CombatState, data: GameData): GameState {
+function combatVictoryResourceLootLine(
+  resource: 'gold' | 'supply' | 'faith' | 'corruption',
+  amount: number
+): string {
+  const n = amount;
+  switch (resource) {
+    case 'gold':
+      return n === 1 ? '+1 ouro' : `+${n} ouro`;
+    case 'supply':
+      return n === 1 ? '+1 suprimento' : `+${n} suprimento`;
+    case 'faith':
+      return n === 1 ? '+1 fé' : `+${n} fé`;
+    case 'corruption':
+      return n === 1 ? '+1 corrupção' : `+${n} corrupção`;
+  }
+}
+
+function applyEnemyLootOnVictory(
+  state: GameState,
+  c: CombatState,
+  data: GameData
+): { state: GameState; lootLines: string[] } {
   let s = state;
+  const lootLines: string[] = [];
   const rng = mulberry32(state.rngSeed + c.round * 131 + c.enemies.length * 17);
   for (const inst of c.enemies) {
     const def = data.enemies[inst.defId];
     if (!def?.lootDrops?.length) continue;
     for (const drop of def.lootDrops) {
       if (rng() >= drop.chance) continue;
-      s = applySingleLootDrop(s, drop, data);
+      const next = applySingleLootDrop(s, drop, data);
+      if (next === s) continue;
+      s = next;
+      if ('itemId' in drop) {
+        const item = data.items[drop.itemId];
+        lootLines.push(item ? `+ ${item.name}` : `+ ${drop.itemId}`);
+      } else {
+        lootLines.push(combatVictoryResourceLootLine(drop.resource, drop.amount ?? 1));
+      }
     }
   }
-  return s;
+  return { state: s, lootLines };
 }
 
 function applySingleLootDrop(state: GameState, drop: EnemyLootDrop, data: GameData): GameState {
@@ -1223,6 +1261,7 @@ export function fleeCombat(state: GameState, bus?: EventBus): GameState {
     ...stateAfterStress,
     lastCombatXpGain: null,
     lastCombatLevelUps: null,
+    lastCombatLootLines: null,
     mode: 'story',
     combat: null,
     sceneId: c.onFlee ?? c.returnScene,

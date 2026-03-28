@@ -5,7 +5,7 @@ ambientTheme: merchant
 artKey: merchant
 title: Tenda do comerciante de geada
 choices:
-  - text: "Comprar Poção Rubra (5 ouro) — 1ª garrafa"
+  - text: "Comprar Poção Rubra (5 ouro) (x2)"
     next: act5/frost_merchant
     condition:
       all:
@@ -15,7 +15,7 @@ choices:
       - { op: addResource, resource: gold, delta: -5 }
       - { op: grantItem, itemId: potion_hp }
       - { op: setFlag, key: act5_merch_hp_1, value: true }
-  - text: "Comprar Poção Rubra (5 ouro) — última garrafa"
+  - text: "Comprar Poção Rubra (5 ouro) (x1)"
     next: act5/frost_merchant
     condition:
       all:
@@ -26,7 +26,7 @@ choices:
       - { op: addResource, resource: gold, delta: -5 }
       - { op: grantItem, itemId: potion_hp }
       - { op: setFlag, key: act5_merch_hp_2, value: true }
-  - text: "Comprar Tônico Azul (10 ouro) — única unidade"
+  - text: "Comprar Tônico Azul (10 ouro) (x1)"
     next: act5/frost_merchant
     condition:
       all:
@@ -36,7 +36,7 @@ choices:
       - { op: addResource, resource: gold, delta: -10 }
       - { op: grantItem, itemId: potion_mana }
       - { op: setFlag, key: act5_merch_mana_1, value: true }
-  - text: "Comprar Infusão Serena (4 ouro) — única unidade"
+  - text: "Comprar Infusão Serena (4 ouro) (x1)"
     next: act5/frost_merchant
     condition:
       all:
@@ -46,7 +46,7 @@ choices:
       - { op: addResource, resource: gold, delta: -4 }
       - { op: grantItem, itemId: potion_stress }
       - { op: setFlag, key: act5_merch_stress_1, value: true }
-  - text: "Comprar Suprimento (5 ouro) — única unidade"
+  - text: "Comprar Suprimento (5 ouro) (x1)"
     next: act5/frost_merchant
     condition:
       all:

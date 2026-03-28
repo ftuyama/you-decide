@@ -5,7 +5,7 @@ ambientTheme: merchant
 artKey: merchant
 title: Banca do último preço
 choices:
-  - text: "Comprar Poção Rubra (8 ouro) — 1ª garrafa"
+  - text: "Comprar Poção Rubra (8 ouro) (x2)"
     next: act6/fractured_merchant
     condition:
       all:
@@ -15,7 +15,7 @@ choices:
       - { op: addResource, resource: gold, delta: -5 }
       - { op: grantItem, itemId: potion_hp }
       - { op: setFlag, key: act6_merch_hp_1, value: true }
-  - text: "Comprar Poção Rubra (5 ouro) — última garrafa"
+  - text: "Comprar Poção Rubra (5 ouro) (x1)"
     next: act6/fractured_merchant
     condition:
       all:
@@ -26,7 +26,7 @@ choices:
       - { op: addResource, resource: gold, delta: -5 }
       - { op: grantItem, itemId: potion_hp }
       - { op: setFlag, key: act6_merch_hp_2, value: true }
-  - text: "Comprar Tônico Azul (7 ouro) — única unidade"
+  - text: "Comprar Tônico Azul (7 ouro) (x1)"
     next: act6/fractured_merchant
     condition:
       all:
@@ -36,7 +36,7 @@ choices:
       - { op: addResource, resource: gold, delta: -7 }
       - { op: grantItem, itemId: potion_mana }
       - { op: setFlag, key: act6_merch_mana_1, value: true }
-  - text: "Comprar Infusão Serena (6 ouro) — única unidade"
+  - text: "Comprar Infusão Serena (6 ouro) (x1)"
     next: act6/fractured_merchant
     condition:
       all:
@@ -46,7 +46,7 @@ choices:
       - { op: addResource, resource: gold, delta: -6 }
       - { op: grantItem, itemId: potion_stress }
       - { op: setFlag, key: act6_merch_stress_1, value: true }
-  - text: "Comprar Suprimento (5 ouro) — única unidade"
+  - text: "Comprar Suprimento (5 ouro) (x1)"
     next: act6/fractured_merchant
     condition:
       all:

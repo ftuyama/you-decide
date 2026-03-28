@@ -45,6 +45,15 @@ import gameVersionRaw from '../../VERSION?raw';
 
 const GAME_VERSION = gameVersionRaw.trim() || '?';
 
+/** Atalhos no combate: 1–9, depois letras (ordem QWERTY). */
+const COMBAT_QUICK_KEYS_AFTER_9 = 'qwertyuiopasdfghjklzxcvbnm';
+
+function combatQuickKeyAt(index: number): string | null {
+  if (index < 9) return String(index + 1);
+  const j = index - 9;
+  return j < COMBAT_QUICK_KEYS_AFTER_9.length ? COMBAT_QUICK_KEYS_AFTER_9[j]! : null;
+}
+
 export class GameApp {
   private readonly campaignId: string;
   private readonly saveKey: string;
@@ -120,20 +129,29 @@ export class GameApp {
         return;
       }
       if (this.pendingStoryDiceRoll) return;
-      if (!/^[1-9]$/.test(e.key)) return;
-      const idx = parseInt(e.key, 10) - 1;
-      const selector =
-        this.state.mode === 'story'
-          ? '.story-shell .choices .choice'
-          : this.state.mode === 'combat'
-            ? '.story-shell .combat-actions-panel button[data-quick-nav-combat]'
-            : '';
-      if (!selector) return;
-      const btns = this.root.querySelectorAll<HTMLButtonElement>(selector);
-      const btn = btns[idx];
-      if (!btn || btn.disabled) return;
-      e.preventDefault();
-      btn.click();
+      if (this.state.mode === 'story') {
+        if (!/^[1-9]$/.test(e.key)) return;
+        const idx = parseInt(e.key, 10) - 1;
+        const btns = this.root.querySelectorAll<HTMLButtonElement>('.story-shell .choices .choice');
+        const btn = btns[idx];
+        if (!btn || btn.disabled) return;
+        e.preventDefault();
+        btn.click();
+        return;
+      }
+      if (this.state.mode === 'combat') {
+        const k = e.key.length === 1 ? e.key.toLowerCase() : '';
+        const isDigit = /^[1-9]$/.test(e.key);
+        const isLetter = /^[a-z]$/.test(k);
+        if (!isDigit && !isLetter) return;
+        const targetKey = isDigit ? e.key : k;
+        const btn = this.root.querySelector<HTMLButtonElement>(
+          `.story-shell .combat-actions-panel button[data-quick-nav-combat="${targetKey}"]:not([disabled])`
+        );
+        if (!btn) return;
+        e.preventDefault();
+        btn.click();
+      }
     };
     document.addEventListener('keydown', this.choiceHotkeyHandler, true);
 
@@ -685,6 +703,7 @@ export class GameApp {
     const campEquipmentScenes = new Set([
       'act2/manage_equip',
       'act5/manage_equip',
+      'act6/manage_equip',
     ]);
     return campEquipmentScenes.has(this.state.sceneId);
   }
@@ -1585,14 +1604,15 @@ export class GameApp {
     let combatQuickNavIndex = 0;
     const decorateCombatQuickNav = (
       btn: HTMLButtonElement,
-      setLabel: (n: number, quickLabel: boolean) => void
+      setLabel: (key: string | null, quickLabel: boolean) => void
     ): void => {
-      if (combatQuickNavIndex >= 9) return;
-      const n = combatQuickNavIndex + 1;
-      btn.dataset.quickNavCombat = String(n);
-      btn.title = `Tecla ${n}`;
-      setLabel(n, this.quickNavMode);
+      const key = combatQuickKeyAt(combatQuickNavIndex);
       combatQuickNavIndex += 1;
+      if (key != null) {
+        btn.dataset.quickNavCombat = key;
+        btn.title = `Tecla ${key}`;
+      }
+      setLabel(key, this.quickNavMode);
     };
 
     if (c.phase === 'choose_stance' && lead) {
@@ -1614,8 +1634,8 @@ export class GameApp {
       for (const st of stances) {
         const btn = document.createElement('button');
         btn.className = 'stance';
-        decorateCombatQuickNav(btn, (n, quickLabel) => {
-          btn.textContent = quickLabel ? `${n} - ${labels[st]}` : labels[st];
+        decorateCombatQuickNav(btn, (key, quickLabel) => {
+          btn.textContent = quickLabel && key != null ? `${key} - ${labels[st]}` : labels[st];
         });
         btn.addEventListener('click', () => {
           this.unlockAudio();
@@ -1632,10 +1652,10 @@ export class GameApp {
       if (canSacrificeChoice) {
         const sacrifice = document.createElement('button');
         sacrifice.className = 'stance special';
-        decorateCombatQuickNav(sacrifice, (n, quickLabel) => {
+        decorateCombatQuickNav(sacrifice, (key, quickLabel) => {
           const corr = this.state.resources.corruption;
           const base = `Selo do Vazio (Corr ${corr})`;
-          sacrifice.textContent = quickLabel ? `${n} - ${base}` : base;
+          sacrifice.textContent = quickLabel && key != null ? `${key} - ${base}` : base;
         });
         sacrifice.disabled = lead.hp <= 1;
         sacrifice.addEventListener('click', () => {
@@ -1651,9 +1671,9 @@ export class GameApp {
       }
       const sp = document.createElement('button');
       sp.className = 'stance special';
-      decorateCombatQuickNav(sp, (n, quickLabel) => {
+      decorateCombatQuickNav(sp, (key, quickLabel) => {
         const base = lead.specialUsedThisCombat ? 'Especial já usado' : 'Golpe especial (+2, +Stress)';
-        sp.textContent = quickLabel ? `${n} - ${base}` : base;
+        sp.textContent = quickLabel && key != null ? `${key} - ${base}` : base;
       });
       sp.disabled = lead.specialUsedThisCombat;
       sp.addEventListener('click', () => {
@@ -1684,10 +1704,11 @@ export class GameApp {
           const btn = document.createElement('button');
           btn.className = 'combat-spell';
           btn.type = 'button';
-          decorateCombatQuickNav(btn, (n, quickLabel) => {
-            const name = quickLabel
-              ? `${n} - ${spellDef.name} (${spellDef.manaCost})`
-              : `${spellDef.name} (${spellDef.manaCost})`;
+          decorateCombatQuickNav(btn, (key, quickLabel) => {
+            const name =
+              quickLabel && key != null
+                ? `${key} - ${spellDef.name} (${spellDef.manaCost})`
+                : `${spellDef.name} (${spellDef.manaCost})`;
             btn.innerHTML = `<span class="spell-emoji" aria-hidden="true">${spellEmoji(spellId, spellDef)}</span><span>${escHtml(name)}</span>`;
           });
           const castOk = canCastSpell(this.state, spellId, this.registry.data);
@@ -1724,9 +1745,9 @@ export class GameApp {
           const btn = document.createElement('button');
           btn.className = 'combat-potion';
           btn.type = 'button';
-          decorateCombatQuickNav(btn, (n, quickLabel) => {
+          decorateCombatQuickNav(btn, (key, quickLabel) => {
             const base = count > 1 ? `${def.name} (${count})` : def.name;
-            btn.textContent = quickLabel ? `${n} - ${base}` : base;
+            btn.textContent = quickLabel && key != null ? `${key} - ${base}` : base;
           });
           const ok = canUseCombatConsumable(this.state, itemId, this.registry.data);
           btn.disabled = !ok;
@@ -1747,8 +1768,8 @@ export class GameApp {
 
     const flee = document.createElement('button');
     flee.className = 'combat-flee-btn';
-    decorateCombatQuickNav(flee, (n, quickLabel) => {
-      flee.textContent = quickLabel ? `${n} - Tentar fugir` : 'Tentar fugir';
+    decorateCombatQuickNav(flee, (key, quickLabel) => {
+      flee.textContent = quickLabel && key != null ? `${key} - Tentar fugir` : 'Tentar fugir';
     });
     flee.addEventListener('click', () => {
       this.unlockAudio();

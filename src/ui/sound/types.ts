@@ -1,1 +1,9 @@
-export type AmbientTheme = 'explore' | 'combat' | 'camp' | 'boss' | 'act5' | 'merchant' | 'void';
+export type AmbientTheme =
+  | 'explore'
+  | 'combat'
+  | 'camp'
+  | 'boss'
+  | 'act3'
+  | 'act5'
+  | 'merchant'
+  | 'void';

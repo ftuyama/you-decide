@@ -2,7 +2,7 @@
 id: act3/stone_rune_trial
 title: Pulso das Runas
 chapter: 3
-ambientTheme: explore
+ambientTheme: act3
 artKey: rune_resonance
 skillCheck:
   id: stone_rune_resonance

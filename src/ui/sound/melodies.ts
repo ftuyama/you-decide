@@ -61,3 +61,15 @@ export const VOID_DRONE_MELODY: number[] = [
   123.47, // B2
   92.5, // F#2
 ];
+
+/** Ato 3 (profundezas): linha descendente com 2ª menor — tensão sem perder clareza melódica. */
+export const ACT3_DEPTH_MELODY: number[] = [
+  311.13, // D#4
+  293.66, // D4
+  277.18, // C#4
+  261.63, // C4
+  233.08, // Bb3 (cor frígia)
+  246.94, // B3
+  277.18, // C#4
+  293.66, // D4
+];

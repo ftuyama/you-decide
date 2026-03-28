@@ -2,7 +2,7 @@
 id: act3/stone_guard_victory
 title: O Guardião Cede
 chapter: 3
-ambientTheme: explore
+ambientTheme: act3
 artKey: stone_guard_fallen
 onEnter:
   - { op: setFlag, key: stone_guard_defeated, value: true }

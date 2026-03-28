@@ -1,4 +1,5 @@
 import {
+  ACT3_DEPTH_MELODY,
   ACT5_ICE_MELODY,
   BOSS_LEAD_MELODY,
   CAMP_MELODY,
@@ -15,8 +16,11 @@ import type { AmbientTheme } from './types.ts';
  */
 export class GameAudio {
   private readonly storageMuteKey: string;
+  private readonly storageVolumeKey: string;
   private ctx: AudioContext | null = null;
   private muted = false;
+  /** 0–1, aplicado a todos os ganhos (música ambiente + efeitos). */
+  private volume = 1;
   private bgCleanup: (() => void) | null = null;
   private bgPulseTimer: ReturnType<typeof setInterval> | null = null;
   private bgRhythmTimer: ReturnType<typeof setInterval> | null = null;
@@ -24,8 +28,20 @@ export class GameAudio {
 
   constructor(campaignId: string) {
     this.storageMuteKey = `${campaignId}_sound_muted`;
+    this.storageVolumeKey = `${campaignId}_sound_volume`;
     try {
       this.muted = localStorage.getItem(this.storageMuteKey) === '1';
+    } catch {
+      /* noop */
+    }
+    try {
+      const raw = localStorage.getItem(this.storageVolumeKey);
+      if (raw != null) {
+        const n = Number.parseFloat(raw);
+        if (Number.isFinite(n)) {
+          this.volume = Math.min(1, Math.max(0, n));
+        }
+      }
     } catch {
       /* noop */
     }
@@ -33,6 +49,21 @@ export class GameAudio {
 
   isMuted(): boolean {
     return this.muted;
+  }
+
+  /** Volume linear 0–1 (persistido em `localStorage`). */
+  getVolume(): number {
+    return this.volume;
+  }
+
+  setVolume(v: number): void {
+    const n = Math.min(1, Math.max(0, v));
+    this.volume = n;
+    try {
+      localStorage.setItem(this.storageVolumeKey, String(n));
+    } catch {
+      /* noop */
+    }
   }
 
   setMuted(m: boolean): void {
@@ -90,6 +121,9 @@ export class GameAudio {
       case 'boss':
         this.playAmbientBoss();
         break;
+      case 'act3':
+        this.playAmbientAct3Depths();
+        break;
       case 'act5':
         this.playAmbientAct5Ice();
         break;
@@ -107,7 +141,7 @@ export class GameAudio {
   }
 
   private gain(base: number): number {
-    return this.muted ? 0 : base;
+    return this.muted ? 0 : base * this.volume;
   }
 
   private stopAmbientInternal(): void {
@@ -234,7 +268,7 @@ export class GameAudio {
   /** Milagre de fé — arpejo suave, tom “angelical” (Web Audio). */
   playFaithMiracle(): void {
     const ctx = this.ensureContext();
-    const g = this.gain(0.09);
+    const g = this.gain(0.15);
     if (g <= 0) return;
     const t0 = ctx.currentTime;
     const notes = [
@@ -274,7 +308,7 @@ export class GameAudio {
 
   playVictory(): void {
     const ctx = this.ensureContext();
-    const g = this.gain(0.08);
+    const g = this.gain(0.15);
     if (g <= 0) return;
     [523, 659, 784].forEach((freq, i) => {
       const o = ctx.createOscillator();
@@ -293,7 +327,7 @@ export class GameAudio {
   /** Fanfarra curta ao subir de nível (após vitória). */
   playLevelUpCelebration(): void {
     const ctx = this.ensureContext();
-    const g = this.gain(0.1);
+    const g = this.gain(0.15);
     if (g <= 0) return;
     const t0 = ctx.currentTime;
     const notes = [
@@ -337,7 +371,7 @@ export class GameAudio {
    */
   playDefeat(): void {
     const ctx = this.ensureContext();
-    const g = this.gain(0.08);
+    const g = this.gain(0.15);
     if (g <= 0) return;
     [392, 349, 311, 277].forEach((freq, i) => {
       const o = ctx.createOscillator();
@@ -354,6 +388,95 @@ export class GameAudio {
   }
 
   /**
+   * Ato 3 (profundezas): drones mais graves, pulso um pouco mais rápido, melodia com tensão frígia.
+   */
+  private playAmbientAct3Depths(): void {
+    if (this.muted || this.bgCleanup) return;
+    const ctx = this.ensureContext();
+
+    const master = ctx.createGain();
+    master.gain.value = this.gain(0.237);
+
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -28;
+    comp.knee.value = 12;
+    comp.ratio.value = 4;
+    comp.attack.value = 0.003;
+    comp.release.value = 0.22;
+    master.connect(comp);
+    comp.connect(ctx.destination);
+
+    const layers: { freq: number; level: number; type: OscillatorType }[] = [
+      { freq: 51.91, level: 0.473, type: 'sine' }, // G#1
+      { freq: 103.83, level: 0.4, type: 'sine' },
+      { freq: 123.47, level: 0.328, type: 'triangle' }, // B2
+      { freq: 155.56, level: 0.291, type: 'sine' }, // D#3
+      { freq: 164.81, level: 0.182, type: 'triangle' }, // 2ª com D# — zumbido tenso
+      { freq: 207.65, level: 0.127, type: 'triangle' },
+    ];
+
+    const oscillators: OscillatorNode[] = [];
+    for (const { freq, level, type } of layers) {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      o.detune.value = (Math.random() - 0.5) * 14;
+      g.gain.value = level;
+      o.connect(g);
+      g.connect(master);
+      o.start();
+      oscillators.push(o);
+    }
+
+    let t = 0;
+    this.bgPulseTimer = setInterval(() => {
+      if (this.muted || !this.ctx) return;
+      t += 0.042;
+      const breathe = 0.273 + Math.sin(t) * 0.141 + Math.sin(t * 0.41) * 0.113;
+      try {
+        master.gain.setTargetAtTime(this.gain(breathe), this.ctx.currentTime, 0.42);
+      } catch {
+        /* noop */
+      }
+    }, 300);
+
+    let melodyStep = 0;
+    this.bgRhythmTimer = setInterval(() => {
+      if (this.muted || !this.ctx) return;
+      const note = ACT3_DEPTH_MELODY[melodyStep % ACT3_DEPTH_MELODY.length];
+      melodyStep++;
+      const when = this.ctx.currentTime + 0.02;
+      triggerPluck(ctx, master, when, note, this.gain(0.182), 'triangle', 1.65);
+      triggerPluck(ctx, master, when + 0.04, note * 0.5, this.gain(0.101), 'sine', 2.0);
+    }, 1180);
+
+    this.bgCleanup = () => {
+      if (this.bgPulseTimer) {
+        clearInterval(this.bgPulseTimer);
+        this.bgPulseTimer = null;
+      }
+      if (this.bgRhythmTimer) {
+        clearInterval(this.bgRhythmTimer);
+        this.bgRhythmTimer = null;
+      }
+      for (const o of oscillators) {
+        try {
+          o.stop();
+        } catch {
+          /* noop */
+        }
+      }
+      try {
+        master.disconnect();
+        comp.disconnect();
+      } catch {
+        /* noop */
+      }
+    };
+  }
+
+  /**
    * Exploração: pad em lá menor com pulsação lenta + piano discreto.
    */
   private playAmbientExplore(): void {
@@ -361,7 +484,7 @@ export class GameAudio {
     const ctx = this.ensureContext();
 
     const master = ctx.createGain();
-    master.gain.value = this.gain(0.14);
+    master.gain.value = this.gain(0.24);
 
     const comp = ctx.createDynamicsCompressor();
     comp.threshold.value = -28;
@@ -447,7 +570,7 @@ export class GameAudio {
     if (this.muted || this.bgCleanup) return;
     const ctx = this.ensureContext();
     const master = ctx.createGain();
-    master.gain.value = this.gain(0.12);
+    master.gain.value = this.gain(0.22);
     master.connect(ctx.destination);
 
     const bass = ctx.createOscillator();
@@ -502,7 +625,7 @@ export class GameAudio {
     if (this.muted || this.bgCleanup) return;
     const ctx = this.ensureContext();
     const master = ctx.createGain();
-    master.gain.value = this.gain(0.12);
+    master.gain.value = this.gain(0.42);
     const comp = ctx.createDynamicsCompressor();
     comp.threshold.value = -28;
     master.connect(comp);
@@ -583,7 +706,7 @@ export class GameAudio {
     if (this.muted || this.bgCleanup) return;
     const ctx = this.ensureContext();
     const master = ctx.createGain();
-    master.gain.value = this.gain(0.12);
+    master.gain.value = this.gain(0.15);
 
     const comp = ctx.createDynamicsCompressor();
     comp.threshold.value = -24;
@@ -601,7 +724,7 @@ export class GameAudio {
       o.type = 'sawtooth';
       o.frequency.value = freq;
       o.detune.value = (Math.random() - 0.5) * 8;
-      g.gain.value = freq === 55 ? 0.18 : 0.12;
+      g.gain.value = freq === 55 ? 0.12 : 0.1;
       o.connect(g);
       g.connect(master);
       o.start();
@@ -627,12 +750,12 @@ export class GameAudio {
       }
 
       const bassFreq = bassPattern[step % bassPattern.length];
-      triggerPluck(ctx, master, tNow, bassFreq, this.gain(0.15), 'sawtooth', 0.22);
+      triggerPluck(ctx, master, tNow, bassFreq, this.gain(0.15), 'sawtooth', 0.12);
 
       if (s % 4 === 0) {
         const note = BOSS_LEAD_MELODY[(step / 4) % BOSS_LEAD_MELODY.length];
-        triggerPluck(ctx, master, tNow + 0.01, note, this.gain(0.18), 'triangle', 0.5);
-        triggerPluck(ctx, master, tNow + 0.08, note * 1.5, this.gain(0.142), 'triangle', 0.35);
+        triggerPluck(ctx, master, tNow + 0.01, note, this.gain(0.16), 'triangle', 0.5);
+        triggerPluck(ctx, master, tNow + 0.08, note * 1.5, this.gain(0.132), 'triangle', 0.35);
       }
       step++;
     }, eighth);
@@ -665,7 +788,7 @@ export class GameAudio {
     if (this.muted || this.bgCleanup) return;
     const ctx = this.ensureContext();
     const master = ctx.createGain();
-    master.gain.value = this.gain(0.1);
+    master.gain.value = this.gain(0.2);
     const comp = ctx.createDynamicsCompressor();
     comp.threshold.value = -30;
     comp.knee.value = 10;
@@ -817,24 +940,34 @@ export class GameAudio {
   }
 
   /**
-   * Void: atmosfera irreal e ameaçadora, sem batida definida.
+   * Void: drone baixo num bus; linha melódica noutro (ganho estável) para não ficar soterrada.
+   * A melodia usa oitava acima — graves puros somam pouco em altifalantes pequenos.
    */
   private playAmbientVoid(): void {
     if (this.muted || this.bgCleanup) return;
     const ctx = this.ensureContext();
-    const master = ctx.createGain();
-    master.gain.value = this.gain(0.25);
+    const voidDroneMul = 1.7;
+    const voidMelodyMul = 1.4;
+    const droneBus = ctx.createGain();
+    droneBus.gain.value = this.gain(0.15 * voidDroneMul);
+    const melodyBus = ctx.createGain();
+    melodyBus.gain.value = this.gain(0.22 * voidMelodyMul);
     const comp = ctx.createDynamicsCompressor();
-    comp.threshold.value = -32;
-    comp.knee.value = 8;
-    comp.ratio.value = 2.8;
-    master.connect(comp);
+    comp.threshold.value = -28;
+    comp.knee.value = 10;
+    comp.ratio.value = 3.2;
+    comp.attack.value = 0.003;
+    comp.release.value = 0.28;
+    droneBus.connect(comp);
+    melodyBus.connect(comp);
     comp.connect(ctx.destination);
 
     const layers: { freq: number; level: number; type: OscillatorType }[] = [
-      { freq: 46.25, level: 0.42, type: 'sine' },
-      { freq: 69.3, level: 0.36, type: 'triangle' },
-      { freq: 92.5, level: 0.31, type: 'sine' },
+      { freq: 55, level: 0.2, type: 'sine' },
+      { freq: 110, level: 0.18, type: 'sine' },
+      { freq: 146.83, level: 0.13, type: 'triangle' },
+      { freq: 174.61, level: 0.1, type: 'sine' },
+      { freq: 123.47, level: 0.07, type: 'triangle' },
     ];
 
     const oscillators: OscillatorNode[] = [];
@@ -844,10 +977,10 @@ export class GameAudio {
       const g = ctx.createGain();
       o.type = type;
       o.frequency.value = freq;
-      o.detune.value = (Math.random() - 0.5) * 18;
+      o.detune.value = (Math.random() - 0.5) * 10;
       g.gain.value = level;
       o.connect(g);
-      g.connect(master);
+      g.connect(droneBus);
       o.start();
       oscillators.push(o);
       gains.push(g);
@@ -856,31 +989,31 @@ export class GameAudio {
     let t = 0;
     this.bgPulseTimer = setInterval(() => {
       if (this.muted || !this.ctx) return;
-      t += 0.025;
+      t += 0.026;
       try {
-        master.gain.setTargetAtTime(
-          this.gain(0.26 + Math.sin(t * 0.31) * 0.22 + Math.sin(t * 0.09) * 0.21),
-          this.ctx.currentTime,
-          0.9
-        );
+        const breathe =
+          (0.43 + Math.sin(t * 0.19) * 0.328 + Math.sin(t * 0.06) * 0.318) * voidDroneMul;
+        droneBus.gain.setTargetAtTime(this.gain(breathe), this.ctx.currentTime, 0.7);
         for (let i = 0; i < gains.length; i++) {
-          const mod = 0.56 + Math.sin(t * (0.5 + i * 0.18)) * 0.4;
-          gains[i]!.gain.setTargetAtTime(mod * (layers[i]!.level), this.ctx.currentTime, 1.1);
+          const mod = 0.82 + Math.sin(t * (0.11 + i * 0.06)) * 0.32;
+          gains[i]!.gain.setTargetAtTime(mod * layers[i]!.level, this.ctx.currentTime, 0.85);
+          oscillators[i]!.detune.setTargetAtTime(Math.sin(t * 0.12 + i * 0.9) * 6, this.ctx.currentTime, 0.75);
         }
       } catch {
         /* noop */
       }
-    }, 500);
+    }, 400);
 
     let melodyStep = 0;
     this.bgRhythmTimer = setInterval(() => {
       if (this.muted || !this.ctx) return;
       const note = VOID_DRONE_MELODY[melodyStep % VOID_DRONE_MELODY.length]!;
       melodyStep++;
-      const when = this.ctx.currentTime + 0.03;
-      triggerPluck(ctx, master, when, note, this.gain(0.354), 'sine', 1.8);
-      triggerPluck(ctx, master, when + 0.11, note * 0.5, this.gain(0.459), 'triangle', 1.5);
-    }, 2100);
+      const when = this.ctx.currentTime + 0.02;
+      const lead = note * 2;
+      triggerPluck(ctx, melodyBus, when, lead, this.gain(0.29), 'triangle', 2.5);
+      triggerPluck(ctx, melodyBus, when + 0.19, lead * 0.5, this.gain(0.18), 'sine', 2.2);
+    }, 2600);
 
     this.bgCleanup = () => {
       if (this.bgPulseTimer) {
@@ -899,7 +1032,8 @@ export class GameAudio {
         }
       }
       try {
-        master.disconnect();
+        droneBus.disconnect();
+        melodyBus.disconnect();
         comp.disconnect();
       } catch {
         /* noop */

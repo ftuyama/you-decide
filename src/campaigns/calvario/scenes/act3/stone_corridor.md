@@ -2,7 +2,7 @@
 id: act3/stone_corridor
 title: Corredor das Runas
 chapter: 3
-ambientTheme: explore
+ambientTheme: act3
 artKey: stone_corridor
 choices:
   - text: "Despertar o guardião"

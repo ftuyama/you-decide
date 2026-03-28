@@ -2,7 +2,7 @@
 id: act3/stone_niche_loot
 title: Nicho Votivo
 chapter: 3
-ambientTheme: explore
+ambientTheme: act3
 artKey: votive_niche
 onEnter:
   - { op: addResource, resource: gold, delta: 8 }

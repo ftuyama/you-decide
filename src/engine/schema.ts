@@ -267,7 +267,7 @@ export const SceneFrontmatterSchema = z.object({
   chapter: z.number().int().min(1).default(1),
   type: z.enum(['story', 'hub', 'combat_intro']).default('story'),
   /** Tema ambiente da cena (música/ambiente no UI). */
-  ambientTheme: z.enum(['explore', 'combat', 'camp', 'boss', 'act5', 'merchant', 'void']).optional(),
+  ambientTheme: z.enum(['explore', 'combat', 'camp', 'boss', 'act3', 'act5', 'merchant', 'void']).optional(),
   /** Efeitos ao entrar na cena (após primeira renderização; idempotência por visit) */
   onEnter: z.array(EffectSchema).default([]),
   choices: z.array(ChoiceSchema).default([]),

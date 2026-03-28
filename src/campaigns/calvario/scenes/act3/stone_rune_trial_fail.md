@@ -2,7 +2,7 @@
 id: act3/stone_rune_trial_fail
 title: Eco nos Ossos
 chapter: 3
-ambientTheme: explore
+ambientTheme: act3
 artKey: rune_resonance
 onEnter:
   - { op: grantTemporaryBuff, attr: agi, delta: -1, remainingScenes: 2 }

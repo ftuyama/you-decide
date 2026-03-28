@@ -98,11 +98,28 @@ export class GameApp {
     this.quickNavMode = this.loadQuickNavMode();
     this.devMode = this.loadDevMode();
     this.choiceHotkeyHandler = (e: KeyboardEvent): void => {
-      if (this.pendingStoryDiceRoll) return;
       const el = e.target;
       if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || el instanceof HTMLSelectElement) {
         return;
       }
+      if (e.key === ' ') {
+        let btn: HTMLButtonElement | null = null;
+        if (this.pendingStoryDiceRoll) {
+          btn = this.root.querySelector<HTMLButtonElement>(
+            '.story-dice-banner button[data-quick-nav-continue]:not([disabled])'
+          );
+        } else {
+          btn = this.root.querySelector<HTMLButtonElement>(
+            '.story-shell button[data-quick-nav-continue]:not([disabled])'
+          );
+        }
+        if (btn) {
+          e.preventDefault();
+          btn.click();
+        }
+        return;
+      }
+      if (this.pendingStoryDiceRoll) return;
       if (!/^[1-9]$/.test(e.key)) return;
       const idx = parseInt(e.key, 10) - 1;
       const selector =
@@ -294,13 +311,15 @@ export class GameApp {
   }
 
   private loadSidebarSections(): Record<string, boolean> {
+    const defaults: Record<string, boolean> = { recursos: true };
     try {
       const raw = sessionStorage.getItem(this.sidebarKey);
-      if (!raw) return {};
+      if (!raw) return { ...defaults };
       const o = JSON.parse(raw) as unknown;
-      return typeof o === 'object' && o !== null ? (o as Record<string, boolean>) : {};
+      if (typeof o !== 'object' || o === null) return { ...defaults };
+      return { ...defaults, ...(o as Record<string, boolean>) };
     } catch {
-      return {};
+      return { ...defaults };
     }
   }
 
@@ -333,7 +352,7 @@ export class GameApp {
     this.audio.setAmbientTheme(this.resolveAmbientTheme());
   }
 
-  /** Paleta CSS (`html[data-theme]`) — ato 5 neve / ato 6 vazio. */
+  /** Paleta CSS (`html[data-theme]`) — ato 5 neve (escuro frio) / ato 6 vazio. */
   private resolveVisualTheme(): 'snow' | 'void' | null {
     if (this.state.chapter === 6 || this.state.sceneId.startsWith('act6/')) return 'void';
     if (this.state.chapter === 5 || this.state.sceneId.startsWith('act5/')) return 'snow';
@@ -422,25 +441,25 @@ export class GameApp {
     }
   }
 
-  private appendStoryDiceRollOverlay(frame: HTMLElement): void {
+  /** Banner no topo da história (como penalidade / item adquirido), não overlay em ecrã inteiro. */
+  private appendStoryDiceRollBanner(inner: HTMLElement): void {
     const pending = this.pendingStoryDiceRoll;
     if (!pending) return;
     const { nextState, breakdown } = pending;
 
-    const backdrop = document.createElement('div');
-    backdrop.className = 'story-dice-overlay-backdrop';
+    const wrap = document.createElement('div');
+    wrap.className = 'story-dice-banner';
 
     const panel = document.createElement('div');
-    panel.className = 'story-dice-overlay-panel';
-    panel.setAttribute('role', 'dialog');
-    panel.setAttribute('aria-modal', 'true');
+    panel.className = 'story-dice-banner-panel';
+    panel.setAttribute('role', 'region');
     panel.setAttribute(
       'aria-label',
       breakdown.kind === 'skill' ? 'Resultado do teste de perícia' : 'Resultado do teste de sorte'
     );
 
     const kicker = document.createElement('div');
-    kicker.className = 'story-dice-overlay-kicker';
+    kicker.className = 'story-dice-banner-kicker';
     kicker.textContent =
       breakdown.kind === 'skill'
         ? `Teste de perícia (${breakdown.attr.toUpperCase()})`
@@ -461,13 +480,15 @@ export class GameApp {
 
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'story-dice-overlay-dismiss';
-    btn.textContent = 'Continuar';
+    btn.className = 'story-dice-banner-dismiss';
+    btn.dataset.quickNavContinue = '';
+    btn.title = 'Barra de espaço';
+    btn.textContent = this.quickNavMode ? '[Espaço] — Continuar' : 'Continuar';
     btn.disabled = true;
     panel.appendChild(btn);
 
-    backdrop.appendChild(panel);
-    frame.appendChild(backdrop);
+    wrap.appendChild(panel);
+    inner.appendChild(wrap);
 
     const dismiss = (): void => {
       this.clearDiceRollTimers();
@@ -481,7 +502,7 @@ export class GameApp {
       pre.textContent = formatDiceAscii([breakdown.d1, breakdown.d2]);
       pre.classList.remove('story-dice-pre--rolling');
       panel.classList.add(
-        breakdown.success ? 'story-dice-overlay-panel--success' : 'story-dice-overlay-panel--fail'
+        breakdown.success ? 'story-dice-banner-panel--success' : 'story-dice-banner-panel--fail'
       );
       if (breakdown.success) this.audio.playCheckSuccess();
       else this.audio.playCheckFail();
@@ -576,14 +597,22 @@ export class GameApp {
 
   private closeMenu(): void {
     this.menuOpen = false;
+    this.syncMenuScrollLock();
     const drawer = this.root.querySelector('.menu-drawer');
     const backdrop = this.root.querySelector('.menu-backdrop');
     drawer?.classList.remove('open');
     backdrop?.classList.remove('open');
   }
 
+  private syncMenuScrollLock(): void {
+    const lock = this.menuOpen;
+    document.body.style.overflow = lock ? 'hidden' : '';
+    document.documentElement.style.overflow = lock ? 'hidden' : '';
+  }
+
   private toggleMenu(): void {
     this.menuOpen = !this.menuOpen;
+    this.syncMenuScrollLock();
     const drawer = this.root.querySelector('.menu-drawer');
     const backdrop = this.root.querySelector('.menu-backdrop');
     if (this.menuOpen) {
@@ -833,6 +862,8 @@ export class GameApp {
     const drawer = document.createElement('aside');
     drawer.className = 'menu-drawer';
     drawer.setAttribute('aria-hidden', 'true');
+    const drawerScroll = document.createElement('div');
+    drawerScroll.className = 'menu-drawer-scroll';
     const createMenuSection = (titleText: string): HTMLDivElement => {
       const section = document.createElement('section');
       section.className = 'menu-section';
@@ -843,7 +874,7 @@ export class GameApp {
       body.className = 'menu-section-body';
       section.appendChild(titleEl);
       section.appendChild(body);
-      drawer.appendChild(section);
+      drawerScroll.appendChild(section);
       return body;
     };
 
@@ -874,6 +905,38 @@ export class GameApp {
     });
     soundRow.appendChild(soundCb);
     soundRow.appendChild(document.createTextNode(' Som ligado'));
+
+    const volumeRow = document.createElement('div');
+    volumeRow.className = 'menu-item menu-volume';
+    const volumeLabelRow = document.createElement('div');
+    volumeLabelRow.className = 'menu-volume-label';
+    const volumeLabel = document.createElement('label');
+    volumeLabel.htmlFor = 'menu-volume-range';
+    volumeLabel.textContent = 'Volume';
+    const volumeValue = document.createElement('span');
+    volumeValue.className = 'menu-volume-value';
+    const volumeRange = document.createElement('input');
+    volumeRange.type = 'range';
+    volumeRange.min = '0';
+    volumeRange.max = '100';
+    volumeRange.step = '1';
+    volumeRange.id = 'menu-volume-range';
+    const syncVolumeUi = (): void => {
+      const pct = Math.round(this.audio.getVolume() * 100);
+      volumeRange.value = String(pct);
+      volumeValue.textContent = `${pct}%`;
+      volumeRange.setAttribute('aria-valuetext', `${pct}%`);
+    };
+    syncVolumeUi();
+    volumeRange.addEventListener('input', () => {
+      this.audio.setVolume(Number(volumeRange.value) / 100);
+      volumeValue.textContent = `${volumeRange.value}%`;
+      volumeRange.setAttribute('aria-valuetext', `${volumeRange.value}%`);
+    });
+    volumeLabelRow.appendChild(volumeLabel);
+    volumeLabelRow.appendChild(volumeValue);
+    volumeRow.appendChild(volumeLabelRow);
+    volumeRow.appendChild(volumeRange);
 
     const devRow = document.createElement('label');
     devRow.className = 'menu-item menu-sound menu-dev';
@@ -971,6 +1034,7 @@ export class GameApp {
 
     const settingsSection = createMenuSection('Configurações');
     settingsSection.appendChild(soundRow);
+    settingsSection.appendChild(volumeRow);
     settingsSection.appendChild(fontBtn);
     settingsSection.appendChild(fullscreenRow);
     settingsSection.appendChild(quickNavRow);
@@ -984,6 +1048,7 @@ export class GameApp {
     const footer = document.createElement('div');
     footer.className = 'menu-drawer-footer';
     footer.appendChild(versionLabel);
+    drawer.appendChild(drawerScroll);
     drawer.appendChild(footer);
     frame.appendChild(drawer);
 
@@ -1023,10 +1088,6 @@ export class GameApp {
     bodyRow.appendChild(sidebar);
     bodyRow.appendChild(main);
     frame.appendChild(bodyRow);
-
-    if (this.pendingStoryDiceRoll) {
-      this.appendStoryDiceRollOverlay(frame);
-    }
 
     this.root.appendChild(frame);
     if (this.state.lastCombatXpGain != null || this.state.lastCombatLevelUps != null) {
@@ -1166,6 +1227,10 @@ export class GameApp {
       inner.appendChild(bc);
     }
 
+    if (this.pendingStoryDiceRoll) {
+      this.appendStoryDiceRollBanner(inner);
+    }
+
     if (this.faithMiraclePending) {
       const miracle = document.createElement('div');
       miracle.className = 'faith-miracle-banner';
@@ -1185,7 +1250,9 @@ export class GameApp {
       const btnM = document.createElement('button');
       btnM.type = 'button';
       btnM.className = 'faith-miracle-dismiss';
-      btnM.textContent = 'Continuar';
+      btnM.dataset.quickNavContinue = '';
+      btnM.title = 'Barra de espaço';
+      btnM.textContent = this.quickNavMode ? '[Espaço] — Continuar' : 'Continuar';
       btnM.addEventListener('click', () => {
         this.faithMiraclePending = false;
         this.audio.playUiClick();
@@ -1225,7 +1292,9 @@ export class GameApp {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'status-highlight-dismiss';
-      btn.textContent = 'Continuar';
+      btn.dataset.quickNavContinue = '';
+      btn.title = 'Barra de espaço';
+      btn.textContent = this.quickNavMode ? '[Espaço] — Continuar' : 'Continuar';
       btn.addEventListener('click', () => {
         this.statusHighlightQueue = [];
         this.audio.playUiClick();
@@ -1264,7 +1333,9 @@ export class GameApp {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'item-acquire-dismiss';
-      btn.textContent = 'Continuar';
+      btn.dataset.quickNavContinue = '';
+      btn.title = 'Barra de espaço';
+      btn.textContent = this.quickNavMode ? '[Espaço] — Continuar' : 'Continuar';
       btn.addEventListener('click', () => {
         this.itemAcquireQueue = [];
         this.audio.playUiClick();

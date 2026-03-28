@@ -1,7 +1,7 @@
 ---
 id: act3/flee_cult
 chapter: 3
-ambientTheme: explore
+ambientTheme: act3
 title: Fuga — capuzes a rir
 choices:
   - text: "Reagrupar nas profundezas"

@@ -2,7 +2,7 @@
 id: act3/stone_combat_intro
 title: Pedra Contra Carne
 chapter: 3
-ambientTheme: explore
+ambientTheme: act3
 choices:
   - text: "Lutar!"
     effects:

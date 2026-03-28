@@ -2,7 +2,7 @@
 id: act3/hub_depths
 title: Núcleo das Profundezas
 chapter: 3
-ambientTheme: explore
+ambientTheme: act3
 artKey: depths
 choices:
   - text: "Rumo ao trono de ossos"

@@ -2,7 +2,7 @@
 id: act3/corruption_event
 title: Pulso de Corrupção
 chapter: 3
-ambientTheme: explore
+ambientTheme: act3
 choices:
   - text: "Tocar o cristal"
     next: act3/hub_depths

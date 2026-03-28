@@ -5,47 +5,57 @@ ambientTheme: merchant
 artKey: merchant
 title: Tenda do comerciante de geada
 choices:
-  - text: "Comprar Poção Rubra (16 ouro) — 1ª garrafa"
+  - text: "Comprar Poção Rubra (5 ouro) — 1ª garrafa"
     next: act5/frost_merchant
     condition:
       all:
-        - { resource: { gold: { gte: 16 } } }
+        - { resource: { gold: { gte: 5 } } }
         - { noFlag: act5_merch_hp_1 }
     effects:
-      - { op: addResource, resource: gold, delta: -16 }
+      - { op: addResource, resource: gold, delta: -5 }
       - { op: grantItem, itemId: potion_hp }
       - { op: setFlag, key: act5_merch_hp_1, value: true }
-  - text: "Comprar Poção Rubra (16 ouro) — última garrafa"
+  - text: "Comprar Poção Rubra (5 ouro) — última garrafa"
     next: act5/frost_merchant
     condition:
       all:
-        - { resource: { gold: { gte: 16 } } }
+        - { resource: { gold: { gte: 5 } } }
         - { flag: act5_merch_hp_1 }
         - { noFlag: act5_merch_hp_2 }
     effects:
-      - { op: addResource, resource: gold, delta: -16 }
+      - { op: addResource, resource: gold, delta: -5 }
       - { op: grantItem, itemId: potion_hp }
       - { op: setFlag, key: act5_merch_hp_2, value: true }
-  - text: "Comprar Tônico Azul (20 ouro) — única unidade"
+  - text: "Comprar Tônico Azul (10 ouro) — única unidade"
     next: act5/frost_merchant
     condition:
       all:
-        - { resource: { gold: { gte: 20 } } }
+        - { resource: { gold: { gte: 10 } } }
         - { noFlag: act5_merch_mana_1 }
     effects:
-      - { op: addResource, resource: gold, delta: -20 }
+      - { op: addResource, resource: gold, delta: -10 }
       - { op: grantItem, itemId: potion_mana }
       - { op: setFlag, key: act5_merch_mana_1, value: true }
-  - text: "Comprar Infusão Serena (14 ouro) — única unidade"
+  - text: "Comprar Infusão Serena (4 ouro) — única unidade"
     next: act5/frost_merchant
     condition:
       all:
-        - { resource: { gold: { gte: 14 } } }
+        - { resource: { gold: { gte: 4 } } }
         - { noFlag: act5_merch_stress_1 }
     effects:
-      - { op: addResource, resource: gold, delta: -14 }
+      - { op: addResource, resource: gold, delta: -4 }
       - { op: grantItem, itemId: potion_stress }
       - { op: setFlag, key: act5_merch_stress_1, value: true }
+  - text: "Comprar Suprimento (5 ouro) — única unidade"
+    next: act5/frost_merchant
+    condition:
+      all:
+        - { resource: { gold: { gte: 5 } } }
+        - { noFlag: act5_merch_supply_1 }
+    effects:
+      - { op: addResource, resource: gold, delta: -5 }
+      - { op: addResource, resource: supply, delta: 1 }
+      - { op: setFlag, key: act5_merch_supply_1, value: true }
   - text: "Afastar-me da tenda"
     next: act5/frost_hub
 onEnter: []

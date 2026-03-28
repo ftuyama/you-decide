@@ -46,6 +46,16 @@ choices:
       - { op: addResource, resource: gold, delta: -6 }
       - { op: grantItem, itemId: potion_stress }
       - { op: setFlag, key: act6_merch_stress_1, value: true }
+  - text: "Comprar Suprimento (5 ouro) — única unidade"
+    next: act6/fractured_merchant
+    condition:
+      all:
+        - { resource: { gold: { gte: 5 } } }
+        - { noFlag: act6_merch_supply_1 }
+    effects:
+      - { op: addResource, resource: gold, delta: -5 }
+      - { op: addResource, resource: supply, delta: 1 }
+      - { op: setFlag, key: act6_merch_supply_1, value: true }
   - text: "Afastar-me da banca"
     next: act6/hub_fractured_nave
 onEnter: []

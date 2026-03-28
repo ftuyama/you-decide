@@ -8,6 +8,7 @@ import {
   resolveLuckCheck,
   resolveSkillCheck,
   type LoadedScene,
+  type StoryDiceRollBreakdown,
 } from '../engine/sceneRuntime';
 import { applyEffects } from '../engine/effects';
 import { tickActiveBuffs } from '../engine/leadStats';
@@ -75,6 +76,13 @@ export class GameApp {
   private faithMiraclePending = false;
   /** Só reproduz efeitos de som para entradas novas do log de combate */
   private combatLogSoundCursor: { encounterId: string; index: number } = { encounterId: '', index: 0 };
+  /** Rola teste de perícia/sorte: estado só aplica após o overlay (dados já resolvidos no motor). */
+  private pendingStoryDiceRoll: {
+    nextState: GameState;
+    breakdown: StoryDiceRollBreakdown;
+  } | null = null;
+  private diceRollIntervalTimer: ReturnType<typeof setInterval> | null = null;
+  private diceRollEnterHandler: ((e: KeyboardEvent) => void) | null = null;
 
   constructor(root: HTMLElement, campaignId: string) {
     this.root = root;
@@ -90,6 +98,7 @@ export class GameApp {
     this.quickNavMode = this.loadQuickNavMode();
     this.devMode = this.loadDevMode();
     this.choiceHotkeyHandler = (e: KeyboardEvent): void => {
+      if (this.pendingStoryDiceRoll) return;
       const el = e.target;
       if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || el instanceof HTMLSelectElement) {
         return;
@@ -324,6 +333,22 @@ export class GameApp {
     this.audio.setAmbientTheme(this.resolveAmbientTheme());
   }
 
+  /** Paleta CSS (`html[data-theme]`) — ato 5 neve / ato 6 vazio. */
+  private resolveVisualTheme(): 'snow' | 'void' | null {
+    if (this.state.chapter === 6 || this.state.sceneId.startsWith('act6/')) return 'void';
+    if (this.state.chapter === 5 || this.state.sceneId.startsWith('act5/')) return 'snow';
+    return null;
+  }
+
+  private syncVisualTheme(): void {
+    const t = this.resolveVisualTheme();
+    if (t == null) {
+      document.documentElement.removeAttribute('data-theme');
+    } else {
+      document.documentElement.setAttribute('data-theme', t);
+    }
+  }
+
   private ctx(): { sceneId: string; data: import('../engine/gameData').GameData; bus: EventBus } {
     return { sceneId: this.state.sceneId, data: this.registry.data, bus: this.bus };
   }
@@ -363,36 +388,138 @@ export class GameApp {
   }
 
   private onSkillRoll(scene: LoadedScene): void {
+    if (this.pendingStoryDiceRoll) return;
     this.unlockAudio();
     this.audio.playDice();
-    const sc = scene.frontmatter.skillCheck;
     const r = resolveSkillCheck(this.state, scene);
-    if (sc) {
-      if (r.state.sceneId === sc.failNext) this.audio.playCheckFail();
-      else if (r.state.sceneId === sc.successNext) this.audio.playCheckSuccess();
-    }
-    this.state = this.stabilize(r.state);
+    if (!r.breakdown) return;
+    this.pendingStoryDiceRoll = { nextState: r.state, breakdown: r.breakdown };
     this.render();
   }
 
   private onLuckRoll(scene: LoadedScene): void {
+    if (this.pendingStoryDiceRoll) return;
     this.unlockAudio();
     this.audio.playDice();
-    const lc = scene.frontmatter.luckCheck;
     const r = resolveLuckCheck(this.state, scene, this.registry.data);
-    if (lc) {
-      if (r.state.sceneId === lc.failNext) this.audio.playCheckFail();
-      else if (r.state.sceneId === lc.successNext) this.audio.playCheckSuccess();
-    }
+    if (!r.breakdown) return;
     const afterRoll: GameState = {
       ...r.state,
       visitedScenes: { ...r.state.visitedScenes, [scene.id]: true },
     };
-    this.state = this.stabilize(afterRoll);
+    this.pendingStoryDiceRoll = { nextState: afterRoll, breakdown: r.breakdown };
     this.render();
   }
 
+  private clearDiceRollTimers(): void {
+    if (this.diceRollIntervalTimer != null) {
+      clearInterval(this.diceRollIntervalTimer);
+      this.diceRollIntervalTimer = null;
+    }
+    if (this.diceRollEnterHandler) {
+      window.removeEventListener('keydown', this.diceRollEnterHandler);
+      this.diceRollEnterHandler = null;
+    }
+  }
+
+  private appendStoryDiceRollOverlay(frame: HTMLElement): void {
+    const pending = this.pendingStoryDiceRoll;
+    if (!pending) return;
+    const { nextState, breakdown } = pending;
+
+    const backdrop = document.createElement('div');
+    backdrop.className = 'story-dice-overlay-backdrop';
+
+    const panel = document.createElement('div');
+    panel.className = 'story-dice-overlay-panel';
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-modal', 'true');
+    panel.setAttribute(
+      'aria-label',
+      breakdown.kind === 'skill' ? 'Resultado do teste de perícia' : 'Resultado do teste de sorte'
+    );
+
+    const kicker = document.createElement('div');
+    kicker.className = 'story-dice-overlay-kicker';
+    kicker.textContent =
+      breakdown.kind === 'skill'
+        ? `Teste de perícia (${breakdown.attr.toUpperCase()})`
+        : 'Teste de sorte';
+    panel.appendChild(kicker);
+
+    const pre = document.createElement('pre');
+    pre.className = 'dice-ascii-block story-dice-pre story-dice-pre--rolling';
+    pre.textContent = formatDiceAscii([3, 4]);
+    panel.appendChild(pre);
+
+    const resultRegion = document.createElement('div');
+    resultRegion.className = 'story-dice-result';
+    resultRegion.setAttribute('aria-live', 'polite');
+    resultRegion.setAttribute('aria-atomic', 'true');
+    resultRegion.hidden = true;
+    panel.appendChild(resultRegion);
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'story-dice-overlay-dismiss';
+    btn.textContent = 'Continuar';
+    btn.disabled = true;
+    panel.appendChild(btn);
+
+    backdrop.appendChild(panel);
+    frame.appendChild(backdrop);
+
+    const dismiss = (): void => {
+      this.clearDiceRollTimers();
+      this.pendingStoryDiceRoll = null;
+      this.state = this.stabilize(nextState);
+      this.audio.playUiClick();
+      this.render();
+    };
+
+    const finishReveal = (): void => {
+      pre.textContent = formatDiceAscii([breakdown.d1, breakdown.d2]);
+      pre.classList.remove('story-dice-pre--rolling');
+      panel.classList.add(
+        breakdown.success ? 'story-dice-overlay-panel--success' : 'story-dice-overlay-panel--fail'
+      );
+      if (breakdown.success) this.audio.playCheckSuccess();
+      else this.audio.playCheckFail();
+      resultRegion.hidden = false;
+      resultRegion.textContent = breakdown.rollLog;
+      btn.disabled = false;
+      btn.focus();
+
+      const onEnter = (e: KeyboardEvent): void => {
+        if (e.key !== 'Enter' || btn.disabled) return;
+        e.preventDefault();
+        dismiss();
+      };
+      this.diceRollEnterHandler = onEnter;
+      window.addEventListener('keydown', onEnter);
+    };
+
+    let ticks = 0;
+    const maxTicks = 10;
+    this.diceRollIntervalTimer = setInterval(() => {
+      ticks += 1;
+      const r1 = Math.floor(Math.random() * 6) + 1;
+      const r2 = Math.floor(Math.random() * 6) + 1;
+      pre.textContent = formatDiceAscii([r1, r2]);
+      if (ticks >= maxTicks) {
+        if (this.diceRollIntervalTimer != null) {
+          clearInterval(this.diceRollIntervalTimer);
+          this.diceRollIntervalTimer = null;
+        }
+        finishReveal();
+      }
+    }, 80);
+
+    btn.addEventListener('click', () => dismiss());
+  }
+
   private onMapKey(e: KeyboardEvent): void {
+    if (this.pendingStoryDiceRoll) return;
     const m = this.state.asciiMap;
     if (!m || this.state.mode !== 'story') return;
     const mapId = m.mapId;
@@ -666,6 +793,7 @@ export class GameApp {
       clearTimeout(this.timedTimer);
       this.timedTimer = null;
     }
+    this.clearDiceRollTimers();
     if (this.state.mode !== 'combat') {
       this.combatLogSoundCursor = { encounterId: '', index: 0 };
     }
@@ -896,6 +1024,10 @@ export class GameApp {
     bodyRow.appendChild(main);
     frame.appendChild(bodyRow);
 
+    if (this.pendingStoryDiceRoll) {
+      this.appendStoryDiceRollOverlay(frame);
+    }
+
     this.root.appendChild(frame);
     if (this.state.lastCombatXpGain != null || this.state.lastCombatLevelUps != null) {
       this.state = {
@@ -906,6 +1038,7 @@ export class GameApp {
     }
     this.syncAmbientTheme();
     this.syncAppFullscreenLayout();
+    this.syncVisualTheme();
   }
 
   private playCombatLogSound(entry: CombatLogEntry, leadName: string | undefined): void {

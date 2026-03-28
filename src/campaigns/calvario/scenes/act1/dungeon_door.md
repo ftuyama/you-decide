@@ -9,6 +9,8 @@ choices:
     effects:
       - { op: setChapter, chapter: 2 }
       - { op: addResource, resource: supply, delta: -1 }
+  - text: "Inclinar-se para o brilho do bronze nos batentes — ver-te"
+    next: act1/mirror_door
   - text: "Voltar ao último corredor (narrativa)"
     next: act1/dungeon_mouth
 onEnter: []

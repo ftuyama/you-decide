@@ -5,6 +5,8 @@ chapter: 1
 ambientTheme: explore
 artKey: crawl
 choices:
+  - text: "Reparar num espelho partido num nicho — encarar o reflexo"
+    next: act1/mirror_entrance
   - text: "Voltar à entrada"
     next: act1/title
 onEnter: []

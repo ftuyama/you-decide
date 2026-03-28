@@ -18,6 +18,8 @@ choices:
     next: act1/class_gate_water
   - text: "Ouvir: há outro som além do gotejar?"
     next: act1/class_gate_listen
+  - text: "Um espelho de mão na parede — segurá-lo e ver-te sem a água"
+    next: act1/mirror_round
 onEnter: []
 ---
 Três **juramentos** ecoam numa câmara redonda. No centro, uma lâmina de **água negra** não move — mas o teu reflexo demora um instante a seguir-te, como se hesitasse entre **espada**, **arco de luz** e **símbolo sagrado**.

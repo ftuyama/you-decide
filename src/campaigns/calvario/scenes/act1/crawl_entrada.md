@@ -9,6 +9,8 @@ choices:
     next: act1/class_gate
     effects:
       - { op: addDiary, text: "Entrei no Calvário." }
+  - text: "Um caco de espelho brilha na argamassa — ver o próprio rosto"
+    next: act1/mirror_descent
   - text: "Tocar na parede: está fria ou úmida?"
     next: act1/crawl_touch
 onEnter: []

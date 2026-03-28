@@ -1,20 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&display=swap');
-
-:root {
-  --bg: #0a0c0b;
-  --fg: #c9b89a;
-  --muted: #6b6a5e;
-  --accent: #6e8f6a;
-  --danger: #8b3a3a;
-  --magic: #5a8f7b;
-  --corrupt: #4a6b4a;
-  --border: #3d3a32;
-  --glow: rgba(90, 143, 123, 0.15);
-  --app-font-pct: 100%;
-  /** Grelha de fundo (combate Ações / magias e canvas global) */
-  --ui-grid-line: rgba(74, 108, 88, 0.11);
-  --ui-grid-size: 12px;
-}
+@import './theme-tokens.css';
 
 * {
   box-sizing: border-box;
@@ -91,7 +76,7 @@ button.hamburger {
   font-size: 1.35rem;
   line-height: 1;
   cursor: pointer;
-  background: #121412;
+  background: var(--surface-raised);
   color: var(--fg);
   border: 1px solid var(--border);
   padding: 0.25rem 0.55rem;
@@ -106,7 +91,7 @@ button.hamburger:hover {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: var(--backdrop-scrim);
   z-index: 40;
 }
 
@@ -120,7 +105,7 @@ button.hamburger:hover {
   right: 0;
   width: min(18rem, 92vw);
   height: 100%;
-  background: #0c0e0d;
+  background: var(--surface-drawer);
   border-left: 1px solid var(--border);
   z-index: 50;
   padding: 1rem 1rem 2rem;
@@ -129,7 +114,7 @@ button.hamburger:hover {
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
-  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-menu);
 }
 
 .menu-drawer.open {
@@ -139,7 +124,7 @@ button.hamburger:hover {
 .menu-section {
   border: 1px solid var(--border);
   border-radius: 2px;
-  background: rgba(0, 0, 0, 0.22);
+  background: var(--menu-section-bg);
   overflow: hidden;
 }
 
@@ -149,8 +134,8 @@ button.hamburger:hover {
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #9a9588;
-  background: #121410;
+  color: var(--text-section);
+  background: var(--surface-inset);
   border-bottom: 1px dashed var(--border);
 }
 
@@ -165,7 +150,7 @@ button.hamburger:hover {
   font: inherit;
   cursor: pointer;
   padding: 0.55rem 0.65rem;
-  background: #121412;
+  background: var(--surface-raised);
   color: var(--fg);
   border: 1px solid var(--border);
   border-radius: 2px;
@@ -226,7 +211,7 @@ button.hamburger:hover {
 
 .player-sidebar {
   border: 1px solid var(--border);
-  background: linear-gradient(165deg, #0f1210 0%, #080a09 100%);
+  background: var(--sidebar-gradient);
   padding: 0.75rem 0.85rem;
   font-size: 0.78rem;
   color: var(--muted);
@@ -253,7 +238,7 @@ button.hamburger:hover {
 .sidebar-collapse {
   border: 1px solid var(--border);
   border-radius: 2px;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--sidebar-collapse-bg);
   overflow: hidden;
 }
 
@@ -267,9 +252,9 @@ button.hamburger:hover {
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #9a9588;
+  color: var(--text-section);
   padding: 0.45rem 0.55rem;
-  background: #121410;
+  background: var(--surface-inset);
   border: none;
   width: 100%;
   text-align: left;
@@ -296,7 +281,7 @@ button.hamburger:hover {
 
 .sidebar-collapse-trigger:hover {
   color: var(--fg);
-  background: #161916;
+  background: var(--surface-hover);
 }
 
 .sidebar-collapse-body {
@@ -312,7 +297,7 @@ button.hamburger:hover {
 }
 
 .sidebar-line strong {
-  color: #e0d8c8;
+  color: var(--text-strong);
   font-weight: 600;
 }
 
@@ -385,7 +370,7 @@ button.hamburger:hover {
 
 .sidebar-buffs {
   font-size: 0.68rem;
-  color: #a89860;
+  color: var(--sidebar-buff);
   line-height: 1.35;
 }
 
@@ -397,7 +382,7 @@ button.hamburger:hover {
 .sidebar-static {
   border: 1px solid var(--border);
   border-radius: 2px;
-  background: rgba(0, 0, 0, 0.25);
+  background: var(--panel-overlay-strong);
   overflow: hidden;
 }
 
@@ -410,9 +395,9 @@ button.hamburger:hover {
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #9a9588;
+  color: var(--text-section);
   padding: 0.45rem 0.55rem;
-  background: #121410;
+  background: var(--surface-inset);
   border-bottom: 1px dashed var(--border);
 }
 
@@ -428,8 +413,8 @@ button.hamburger:hover {
 .hp-bar-track {
   height: 6px;
   margin: 0.35rem 0 0.5rem;
-  background: #1a1c18;
-  border: 1px solid #2a2824;
+  background: var(--hp-bar-track-bg);
+  border: 1px solid var(--hp-bar-track-border);
   border-radius: 1px;
   overflow: hidden;
 }
@@ -460,8 +445,8 @@ button.hamburger:hover {
 .mana-bar-track {
   height: 6px;
   margin: 0.25rem 0 0.45rem;
-  background: #121820;
-  border: 1px solid #2a3548;
+  background: var(--mana-bar-track-bg);
+  border: 1px solid var(--mana-bar-track-border);
   border-radius: 1px;
   overflow: hidden;
 }
@@ -480,8 +465,8 @@ button.hamburger:hover {
 .stress-bar-track {
   height: 6px;
   margin: 0 0 0.5rem;
-  background: #1a1810;
-  border: 1px solid #3d3520;
+  background: var(--stress-bar-track-bg);
+  border: 1px solid var(--stress-bar-track-border);
   border-radius: 1px;
   overflow: hidden;
 }
@@ -573,7 +558,7 @@ button.hamburger:hover {
   margin-top: 0.4rem;
   padding: 0.45rem 0.5rem;
   border-radius: 2px;
-  background: rgba(0, 0, 0, 0.22);
+  background: var(--menu-section-bg);
   border: 1px solid rgba(160, 190, 80, 0.28);
 }
 
@@ -599,7 +584,7 @@ button.hamburger:hover {
 .status-highlight-stack {
   margin: 0 0 1rem;
   padding: 0.75rem 0.85rem 0.85rem;
-  background: linear-gradient(145deg, #1c1a16 0%, #121410 100%);
+  background: linear-gradient(145deg, #1c1a16 0%, var(--surface-inset) 100%);
   border-radius: 3px;
   border: 1px solid rgba(100, 96, 80, 0.45);
   box-shadow: 0 0 18px rgba(0, 0, 0, 0.35);
@@ -875,13 +860,13 @@ button.hamburger:hover {
 }
 
 .sidebar-attr-label {
-  color: #8e8b7f;
+  color: var(--sidebar-attr);
   letter-spacing: 0.03em;
 }
 
 .sidebar-hint-label {
   cursor: help;
-  text-decoration: underline dotted rgba(142, 139, 127, 0.75);
+  text-decoration: underline dotted var(--sidebar-attr-underline);
   text-underline-offset: 2px;
 }
 
@@ -898,11 +883,11 @@ button.hamburger:hover {
 }
 
 .companion-sidebar-card {
-  border: 1px dashed #3a3834;
+  border: 1px dashed var(--companion-border);
   border-radius: 2px;
   padding: 0.45rem 0.5rem 0.55rem;
   margin-bottom: 0.5rem;
-  background: rgba(0, 0, 0, 0.15);
+  background: var(--panel-overlay-15);
 }
 
 .companion-sidebar-card:last-child {
@@ -912,7 +897,7 @@ button.hamburger:hover {
 .companion-sidebar-name {
   font-size: 0.82rem;
   font-weight: 600;
-  color: #d8d0c0;
+  color: var(--companion-name);
   margin-bottom: 0.15rem;
 }
 
@@ -941,7 +926,7 @@ button.hamburger:hover {
   padding: 0.4rem 0.45rem;
   border: 1px solid var(--border);
   border-radius: 2px;
-  background: rgba(0, 0, 0, 0.28);
+  background: var(--panel-overlay-28);
 }
 
 .party-member-card-label {
@@ -955,7 +940,7 @@ button.hamburger:hover {
 .party-member-card-name {
   font-size: 0.78rem;
   font-weight: 600;
-  color: #e0d8c8;
+  color: var(--text-strong);
   line-height: 1.25;
   word-break: break-word;
 }
@@ -974,7 +959,7 @@ button.hamburger:hover {
 }
 
 .stat-build-bonus {
-  color: #7a9a72;
+  color: var(--stat-build-bonus);
   font-weight: 500;
   font-size: 0.92em;
 }
@@ -1009,8 +994,8 @@ button.hamburger:hover {
 .faction-rep-track {
   height: 6px;
   margin: 0 0 0.35rem;
-  background: #141618;
-  border: 1px solid #2a2824;
+  background: var(--faction-rep-track-bg);
+  border: 1px solid var(--faction-rep-track-border);
   border-radius: 1px;
   overflow: hidden;
 }
@@ -1044,7 +1029,7 @@ button.hamburger:hover {
   margin: 0.45rem 0;
   font-size: 0.72rem;
   line-height: 1.5;
-  color: #a8a090;
+  color: var(--sidebar-lore);
 }
 
 .sidebar-lore-body p:first-child {
@@ -1055,7 +1040,7 @@ button.hamburger:hover {
   margin: 0.4rem 0;
   font-size: 0.72rem;
   line-height: 1.45;
-  color: #a8b8c8;
+  color: var(--sidebar-spell);
 }
 
 .sidebar-spells .sidebar-spell-line.sidebar-line--with-icon {
@@ -1084,7 +1069,7 @@ button.hamburger:hover {
   margin: 0.45rem 0;
   font-size: 0.72rem;
   line-height: 1.45;
-  color: #a8b8a8;
+  color: var(--sidebar-equip);
 }
 
 .sidebar-equip .sidebar-equip-line:first-child {
@@ -1096,7 +1081,7 @@ button.hamburger:hover {
   margin-top: 0.15rem;
   font-size: 0.68rem;
   line-height: 1.4;
-  color: #8a9a88;
+  color: var(--sidebar-equip-stats);
 }
 
 .player-sidebar .diary-box p {
@@ -1118,18 +1103,18 @@ main.main--combat {
   font-size: 0.62rem;
   line-height: 1.15;
   white-space: pre;
-  color: #8a9a82;
+  color: var(--scene-art-color);
   margin: 0 0 1rem;
   padding: 0.75rem;
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--panel-overlay-35);
   border: 1px solid var(--border);
   overflow-x: auto;
 }
 
 .shell {
   border: 1px solid var(--border);
-  box-shadow: 0 0 0 1px var(--glow), inset 0 0 80px rgba(0, 0, 0, 0.5);
-  background: linear-gradient(180deg, #0e100f 0%, #080908 100%);
+  box-shadow: 0 0 0 1px var(--glow), inset 0 0 80px var(--shell-inset-glow);
+  background: var(--shell-gradient);
   padding: 1rem 1.25rem 1.5rem;
   min-height: 70vh;
 }
@@ -1152,7 +1137,7 @@ h1 {
 }
 
 .story-body strong {
-  color: #e0d4b8;
+  color: var(--text-emphasis);
 }
 
 .breadcrumb {
@@ -1197,7 +1182,7 @@ button.choice {
   font: inherit;
   cursor: pointer;
   padding: 0.55rem 0.65rem;
-  background: #121412;
+  background: var(--surface-raised);
   color: var(--fg);
   border: 1px solid var(--border);
   border-radius: 2px;
@@ -1206,7 +1191,7 @@ button.choice {
 
 button.choice:hover {
   border-color: var(--accent);
-  background: #151a16;
+  background: var(--surface-hover-alt);
 }
 
 button.choice .preview {
@@ -1225,7 +1210,7 @@ button.choice .preview {
   padding: 0.85rem 1rem;
   border: 1px solid var(--border);
   border-radius: 3px;
-  background: rgba(0, 0, 0, 0.32);
+  background: var(--panel-overlay-32);
   box-shadow: inset 0 0 48px rgba(0, 0, 0, 0.35);
 }
 
@@ -1287,7 +1272,7 @@ button.choice .preview {
 
 .camp-equip-current {
   font-size: 0.82rem;
-  color: #e0d4b8;
+  color: var(--text-emphasis);
   margin-bottom: 0.35rem;
 }
 
@@ -1298,7 +1283,7 @@ button.choice .preview {
 
 .camp-equip-hint {
   font-size: 0.75rem;
-  color: #6a7568;
+  color: var(--camp-equip-hint);
 }
 
 .camp-equip-actions {
@@ -1316,7 +1301,7 @@ button.camp-equip-btn {
   font-size: 0.78rem;
   cursor: pointer;
   padding: 0.35rem 0.55rem;
-  background: #121412;
+  background: var(--surface-raised);
   color: var(--fg);
   border: 1px solid var(--border);
   border-radius: 2px;
@@ -1325,17 +1310,17 @@ button.camp-equip-btn {
 
 button.camp-equip-btn:hover {
   border-color: var(--accent);
-  background: #151a16;
+  background: var(--surface-hover-alt);
 }
 
 button.camp-equip-btn--unequip {
-  border-color: #4a4540;
+  border-color: var(--camp-equip-unequip-border);
   color: var(--muted);
   font-size: 0.74rem;
 }
 
 button.camp-equip-btn--unequip:hover {
-  border-color: #6a6358;
+  border-color: var(--camp-equip-unequip-hover);
   color: var(--fg);
 }
 
@@ -1358,7 +1343,7 @@ button.camp-equip-btn--unequip:hover {
   border: 1px solid var(--border);
   border-radius: 3px;
   padding: 0.75rem 0.85rem;
-  background: rgba(0, 0, 0, 0.28);
+  background: var(--panel-overlay-28);
   transition:
     border-color 0.2s ease,
     box-shadow 0.2s ease;
@@ -1366,9 +1351,9 @@ button.camp-equip-btn--unequip:hover {
 
 /** Último dano aplicado foi crítico — destaque no “quadrado” do campo (inimigos) */
 .combat-enemies-column.combat-enemies-column--crit-damage {
-  border-color: #d4a820;
+  border-color: var(--crit-highlight);
   box-shadow:
-    0 0 0 2px rgba(230, 194, 0, 0.55),
+    0 0 0 2px var(--crit-highlight-glow),
     inset 0 0 0 1px rgba(230, 194, 0, 0.2),
     inset 0 0 32px rgba(230, 194, 0, 0.07);
 }
@@ -1377,9 +1362,9 @@ button.camp-equip-btn--unequip:hover {
 .combat-actions-panel {
   margin-top: 0.85rem;
   padding: 0.6rem 0.65rem 0.65rem;
-  border: 1px solid #4a5c52;
+  border: 1px solid var(--combat-actions-border);
   border-radius: 4px;
-  background-color: rgba(8, 12, 10, 0.55);
+  background-color: var(--combat-actions-bg);
   background-image:
     linear-gradient(var(--ui-grid-line) 1px, transparent 1px),
     linear-gradient(90deg, var(--ui-grid-line) 1px, transparent 1px);
@@ -1393,10 +1378,10 @@ button.camp-equip-btn--unequip:hover {
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #9aaa9a;
+  color: var(--combat-actions-hdr);
   margin: 0 0 0.45rem;
   padding-bottom: 0.35rem;
-  border-bottom: 1px solid rgba(74, 100, 82, 0.45);
+  border-bottom: 1px solid var(--combat-actions-hdr-border);
 }
 
 .combat-actions-panel .combat-allies-hint {
@@ -1423,9 +1408,9 @@ button.combat-flee-btn {
   text-align: left;
   cursor: pointer;
   padding: 0.35rem 0.5rem;
-  background: #161f22;
-  color: #b8e0c8;
-  border: 1px solid #4a6a58;
+  background: var(--combat-flee-bg);
+  color: var(--combat-flee-fg);
+  border: 1px solid var(--combat-flee-border);
   display: block;
   width: 100%;
   margin-top: 0.55rem;
@@ -1433,7 +1418,7 @@ button.combat-flee-btn {
 }
 
 button.combat-flee-btn:hover {
-  border-color: #5ac890;
+  border-color: var(--combat-flee-hover);
 }
 
 /** Log ao lado do campo de batalha; sticky para acompanhar scroll sem ficar “embaixo” do layout */
@@ -1462,9 +1447,9 @@ button.combat-flee-btn:hover {
   max-height: min(74vh, 46rem);
   min-height: 18rem;
   padding: 0.55rem 0.6rem;
-  border: 2px solid #4a6b52;
+  border: 2px solid var(--combat-border);
   border-radius: 4px;
-  background: linear-gradient(165deg, #0a100c 0%, #040604 55%, #080b08 100%);
+  background: var(--combat-log-bg);
   box-shadow:
     0 0 0 1px rgba(0, 0, 0, 0.65),
     0 6px 20px rgba(0, 0, 0, 0.45),
@@ -1481,7 +1466,7 @@ button.combat-flee-btn:hover {
 .enemy-panel {
   border: 1px solid var(--border);
   padding: 0.75rem;
-  background: rgba(0, 0, 0, 0.35);
+  background: var(--panel-overlay-35);
 }
 
 .enemy-panel + .enemy-panel {
@@ -1572,10 +1557,10 @@ button.combat-flee-btn:hover {
   font-size: 0.82rem;
   flex: 1;
   min-height: 0;
-  border: 1px solid #2a3328;
+  border: 1px solid var(--dice-panel-border);
   padding: 0;
   border-radius: 2px;
-  background: linear-gradient(180deg, #050705 0%, #020302 100%);
+  background: var(--dice-panel-bg);
   display: flex;
   flex-direction: column;
 }
@@ -1587,9 +1572,9 @@ button.combat-flee-btn:hover {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #b8cbb8;
-  border-bottom: 1px solid #3d5248;
-  background: linear-gradient(180deg, rgba(28, 42, 32, 0.98) 0%, rgba(12, 16, 12, 0.95) 100%);
+  color: var(--dice-panel-header-color);
+  border-bottom: 1px solid var(--dice-panel-header-border);
+  background: var(--dice-panel-header-bg);
 }
 
 .combat-log-scroll {
@@ -1606,24 +1591,24 @@ button.combat-flee-btn:hover {
 }
 
 .combat-log-scroll::-webkit-scrollbar-track {
-  background: #0a0c0a;
+  background: var(--scrollbar-track);
   border-radius: 2px;
 }
 
 .combat-log-scroll::-webkit-scrollbar-thumb {
-  background: #3a4a3a;
+  background: var(--scrollbar-thumb);
   border-radius: 2px;
 }
 
 .combat-log-scroll::-webkit-scrollbar-thumb:hover {
-  background: #4d5f4d;
+  background: var(--scrollbar-thumb-hover);
 }
 
 .combat-log-entry {
   margin: 0 0 0.42rem;
   padding: 0.32rem 0.45rem;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid #2a2824;
+  background: var(--panel-overlay-35);
+  border: 1px solid var(--combat-log-entry-border);
   border-radius: 2px;
 }
 
@@ -1634,7 +1619,7 @@ button.combat-flee-btn:hover {
 .combat-log-msg {
   font-size: 0.78rem;
   line-height: 1.35;
-  color: #c4baa8;
+  color: var(--combat-log-msg);
 }
 
 /** Ataque: cores por acerto / erro (verde / vermelho) */
@@ -1805,7 +1790,7 @@ button.combat-flee-btn:hover {
 
 .combat-allies-hint {
   font-size: 0.75rem;
-  color: #8a9a88;
+  color: var(--sidebar-equip-stats);
   margin: 0.5rem 0 0.25rem;
   padding: 0.35rem 0.45rem;
   border-left: 2px solid #4a5a48;
@@ -1928,7 +1913,7 @@ button.combat-potion:disabled {
   font: inherit;
   cursor: pointer;
   padding: 0.35rem 0.55rem;
-  background: #121412;
+  background: var(--surface-raised);
   color: var(--muted);
   border: 1px solid var(--border);
 }

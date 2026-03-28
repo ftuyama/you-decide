@@ -95,12 +95,37 @@ export function filterChoices(choices: Choice[], state: GameState): Choice[] {
   return choices.filter((ch) => evaluateCondition(ch.condition, state));
 }
 
+/** Dados da rolagem 2d6 + mod para a UI (teste de perícia / sorte). */
+export type StoryDiceRollBreakdown =
+  | {
+      kind: 'skill';
+      attr: 'str' | 'agi' | 'mind';
+      d1: number;
+      d2: number;
+      mod: number;
+      total: number;
+      tn: number;
+      success: boolean;
+      rollLog: string;
+    }
+  | {
+      kind: 'luck';
+      d1: number;
+      d2: number;
+      mod: number;
+      luckPenalty: number;
+      total: number;
+      tn: number;
+      success: boolean;
+      rollLog: string;
+    };
+
 export function resolveSkillCheck(
   state: GameState,
   scene: LoadedScene
-): { state: GameState; nextSceneId: string; rollLog: string } {
+): { state: GameState; breakdown: StoryDiceRollBreakdown | null } {
   const sc = scene.frontmatter.skillCheck;
-  if (!sc) return { state, nextSceneId: state.sceneId, rollLog: '' };
+  if (!sc) return { state, breakdown: null };
   const rng = mulberry32(state.rngSeed);
   const [d1, d2] = roll2d6(rng);
   const lead = state.party[0];
@@ -110,21 +135,32 @@ export function resolveSkillCheck(
   const ok = total >= sc.tn;
   const next = ok ? sc.successNext : sc.failNext;
   const rollLog = `Teste (${sc.attr.toUpperCase()}): [${d1}][${d2}] +${mod} = ${total} vs TN ${sc.tn} → ${ok ? 'sucesso' : 'falha'}.`;
+  const breakdown: StoryDiceRollBreakdown = {
+    kind: 'skill',
+    attr: sc.attr,
+    d1,
+    d2,
+    mod,
+    total,
+    tn: sc.tn,
+    success: ok,
+    rollLog,
+  };
   const newState = tickActiveBuffs({
     ...state,
     rngSeed: (state.rngSeed + 17) >>> 0,
     sceneId: next,
   });
-  return { state: newState, nextSceneId: next, rollLog };
+  return { state: newState, breakdown };
 }
 
 export function resolveLuckCheck(
   state: GameState,
   scene: LoadedScene,
   data: GameData
-): { state: GameState; nextSceneId: string; rollLog: string } {
+): { state: GameState; breakdown: StoryDiceRollBreakdown | null } {
   const lc = scene.frontmatter.luckCheck;
-  if (!lc) return { state, nextSceneId: state.sceneId, rollLog: '' };
+  if (!lc) return { state, breakdown: null };
   const rng = mulberry32(state.rngSeed);
   const [d1, d2] = roll2d6(rng);
   const lead = state.party[0];
@@ -137,12 +173,23 @@ export function resolveLuckCheck(
   const curseBit =
     penalty > 0 ? ` −${penalty} (maldição)` : '';
   const rollLog = `Sorte: [${d1}][${d2}] +${mod}${curseBit} = ${total} vs TN ${lc.tn} → ${ok ? 'sucesso' : 'falha'}.`;
+  const breakdown: StoryDiceRollBreakdown = {
+    kind: 'luck',
+    d1,
+    d2,
+    mod,
+    luckPenalty: penalty,
+    total,
+    tn: lc.tn,
+    success: ok,
+    rollLog,
+  };
   const newState = tickActiveBuffs({
     ...state,
     rngSeed: (state.rngSeed + 19) >>> 0,
     sceneId: next,
   });
-  return { state: newState, nextSceneId: next, rollLog };
+  return { state: newState, breakdown };
 }
 
 export function resolveRandomBranch(

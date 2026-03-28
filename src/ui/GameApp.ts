@@ -142,6 +142,10 @@ export class GameApp {
         this.closeMenu();
       }
     });
+    document.addEventListener('fullscreenchange', () => {
+      this.syncFullscreenCheckbox();
+      this.syncAppFullscreenLayout();
+    });
     /** Primeiro gesto (toque ou tecla) desbloqueia AudioContext (política dos browsers). */
     const unlockOnce = (): void => {
       this.unlockAudio();
@@ -465,6 +469,51 @@ export class GameApp {
     }
   }
 
+  private getFullscreenElement(): Element | null {
+    const doc = document as Document & { webkitFullscreenElement?: Element | null };
+    return document.fullscreenElement ?? doc.webkitFullscreenElement ?? null;
+  }
+
+  private isFullscreenSupported(): boolean {
+    const el = document.documentElement as HTMLElement & {
+      webkitRequestFullscreen?: () => Promise<void>;
+    };
+    return typeof el.requestFullscreen === 'function' || typeof el.webkitRequestFullscreen === 'function';
+  }
+
+  private syncFullscreenCheckbox(): void {
+    const cb = this.root.querySelector<HTMLInputElement>('[data-menu-fullscreen-cb]');
+    if (cb) cb.checked = this.getFullscreenElement() != null;
+  }
+
+  private syncAppFullscreenLayout(): void {
+    this.root.classList.toggle('app-fullscreen', this.getFullscreenElement() != null);
+  }
+
+  private async requestGameFullscreen(): Promise<void> {
+    const el = document.documentElement as HTMLElement & {
+      webkitRequestFullscreen?: () => Promise<void>;
+    };
+    if (typeof el.requestFullscreen === 'function') {
+      await el.requestFullscreen();
+      return;
+    }
+    if (typeof el.webkitRequestFullscreen === 'function') {
+      await el.webkitRequestFullscreen();
+    }
+  }
+
+  private async exitGameFullscreen(): Promise<void> {
+    const doc = document as Document & { webkitExitFullscreen?: () => Promise<void> };
+    if (typeof document.exitFullscreen === 'function') {
+      await document.exitFullscreen();
+      return;
+    }
+    if (typeof doc.webkitExitFullscreen === 'function') {
+      await doc.webkitExitFullscreen();
+    }
+  }
+
   private resolveArt(scene: LoadedScene): string | undefined {
     const fm = scene.frontmatter;
     const inline = fm.art?.trim();
@@ -732,6 +781,36 @@ export class GameApp {
     fontBtn.textContent = `Tamanho do texto (${100 + this.fontStep * 10}%)`;
     fontBtn.addEventListener('click', () => this.cycleFontSize());
 
+    const fullscreenSupported = this.isFullscreenSupported();
+    const fullscreenRow = document.createElement('label');
+    fullscreenRow.className = 'menu-item menu-sound';
+    if (!fullscreenSupported) {
+      fullscreenRow.classList.add('menu-sound--disabled');
+      fullscreenRow.title = 'Ecrã inteiro não está disponível neste navegador.';
+    }
+    const fullscreenCb = document.createElement('input');
+    fullscreenCb.type = 'checkbox';
+    fullscreenCb.dataset.menuFullscreenCb = '';
+    fullscreenCb.checked = this.getFullscreenElement() != null;
+    fullscreenCb.disabled = !fullscreenSupported;
+    fullscreenCb.addEventListener('change', () => {
+      if (!fullscreenSupported) return;
+      const goFullscreen = fullscreenCb.checked;
+      void (async () => {
+        try {
+          if (goFullscreen) {
+            await this.requestGameFullscreen();
+          } else {
+            await this.exitGameFullscreen();
+          }
+        } catch {
+          fullscreenCb.checked = this.getFullscreenElement() != null;
+        }
+      })();
+    });
+    fullscreenRow.appendChild(fullscreenCb);
+    fullscreenRow.appendChild(document.createTextNode(' Ecrã inteiro'));
+
     const exportBtn = document.createElement('button');
     exportBtn.type = 'button';
     exportBtn.className = 'menu-item';
@@ -765,6 +844,7 @@ export class GameApp {
     const settingsSection = createMenuSection('Configurações');
     settingsSection.appendChild(soundRow);
     settingsSection.appendChild(fontBtn);
+    settingsSection.appendChild(fullscreenRow);
     settingsSection.appendChild(quickNavRow);
     if (this.isLocalhostHost()) {
       settingsSection.appendChild(devRow);
@@ -825,6 +905,7 @@ export class GameApp {
       };
     }
     this.syncAmbientTheme();
+    this.syncAppFullscreenLayout();
   }
 
   private playCombatLogSound(entry: CombatLogEntry, leadName: string | undefined): void {

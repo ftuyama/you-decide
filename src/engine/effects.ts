@@ -50,6 +50,14 @@ const RESOURCE_LABEL: Record<'gold' | 'supply' | 'faith' | 'corruption', string>
   corruption: 'Corrupção',
 };
 
+/** Caps para `addResource` — alinhar com `schema.ts` `resources`. */
+const RESOURCE_MAX = {
+  gold: 999,
+  supply: 10,
+  faith: 5,
+  corruption: 10,
+} as const;
+
 function resourceDebuffSubtitle(resource: keyof typeof RESOURCE_LABEL): string {
   switch (resource) {
     case 'corruption':
@@ -143,19 +151,19 @@ function applyOne(
       const res = e.resource;
       if (res === 'gold') {
         const before = r.gold ?? 0;
-        r.gold = Math.max(0, Math.min(999, before + e.delta));
+        r.gold = Math.max(0, Math.min(RESOURCE_MAX.gold, before + e.delta));
         actual = r.gold - before;
       } else if (res === 'supply') {
         const before = r.supply;
-        r.supply = Math.max(0, Math.min(10, r.supply + e.delta));
+        r.supply = Math.max(0, Math.min(RESOURCE_MAX.supply, r.supply + e.delta));
         actual = r.supply - before;
       } else if (res === 'faith') {
         const before = r.faith;
-        r.faith = Math.max(0, Math.min(5, r.faith + e.delta));
+        r.faith = Math.max(0, Math.min(RESOURCE_MAX.faith, r.faith + e.delta));
         actual = r.faith - before;
       } else {
         const before = r.corruption;
-        r.corruption = Math.max(0, Math.min(5, r.corruption + e.delta));
+        r.corruption = Math.max(0, Math.min(RESOURCE_MAX.corruption, r.corruption + e.delta));
         actual = r.corruption - before;
       }
       if (actual !== 0) {

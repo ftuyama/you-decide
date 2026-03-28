@@ -548,7 +548,7 @@ export const GameStateSchema = z.object({
   resources: z.object({
     supply: z.number().int().min(0).max(10).default(5),
     faith: z.number().int().min(0).max(5).default(3),
-    corruption: z.number().int().min(0).max(5).default(0),
+    corruption: z.number().int().min(0).max(10).default(0),
     gold: z.number().int().min(0).max(999).default(0),
   }),
   combat: CombatStateSchema.nullable(),

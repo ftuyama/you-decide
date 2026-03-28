@@ -324,7 +324,7 @@ export const EnemyDefSchema = z.object({
   sprite: z.string(),
   spriteWounded: z.string().optional(),
   advantageOnFirstRound: z.boolean().optional(),
-  /** XP concedido ao derrotar; se omitido, usa fórmula do engine */
+  /** XP base ao derrotar este inimigo; se omitido, usa fórmula do engine (10 + floor(maxHp/2)) */
   xp: z.number().int().min(0).optional(),
   /** Probabilidade de confirmar crítico após 6+6 em 2d6 (ou equivalente 3d6dl); padrão no engine se omitido */
   critConfirm: z.number().min(0).max(1).optional(),
@@ -345,7 +345,7 @@ export const EncounterSchema = z.object({
   enemies: z.array(z.string()),
   playerAdvantage: z.boolean().optional(),
   enemyAdvantage: z.boolean().optional(),
-  /** Substitui o XP calculado por inimigos (chefes, encontros especiais) */
+  /** XP extra do encontro (soma ao XP base dos inimigos); ex.: bónus por grupo grande */
   xpReward: z.number().int().min(0).optional(),
 });
 

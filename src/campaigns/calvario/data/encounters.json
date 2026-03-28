@@ -15,13 +15,15 @@
     "id": "rats_cellar_pair",
     "enemies": ["rat_swarm", "rat_swarm"],
     "playerAdvantage": false,
-    "enemyAdvantage": false
+    "enemyAdvantage": false,
+    "xpReward": 3
   },
   "cellar_mixed": {
     "id": "cellar_mixed",
     "enemies": ["rat_swarm", "skeleton"],
     "playerAdvantage": false,
-    "enemyAdvantage": false
+    "enemyAdvantage": false,
+    "xpReward": 3
   },
   "cultist_patrol": {
     "id": "cultist_patrol",
@@ -33,19 +35,22 @@
     "id": "act2_rare_bone_sentinel",
     "enemies": ["skeleton", "skeleton", "skeleton"],
     "playerAdvantage": false,
-    "enemyAdvantage": true
+    "enemyAdvantage": true,
+    "xpReward": 10
   },
   "act2_rare_lone_swarm": {
     "id": "act2_rare_lone_swarm",
     "enemies": ["rat_swarm", "rat_swarm", "rat_swarm", "rat_swarm", "rat_swarm"],
     "playerAdvantage": false,
-    "enemyAdvantage": true
+    "enemyAdvantage": true,
+    "xpReward": 10
   },
   "cult_ambush": {
     "id": "cult_ambush",
     "enemies": ["cultist", "cultist"],
     "playerAdvantage": false,
-    "enemyAdvantage": true
+    "enemyAdvantage": true,
+    "xpReward": 3
   },
   "stone_guard_fight": {
     "id": "stone_guard_fight",
@@ -69,119 +74,108 @@
     "id": "boss_morvayn_2",
     "enemies": ["morvayn_p2"],
     "playerAdvantage": true,
-    "enemyAdvantage": false,
-    "xpReward": 120
+    "enemyAdvantage": false
   },
   "boss_morvayn_2_disadv": {
     "id": "boss_morvayn_2_disadv",
     "enemies": ["morvayn_p2"],
     "playerAdvantage": false,
-    "enemyAdvantage": true,
-    "xpReward": 120
+    "enemyAdvantage": true
   },
   "vigil_hunter_fight": {
     "id": "vigil_hunter_fight",
     "enemies": ["vigil_hunter"],
     "playerAdvantage": false,
-    "enemyAdvantage": false,
-    "xpReward": 45
+    "enemyAdvantage": false
   },
   "boss_fallen_angel_trial": {
     "id": "boss_fallen_angel_trial",
     "enemies": ["fallen_angel"],
     "playerAdvantage": false,
-    "enemyAdvantage": true,
-    "xpReward": 55
+    "enemyAdvantage": true
   },
   "frost_whelps": {
     "id": "frost_whelps",
     "enemies": ["frost_whelp", "frost_whelp"],
     "playerAdvantage": false,
     "enemyAdvantage": false,
-    "xpReward": 45
+    "xpReward": 3
   },
   "frost_whelp_solo": {
     "id": "frost_whelp_solo",
     "enemies": ["frost_whelp"],
     "playerAdvantage": false,
-    "enemyAdvantage": false,
-    "xpReward": 28
+    "enemyAdvantage": false
   },
   "frost_hunt_party": {
     "id": "frost_hunt_party",
     "enemies": ["frost_whelp", "frost_whelp", "frost_cultist"],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 65
+    "xpReward": 8
   },
   "frost_tomas_rescue": {
     "id": "frost_tomas_rescue",
     "enemies": ["frost_whelp", "frost_cultist", "frost_cultist"],
     "playerAdvantage": true,
     "enemyAdvantage": false,
-    "xpReward": 48
+    "xpReward": 8
   },
   "frost_tomas_rescue_ambush": {
     "id": "frost_tomas_rescue_ambush",
     "enemies": ["frost_whelp", "frost_cultist", "frost_cultist"],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 48
+    "xpReward": 8
   },
   "frost_howl_horde": {
     "id": "frost_howl_horde",
     "enemies": ["frost_whelp", "frost_whelp", "frost_whelp", "frost_reaver"],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 90
+    "xpReward": 10
   },
   "boss_ice_dragon_1": {
     "id": "boss_ice_dragon_1",
     "enemies": ["ice_dragon_p1"],
     "playerAdvantage": false,
-    "enemyAdvantage": false,
-    "xpReward": 115
+    "enemyAdvantage": false
   },
   "boss_ice_dragon_2": {
     "id": "boss_ice_dragon_2",
     "enemies": ["ice_dragon_p2"],
     "playerAdvantage": true,
-    "enemyAdvantage": false,
-    "xpReward": 145
+    "enemyAdvantage": false
   },
   "act6_veil_herald": {
     "id": "act6_veil_herald",
     "enemies": ["act6_veil_herald"],
     "playerAdvantage": false,
-    "enemyAdvantage": true,
-    "xpReward": 180
+    "enemyAdvantage": true
   },
   "act6_echo_chorus": {
     "id": "act6_echo_chorus",
     "enemies": ["act6_echo_chorus"],
     "playerAdvantage": false,
-    "enemyAdvantage": true,
-    "xpReward": 190
+    "enemyAdvantage": true
   },
   "act6_penitent_blade": {
     "id": "act6_penitent_blade",
     "enemies": ["act6_penitent_blade"],
     "playerAdvantage": false,
-    "enemyAdvantage": false,
-    "xpReward": 210
+    "enemyAdvantage": false
   },
   "act6_shadow_self": {
     "id": "act6_shadow_self",
     "enemies": ["act6_shadow_self"],
     "playerAdvantage": false,
-    "enemyAdvantage": true,
-    "xpReward": 280
+    "enemyAdvantage": true
   },
   "act6_will_horde": {
     "id": "act6_will_horde",
     "enemies": ["act6_penitent_blade", "act6_shade_fragment"],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 245
+    "xpReward": 8
   }
 }

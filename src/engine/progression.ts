@@ -22,14 +22,14 @@ function defaultXpFromEnemyDef(maxHp: number): number {
 }
 
 export function computeCombatXp(enc: Encounter, data: GameData): number {
-  if (enc.xpReward !== undefined) return enc.xpReward;
   let sum = 0;
   for (const id of enc.enemies) {
     const def = data.enemies[id];
     if (!def) continue;
     sum += def.xp !== undefined ? def.xp : defaultXpFromEnemyDef(def.maxHp);
   }
-  return Math.max(0, sum);
+  const bonus = enc.xpReward ?? 0;
+  return Math.max(0, sum + bonus);
 }
 
 const ZERO_DELTAS: LevelUpStatDeltas = {

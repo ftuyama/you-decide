@@ -19,7 +19,7 @@ import type {
   Stance,
 } from './schema';
 import type { GameData } from './gameData';
-import { extraLifeReadyFromFaith } from './state';
+import { extraLifeReadyFromFaith, isLeadPassiveUnlocked } from './state';
 import { effectiveLeadAttr, tickActiveBuffs } from './leadStats';
 import { addXp, computeCombatXp } from './progression';
 import type { EventBus } from './eventBus';
@@ -219,11 +219,14 @@ function getLead(state: GameState): Character {
 }
 
 function applyStartOfPlayerTurnPassive(
+  state: GameState,
   party: Character[],
   log: CombatLogEntry[]
 ): { party: Character[]; log: CombatLogEntry[] } {
   const lead = party[0];
   if (!lead || lead.hp <= 0) return { party, log };
+
+  if (!isLeadPassiveUnlocked(state)) return { party, log };
 
   if (lead.class === 'cleric') {
     const regen = Math.max(1, Math.ceil(lead.maxHp * 0.01));
@@ -1152,7 +1155,7 @@ function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData, bu
   }
 
   const nextRound = c.round + 1;
-  const roundPrep = applyStartOfPlayerTurnPassive(party, log);
+  const roundPrep = applyStartOfPlayerTurnPassive(state, party, log);
   party = roundPrep.party;
   const nextLog = [
     ...roundPrep.log,

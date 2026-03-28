@@ -123,7 +123,8 @@ function baseCritRatioForClass(cls: ClassId): number {
   return 0.01;
 }
 
-function isLeadPassiveUnlocked(state: GameState): boolean {
+/** Passivos de classe (Pulso Devoto, Fio Arcano, bónus de crítico do cavaleiro) exigem o fragmento de Morvayn. */
+export function isLeadPassiveUnlocked(state: GameState): boolean {
   const lead = state.party[0];
   if (!lead) return false;
   return (

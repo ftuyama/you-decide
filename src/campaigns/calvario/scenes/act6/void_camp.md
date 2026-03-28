@@ -44,4 +44,4 @@ onEnter: []
 ---
 Não há **lenha** — só **restos** de quem já se queimou a si próprio. A fogueira **imita** calor; o teu corpo aceita a mentira porque **precisa** de um sítio onde fingir que ainda há **amanhã**.
 
-**Suprimento** aqui compra **descanso**: recuperas HP e alivias 1 de stress (custa 1 suprimento). O fumo sobe em **espirais** que lembram corredores — não perguntes para onde vão.
+**Suprimento** aqui compra **descanso**: recuperas HP e mana ao máximo e alivias 1 de stress (custa 1 suprimento). O fumo sobe em **espirais** que lembram corredores — não perguntes para onde vão.

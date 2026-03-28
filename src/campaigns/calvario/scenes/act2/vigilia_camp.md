@@ -45,4 +45,4 @@ onEnter:
 ---
 Soldados da **Vigília** partilham pão seco. Honra tem gosto de cinza.
 
-**Suprimento** aqui serve para **descansar**: recuperas o teu HP e alivias 1 de stress (custa 1 suprimento).
+**Suprimento** aqui serve para **descansar**: recuperas HP e mana ao máximo e alivias 1 de stress (custa 1 suprimento).

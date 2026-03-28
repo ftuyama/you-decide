@@ -191,6 +191,7 @@ function applyOne(
       const party = state.party.map((p) => ({
         ...p,
         hp: p.maxHp,
+        mana: p.maxMana,
         stress: Math.max(0, p.stress - 1),
       }));
       return { ...state, resources: res, party };

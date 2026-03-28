@@ -114,6 +114,20 @@
     "enemyAdvantage": true,
     "xpReward": 65
   },
+  "frost_tomas_rescue": {
+    "id": "frost_tomas_rescue",
+    "enemies": ["frost_whelp", "frost_cultist", "frost_cultist"],
+    "playerAdvantage": true,
+    "enemyAdvantage": false,
+    "xpReward": 48
+  },
+  "frost_tomas_rescue_ambush": {
+    "id": "frost_tomas_rescue_ambush",
+    "enemies": ["frost_whelp", "frost_cultist", "frost_cultist"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 48
+  },
   "frost_howl_horde": {
     "id": "frost_howl_horde",
     "enemies": ["frost_whelp", "frost_whelp", "frost_whelp", "frost_reaver"],

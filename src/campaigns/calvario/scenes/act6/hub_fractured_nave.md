@@ -22,6 +22,10 @@ choices:
         - { flag: act6_reality_done }
         - { flag: act6_memory_done }
         - { flag: act6_will_done }
+  - text: "Acender a fogueira de cinzas espelhadas (acampamento)"
+    next: act6/void_camp
+  - text: "Negociar com o mercador da banca esquecida"
+    next: act6/fractured_merchant
   - text: "Ouvir o sussurro sob as colunas (rota de corrupção)"
     next: act6/void_secret_entry
     condition:
@@ -35,4 +39,6 @@ Três corredores respiram à tua frente, cada um com uma mentira diferente sobre
 No teto, rachaduras formam constelações impossíveis. Uma delas lembra o teu rosto em idade avançada. Outra, o teu rosto sem culpa.
 
 Se queres sair inteiro, vais precisar de aceitar que inteiro talvez seja uma forma elegante de dizer **incompleto**.
+
+Entre colunas partidas, alguém **aquece** uma fogueira que não deveria existir — e mais adiante, uma **banca** sem dono expõe remédios como se o vazio fosse cliente **habitué**.
 

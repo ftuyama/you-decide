@@ -13,8 +13,8 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 0,
     type: 'normal',
     armorChips: 0,
-    sprite: E.rat_swarm.sprite,
-    spriteWounded: E.rat_swarm.spriteWounded,
+    sprite: E.act1_rat_swarm.sprite,
+    spriteWounded: E.act1_rat_swarm.spriteWounded,
     attackStrategy: 'random',
     lootDrops: [
       { chance: 0.01, itemId: 'potion_hp' },
@@ -32,8 +32,8 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 1,
     type: 'undead',
     armorChips: 0,
-    sprite: E.skeleton.sprite,
-    spriteWounded: E.skeleton.spriteWounded,
+    sprite: E.act2_skeleton.sprite,
+    spriteWounded: E.act2_skeleton.spriteWounded,
     attackStrategy: 'random',
     lootDrops: [
       { chance: 0.05, itemId: 'iron_dagger' },
@@ -51,7 +51,7 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 0,
     type: 'cultist',
     armorChips: 0,
-    sprite: E.cultist.sprite,
+    sprite: E.act2_cultist.sprite,
     attackStrategy: 'random',
     lootDrops: [{ chance: 0.05, resource: 'gold', amount: 1 }],
   },
@@ -66,7 +66,7 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 0,
     type: 'cultist',
     armorChips: 0,
-    sprite: E.cultist.sprite,
+    sprite: E.act2_cultist.sprite,
     attackStrategy: 'random',
     lootDrops: [{ chance: 0.12, resource: 'gold', amount: 1 }],
   },
@@ -81,7 +81,7 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 3,
     type: 'armored',
     armorChips: 3,
-    sprite: E.stone_guard.sprite,
+    sprite: E.act3_stone_guard.sprite,
     attackStrategy: 'random',
     lootDrops: [
       { chance: 0.25, resource: 'gold', amount: 1 },
@@ -99,8 +99,8 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 2,
     type: 'cultist',
     armorChips: 1,
-    sprite: E.morvayn_p1.sprite,
-    spriteWounded: E.morvayn_p1.spriteWounded,
+    sprite: E.act4_morvayn_p1.sprite,
+    spriteWounded: E.act4_morvayn_p1.spriteWounded,
     attackStrategy: 'focus_leader',
     lootDrops: [
       { chance: 1, resource: 'gold', amount: 2 },
@@ -118,7 +118,7 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 3,
     type: 'armored',
     armorChips: 2,
-    sprite: E.morvayn_p2.sprite,
+    sprite: E.act4_morvayn_p2.sprite,
     attackStrategy: 'focus_leader',
     lootDrops: [
       { chance: 1, resource: 'gold', amount: 4 },
@@ -136,8 +136,8 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 1,
     type: 'armored',
     armorChips: 2,
-    sprite: E.fallen_angel.sprite,
-    spriteWounded: E.fallen_angel.spriteWounded,
+    sprite: E.act2_fallen_angel.sprite,
+    spriteWounded: E.act2_fallen_angel.spriteWounded,
     attackStrategy: 'focus_leader',
     lootDrops: [
       { chance: 0.75, resource: 'supply', amount: 1 },
@@ -155,9 +155,13 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 2,
     type: 'armored',
     armorChips: 1,
-    sprite: E.vigil_hunter.sprite,
-    spriteWounded: E.vigil_hunter.spriteWounded,
+    sprite: E.act4_vigil_hunter.sprite,
+    spriteWounded: E.act4_vigil_hunter.spriteWounded,
     attackStrategy: 'random',
+    lootDrops: [
+      { chance: 0.25, resource: 'supply', amount: 1 },
+      { chance: 0.4, resource: 'gold', amount: 3 },
+    ],
   },
   frost_whelp: {
     id: 'frost_whelp',
@@ -170,8 +174,8 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 0,
     type: 'normal',
     armorChips: 0,
-    sprite: E.frost_whelp.sprite,
-    spriteWounded: E.frost_whelp.spriteWounded,
+    sprite: E.act5_frost_whelp.sprite,
+    spriteWounded: E.act5_frost_whelp.spriteWounded,
     attackStrategy: 'random',
     lootDrops: [{ chance: 0.08, resource: 'gold', amount: 1 }],
   },
@@ -186,8 +190,8 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 2,
     type: 'armored',
     armorChips: 2,
-    sprite: E.frost_reaver.sprite,
-    spriteWounded: E.frost_reaver.spriteWounded,
+    sprite: E.act5_frost_reaver.sprite,
+    spriteWounded: E.act5_frost_reaver.spriteWounded,
     attackStrategy: 'focus_leader',
     lootDrops: [{ chance: 0.25, resource: 'gold', amount: 2 }],
   },
@@ -202,8 +206,8 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 4,
     type: 'armored',
     armorChips: 2,
-    sprite: E.ice_dragon_p1.sprite,
-    spriteWounded: E.ice_dragon_p1.spriteWounded,
+    sprite: E.act5_ice_dragon_p1.sprite,
+    spriteWounded: E.act5_ice_dragon_p1.spriteWounded,
     attackStrategy: 'focus_leader',
     lootDrops: [
       { chance: 1, resource: 'gold', amount: 5 },
@@ -221,7 +225,7 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 4,
     type: 'armored',
     armorChips: 3,
-    sprite: E.ice_dragon_p2.sprite,
+    sprite: E.act5_ice_dragon_p2.sprite,
     attackStrategy: 'focus_leader',
     lootDrops: [
       { chance: 1, resource: 'gold', amount: 5 },
@@ -239,13 +243,17 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 3,
     type: 'cultist',
     armorChips: 1,
-    sprite: E.fallen_angel.sprite,
-    spriteWounded: E.fallen_angel.spriteWounded,
+    sprite: E.act6_veil_herald.sprite,
+    spriteWounded: E.act6_veil_herald.spriteWounded,
     attackStrategy: 'focus_leader',
     combatLines: [
       'Tu chamas isto de mundo porque ainda não viste as costuras.',
       'Toda certeza é uma cela com paredes invisíveis.',
       'A verdade não consola. Ela exige.',
+    ],
+    lootDrops: [
+      { chance: 0.3, resource: 'gold', amount: 5 },
+      { chance: 0.2, resource: 'supply', amount: 1 }
     ],
   },
   act6_echo_chorus: {
@@ -259,12 +267,16 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 2,
     type: 'undead',
     armorChips: 0,
-    sprite: E.morvayn_p2.sprite,
+    sprite: E.act6_echo_chorus.sprite,
     attackStrategy: 'random',
     combatLines: [
       'Lembrar e reescrever.',
       'A memória mente para proteger quem a consulta.',
       'Qual de nós é o original?',
+    ],
+    lootDrops: [
+      { chance: 0.3, resource: 'gold', amount: 5 },
+      { chance: 0.2, resource: 'supply', amount: 1 }
     ],
   },
   act6_penitent_blade: {
@@ -278,13 +290,17 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 4,
     type: 'armored',
     armorChips: 2,
-    sprite: E.vigil_hunter.sprite,
-    spriteWounded: E.vigil_hunter.spriteWounded,
+    sprite: E.act6_penitent_blade.sprite,
+    spriteWounded: E.act6_penitent_blade.spriteWounded,
     attackStrategy: 'focus_leader',
     combatLines: [
       'Vontade sem limite é só fome com armadura.',
       'Tu tremes porque ainda tens algo a perder.',
       'Não é poder. É abstinência de misericórdia.',
+    ],
+    lootDrops: [
+      { chance: 0.3, resource: 'gold', amount: 5 },
+      { chance: 0.2, resource: 'supply', amount: 1 }
     ],
   },
   act6_shadow_self: {
@@ -298,12 +314,16 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 5,
     type: 'armored',
     armorChips: 3,
-    sprite: E.ice_dragon_p2.sprite,
+    sprite: E.act6_shadow_self.sprite,
     attackStrategy: 'focus_leader',
     combatLines: [
       'Eu sou tu sem a tua culpa.',
       'Tu pedes sentido; eu imponho direção.',
       'Se eu vencer, tu sobrevives. Só não escolhes mais.',
+    ],
+    lootDrops: [
+      { chance: 0.3, resource: 'gold', amount: 5 },
+      { chance: 0.2, resource: 'corruption', amount: 3 }
     ],
   },
   act6_shade_fragment: {
@@ -317,12 +337,16 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 1,
     type: 'normal',
     armorChips: 0,
-    sprite: E.cultist.sprite,
+    sprite: E.act6_shade_fragment.sprite,
     attackStrategy: 'random',
     combatLines: [
       'Eu sou uma decisão tua que continuou viva.',
       'Toda renúncia deixa filhos no escuro.',
       'Não me mates. Assume-me.',
+    ],
+    lootDrops: [
+      { chance: 0.3, resource: 'gold', amount: 5 },
+      { chance: 0.2, resource: 'supply', amount: 1 }
     ],
   },
 };

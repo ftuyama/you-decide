@@ -300,7 +300,7 @@ export const EnemyLootDropSchema = z.union([
   }),
   z.object({
     chance: z.number().min(0).max(1),
-    resource: z.enum(['gold', 'supply']),
+    resource: z.enum(['gold', 'supply', 'faith', 'corruption']),
     amount: z.number().int().positive().default(1),
   }),
 ]);

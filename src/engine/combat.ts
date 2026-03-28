@@ -1010,17 +1010,34 @@ function applySingleLootDrop(state: GameState, drop: EnemyLootDrop, data: GameDa
     return { ...state, inventory: [...state.inventory, drop.itemId] };
   }
   const amount = drop.amount ?? 1;
-  if (drop.resource === 'gold') {
+  const r = drop.resource;
+  if (r === 'gold') {
     const before = state.resources.gold ?? 0;
     return {
       ...state,
       resources: { ...state.resources, gold: Math.max(0, Math.min(999, before + amount)) },
     };
   }
-  const before = state.resources.supply;
+  if (r === 'supply') {
+    const before = state.resources.supply;
+    return {
+      ...state,
+      resources: { ...state.resources, supply: Math.max(0, Math.min(10, before + amount)) },
+    };
+  }
+  if (r === 'faith') {
+    const before = state.resources.faith;
+    const faith = Math.max(0, Math.min(5, before + amount));
+    return {
+      ...state,
+      resources: { ...state.resources, faith },
+      extraLifeReady: extraLifeReadyFromFaith(faith),
+    };
+  }
+  const before = state.resources.corruption;
   return {
     ...state,
-    resources: { ...state.resources, supply: Math.max(0, Math.min(10, before + amount)) },
+    resources: { ...state.resources, corruption: Math.max(0, Math.min(10, before + amount)) },
   };
 }
 

@@ -10,6 +10,7 @@ luckCheck:
   failNext: act4/throne_nerves_fail
   label: "Manter as mãos firmes quando o chão mente"
 choices: []
-onEnter: []
+onEnter:
+  - { op: setFlag, key: throne_acted_nerves, value: true }
 ---
 O chão **inventa** degraus. Se hesitares, o osso sob os pés **recorda** o teu peso como dívida.

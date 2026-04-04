@@ -9,6 +9,7 @@ choices:
     next: act6/hub_fractured_nave
 onEnter:
   - { op: setChapter, chapter: 6 }
+  - { op: setNarrativeTier, tier: 4 }
   - { op: addDiary, text: "No fundo do gelo havia uma porta sem dobradiça. Entrei e o mundo respondeu com a minha voz, mas sem a minha piedade." }
 ---
 O gelo não termina: ele **abre**. Debaixo das Cimeiras, encontras uma nave sem altar, pendurada entre pedra e noite, como se alguém tivesse construído uma catedral para abrigar uma pergunta.

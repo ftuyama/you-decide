@@ -9,6 +9,7 @@ choices:
     next: act5/frost_hub
 onEnter:
   - { op: setChapter, chapter: 5 }
+  - { op: setNarrativeTier, tier: 4 }
   - { op: addResource, resource: supply, delta: -1 }
   - { op: addDiary, text: "Subi onde o mapa falha. Dizem que nas Cimeiras há um dragão que não pede permissão a ninguém — só ao céu, quando o céu hesita." }
 ---

@@ -11,7 +11,8 @@ choices:
     next: act4/throne_observe_luck
   - text: "Voltar ao momento da decisão"
     next: act4/throne_gate
-onEnter: []
+onEnter:
+  - { op: setFlag, key: throne_acted_observe, value: true }
 ---
 Cada osso do trono tem **um nome** raspado — não consegues ler todos. Um deles é o teu **primeiro medo** em letras pequenas.
 

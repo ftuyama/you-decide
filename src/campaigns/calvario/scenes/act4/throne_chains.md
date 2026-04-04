@@ -20,6 +20,7 @@ choices:
       - { op: addDiary, text: "Provei o gotejar: doce como promessa, e promessa sempre cobra juros." }
   - text: "Afastar as mãos e voltar"
     next: act4/throne_gate
-onEnter: []
+onEnter:
+  - { op: setFlag, key: throne_acted_chains, value: true }
 ---
 As correntes **querem** dedos. Não prendem só o trono — **ensaiam** o teu nome como quem experimenta uma corrente nova.

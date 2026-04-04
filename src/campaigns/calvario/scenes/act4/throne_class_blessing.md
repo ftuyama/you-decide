@@ -24,6 +24,7 @@ choices:
       - { op: addDiary, text: "Cada silêncio tem coeficiente — eu só anotei o que não me come primeiro." }
   - text: "Voltar sem invocar ofício"
     next: act4/throne_gate
-onEnter: []
+onEnter:
+  - { op: setFlag, key: throne_acted_class_blessing, value: true }
 ---
 O salão **reconhece** ofícios como quem reconhece **ferramentas**: não julga — **mede** o que podes estragar com elas.

@@ -4,6 +4,10 @@ title: Marcas
 chapter: 2
 ambientTheme: explore
 choices:
+  - text: "Conversar com Mira sobre o cruzeiro"
+    next: act2/hub_mira_banter
+    condition: { flag: mira_recruited }
+    preview: "Ela já conhece o preço deste chão."
   - text: "Voltar ao hub"
     next: act2/hub_catacomb
 onEnter: []

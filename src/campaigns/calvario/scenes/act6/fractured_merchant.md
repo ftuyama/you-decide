@@ -56,6 +56,18 @@ choices:
       - { op: addResource, resource: gold, delta: -5 }
       - { op: addResource, resource: supply, delta: 1 }
       - { op: setFlag, key: act6_merch_supply_1, value: true }
+  - text: "Comprar Suprimento (5 ouro) (x1)"
+    next: act6/fractured_merchant
+    condition:
+      all:
+        - { resource: { gold: { gte: 5 } } }
+        - { level: { gte: 31 } }
+        - { flag: act6_merch_supply_1 }
+        - { noFlag: act6_merch_supply_2 }
+    effects:
+      - { op: addResource, resource: gold, delta: -5 }
+      - { op: addResource, resource: supply, delta: 1 }
+      - { op: setFlag, key: act6_merch_supply_2, value: true }
   - text: "Afastar-me da banca"
     next: act6/hub_fractured_nave
 onEnter: []

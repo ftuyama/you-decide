@@ -24,6 +24,18 @@ choices:
       - { op: grantItem, itemId: iron_dagger }
       - { op: addResource, resource: gold, delta: -3 }
     preview: "Arma · para o inventário"
+  - text: "Comprar Suprimento (−5 ouro)"
+    next: act2/hub_catacomb
+    condition:
+      all:
+        - { resource: { gold: { gte: 5 } } }
+        - { level: { gte: 11 } }
+        - { noFlag: act2_merch_moon_supply_1 }
+    effects:
+      - { op: addResource, resource: gold, delta: -5 }
+      - { op: addResource, resource: supply, delta: 1 }
+      - { op: setFlag, key: act2_merch_moon_supply_1, value: true }
+    preview: "Recurso · estoque único"
   - text: "Recusar educadamente"
     next: act2/hub_catacomb
   - text: "Perguntar de onde veio o mapa"

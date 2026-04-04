@@ -5,9 +5,9 @@ import {
   sortedSceneActsFromNodes,
   type SceneGraphEdge,
   type SceneGraphNode,
-} from '../engine/sceneGraph';
-import { getRegisteredCampaignIds } from '../campaigns/registry';
-import { buildGameHref, resolveScenesGraphActFromLocation } from './campaignUrl';
+} from '../engine/sceneGraph.ts';
+import { getRegisteredCampaignIds } from '../campaigns/registry.ts';
+import { buildGameHref, resolveScenesGraphActFromLocation } from './campaignUrl.ts';
 
 type Vec2 = { x: number; y: number };
 

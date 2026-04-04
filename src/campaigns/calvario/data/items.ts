@@ -1,4 +1,4 @@
-import type { ItemDef } from '../../../engine/schema';
+import type { ItemDef } from '../../../engine/schema.ts';
 import * as itemSprites from '../ascii/sprites/items/index.ts';
 
 const z = (x: Partial<ItemDef> & Pick<ItemDef, 'id' | 'name' | 'slot'>): ItemDef => ({

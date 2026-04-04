@@ -5,59 +5,19 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { parse as parseYaml } from 'yaml';
+import {
+  campaignPaths,
+  parseCampaignArgv,
+  pathToSceneIdFromScenesDir,
+  splitFrontmatter,
+  walkMd,
+} from './lib/campaignFs.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const repoRoot = path.join(__dirname, '..');
 
-const argv = process.argv.slice(2);
-let campaignId = 'calvario';
-for (let i = 0; i < argv.length; i++) {
-  if (argv[i] === '--campaign' && argv[i + 1]) {
-    campaignId = argv[i + 1];
-    i++;
-  }
-}
-
-const campaignRoot = path.join(__dirname, '..', 'src', 'campaigns', campaignId);
-const scenesDir = path.join(campaignRoot, 'scenes');
-const indexPath = path.join(campaignRoot, 'index.json');
-
-function splitFrontmatter(text) {
-  const lines = text.replace(/^\uFEFF/, '').split(/\r?\n/);
-  if (lines[0]?.trim() !== '---') {
-    return { data: {}, content: text };
-  }
-  const yamlLines = [];
-  let i = 1;
-  while (i < lines.length) {
-    const line = lines[i];
-    if (line?.trim() === '---') {
-      const yamlStr = yamlLines.join('\n');
-      let data = {};
-      if (yamlStr.trim()) {
-        data = parseYaml(yamlStr) ?? {};
-      }
-      return { data, content: lines.slice(i + 1).join('\n') };
-    }
-    yamlLines.push(line ?? '');
-    i++;
-  }
-  return { data: {}, content: text };
-}
-
-function walkMd(dir) {
-  const out = [];
-  for (const name of fs.readdirSync(dir, { withFileTypes: true })) {
-    const p = path.join(dir, name.name);
-    if (name.isDirectory()) walkMd(p).forEach((x) => out.push(x));
-    else if (name.name.endsWith('.md')) out.push(p);
-  }
-  return out;
-}
-
-function pathToSceneId(relFromScenes) {
-  return relFromScenes.replace(/\\/g, '/').replace(/\.md$/, '');
-}
+const campaignId = parseCampaignArgv(process.argv.slice(2));
+const { scenesDir, indexPath } = campaignPaths(repoRoot, campaignId);
 
 function pushEffectEdges(effects, from, out) {
   if (!Array.isArray(effects)) return;
@@ -120,8 +80,7 @@ const sceneIds = new Set();
 const allEdges = [];
 
 for (const f of files) {
-  const rel = path.relative(scenesDir, f);
-  const id = pathToSceneId(rel);
+  const id = pathToSceneIdFromScenesDir(scenesDir, f);
   const raw = fs.readFileSync(f, 'utf8');
   const { data } = splitFrontmatter(raw);
   const fmId = data.id ?? id;

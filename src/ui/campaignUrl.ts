@@ -1,4 +1,4 @@
-import { isCampaignRegistered } from '../campaigns/registry';
+import { isCampaignRegistered } from '../campaigns/registry.ts';
 
 export type AppView = 'game' | 'scenes-graph';
 

@@ -2,11 +2,13 @@
  * Central registry of playable campaigns. Each campaign folder provides a loader that returns
  * GameData, raw scene files (for parsing), and a CampaignUIAdapter. Add a new campaign by
  * implementing bundle.ts + index.json under src/campaigns/<id>/ and registering the loader below.
+ *
+ * Cenas já parseadas: `src/content/registry.ts` (ContentRegistry).
  */
-import type { CampaignUIAdapter } from './campaignUi';
-import type { GameData } from '../engine/gameData';
-import { loadCalvarioContent } from './calvario/bundle';
-import { loadDemoContent } from './demo/bundle';
+import type { CampaignUIAdapter } from './campaignUi.ts';
+import type { GameData } from '../engine/gameData.ts';
+import { loadCalvarioContent } from './calvario/bundle.ts';
+import { loadDemoContent } from './demo/bundle.ts';
 
 export type CampaignContentBundle = {
   data: GameData;

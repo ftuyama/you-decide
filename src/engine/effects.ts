@@ -1,18 +1,18 @@
-import type { Effect, GameState } from './schema';
-import { GameStateSchema } from './schema';
-import type { EventBus } from './eventBus';
-import { beginEncounter } from './combat';
-import type { GameData } from './gameData';
-import { addXp } from './progression';
-import { initialKnownSpellIds } from './spellsKnown';
+import type { Effect, GameState } from './schema.ts';
+import { GameStateSchema } from './schema.ts';
+import type { EventBus } from './eventBus.ts';
+import { beginEncounter } from './combat/encounter.ts';
+import type { GameData } from './gameData.ts';
+import { addXp } from './progression.ts';
+import { initialKnownSpellIds } from './spellsKnown.ts';
 import {
   createInitialState,
   createPlayerCharacter,
   extraLifeReadyFromFaith,
   syncLeadPassiveStats,
-} from './state';
-import { clampLeadStat, tickActiveBuffs, type LeadStatAttr } from './leadStats';
-import { applyConsumableToCharacter, isConsumable, removeOneInventoryItem } from './consumables';
+} from './state.ts';
+import { clampLeadStat, tickActiveBuffs, type LeadStatAttr } from './leadStats.ts';
+import { applyConsumableToCharacter, isConsumable, removeOneInventoryItem } from './consumables.ts';
 
 export { tickActiveBuffs };
 

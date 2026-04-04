@@ -1,5 +1,5 @@
-import type { FactionId, GameState } from './schema';
-import { MAX_LEVEL, xpToNextLevel } from './progression';
+import type { FactionId, GameState } from './schema.ts';
+import { MAX_LEVEL, xpToNextLevel } from './progression.ts';
 
 function repTier(f: FactionId, state: GameState): string {
   const v = state.reputation[f] ?? 0;

@@ -1,4 +1,4 @@
-import type { Character, GameState } from './schema';
+import type { Character, GameState } from './schema.ts';
 
 export type LeadStatAttr = 'str' | 'agi' | 'mind' | 'luck';
 

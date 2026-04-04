@@ -6,53 +6,33 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import {
+  campaignPaths,
+  extractSceneIdLine,
+  parseCampaignArgv,
+  walkMd,
+} from './lib/campaignFs.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const repoRoot = path.join(__dirname, '..');
 
-const argv = process.argv.slice(2);
-let campaignId = 'calvario';
-for (let i = 0; i < argv.length; i++) {
-  if (argv[i] === '--campaign' && argv[i + 1]) {
-    campaignId = argv[i + 1];
-    i++;
-  }
-}
-
-const scenesDir = path.join(__dirname, '..', 'src', 'campaigns', campaignId, 'scenes');
+const campaignId = parseCampaignArgv(process.argv.slice(2));
+const { scenesDir } = campaignPaths(repoRoot, campaignId);
 
 if (!fs.existsSync(scenesDir)) {
   console.error(`Pasta de cenas não encontrada: ${scenesDir}`);
   process.exit(1);
 }
 
-function walkMd(dir) {
-  const out = [];
-  for (const name of fs.readdirSync(dir, { withFileTypes: true })) {
-    const p = path.join(dir, name.name);
-    if (name.isDirectory()) { walkMd(p).forEach((x) => out.push(x)); }
-    else if (name.name.endsWith('.md')) out.push(p);
-  }
-  return out;
-}
-
 const refRe = /\b(?:next|successNext|failNext|onVictory|onDefeat|onFlee|fallbackNext):\s*([a-z0-9_/]+)/gi;
-
-function extractId(raw) {
-  const m = raw.match(/^id:\s*(.+)$/m);
-  return m ? m[1].trim() : null;
-}
 
 const files = walkMd(scenesDir);
 const ids = new Set();
-const fileById = new Map();
 
 for (const f of files) {
   const raw = fs.readFileSync(f, 'utf8');
-  const id = extractId(raw);
-  if (id) {
-    ids.add(id);
-    fileById.set(id, path.relative(path.join(__dirname, '..'), f));
-  }
+  const id = extractSceneIdLine(raw);
+  if (id) ids.add(id);
 }
 
 const missing = [];
@@ -67,7 +47,7 @@ for (const f of files) {
     if (seen.has(`${f}:${target}`)) continue;
     seen.add(`${f}:${target}`);
     if (!ids.has(target)) {
-      missing.push({ from: path.relative(path.join(__dirname, '..'), f), target });
+      missing.push({ from: path.relative(repoRoot, f), target });
     }
   }
 }

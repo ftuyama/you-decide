@@ -1,6 +1,6 @@
-import { GameApp } from './ui/GameApp';
-import { mountScenesGraphView } from './ui/scenesGraphView';
-import { resolveAppViewFromLocation, resolveCampaignIdFromLocation } from './ui/campaignUrl';
+import { GameApp } from './ui/GameApp.ts';
+import { mountScenesGraphView } from './ui/scenesGraphView.ts';
+import { resolveAppViewFromLocation, resolveCampaignIdFromLocation } from './ui/campaignUrl.ts';
 
 const el = document.querySelector<HTMLElement>('#app');
 if (el) {

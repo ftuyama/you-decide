@@ -1,7 +1,8 @@
-import { parseSceneMarkdown, type LoadedScene } from '../engine/sceneRuntime';
-import type { GameData } from '../engine/gameData';
-import { loadCampaignContent } from '../campaigns/registry';
-import type { CampaignUIAdapter } from '../campaigns/campaignUi';
+/** Cenas parseadas e `GameData`; os loaders de campanha estão em `src/campaigns/registry.ts`. */
+import { parseSceneMarkdown, type LoadedScene } from '../engine/sceneRuntime.ts';
+import type { GameData } from '../engine/gameData.ts';
+import { loadCampaignContent } from '../campaigns/registry.ts';
+import type { CampaignUIAdapter } from '../campaigns/campaignUi.ts';
 
 export class ContentRegistry {
   readonly data: GameData;

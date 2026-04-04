@@ -1,4 +1,4 @@
-import type { ClassId } from '../../../engine/schema';
+import type { ClassId } from '../../../engine/schema.ts';
 
 export type ClassPassiveDef = {
   id: string;

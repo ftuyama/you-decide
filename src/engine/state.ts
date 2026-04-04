@@ -1,5 +1,5 @@
-import { SCHEMA_VERSION, type CampaignIndex, type ClassId, type GameState } from './schema';
-import { parseSeedFromSearch } from './rng';
+import { SCHEMA_VERSION, type CampaignIndex, type ClassId, type GameState } from './schema.ts';
+import { parseSeedFromSearch } from './rng.ts';
 
 const defaultRep = { vigilia: 0, circulo: 0, culto: 0 } as GameState['reputation'];
 export const PASSIVE_UNLOCK_ITEM_ID = 'morvayn_heart_shard';

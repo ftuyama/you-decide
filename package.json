@@ -7,12 +7,16 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "validate:scenes": "node scripts/validate-scenes.mjs"
+    "validate:scenes": "node scripts/validate-scenes.mjs",
+    "validate:unreachable": "node scripts/find-unreachable-scenes.mjs",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "devDependencies": {
     "@types/dompurify": "^3.0.5",
     "typescript": "~5.9.3",
-    "vite": "^8.0.1"
+    "vite": "^8.0.1",
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "dompurify": "^3.3.3",

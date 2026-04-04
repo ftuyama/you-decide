@@ -1,14 +1,14 @@
-import type { Character, ClassId, GameState, ItemDef, SpellDef } from '../engine/schema';
-import { effectiveLeadAttr } from '../engine/leadStats';
-import { PASSIVE_UNLOCK_ITEM_ID } from '../engine/state';
+import type { Character, ClassId, GameState, ItemDef, SpellDef } from '../engine/schema.ts';
+import { effectiveLeadAttr } from '../engine/leadStats.ts';
+import { PASSIVE_UNLOCK_ITEM_ID } from '../engine/state.ts';
 import {
   getCharacterArmorClass,
-  getEffectiveLuck,
   getEquippedArmorPoints,
   sumEquippedItemBonuses,
-} from '../engine/combat';
-import { MAX_LEVEL, xpToNextLevel } from '../engine/progression';
-import type { ContentRegistry } from '../content/registry';
+} from '../engine/combat.ts';
+import { getEffectiveLuck } from '../engine/luck.ts';
+import { MAX_LEVEL, xpToNextLevel } from '../engine/progression.ts';
+import type { ContentRegistry } from '../content/registry.ts';
 import {
   escHtml,
   hpBarMarkup,
@@ -17,8 +17,8 @@ import {
   spellSidebarMechanicsLinePt,
   statBonusParen,
   stressBarMarkup,
-} from './gameAppUtils';
-import { collapseTriggerStart, iconWrap, icons } from './icons';
+} from './gameAppUtils.ts';
+import { collapseTriggerStart, iconWrap, icons } from './icons/index.ts';
 
 type SidebarBuilderParams = {
   state: GameState;

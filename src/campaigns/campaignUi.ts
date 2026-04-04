@@ -1,4 +1,4 @@
-import type { ClassId } from '../engine/schema';
+import type { ClassId } from '../engine/schema.ts';
 
 /** Maps, ASCII art, and hero copy used only by the UI layer for a campaign. */
 export type CampaignUIAdapter = {

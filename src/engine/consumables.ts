@@ -1,4 +1,4 @@
-import type { Character, ItemDef } from './schema';
+import type { Character, ItemDef } from './schema.ts';
 
 export function isConsumable(def: ItemDef | undefined): def is ItemDef & { slot: 'consumable' } {
   return def?.slot === 'consumable';

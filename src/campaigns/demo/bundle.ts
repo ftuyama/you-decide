@@ -5,19 +5,19 @@ import {
   type Encounter,
   type ItemDef,
   type SpellDef,
-} from '../../engine/schema';
-import { emptyGameData } from '../../engine/gameData';
-import type { CampaignUIAdapter } from '../campaignUi';
+} from '../../engine/schema.ts';
+import { emptyGameData } from '../../engine/gameData.ts';
+import type { CampaignUIAdapter } from '../campaignUi.ts';
 import campaignIndex from './index.json';
-import { enemies as enemiesTs } from './data/enemies';
-import { items as itemsTs } from './data/items';
+import { enemies as enemiesTs } from './data/enemies.ts';
+import { items as itemsTs } from './data/items.ts';
 import encounters from './data/encounters.json';
 import companions from './data/companions.json';
-import { spells as spellsTs } from './data/spells';
-import { demoHeroNarrative } from './heroNarrative';
-import { canWalk, renderMap } from './maps';
-import { SCENE_ART } from './ascii/art';
-import { getHeroClassLabel, getHeroLore } from './classHero';
+import { spells as spellsTs } from './data/spells.ts';
+import { demoHeroNarrative } from './heroNarrative.ts';
+import { canWalk, renderMap } from './maps.ts';
+import { SCENE_ART } from './ascii/art.ts';
+import { getHeroClassLabel, getHeroLore } from './classHero.ts';
 
 const sceneRaw = import.meta.glob<string>('./scenes/**/*.md', {
   query: '?raw',

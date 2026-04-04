@@ -1,8 +1,8 @@
-import type { ClassId, GameState, LevelUpStatDeltas, LevelUpStep } from './schema';
-import type { GameData } from './gameData';
-import type { Encounter } from './schema';
-import type { EventBus } from './eventBus';
-import { unlockSpellsForNewLevel } from './spellsKnown';
+import type { ClassId, GameState, LevelUpStatDeltas, LevelUpStep } from './schema.ts';
+import type { GameData } from './gameData.ts';
+import type { Encounter } from './schema.ts';
+import type { EventBus } from './eventBus.ts';
+import { unlockSpellsForNewLevel } from './spellsKnown.ts';
 
 /** Nível máximo; acima disso o XP não aumenta nível */
 export const MAX_LEVEL = 40;

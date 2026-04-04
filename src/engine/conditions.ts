@@ -1,4 +1,4 @@
-import type { ClassId, Condition, FactionId, GameState } from './schema';
+import type { ClassId, Condition, FactionId, GameState } from './schema.ts';
 
 /** Inventário ou equipado no líder (para hasItem / noItem). */
 export function leadOwnsItem(state: GameState, itemId: string): boolean {

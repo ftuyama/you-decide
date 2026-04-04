@@ -560,6 +560,8 @@ export type LevelUpStatDeltas = z.infer<typeof LevelUpStatDeltasSchema>;
 export const LevelUpStepSchema = z.object({
   level: z.number().int().min(1),
   deltas: LevelUpStatDeltasSchema,
+  /** IDs de magias desbloqueadas neste nível (minLevel + classe), se houver. */
+  spellsLearned: z.array(z.string()).default([]),
 });
 export type LevelUpStep = z.infer<typeof LevelUpStepSchema>;
 

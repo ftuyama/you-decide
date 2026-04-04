@@ -1554,6 +1554,17 @@ export class GameApp {
           attrs.className = 'level-up-attrs';
           attrs.textContent = formatLevelUpDeltaLine(step.deltas);
           block.appendChild(attrs);
+          const sid = step.spellsLearned;
+          if (sid != null && sid.length > 0) {
+            const names = sid.map((id) => this.registry.data.spells[id]?.name ?? id);
+            const spellsEl = document.createElement('div');
+            spellsEl.className = 'level-up-spells';
+            spellsEl.textContent =
+              names.length === 1
+                ? `Magia aprendida: ${names[0]}.`
+                : `Magias aprendidas: ${names.join(', ')}.`;
+            block.appendChild(spellsEl);
+          }
           wrap.appendChild(block);
         }
       }

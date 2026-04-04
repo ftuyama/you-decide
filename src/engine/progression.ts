@@ -122,10 +122,13 @@ export function addXp(
     level += 1;
     const step = applyOneLevelUp(s, level, xp);
     s = step.state;
-    levelUps.push({ level, deltas: step.deltas });
+    let spellsLearned: string[] = [];
     if (data) {
-      s = unlockSpellsForNewLevel(s, level, data);
+      const unlocked = unlockSpellsForNewLevel(s, level, data);
+      s = unlocked.state;
+      spellsLearned = unlocked.learned;
     }
+    levelUps.push({ level, deltas: step.deltas, spellsLearned });
     bus?.emit({ type: 'level.up', level });
   }
 

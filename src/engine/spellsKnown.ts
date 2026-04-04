@@ -22,17 +22,20 @@ export function unlockSpellsForNewLevel(
   state: GameState,
   newLevel: number,
   data: GameData
-): GameState {
+): { state: GameState; learned: string[] } {
   const lead = state.party[0];
-  if (!lead) return state;
+  if (!lead) return { state, learned: [] };
+  const knownBefore = new Set(state.knownSpells);
   const known = new Set(state.knownSpells);
+  const learned: string[] = [];
   for (const [id, sp] of Object.entries(data.spells)) {
     if (sp.learnOnly) continue;
     if (sp.minLevel !== newLevel) continue;
     if (!spellMatchesHeroClass(sp, lead)) continue;
     known.add(id);
+    if (!knownBefore.has(id)) learned.push(id);
   }
-  return { ...state, knownSpells: [...known] };
+  return { state: { ...state, knownSpells: [...known] }, learned };
 }
 
 /**

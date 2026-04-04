@@ -40,6 +40,18 @@ export const ACT5_ICE_MELODY: number[] = [
   246.94, // B3
 ];
 
+/** Neve / gruta: pentatónica menor lenta, sensação de mistério e eco. */
+export const FROST_MYSTERY_MELODY: number[] = [
+  174.61, // F3
+  196.0, // G3
+  233.08, // Bb3
+  261.63, // C4
+  311.13, // D#4
+  261.63, // C4
+  233.08, // Bb3
+  196.0, // G3
+];
+
 export const MERCHANT_LUTE_MELODY: number[] = [
   220.0, // A3
   246.94, // B3

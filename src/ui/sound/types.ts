@@ -5,5 +5,6 @@ export type AmbientTheme =
   | 'boss'
   | 'act3'
   | 'act5'
+  | 'frost_mystery'
   | 'merchant'
   | 'void';

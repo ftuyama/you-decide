@@ -4,6 +4,7 @@ import {
   BOSS_LEAD_MELODY,
   CAMP_MELODY,
   EXPLORE_PIANO_MELODY,
+  FROST_MYSTERY_MELODY,
   MERCHANT_LUTE_MELODY,
   VOID_DRONE_MELODY,
 } from './melodies.ts';
@@ -126,6 +127,9 @@ export class GameAudio {
         break;
       case 'act5':
         this.playAmbientAct5Ice();
+        break;
+      case 'frost_mystery':
+        this.playAmbientFrostMystery();
         break;
       case 'merchant':
         this.playAmbientMerchant();
@@ -860,6 +864,89 @@ export class GameAudio {
       triggerPluck(ctx, master, when, note, this.gain(0.187), 'triangle', 2.6);
       triggerPluck(ctx, master, when + 0.09, note * 2, this.gain(0.107), 'sine', 1.4);
     }, 1800);
+
+    this.bgCleanup = () => {
+      if (this.bgPulseTimer) {
+        clearInterval(this.bgPulseTimer);
+        this.bgPulseTimer = null;
+      }
+      if (this.bgRhythmTimer) {
+        clearInterval(this.bgRhythmTimer);
+        this.bgRhythmTimer = null;
+      }
+      for (const o of oscillators) {
+        try {
+          o.stop();
+        } catch {
+          /* noop */
+        }
+      }
+      try {
+        master.disconnect();
+        comp.disconnect();
+      } catch {
+        /* noop */
+      }
+    };
+  }
+
+  /**
+   * Montanhas (gruta / monge): drones baixos + motivo lento, mais suspenso que o gelo aberto.
+   */
+  private playAmbientFrostMystery(): void {
+    if (this.muted || this.bgCleanup) return;
+    const ctx = this.ensureContext();
+    const master = ctx.createGain();
+    master.gain.value = this.gain(0.17);
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -32;
+    comp.knee.value = 14;
+    comp.ratio.value = 2.5;
+    master.connect(comp);
+    comp.connect(ctx.destination);
+
+    const layers: { freq: number; level: number; type: OscillatorType }[] = [
+      { freq: 65.41, level: 0.12, type: 'sine' }, // C2
+      { freq: 98.0, level: 0.11, type: 'triangle' }, // G2
+      { freq: 130.81, level: 0.09, type: 'sine' }, // C3
+      { freq: 174.61, level: 0.06, type: 'triangle' }, // F3
+    ];
+
+    const oscillators: OscillatorNode[] = [];
+    for (const { freq, level, type } of layers) {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      o.detune.value = (Math.random() - 0.5) * 8;
+      g.gain.value = level * 0.42;
+      o.connect(g);
+      g.connect(master);
+      o.start();
+      oscillators.push(o);
+    }
+
+    let t = 0;
+    this.bgPulseTimer = setInterval(() => {
+      if (this.muted || !this.ctx) return;
+      t += 0.025;
+      const breathe = 0.14 + Math.sin(t * 0.4) * 0.08 + Math.sin(t * 0.09) * 0.02;
+      try {
+        master.gain.setTargetAtTime(this.gain(breathe), this.ctx.currentTime, 0.85);
+      } catch {
+        /* noop */
+      }
+    }, 520);
+
+    let melodyStep = 0;
+    this.bgRhythmTimer = setInterval(() => {
+      if (this.muted || !this.ctx) return;
+      const note = FROST_MYSTERY_MELODY[melodyStep % FROST_MYSTERY_MELODY.length];
+      melodyStep++;
+      const when = this.ctx.currentTime + 0.04;
+      triggerPluck(ctx, master, when, note, this.gain(0.14), 'sine', 3.2);
+      triggerPluck(ctx, master, when + 0.12, note * 1.5, this.gain(0.09), 'triangle', 2.4);
+    }, 2400);
 
     this.bgCleanup = () => {
       if (this.bgPulseTimer) {

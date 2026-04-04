@@ -24,6 +24,13 @@ choices:
     next: act5/frost_merchant
   - text: "Patrulhar ao acaso — a cordilheira morde"
     next: act5/frost_random_router
+  - text: "Montanhas de neve — rumor de um monge na gruta"
+    next: act5/frost_snow_mountains_enter
+    condition:
+      all:
+        - { noFlag: monk_cave_banished }
+        - { noMark: monk_inner_peace }
+        - { level: { gte: 25 } }
 onEnter: []
 ---
 Uma **lasca** de abrigo contra o vento: tendas que rangem como **dentes** velhos, fogareiro que mais **ameaça** do que aquece. Alguém deixou marcas na neve — **humanas**, **bestiais**, e uma terceira que não gosta de nome.

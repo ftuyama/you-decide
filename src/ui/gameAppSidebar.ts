@@ -277,6 +277,9 @@ export function buildGameSidebar({
             .map((b) => `${b.attr.toUpperCase()} ${b.delta >= 0 ? '+' : ''}${b.delta} (${b.remainingScenes} cena(s))`)
             .join(' · ')}</div>`
         : '';
+    const monkPeaceLine = state.marks.includes('monk_inner_peace')
+      ? `<div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.tier)}<span><strong>Paz interior</strong> — +1 SOR permanente (bênção do monge).</span></div>`
+      : '';
     const passiveUnlocked =
       state.inventory.includes(PASSIVE_UNLOCK_ITEM_ID) ||
       p.weaponId === PASSIVE_UNLOCK_ITEM_ID ||
@@ -296,6 +299,7 @@ export function buildGameSidebar({
         <div class="sidebar-line sidebar-stress-label">${hintedLabel('Stress')} <strong>${p.stress}</strong> / 4</div>
         ${stressBarMarkup(p.stress)}
         ${buffHint}
+        ${monkPeaceLine}
         ${formatStatAttrsLineHtml(p, state, registry)}
         ${(() => {
           const equipBody = sidebarEquipBodyHtml(p, registry);

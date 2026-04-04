@@ -267,7 +267,7 @@ export const GameStateSchema = z.object({
   level: z.number().int().min(1).default(1),
   /** XP dentro do nível atual (0 até xpToNext(level)-1) */
   xp: z.number().int().min(0).default(0),
-  /** Dia narrativo (1 = início); avança ao visitar cenas de acampamento principais. */
+  /** Dia narrativo (1 = início); avança ao sair de cenas de acampamento principais (`*_camp`). */
   day: z.number().int().min(1).default(1),
   party: z.array(CharacterSchema),
   companionsAvailable: z.array(z.string()).default([]),
@@ -325,6 +325,8 @@ export type GameState = z.infer<typeof GameStateSchema>;
 export const CampaignIndexSchema = z.object({
   id: z.string(),
   name: z.string(),
+  /** Rótulos de UI por capítulo (1 = primeiro ato, …). Chaves como dígitos em string. */
+  chapterTitles: z.record(z.string(), z.string()).optional(),
   entryScene: z.string(),
   /** IDs still available to recruit at a new run */
   startingCompanionPool: z.array(z.string()).default([]),

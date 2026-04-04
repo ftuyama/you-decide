@@ -23,6 +23,7 @@ export function injectText(text: string, state: GameState): string {
   return text
     .replace(/\{\{playerName\}\}/g, state.playerName)
     .replace(/\{\{leadName\}\}/g, lead?.name ?? '???')
+    .replace(/\{\{day\}\}/g, String(state.day ?? 1))
     .replace(/\{\{chapter\}\}/g, String(state.chapter))
     .replace(/\{\{corruption\}\}/g, String(state.resources.corruption))
     .replace(/\{\{supply\}\}/g, String(state.resources.supply))

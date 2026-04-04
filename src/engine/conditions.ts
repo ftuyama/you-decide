@@ -88,5 +88,16 @@ export function evaluateCondition(cond: Condition | undefined, state: GameState)
   if ('companionInParty' in cond) {
     return state.party.some((p) => p.id === cond.companionInParty);
   }
+  if ('dayMod' in cond) {
+    const d = state.day ?? 1;
+    const { mod, eq } = cond.dayMod;
+    return mod > 0 && d % mod === eq;
+  }
+  if ('day' in cond) {
+    const d = state.day ?? 1;
+    if (cond.day.gte !== undefined && d < cond.day.gte) return false;
+    if (cond.day.lte !== undefined && d > cond.day.lte) return false;
+    return true;
+  }
   return true;
 }

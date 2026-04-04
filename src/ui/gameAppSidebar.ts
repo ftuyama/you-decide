@@ -85,6 +85,7 @@ function statHint(label: string): string {
     SOR: 'Sorte: afeta bônus de sorte e alguns testes.',
     CRIT: 'Chance de crítico em ataques físicos.',
     XP: 'Experiência acumulada para subir de nível.',
+    Dia: 'Dia narrativo: avança quando sais de um acampamento principal (fogueira).',
   };
   return hints[label] ?? label;
 }
@@ -347,6 +348,7 @@ export function buildGameSidebar({
         <div class="sidebar-static-title sidebar-static-title--with-icon">${iconWrap(icons.progress)}<span>Progresso</span></div>
         <div class="sidebar-static-body">
           <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.progress)}<span>Capítulo <strong>${state.chapter}</strong></span></div>
+          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.memories)}<span>${hintedLabel('Dia')} <strong>${state.day}</strong></span></div>
           <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.tier)}<span>Tier <strong>${state.narrativeTier}</strong></span></div>
         </div>
       </div>

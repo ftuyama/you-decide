@@ -36,6 +36,11 @@ choices:
   - text: "Trocar duas palavras com o grupo"
     next: act6/void_companion_chat
     condition: { companionCount: { gte: 1 } }
+  - text: "Ver o cinzento engolir mais um dia"
+    next: act6/void_camp
+    preview: "O dia narrativo avança; não recuperas força."
+    effects:
+      - { op: advanceDay }
   - text: "Manusear equipamento junto à luz instável"
     next: act6/manage_equip
   - text: "Voltar à nave fraturada"
@@ -43,5 +48,7 @@ choices:
 onEnter: []
 ---
 Não há **lenha** — só **restos** de quem já se queimou a si próprio. A fogueira **imita** calor; o teu corpo aceita a mentira porque **precisa** de um sítio onde fingir que ainda há **amanhã**.
+
+*Mesmo aqui, o número segue: **dia {{day}}** — espelhado em cinza.*
 
 **Suprimento** aqui compra **descanso**: recuperas HP e mana ao máximo e alivias 1 de stress (custa 1 suprimento). O fumo sobe em **espirais** que lembram corredores — não perguntes para onde vão.

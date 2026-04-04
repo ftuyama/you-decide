@@ -275,27 +275,31 @@ export class GameAudio {
     }
   }
 
-  /** Virada de dia narrativo (ao entrar no acampamento) — sino curto, tom ascendente. */
+  /** Virada de dia narrativo — graves lentos, descida suave (tempo que pesa, não fanfarra). */
   playDayAdvance(): void {
     const ctx = this.ensureContext();
-    const g = this.gain(0.065);
+    const g = this.gain(0.42);
     if (g <= 0) return;
     const t0 = ctx.currentTime;
-    const notes = [523.25, 659.25, 783.99];
-    notes.forEach((freq, i) => {
+    const notes: Array<{ f: number; t: number; dur: number }> = [
+      { f: 196.0, t: 0, dur: 1.15 },
+      { f: 174.61, t: 0.95, dur: 1.25 },
+      { f: 155.56, t: 2.05, dur: 1.35 },
+    ];
+    for (const { f, t, dur } of notes) {
       const o = ctx.createOscillator();
       const gn = ctx.createGain();
-      o.type = 'sine';
-      o.frequency.value = freq;
-      const start = t0 + i * 0.09;
+      o.type = 'triangle';
+      o.frequency.value = f;
+      const start = t0 + t;
       gn.gain.setValueAtTime(0.001, start);
-      gn.gain.exponentialRampToValueAtTime(g, start + 0.02);
-      gn.gain.exponentialRampToValueAtTime(0.001, start + 0.2);
+      gn.gain.exponentialRampToValueAtTime(g * 0.9, start + 0.28);
+      gn.gain.exponentialRampToValueAtTime(0.001, start + dur);
       o.connect(gn);
       gn.connect(ctx.destination);
       o.start(start);
-      o.stop(start + 0.22);
-    });
+      o.stop(start + dur + 0.08);
+    }
   }
 
   /** Item novo no inventário (fanfarra curta em três notas). */

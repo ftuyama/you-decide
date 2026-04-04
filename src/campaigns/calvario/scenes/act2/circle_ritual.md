@@ -16,5 +16,7 @@ choices:
     next: act2/circle_ritual_refuse_mind
     preview: "Mente — manter a clareza ao recusar (TN 8)"
 onEnter: []
+repeatOnLeave:
+  - { op: advanceDay }
 ---
 Um mago do **Círculo** desenha cinza no chão. "Um preço leve", diz.

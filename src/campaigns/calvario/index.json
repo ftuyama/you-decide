@@ -1,6 +1,14 @@
 {
   "id": "calvario",
   "name": "Calvário Subterrâneo",
+  "chapterTitles": {
+    "1": "Abertura",
+    "2": "Catacumbas",
+    "3": "Profundezas",
+    "4": "O Trono",
+    "5": "Neve",
+    "6": "O Vazio"
+  },
   "entryScene": "act1/title",
   "startingCompanionPool": ["rogue_mira"],
   "scenes": []

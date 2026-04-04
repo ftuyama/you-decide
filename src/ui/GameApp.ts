@@ -3,6 +3,8 @@ import { createInitialState, deserializeState, serializeState } from '../engine/
 import { EventBus, type GameEvent } from '../engine/eventBus.ts';
 import {
   enterScene,
+  maybeAdvanceDayLeavingCamp,
+  maybeApplyRepeatOnLeave,
   resolveLuckCheck,
   resolveDualAttrSkillCheck,
   resolveSkillCheck,
@@ -27,11 +29,26 @@ import {
   type StoryDiceBannerHost,
   type StoryRenderContext,
 } from './gameAppStory.ts';
+import { formatCampaignHeaderTitle } from './campaignHeaderTitle.ts';
 import { mountAppChrome } from './gameAppShell.ts';
 import './css/styles.css';
 import gameVersionRaw from '../../VERSION?raw';
 
 const GAME_VERSION = gameVersionRaw.trim() || '?';
+
+/** Legenda do aviso quando o dia narrativo avança (varia com o tempo sob pedra). */
+function dayAdvanceSubtitle(day: number): string {
+  if (day >= 30) return 'Até o número parece estranho na língua.';
+  if (day >= 25) return 'Quem conta dias conta também medo.';
+  if (day >= 20) return 'A pedra não distingue pressa de desespero.';
+  if (day >= 15) return 'O subsolo não perdoa quem demora.';
+  if (day >= 12) return 'O abismo não tem pressa — tu é que tens.';
+  if (day >= 9) return 'Sem sol: só hábito e eco.';
+  if (day >= 6) return 'Os túneis não esquecem quem passa.';
+  if (day >= 4) return 'Cada viragem arrasta mais silêncio.';
+  if (day >= 2) return 'Primeiras marcas na contagem — ainda sabes em voz alta.';
+  return 'Passou tempo desde a última paragem.';
+}
 
 export class GameApp {
   private readonly campaignId: string;
@@ -40,6 +57,7 @@ export class GameApp {
   private readonly sidebarKey: string;
   private readonly fontKey: string;
   private readonly quickNavKey: string;
+  private readonly timedChoiceKey: string;
   private readonly devModeKey: string;
   private registry: ContentRegistry;
   private bus = new EventBus();
@@ -54,6 +72,8 @@ export class GameApp {
   private devMode = false;
   /** Modo de navegação rápida: mostra números clicáveis antes das escolhas. */
   private quickNavMode = false;
+  /** Escolhas com `timedMs` + barra / auto-navegação. */
+  private timedChoiceMode = false;
   private readonly choiceHotkeyHandler: (e: KeyboardEvent) => void;
   /** Secções colapsáveis (recursos, faccoes, diario) — persistido em sessionStorage */
   private sidebarSections: Record<string, boolean> = {};
@@ -80,11 +100,13 @@ export class GameApp {
     this.sidebarKey = `${campaignId}_sidebar_sections_v1`;
     this.fontKey = `${campaignId}_font_step_v1`;
     this.quickNavKey = `${campaignId}_quick_nav_mode_v1`;
+    this.timedChoiceKey = `${campaignId}_timed_choice_v1`;
     this.devModeKey = `${campaignId}_dev_mode`;
     this.registry = new ContentRegistry(campaignId);
     this.audio = new GameAudio(campaignId);
     this.fontStep = this.loadFontStep();
     this.quickNavMode = this.loadQuickNavMode();
+    this.timedChoiceMode = this.loadTimedChoiceMode();
     this.devMode = this.loadDevMode();
     this.choiceHotkeyHandler = (e: KeyboardEvent): void => {
       const el = e.target;
@@ -158,6 +180,16 @@ export class GameApp {
         this.unlockAudio();
         this.audio.playCampRest();
       }
+      if (ev.type === 'time.dayAdvanced') {
+        this.unlockAudio();
+        this.audio.playDayAdvance();
+        this.statusHighlightQueue.push({
+          type: 'statusHighlight',
+          variant: 'good',
+          title: `Dia ${ev.day}`,
+          subtitle: dayAdvanceSubtitle(ev.day),
+        });
+      }
       if (ev.type === 'statusHighlight') {
         this.statusHighlightQueue.push(ev);
       }
@@ -225,6 +257,22 @@ export class GameApp {
   private saveQuickNavMode(): void {
     try {
       localStorage.setItem(this.quickNavKey, this.quickNavMode ? '1' : '0');
+    } catch {
+      /* noop */
+    }
+  }
+
+  private loadTimedChoiceMode(): boolean {
+    try {
+      return localStorage.getItem(this.timedChoiceKey) === '1';
+    } catch {
+      return false;
+    }
+  }
+
+  private saveTimedChoiceMode(): void {
+    try {
+      localStorage.setItem(this.timedChoiceKey, this.timedChoiceMode ? '1' : '0');
     } catch {
       /* noop */
     }
@@ -405,6 +453,13 @@ export class GameApp {
     }
     if (s.sceneId !== prevScene) {
       s = tickActiveBuffs(s);
+      s = maybeApplyRepeatOnLeave(prevScene, s.sceneId, s, this.bus, (id) =>
+        this.registry.getScene(id),
+        this.registry.data
+      );
+      s = maybeAdvanceDayLeavingCamp(prevScene, s.sceneId, s, this.bus, (id) =>
+        this.registry.getScene(id)
+      );
     }
     this.state = this.stabilize(s);
     this.render();
@@ -585,7 +640,19 @@ export class GameApp {
       dismissStoryDiceRoll: (nextState) => {
         this.clearDiceRollTimers();
         this.pendingStoryDiceRoll = null;
-        this.state = this.stabilize(nextState);
+        const prevScene = this.state.sceneId;
+        let s = nextState;
+        if (s.sceneId !== prevScene) {
+          s = tickActiveBuffs(s);
+          s = maybeApplyRepeatOnLeave(prevScene, s.sceneId, s, this.bus, (id) =>
+            this.registry.getScene(id),
+            this.registry.data
+          );
+          s = maybeAdvanceDayLeavingCamp(prevScene, s.sceneId, s, this.bus, (id) =>
+            this.registry.getScene(id)
+          );
+        }
+        this.state = this.stabilize(s);
         this.audio.playUiClick();
         this.render();
       },
@@ -599,6 +666,7 @@ export class GameApp {
       campaignId: this.campaignId,
       devMode: this.devMode,
       quickNavMode: this.quickNavMode,
+      timedChoiceEnabled: this.timedChoiceMode,
       state: this.state,
       registry: this.registry,
       scene,
@@ -655,12 +723,17 @@ export class GameApp {
     }
     this.root.innerHTML = '';
 
+    const headerTitle = formatCampaignHeaderTitle(this.registry.data.campaign, this.state.chapter);
+    document.title = headerTitle;
+
     mountAppChrome(this.root, {
+      headerTitle,
       gameVersion: GAME_VERSION,
       fontStep: this.fontStep,
       campaignId: this.campaignId,
       devMode: this.devMode,
       quickNavMode: this.quickNavMode,
+      timedChoiceEnabled: this.timedChoiceMode,
       state: this.state,
       registry: this.registry,
       sidebarSections: this.sidebarSections,
@@ -692,6 +765,12 @@ export class GameApp {
       onQuickNavChange: (v) => {
         this.quickNavMode = v;
         this.saveQuickNavMode();
+        this.closeMenu();
+        this.render();
+      },
+      onTimedChoiceChange: (v) => {
+        this.timedChoiceMode = v;
+        this.saveTimedChoiceMode();
         this.closeMenu();
         this.render();
       },
@@ -739,7 +818,15 @@ export class GameApp {
               unlockAudio: () => this.unlockAudio(),
               stabilize: (s) => this.stabilize(s),
               commitState: (s) => {
-                this.state = this.stabilize(s);
+                const prev = this.state.sceneId;
+                let next = s;
+                if (s.sceneId !== prev && s.mode === 'story') {
+                  next = maybeApplyRepeatOnLeave(prev, s.sceneId, s, this.bus, (id) =>
+                    this.registry.getScene(id),
+                    this.registry.data
+                  );
+                }
+                this.state = this.stabilize(next);
                 this.render();
               },
             },

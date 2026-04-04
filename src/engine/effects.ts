@@ -13,6 +13,7 @@ import {
 } from './state.ts';
 import { clampLeadStat, tickActiveBuffs, type LeadStatAttr } from './leadStats.ts';
 import { applyConsumableToCharacter, isConsumable, removeOneInventoryItem } from './consumables.ts';
+import { injectText } from './template.ts';
 
 export { tickActiveBuffs };
 
@@ -187,6 +188,11 @@ function applyOne(
         extraLifeReady: extraLifeReadyFromFaith(r.faith),
       };
     }
+    case 'advanceDay': {
+      const nextDay = (state.day ?? 1) + 1;
+      bus.emit({ type: 'time.dayAdvanced', day: nextDay });
+      return GameStateSchema.parse({ ...state, day: nextDay });
+    }
     case 'campRest': {
       if (state.resources.supply < 1) return state;
       bus.emit({ type: 'camp.rest' });
@@ -264,7 +270,7 @@ function applyOne(
     case 'goto':
       return { ...state, sceneId: e.sceneId, mode: 'story' };
     case 'addDiary':
-      return { ...state, diary: [...state.diary, e.text] };
+      return { ...state, diary: [...state.diary, injectText(e.text, state)] };
     case 'startCombat': {
       const enc = ctx.data.encounters[e.encounterId];
       if (!enc) {

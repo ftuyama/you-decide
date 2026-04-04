@@ -54,6 +54,16 @@ export const ConditionSchema: z.ZodType<Condition> = z.lazy(() =>
       companionCount: z.object({ gte: z.number().optional(), lte: z.number().optional() }),
     }),
     z.object({ companionInParty: z.string() }),
+    /** (dia narrativo % mod) === eq — ex.: mod 5, eq 0 → dias 5, 10, … */
+    z.object({
+      dayMod: z.object({
+        mod: z.number().int().min(2).max(30),
+        eq: z.number().int().min(0).max(29),
+      }),
+    }),
+    z.object({
+      day: z.object({ gte: z.number().optional(), lte: z.number().optional() }),
+    }),
   ])
 );
 
@@ -83,7 +93,9 @@ export type Condition =
   | { level: { gte?: number; lte?: number } }
   | { corruption: { gte?: number; lte?: number } }
   | { companionCount: { gte?: number; lte?: number } }
-  | { companionInParty: string };
+  | { companionInParty: string }
+  | { dayMod: { mod: number; eq: number } }
+  | { day: { gte?: number; lte?: number } };
 
 export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
   z.object({ op: z.literal('setFlag'), key: z.string(), value: z.boolean() }),
@@ -150,6 +162,7 @@ export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
     itemId: z.string(),
     targetIndex: z.number().int().min(0).max(2).optional(),
   }),
+  z.object({ op: z.literal('advanceDay') }),
   z.object({ op: z.literal('resetRun') }),
 ]);
 
@@ -194,6 +207,7 @@ export type Effect =
       remainingScenes: number;
     }
   | { op: 'useConsumable'; itemId: string; targetIndex?: number }
+  | { op: 'advanceDay' }
   | { op: 'resetRun' };
 
 export const ChoiceSchema = z.object({
@@ -300,6 +314,10 @@ export const SceneFrontmatterSchema = z.object({
     .optional(),
   /** Efeitos ao entrar na cena (após primeira renderização; idempotência por visit) */
   onEnter: z.array(EffectSchema).default([]),
+  /** Efeitos em **cada** entrada na cena (ex.: avançar dia num hub) */
+  repeatOnEnter: z.array(EffectSchema).default([]),
+  /** Efeitos ao sair da cena para outra `sceneId` (cada transição) */
+  repeatOnLeave: z.array(EffectSchema).default([]),
   choices: z.array(ChoiceSchema).default([]),
   skillCheck: SkillCheckSchema.optional(),
   dualAttrSkillCheck: DualAttrSkillCheckSchema.optional(),

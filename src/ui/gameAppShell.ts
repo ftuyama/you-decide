@@ -5,6 +5,8 @@ import { buildGameSidebar } from './gameAppSidebar.ts';
 import { SAVE_SLOT_COUNT, buildMenuSaveSlot } from './gameAppSaveSlots.ts';
 /** Layout persistente: cabeçalho, menu lateral, sidebar do jogador e área principal (`main.story-shell`). */
 export type MountAppChromeOptions = {
+  /** Texto do título no topo (`{campanha} / {ato}`). */
+  headerTitle: string;
   gameVersion: string;
   fontStep: number;
   campaignId: string;
@@ -52,7 +54,7 @@ export function mountAppChrome(root: HTMLElement, opts: MountAppChromeOptions): 
   header.className = 'app-top';
   const title = document.createElement('div');
   title.className = 'game-title';
-  title.textContent = 'Calvário Subterrâneo';
+  title.textContent = opts.headerTitle;
   const hBtn = document.createElement('button');
   hBtn.type = 'button';
   hBtn.className = 'hamburger';

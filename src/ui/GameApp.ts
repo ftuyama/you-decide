@@ -166,7 +166,6 @@ export class GameApp {
     this.state = this.stabilize(this.state);
     this.sidebarSections = this.loadSidebarSections();
     this.migrateLegacySaveIfNeeded();
-    window.addEventListener('keydown', (e) => this.onMapKey(e));
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         this.menuOpen = false;
@@ -458,30 +457,6 @@ export class GameApp {
       window.removeEventListener('keydown', this.diceRollEnterHandler);
       this.diceRollEnterHandler = null;
     }
-  }
-
-  private onMapKey(e: KeyboardEvent): void {
-    if (this.pendingStoryDiceRoll) return;
-    const m = this.state.asciiMap;
-    if (!m || this.state.mode !== 'story') return;
-    const mapId = m.mapId;
-    let { playerX: x, playerY: y } = m;
-    let nx = x;
-    let ny = y;
-    if (e.key === 'ArrowUp') ny -= 1;
-    else if (e.key === 'ArrowDown') ny += 1;
-    else if (e.key === 'ArrowLeft') nx -= 1;
-    else if (e.key === 'ArrowRight') nx += 1;
-    else return;
-    e.preventDefault();
-    if (!this.registry.ui.canWalk(mapId, x, y, nx, ny)) {
-      this.audio.playBlocked();
-      return;
-    }
-    let s: GameState = { ...this.state, asciiMap: { ...m, playerX: nx, playerY: ny } };
-    this.audio.playUiClick();
-    this.state = s;
-    this.render();
   }
 
   /** Copia a gravação legada para o slot 1 se o slot 1 ainda estiver vazio. */

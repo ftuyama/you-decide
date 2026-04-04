@@ -537,14 +537,10 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
   inner.appendChild(body);
 
   if (ctx.state.asciiMap) {
-    const rm = ctx.registry.ui.renderMap(
-      ctx.state.asciiMap.mapId,
-      ctx.state.asciiMap.playerX,
-      ctx.state.asciiMap.playerY
-    );
+    const rm = ctx.registry.ui.renderMap(ctx.state.asciiMap.mapId);
     if (rm) {
       const wrap = document.createElement('div');
-      wrap.innerHTML = `<div class="map-hint sidebar-line--with-icon">${iconWrap(icons.map)}<span>Mapa (setas; −1 suprimento por passo)</span></div>`;
+      wrap.innerHTML = `<div class="map-hint sidebar-line--with-icon">${iconWrap(icons.map)}<span>Mapa</span></div>`;
       const pre = document.createElement('pre');
       pre.className = 'ascii-map';
       pre.textContent = rm.lines.join('\n');

@@ -318,7 +318,7 @@ function applyOne(
     case 'setAsciiMap':
       return {
         ...state,
-        asciiMap: { mapId: e.mapId, playerX: e.playerX, playerY: e.playerY },
+        asciiMap: { mapId: e.mapId },
       };
     case 'clearAsciiMap':
       return { ...state, asciiMap: null };

@@ -127,7 +127,7 @@ export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
   }),
   z.object({ op: z.literal('recruit'), companionId: z.string() }),
   z.object({ op: z.literal('dismissCompanion'), companionId: z.string() }),
-  z.object({ op: z.literal('setAsciiMap'), mapId: z.string(), playerX: z.number(), playerY: z.number() }),
+  z.object({ op: z.literal('setAsciiMap'), mapId: z.string() }),
   z.object({ op: z.literal('clearAsciiMap') }),
   z.object({ op: z.literal('initClass'), class: ClassIdSchema }),
   z.object({ op: z.literal('addXp'), amount: z.number().int().min(1) }),
@@ -179,7 +179,7 @@ export type Effect =
     }
   | { op: 'recruit'; companionId: string }
   | { op: 'dismissCompanion'; companionId: string }
-  | { op: 'setAsciiMap'; mapId: string; playerX: number; playerY: number }
+  | { op: 'setAsciiMap'; mapId: string }
   | { op: 'clearAsciiMap' }
   | { op: 'initClass'; class: ClassId }
   | { op: 'addXp'; amount: number }

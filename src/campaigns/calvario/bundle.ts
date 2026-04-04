@@ -16,7 +16,7 @@ import companions from './data/companions.json';
 import { spells as spellsTs } from './data/spells.ts';
 import { passives as passivesTs } from './data/passives.ts';
 import { calvarioHeroNarrative } from './heroNarrative.ts';
-import { canWalk, renderMap } from './maps.ts';
+import { renderMap } from './maps.ts';
 import { SCENE_ART } from './ascii/art.ts';
 import { getHeroClassLabel, getHeroLore } from './classHero.ts';
 
@@ -27,7 +27,6 @@ const sceneRaw = import.meta.glob<string>('./scenes/**/*.md', {
 }) as Record<string, string>;
 
 export const calvarioUI: CampaignUIAdapter = {
-  canWalk,
   renderMap,
   sceneArt: SCENE_ART,
   getHeroClassLabel,

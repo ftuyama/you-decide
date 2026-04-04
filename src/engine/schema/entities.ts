@@ -292,12 +292,10 @@ export const GameStateSchema = z.object({
   /** IDs de magias conhecidas pelo líder (combate e sidebar) */
   knownSpells: z.array(z.string()).default([]),
   visitedScenes: z.record(z.string(), z.boolean()).default({}),
-  /** Mapa ASCII ativo */
+  /** Mapa ASCII ativo (só visual; sem posição de jogador no estado) */
   asciiMap: z
     .object({
       mapId: z.string(),
-      playerX: z.number().int(),
-      playerY: z.number().int(),
     })
     .nullable()
     .default(null),

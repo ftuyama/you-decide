@@ -13,7 +13,9 @@ choices:
     next: act6/camp/void_companion_chat
 onEnter: []
 ---
-**Tomás** apoia o escudo na cinza que não espalha calor. "Isto não é campo", diz baixo. "É **prova**. E prova não pede aplausos — pede passos."
+**Tomás** apoia o escudo na cinza que não espalha calor.
+
+> *"Isto não é campo", diz baixo. "É **prova**. E prova não pede aplausos — pede passos."*
 
 ---
 

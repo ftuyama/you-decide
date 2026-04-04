@@ -8,9 +8,13 @@ choices:
     next: act2/camp/camp_tomas_fireside
 onEnter: []
 ---
-Ele olha para as marcas no couro como quem lê uma genealogia torta. "Pesa o que **não** consegui parar. O resto é madeira e pregos — isso qualquer ferreiro conserta."
+Ele olha para as marcas no couro como quem lê uma genealogia torta.
 
-Um segundo depois, mais baixo: "Tu também carregas coisa demais. Não te acostumes a chamar isso de honra."
+> *"Pesa o que **não** consegui parar. O resto é madeira e pregos — isso qualquer ferreiro conserta."*
+
+Um segundo depois, mais baixo:
+
+> *"Tu também carregas coisa demais. Não te acostumes a chamar isso de honra."*
 ---
 
 {{companionLine}}

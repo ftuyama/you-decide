@@ -15,7 +15,9 @@ choices:
     next: act6/camp/void_companion_chat
 onEnter: []
 ---
-**Mira** observa a chama que não consome madeira — e mesmo assim recua, hábito de sobrevivente. "Aqui o eco **mente** menos que as pessoas. Isso não é conforto: é **aviso**."
+**Mira** observa a chama que não consome madeira — e mesmo assim recua, hábito de sobrevivente.
+
+> *"Aqui o eco **mente** menos que as pessoas. Isso não é conforto: é **aviso**."*
 
 ---
 

@@ -12,7 +12,9 @@ onEnter: []
 ---
 Não dizes nada. Ela também não. O ruído do acampamento recua; só resta o estalar da lenha e o calor mentiroso na pele.
 
-Quando Mira fala, é quase um insulto suave: "Vê? **Assim** se faz trégua."
+Quando Mira fala, é quase um insulto suave:
+
+> *"Vê? **Assim** se faz trégua."*
 
 ---
 

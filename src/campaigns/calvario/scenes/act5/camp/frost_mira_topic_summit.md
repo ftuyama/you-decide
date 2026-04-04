@@ -8,9 +8,13 @@ choices:
     next: act5/camp/frost_mira_fireside
 onEnter: []
 ---
-Mira olha para a escuridão acima do desfiladeiro. "O cume não é vitória. É **exposição**. O céu gosta de ver quem tremer primeiro — não vou dar esse espetáculo de graça."
+Mira olha para a escuridão acima do desfiladeiro.
 
-Ela cruza os braços. "Quando subirmos, não me peças heroísmo. Pede **clareza**. Eu corto o que estiver à frente."
+> *"O cume não é vitória. É **exposição**. O céu gosta de ver quem tremer primeiro — não vou dar esse espetáculo de graça."*
+
+Ela cruza os braços.
+
+> *"Quando subirmos, não me peças heroísmo. Pede **clareza**. Eu corto o que estiver à frente."*
 ---
 
 {{companionLine}}

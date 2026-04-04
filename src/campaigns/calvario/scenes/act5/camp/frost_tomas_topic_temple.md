@@ -10,9 +10,11 @@ choices:
       - { op: addDiary, text: "Tomás falou do cume como de uma linha — não de glória, mas de dever. O escudo dele continua a fazer sombra maior do que ele admite." }
 onEnter: []
 ---
-"Pedra negra não é moral", murmura Tomás. "É **peso**. O templo vai pedir joelhos — eu dou joelhos por hábito, não por teatro. Se lá dentro houver vozes, lembra-te: eco não é ordem."
+> *"Pedra negra não é moral", murmura Tomás. "É **peso**. O templo vai pedir joelhos — eu dou joelhos por hábito, não por teatro. Se lá dentro houver vozes, lembra-te: eco não é ordem."*
 
-Ele bate leve no escudo. "Eu entro primeiro quando o chão for duvidoso. Não por bravura — por **medida**."
+Ele bate leve no escudo.
+
+> *"Eu entro primeiro quando o chão for duvidoso. Não por bravura — por **medida**."*
 ---
 
 {{companionLine}}

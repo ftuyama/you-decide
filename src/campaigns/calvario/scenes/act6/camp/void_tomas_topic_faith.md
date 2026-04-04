@@ -9,9 +9,11 @@ choices:
     next: act6/camp/void_tomas_fireside
 onEnter: []
 ---
-"A fé não muda de som", diz Tomás. "Muda de **eco**. Aqui o eco repete o que queres ouvir — por isso desconfio."
+> *"A fé não muda de som", diz Tomás. "Muda de **eco**. Aqui o eco repete o que queres ouvir — por isso desconfio."*
 
-Ele inspira devagar. "Se Deus calar, eu continuo a levantar o escudo. Não é teatro. É **hábito** de quem ainda acredita em chão."
+Ele inspira devagar.
+
+> *"Se Deus calar, eu continuo a levantar o escudo. Não é teatro. É **hábito** de quem ainda acredita em chão."*
 ---
 
 {{companionLine}}

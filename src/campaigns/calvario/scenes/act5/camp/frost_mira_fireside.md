@@ -17,7 +17,7 @@ onEnter: []
 ---
 **Mira** não se encolhe contra o vento: usa-o. O capuz faz sombra extra no rosto; só os olhos ficam vivos, a reflectir o fogareiro.
 
-"Neve é boa para **apagar pegadas**", diz. "Má para esquecer onde puseste os pés. Escolhe o que queres apagar."
+> *"Neve é boa para **apagar pegadas**", diz. "Má para esquecer onde puseste os pés. Escolhe o que queres apagar."*
 ---
 
 {{companionLine}}

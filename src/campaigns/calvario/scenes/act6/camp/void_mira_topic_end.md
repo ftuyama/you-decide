@@ -11,9 +11,11 @@ choices:
       - { op: addDiary, text: "Mira falou do fim como de uma fresta — não de vitória. Guardo isto como quem guarda fósforo: pouco, mas suficiente para ver o próximo passo." }
 onEnter: []
 ---
-"Porta fecha. Poço **engole**", murmura ela. "Eu prefiro porta — dói menos no orgulho. Se o fim for buraco, eu desço **primeiro**: já sei o sabor da queda."
+> *"Porta fecha. Poço **engole**", murmura ela. "Eu prefiro porta — dói menos no orgulho. Se o fim for buraco, eu desço **primeiro**: já sei o sabor da queda."*
 
-Um riso curto, sem alegria. "Contigo, talvez seja só mais um beco. Becos eu conheço."
+Um riso curto, sem alegria.
+
+> *"Contigo, talvez seja só mais um beco. Becos eu conheço."*
 ---
 
 {{companionLine}}

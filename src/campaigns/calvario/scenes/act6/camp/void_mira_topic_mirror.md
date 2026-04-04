@@ -9,9 +9,11 @@ choices:
     next: act6/camp/void_mira_fireside
 onEnter: []
 ---
-"Sombras aqui têm **dentes**", diz Mira. "A minha inclui tudo o que roubei ao medo — e o medo gosta de cobrar juros."
+> *"Sombras aqui têm **dentes**", diz Mira. "A minha inclui tudo o que roubei ao medo — e o medo gosta de cobrar juros."*
 
-Ela fecha os olhos um instante. "Se me vires a hesitar, não chames piedade. Chama **tempo**."
+Ela fecha os olhos um instante.
+
+> *"Se me vires a hesitar, não chames piedade. Chama **tempo**."*
 ---
 
 {{companionLine}}

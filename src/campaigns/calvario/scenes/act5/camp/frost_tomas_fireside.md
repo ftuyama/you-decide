@@ -15,7 +15,7 @@ onEnter: []
 ---
 **Tomás** esfrega as mãos devagar, sem drama — trabalho de quem já aprendeu que o frio não negocia. O escudo está perto, sempre, como segunda pele.
 
-"A montanha não é inimigo", diz. "Inimigo é **confundir** cansaço com sinal de Deus."
+> *"A montanha não é inimigo", diz. "Inimigo é **confundir** cansaço com sinal de Deus."*
 ---
 
 {{companionLine}}

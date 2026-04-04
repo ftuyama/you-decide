@@ -15,7 +15,9 @@ choices:
     next: act2/camp/camp_companion_chat
 onEnter: []
 ---
-**Tomás** apoia o escudo na terra como quem afirma um limite. "Se vieste por pena, poupa saliva. Se vieste por **palavra**, fala — o fogo não vai interromper por educação."
+**Tomás** apoia o escudo na terra como quem afirma um limite.
+
+> *"Se vieste por pena, poupa saliva. Se vieste por **palavra**, fala — o fogo não vai interromper por educação."*
 
 ---
 

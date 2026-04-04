@@ -1,18 +1,21 @@
-import { ACT1_SCENE_ART } from './scenes/act1.ts';
-import { ACT2_SCENE_ART } from './scenes/act2.ts';
-import { ACT3_SCENE_ART } from './scenes/act3.ts';
-import { ACT4_SCENE_ART } from './scenes/act4.ts';
-import { ACT5_SCENE_ART } from './scenes/act5.ts';
-import { ACT6_SCENE_ART } from './scenes/act6.ts';
-import { CORE_SCENE_ART } from './scenes/core.ts';
+const sceneArtRaw = import.meta.glob<string>('./scenes/files/**/*.txt', {
+  query: '?raw',
+  import: 'default',
+  eager: true,
+}) as Record<string, string>;
+
+function buildSceneArt(): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [path, content] of Object.entries(sceneArtRaw)) {
+    const base = path.split('/').pop()!;
+    const key = base.replace(/\.txt$/u, '');
+    if (out[key]) {
+      throw new Error(`Duplicate scene art key: ${key}`);
+    }
+    out[key] = content;
+  }
+  return out;
+}
 
 /** Arte ASCII reutilizável — paisagens e cenas (artKey no frontmatter). */
-export const SCENE_ART: Record<string, string> = {
-  ...CORE_SCENE_ART,
-  ...ACT1_SCENE_ART,
-  ...ACT2_SCENE_ART,
-  ...ACT3_SCENE_ART,
-  ...ACT4_SCENE_ART,
-  ...ACT5_SCENE_ART,
-  ...ACT6_SCENE_ART,
-};
+export const SCENE_ART: Record<string, string> = buildSceneArt();

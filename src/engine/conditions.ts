@@ -85,5 +85,8 @@ export function evaluateCondition(cond: Condition | undefined, state: GameState)
     if (cc.lte !== undefined && n > cc.lte) return false;
     return true;
   }
+  if ('companionInParty' in cond) {
+    return state.party.some((p) => p.id === cond.companionInParty);
+  }
   return true;
 }

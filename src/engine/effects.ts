@@ -38,6 +38,7 @@ function humanizeMarkId(mark: string): string {
 const MARK_TITLE_PT: Partial<Record<string, string>> = {
   monk_inner_peace: 'Paz interior (monge da neve)',
   wound_mire_leg: 'Mordida do poço',
+  title_fallen_god: 'Título: Deus caído',
 };
 
 function titleForMark(mark: string): string {

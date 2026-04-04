@@ -7,4 +7,5 @@ export type AmbientTheme =
   | 'act5'
   | 'frost_mystery'
   | 'merchant'
-  | 'void';
+  | 'void'
+  | 'ancient_macabre';

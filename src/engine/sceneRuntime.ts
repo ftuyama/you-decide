@@ -118,6 +118,21 @@ export type StoryDiceRollBreakdown =
       tn: number;
       success: boolean;
       rollLog: string;
+    }
+  | {
+      kind: 'dualSkill';
+      attrs: ['str' | 'agi' | 'mind', 'str' | 'agi' | 'mind'];
+      rounds: Array<{
+        d1: number;
+        d2: number;
+        mod1: number;
+        mod2: number;
+        total: number;
+        tn: number;
+        success: boolean;
+      }>;
+      success: boolean;
+      rollLog: string;
     };
 
 export function resolveSkillCheck(
@@ -149,6 +164,61 @@ export function resolveSkillCheck(
   const newState = tickActiveBuffs({
     ...state,
     rngSeed: (state.rngSeed + 17) >>> 0,
+    sceneId: next,
+  });
+  return { state: newState, breakdown };
+}
+
+function attrMod(lead: GameState['party'][0], attr: 'str' | 'agi' | 'mind'): number {
+  const v =
+    attr === 'str' ? lead?.str ?? 0 : attr === 'agi' ? lead?.agi ?? 0 : lead?.mind ?? 0;
+  return Math.floor((v - 6) / 2);
+}
+
+export function resolveDualAttrSkillCheck(
+  state: GameState,
+  scene: LoadedScene
+): { state: GameState; breakdown: StoryDiceRollBreakdown | null } {
+  const dc = scene.frontmatter.dualAttrSkillCheck;
+  if (!dc) return { state, breakdown: null };
+  const rng = mulberry32(state.rngSeed);
+  const lead = state.party[0];
+  const [a1, a2] = dc.attrs;
+  const m1 = attrMod(lead, a1);
+  const m2 = attrMod(lead, a2);
+  const rounds: Array<{
+    d1: number;
+    d2: number;
+    mod1: number;
+    mod2: number;
+    total: number;
+    tn: number;
+    success: boolean;
+  }> = [];
+  const lines: string[] = [];
+  let allOk = true;
+  for (let r = 0; r < dc.rounds; r++) {
+    const [d1, d2] = roll2d6(rng);
+    const total = d1 + d2 + m1 + m2;
+    const ok = total >= dc.tn;
+    if (!ok) allOk = false;
+    rounds.push({ d1, d2, mod1: m1, mod2: m2, total, tn: dc.tn, success: ok });
+    lines.push(
+      `Selo ${r + 1}/${dc.rounds}: [${d1}][${d2}] +${m1} (${a1.toUpperCase()}) +${m2} (${a2.toUpperCase()}) = ${total} vs TN ${dc.tn} → ${ok ? 'sucesso' : 'falha'}.`
+    );
+  }
+  const rollLog = lines.join('\n');
+  const next = allOk ? dc.successNext : dc.failNext;
+  const breakdown: StoryDiceRollBreakdown = {
+    kind: 'dualSkill',
+    attrs: dc.attrs,
+    rounds,
+    success: allOk,
+    rollLog,
+  };
+  const newState = tickActiveBuffs({
+    ...state,
+    rngSeed: (state.rngSeed + 23 + dc.rounds * 7) >>> 0,
     sceneId: next,
   });
   return { state: newState, breakdown };

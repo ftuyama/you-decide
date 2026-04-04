@@ -147,6 +147,34 @@
     "playerAdvantage": true,
     "enemyAdvantage": false
   },
+  "summit_ascent_1": {
+    "id": "summit_ascent_1",
+    "enemies": ["frost_reaver", "frost_whelp"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 4
+  },
+  "summit_ascent_2": {
+    "id": "summit_ascent_2",
+    "enemies": ["frost_reaver", "frost_cultist"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 5
+  },
+  "summit_ascent_3": {
+    "id": "summit_ascent_3",
+    "enemies": ["frost_whelp", "frost_whelp", "frost_reaver", "frost_cultist"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 12
+  },
+  "summit_fallen_god": {
+    "id": "summit_fallen_god",
+    "enemies": ["summit_fallen_god"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 25
+  },
   "act6_veil_herald": {
     "id": "act6_veil_herald",
     "enemies": ["act6_veil_herald"],

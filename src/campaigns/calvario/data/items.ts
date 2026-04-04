@@ -94,6 +94,15 @@ export const items: Record<string, ItemDef> = {
     armor: 1,
     sprite: itemSprites.frost_wyrm_scale,
   }),
+  fallen_god_amulet: z({
+    id: 'fallen_god_amulet',
+    name: 'Amuleto do Panteão Quebrado',
+    slot: 'relic',
+    bonusMind: 1,
+    corruptionDrainOnHit: 1,
+    damageBonusPerCorruptionDrain: 3,
+    sprite: itemSprites.third_bell,
+  }),
   morvayn_heart_shard: z({
     id: 'morvayn_heart_shard',
     name: 'Fragmento do Trono de Morvayn',

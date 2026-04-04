@@ -6,6 +6,7 @@ import {
   filterChoices,
   renderSceneBody,
   resolveLuckCheck,
+  resolveDualAttrSkillCheck,
   resolveSkillCheck,
   type LoadedScene,
   type StoryDiceRollBreakdown,
@@ -440,6 +441,20 @@ export class GameApp {
     this.render();
   }
 
+  private onDualAttrSkillRoll(scene: LoadedScene): void {
+    if (this.pendingStoryDiceRoll) return;
+    this.unlockAudio();
+    this.audio.playDice();
+    const r = resolveDualAttrSkillCheck(this.state, scene);
+    if (!r.breakdown) return;
+    const afterRoll: GameState = {
+      ...r.state,
+      visitedScenes: { ...r.state.visitedScenes, [scene.id]: true },
+    };
+    this.pendingStoryDiceRoll = { nextState: afterRoll, breakdown: r.breakdown };
+    this.render();
+  }
+
   private onLuckRoll(scene: LoadedScene): void {
     if (this.pendingStoryDiceRoll) return;
     this.unlockAudio();
@@ -479,7 +494,11 @@ export class GameApp {
     panel.setAttribute('role', 'region');
     panel.setAttribute(
       'aria-label',
-      breakdown.kind === 'skill' ? 'Resultado do teste de perícia' : 'Resultado do teste de sorte'
+      breakdown.kind === 'skill'
+        ? 'Resultado do teste de perícia'
+        : breakdown.kind === 'dualSkill'
+          ? 'Resultado da prova tríplice'
+          : 'Resultado do teste de sorte'
     );
 
     const kicker = document.createElement('div');
@@ -487,7 +506,9 @@ export class GameApp {
     kicker.textContent =
       breakdown.kind === 'skill'
         ? `Teste de perícia (${breakdown.attr.toUpperCase()})`
-        : 'Teste de sorte';
+        : breakdown.kind === 'dualSkill'
+          ? `Prova tríplice (${breakdown.attrs[0].toUpperCase()} + ${breakdown.attrs[1].toUpperCase()})`
+          : 'Teste de sorte';
     panel.appendChild(kicker);
 
     const pre = document.createElement('pre');
@@ -523,7 +544,14 @@ export class GameApp {
     };
 
     const finishReveal = (): void => {
-      pre.textContent = formatDiceAscii([breakdown.d1, breakdown.d2]);
+      const dPair =
+        breakdown.kind === 'dualSkill'
+          ? (() => {
+              const last = breakdown.rounds[breakdown.rounds.length - 1];
+              return last ? [last.d1, last.d2] : [1, 1];
+            })()
+          : [breakdown.d1, breakdown.d2];
+      pre.textContent = formatDiceAscii(dPair);
       pre.classList.remove('story-dice-pre--rolling');
       panel.classList.add(
         breakdown.success ? 'story-dice-banner-panel--success' : 'story-dice-banner-panel--fail'
@@ -1482,6 +1510,24 @@ export class GameApp {
       b.textContent = this.quickNavMode ? `${storyNavIndex} - ${base}` : base;
       if (storyNavIndex < 10) b.title = `Tecla ${storyNavIndex}`;
       b.addEventListener('click', () => this.onSkillRoll(scene));
+      row.appendChild(b);
+      inner.appendChild(row);
+    }
+
+    if (scene.frontmatter.dualAttrSkillCheck) {
+      storyNavIndex += 1;
+      const row = document.createElement('div');
+      row.className = 'skill-row';
+      const b = document.createElement('button');
+      b.className = 'choice';
+      const dc = scene.frontmatter.dualAttrSkillCheck;
+      const lbl =
+        dc.label ??
+        `${dc.attrs[0].toUpperCase()} + ${dc.attrs[1].toUpperCase()} · ${dc.rounds} lançamentos`;
+      const base = `Rolar prova tríplice: ${lbl} (2d6 + dois mods vs TN ${dc.tn})`;
+      b.textContent = this.quickNavMode ? `${storyNavIndex} - ${base}` : base;
+      if (storyNavIndex < 10) b.title = `Tecla ${storyNavIndex}`;
+      b.addEventListener('click', () => this.onDualAttrSkillRoll(scene));
       row.appendChild(b);
       inner.appendChild(row);
     }

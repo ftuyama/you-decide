@@ -968,6 +968,7 @@ button.hamburger:hover {
   border-radius: 2px;
   background: rgba(0, 0, 0, 0.35);
   border: 1px solid #2a2824;
+  white-space: pre-wrap;
 }
 
 .story-dice-banner-panel--success {

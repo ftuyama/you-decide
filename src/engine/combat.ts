@@ -627,8 +627,15 @@ function physicalAttackForCharacter(
   rng: () => number,
   log: CombatLogEntry[],
   _bus?: EventBus
-): { party: Character[]; enemies: EnemyInstance[]; log: CombatLogEntry[] } | null {
+): {
+  party: Character[];
+  enemies: EnemyInstance[];
+  log: CombatLogEntry[];
+  /** Negativo = gasto de corrupção (apenas líder / relíquia). */
+  corruptionDelta?: number;
+} | null {
   void _bus;
+  let corruptionDelta: number | undefined;
   const attacker = party[attackerIndex];
   if (!attacker || attacker.hp <= 0) return null;
   const inst = enemies[enemyIndex];
@@ -758,9 +765,26 @@ function physicalAttackForCharacter(
       });
       newEnemies[enemyIndex] = ct;
     } else {
-      const dmg = isPlayerCrit
+      let dmg = isPlayerCrit
         ? dDmg * 2 + baseFlat + holyBonus + luckBonus
         : dDmg + baseFlat + holyBonus;
+      if (attackerIndex === 0 && attacker.relicId) {
+        const relic = data.items[attacker.relicId];
+        const cap = relic?.corruptionDrainOnHit ?? 0;
+        if (cap > 0 && state.resources.corruption > 0) {
+          const drain = Math.min(cap, state.resources.corruption);
+          const per = relic?.damageBonusPerCorruptionDrain ?? 2;
+          const extra = drain * per;
+          dmg += extra;
+          corruptionDelta = -drain;
+          logOut.push({
+            kind: 'info',
+            message: `O amuleto arde: −${drain} corrupção, +${extra} dano.`,
+            actor: attacker.name,
+            target: def.name,
+          });
+        }
+      }
       const nh = Math.max(0, chipTarget.hp - dmg);
       newEnemies[enemyIndex] = { ...chipTarget, hp: nh };
       logOut.push({
@@ -786,7 +810,12 @@ function physicalAttackForCharacter(
 
   const newParty = party.map((p, i) => (i === attackerIndex ? newAttacker : p));
 
-  return { party: newParty, enemies: newEnemies, log: logOut };
+  return {
+    party: newParty,
+    enemies: newEnemies,
+    log: logOut,
+    ...(corruptionDelta !== undefined ? { corruptionDelta } : {}),
+  };
 }
 
 export function playerAttack(
@@ -827,12 +856,18 @@ export function playerAttack(
   enemies = r0.enemies;
   log = r0.log;
 
+  let resources = state.resources;
+  if (r0.corruptionDelta !== undefined) {
+    const nc = Math.max(0, Math.min(10, resources.corruption + r0.corruptionDelta));
+    resources = { ...resources, corruption: nc };
+  }
+
   let rngSeed = (state.rngSeed + 31) >>> 0;
 
   if (enemies.every((e) => e.hp <= 0)) {
     log.push({ kind: 'info', message: 'Vitória!' });
     return finishCombat(
-      { ...state, party, rngSeed },
+      { ...state, party, rngSeed, resources },
       { ...c, enemies, log, phase: 'ended' },
       true,
       data,
@@ -846,7 +881,7 @@ export function playerAttack(
     if (eIdx < 0) break;
     rng = mulberry32(rngSeed + c.round * 997 + pi * 47);
     const rn = physicalAttackForCharacter(
-      { ...state, party, rngSeed },
+      { ...state, party, rngSeed, resources },
       c,
       party,
       enemies,
@@ -868,7 +903,7 @@ export function playerAttack(
     if (enemies.every((e) => e.hp <= 0)) {
       log.push({ kind: 'info', message: 'Vitória!' });
       return finishCombat(
-        { ...state, party, rngSeed },
+        { ...state, party, rngSeed, resources },
         { ...c, enemies, log, phase: 'ended' },
         true,
         data,
@@ -882,6 +917,7 @@ export function playerAttack(
       ...state,
       party,
       rngSeed,
+      resources,
     },
     {
       ...c,

@@ -1,6 +1,7 @@
 import {
   ACT3_DEPTH_MELODY,
   ACT5_ICE_MELODY,
+  ANCIENT_MACABRE_MELODY,
   BOSS_LEAD_MELODY,
   CAMP_MELODY,
   EXPLORE_PIANO_MELODY,
@@ -136,6 +137,9 @@ export class GameAudio {
         break;
       case 'void':
         this.playAmbientVoid();
+        break;
+      case 'ancient_macabre':
+        this.playAmbientAncientMacabre();
         break;
     }
   }
@@ -1040,6 +1044,90 @@ export class GameAudio {
       try {
         drone.disconnect();
         droneGain.disconnect();
+        master.disconnect();
+        comp.disconnect();
+      } catch {
+        /* noop */
+      }
+    };
+  }
+
+  /**
+   * Templo antigo / ritual: drones graves dissonantes + plucks lentos (trítonos).
+   */
+  private playAmbientAncientMacabre(): void {
+    if (this.muted || this.bgCleanup) return;
+    const ctx = this.ensureContext();
+    const master = ctx.createGain();
+    master.gain.value = this.gain(0.19);
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -26;
+    comp.knee.value = 8;
+    comp.ratio.value = 4;
+    master.connect(comp);
+    comp.connect(ctx.destination);
+
+    const layers: { freq: number; level: number; type: OscillatorType }[] = [
+      { freq: 41.2, level: 0.22, type: 'sine' },
+      { freq: 61.74, level: 0.18, type: 'triangle' },
+      { freq: 87.31, level: 0.14, type: 'sawtooth' },
+      { freq: 116.54, level: 0.11, type: 'sine' },
+    ];
+
+    const oscillators: OscillatorNode[] = [];
+    for (const { freq, level, type } of layers) {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      o.detune.value = (Math.random() - 0.5) * 18;
+      g.gain.value = level * 0.5;
+      o.connect(g);
+      g.connect(master);
+      o.start();
+      oscillators.push(o);
+    }
+
+    let t = 0;
+    this.bgPulseTimer = setInterval(() => {
+      if (this.muted || !this.ctx) return;
+      t += 0.031;
+      const breathe = 0.16 + Math.sin(t * 0.22) * 0.1 + Math.sin(t * 0.07) * 0.04;
+      try {
+        master.gain.setTargetAtTime(this.gain(breathe), this.ctx.currentTime, 0.55);
+      } catch {
+        /* noop */
+      }
+    }, 380);
+
+    let melodyStep = 0;
+    this.bgRhythmTimer = setInterval(() => {
+      if (this.muted || !this.ctx) return;
+      const note = ANCIENT_MACABRE_MELODY[melodyStep % ANCIENT_MACABRE_MELODY.length];
+      melodyStep++;
+      const when = this.ctx.currentTime + 0.02;
+      triggerPluck(ctx, master, when, note, this.gain(0.2), 'sawtooth', 2.8);
+      triggerPluck(ctx, master, when + 0.14, note * 1.414, this.gain(0.11), 'triangle', 2.2);
+      triggerHat(ctx, master, when + 0.28, this.gain(0.038));
+    }, 2100);
+
+    this.bgCleanup = () => {
+      if (this.bgPulseTimer) {
+        clearInterval(this.bgPulseTimer);
+        this.bgPulseTimer = null;
+      }
+      if (this.bgRhythmTimer) {
+        clearInterval(this.bgRhythmTimer);
+        this.bgRhythmTimer = null;
+      }
+      for (const o of oscillators) {
+        try {
+          o.stop();
+        } catch {
+          /* noop */
+        }
+      }
+      try {
         master.disconnect();
         comp.disconnect();
       } catch {

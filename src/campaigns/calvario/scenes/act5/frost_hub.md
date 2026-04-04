@@ -30,7 +30,11 @@ choices:
       all:
         - { noFlag: monk_cave_banished }
         - { noMark: monk_inner_peace }
-        - { level: { gte: 25 } }
+        - { level: { gte: 22 } }
+  - text: "Rumo ao cume — templo de pedra negra (caminho perigoso)"
+    next: act5/frost_summit_ascend
+    condition:
+      level: { gte: 25 }
 onEnter: []
 ---
 Uma **lasca** de abrigo contra o vento: tendas que rangem como **dentes** velhos, fogareiro que mais **ameaça** do que aquece. Alguém deixou marcas na neve — **humanas**, **bestiais**, e uma terceira que não gosta de nome.

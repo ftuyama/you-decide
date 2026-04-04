@@ -10,6 +10,7 @@ export * as act5_frost_whelp from './act5_frost_whelp.ts';
 export * as act5_frost_reaver from './act5_frost_reaver.ts';
 export * as act5_ice_dragon_p1 from './act5_ice_dragon_p1.ts';
 export * as act5_ice_dragon_p2 from './act5_ice_dragon_p2.ts';
+export * as act5_summit_fallen_god from './act5_summit_fallen_god.ts';
 export * as act6_veil_herald from './act6_veil_herald.ts';
 export * as act6_echo_chorus from './act6_echo_chorus.ts';
 export * as act6_penitent_blade from './act6_penitent_blade.ts';

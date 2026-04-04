@@ -85,3 +85,16 @@ export const ACT3_DEPTH_MELODY: number[] = [
   277.18, // C#4
   293.66, // D4
 ];
+
+/** Ritual no cume: trítonos lentos, motivo descendente — macabro, sem conforto tonal. */
+export const ANCIENT_MACABRE_MELODY: number[] = [
+  155.56, // D#3
+  146.83, // D3
+  130.81, // C3
+  123.47, // B2
+  116.54, // A#2
+  103.83, // G#2
+  116.54, // A#2
+  130.81, // C3
+  155.56, // D#3
+];

@@ -53,6 +53,7 @@ export const ConditionSchema: z.ZodType<Condition> = z.lazy(() =>
     z.object({
       companionCount: z.object({ gte: z.number().optional(), lte: z.number().optional() }),
     }),
+    z.object({ companionInParty: z.string() }),
   ])
 );
 
@@ -81,7 +82,8 @@ export type Condition =
   | { chapter: { gte?: number; lte?: number } }
   | { level: { gte?: number; lte?: number } }
   | { corruption: { gte?: number; lte?: number } }
-  | { companionCount: { gte?: number; lte?: number } };
+  | { companionCount: { gte?: number; lte?: number } }
+  | { companionInParty: string };
 
 export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
   z.object({ op: z.literal('setFlag'), key: z.string(), value: z.boolean() }),
@@ -220,6 +222,19 @@ export const SkillCheckSchema = z.object({
 
 export type SkillCheck = z.infer<typeof SkillCheckSchema>;
 
+/** 2d6 + mod(attr1) + mod(attr2) por ronda; sucesso = todas as rondas ≥ TN */
+export const DualAttrSkillCheckSchema = z.object({
+  id: z.string(),
+  attrs: z.tuple([z.enum(['str', 'agi', 'mind']), z.enum(['str', 'agi', 'mind'])]),
+  tn: z.number().int(),
+  rounds: z.number().int().min(1).max(6).default(3),
+  successNext: z.string(),
+  failNext: z.string(),
+  label: z.string().optional(),
+});
+
+export type DualAttrSkillCheck = z.infer<typeof DualAttrSkillCheckSchema>;
+
 /** 2d6 + mod(sorte efetiva) − luckPenalty vs TN — paralelo a skillCheck */
 export const LuckCheckSchema = z.object({
   id: z.string(),
@@ -270,12 +285,24 @@ export const SceneFrontmatterSchema = z.object({
   type: z.enum(['story', 'hub', 'combat_intro']).default('story'),
   /** Tema ambiente da cena (música/ambiente no UI). */
   ambientTheme: z
-    .enum(['explore', 'combat', 'camp', 'boss', 'act3', 'act5', 'frost_mystery', 'merchant', 'void'])
+    .enum([
+      'explore',
+      'combat',
+      'camp',
+      'boss',
+      'act3',
+      'act5',
+      'frost_mystery',
+      'merchant',
+      'void',
+      'ancient_macabre',
+    ])
     .optional(),
   /** Efeitos ao entrar na cena (após primeira renderização; idempotência por visit) */
   onEnter: z.array(EffectSchema).default([]),
   choices: z.array(ChoiceSchema).default([]),
   skillCheck: SkillCheckSchema.optional(),
+  dualAttrSkillCheck: DualAttrSkillCheckSchema.optional(),
   luckCheck: LuckCheckSchema.optional(),
   randomBranch: RandomBranchSchema.optional(),
   chapterGate: ChapterGateSchema.optional(),
@@ -374,6 +401,12 @@ export const ItemDefSchema = z.object({
   restoreMana: z.number().int().min(0).optional(),
   /** Reduz stress (0–4) em N */
   stressRelief: z.number().int().min(0).optional(),
+  /**
+   * Relíquia: em cada acerto físico do líder que cause dano ao HP, consome até N de corrupção
+   * e adiciona dano extra por ponto consumido.
+   */
+  corruptionDrainOnHit: z.number().int().min(0).max(3).optional(),
+  damageBonusPerCorruptionDrain: z.number().int().min(1).max(5).optional(),
 });
 
 export type ItemDef = z.infer<typeof ItemDefSchema>;

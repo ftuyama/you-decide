@@ -46,6 +46,8 @@ import gameVersionRaw from '../../VERSION?raw';
 
 const GAME_VERSION = gameVersionRaw.trim() || '?';
 
+const SAVE_SLOT_COUNT = 3;
+
 /** Atalhos no combate: 1–9, depois letras (ordem QWERTY). */
 const COMBAT_QUICK_KEYS_AFTER_9 = 'qwertyuiopasdfghjklzxcvbnm';
 
@@ -57,7 +59,8 @@ function combatQuickKeyAt(index: number): string | null {
 
 export class GameApp {
   private readonly campaignId: string;
-  private readonly saveKey: string;
+  /** Gravação única antiga (`{campaignId}_save_v1`) — migrada para o slot 1 na primeira execução. */
+  private readonly legacySaveKey: string;
   private readonly sidebarKey: string;
   private readonly fontKey: string;
   private readonly quickNavKey: string;
@@ -97,7 +100,7 @@ export class GameApp {
   constructor(root: HTMLElement, campaignId: string) {
     this.root = root;
     this.campaignId = campaignId;
-    this.saveKey = `${campaignId}_save_v1`;
+    this.legacySaveKey = `${campaignId}_save_v1`;
     this.sidebarKey = `${campaignId}_sidebar_sections_v1`;
     this.fontKey = `${campaignId}_font_step_v1`;
     this.quickNavKey = `${campaignId}_quick_nav_mode_v1`;
@@ -186,6 +189,7 @@ export class GameApp {
     this.state = createInitialState(this.registry.data.campaign);
     this.state = this.stabilize(this.state);
     this.sidebarSections = this.loadSidebarSections();
+    this.migrateLegacySaveIfNeeded();
     window.addEventListener('keydown', (e) => this.onMapKey(e));
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
@@ -615,21 +619,70 @@ export class GameApp {
     this.render();
   }
 
-  private save(): void {
-    this.unlockAudio();
+  private slotStorageKey(slot: number): string {
+    return `${this.campaignId}_save_v1_s${slot}`;
+  }
+
+  /** Copia a gravação legada para o slot 1 se o slot 1 ainda estiver vazio. */
+  private migrateLegacySaveIfNeeded(): void {
     try {
-      localStorage.setItem(this.saveKey, serializeState(this.state));
+      const legacy = localStorage.getItem(this.legacySaveKey);
+      if (!legacy?.trim()) return;
+      const s1 = localStorage.getItem(this.slotStorageKey(1));
+      if (s1?.trim()) return;
+      localStorage.setItem(this.slotStorageKey(1), legacy);
+      localStorage.removeItem(this.legacySaveKey);
+    } catch {
+      /* noop */
+    }
+  }
+
+  private readRawSlot(slot: number): string | null {
+    if (slot < 1 || slot > SAVE_SLOT_COUNT) return null;
+    try {
+      return localStorage.getItem(this.slotStorageKey(slot));
+    } catch {
+      return null;
+    }
+  }
+
+  private slotPreviewLines(slot: number): { line1: string; line2?: string } {
+    const raw = this.readRawSlot(slot);
+    if (!raw?.trim()) return { line1: 'Vazio' };
+    try {
+      const s = deserializeState(raw);
+      if (s.campaignId !== this.campaignId) return { line1: 'Outra campanha' };
+      const sceneShort = s.sceneId.length > 28 ? `${s.sceneId.slice(0, 25)}…` : s.sceneId;
+      return {
+        line1: `Cap. ${s.chapter} · ${s.playerName}`,
+        line2: sceneShort,
+      };
+    } catch {
+      return { line1: 'Gravação inválida' };
+    }
+  }
+
+  private saveToSlot(slot: number): void {
+    this.unlockAudio();
+    if (slot < 1 || slot > SAVE_SLOT_COUNT) return;
+    try {
+      localStorage.setItem(this.slotStorageKey(slot), serializeState(this.state));
     } catch {
       /* noop */
     }
     this.closeMenu();
+    this.render();
   }
 
-  private load(): void {
+  private loadFromSlot(slot: number): void {
     this.unlockAudio();
+    if (slot < 1 || slot > SAVE_SLOT_COUNT) return;
     try {
-      const raw = localStorage.getItem(this.saveKey);
-      if (!raw) return;
+      const raw = this.readRawSlot(slot);
+      if (!raw?.trim()) {
+        alert('Este slot está vazio.');
+        return;
+      }
       const parsed = deserializeState(raw);
       if (parsed.campaignId !== this.campaignId) {
         alert(
@@ -642,9 +695,65 @@ export class GameApp {
       this.state = this.stabilize(this.state);
       this.render();
     } catch {
-      /* noop */
+      alert('Não foi possível carregar esta gravação.');
     }
     this.closeMenu();
+  }
+
+  private buildMenuSaveSlot(slot: number): HTMLElement {
+    const wrap = document.createElement('div');
+    wrap.className = 'menu-save-slot';
+
+    const info = document.createElement('div');
+    info.className = 'menu-save-slot-info';
+    const titleEl = document.createElement('div');
+    titleEl.className = 'menu-save-slot-title';
+    titleEl.textContent = `Slot ${slot}`;
+    const meta = document.createElement('div');
+    meta.className = 'menu-save-slot-meta';
+    const lines = this.slotPreviewLines(slot);
+    const line1El = document.createElement('div');
+    line1El.className = 'menu-save-slot-meta-line';
+    line1El.textContent = lines.line1;
+    meta.appendChild(line1El);
+    if (lines.line2 !== undefined) {
+      const line2El = document.createElement('div');
+      line2El.className = 'menu-save-slot-meta-line menu-save-slot-meta-line--scene';
+      line2El.textContent = lines.line2;
+      meta.appendChild(line2El);
+    }
+    meta.title =
+      lines.line2 !== undefined ? `${lines.line1}\n${lines.line2}` : lines.line1;
+    info.appendChild(titleEl);
+    info.appendChild(meta);
+
+    const actions = document.createElement('div');
+    actions.className = 'menu-save-slot-actions';
+
+    const saveBtn = document.createElement('button');
+    saveBtn.type = 'button';
+    saveBtn.className = 'menu-item menu-save-slot-btn';
+    saveBtn.textContent = 'Salvar';
+    saveBtn.addEventListener('click', () => this.saveToSlot(slot));
+
+    const loadBtn = document.createElement('button');
+    loadBtn.type = 'button';
+    loadBtn.className = 'menu-item menu-save-slot-btn';
+    const raw = this.readRawSlot(slot);
+    const hasSave = raw != null && raw.trim().length > 0;
+    loadBtn.disabled = !hasSave;
+    if (!hasSave) loadBtn.classList.add('menu-save-slot-btn--disabled');
+    loadBtn.textContent = 'Carregar';
+    loadBtn.addEventListener('click', () => {
+      if (!hasSave) return;
+      this.loadFromSlot(slot);
+    });
+
+    actions.appendChild(saveBtn);
+    actions.appendChild(loadBtn);
+    wrap.appendChild(info);
+    wrap.appendChild(actions);
+    return wrap;
   }
 
   private closeMenu(): void {
@@ -931,18 +1040,6 @@ export class GameApp {
       return body;
     };
 
-    const saveBtn = document.createElement('button');
-    saveBtn.type = 'button';
-    saveBtn.className = 'menu-item';
-    saveBtn.textContent = 'Salvar jogo';
-    saveBtn.addEventListener('click', () => this.save());
-
-    const loadBtn = document.createElement('button');
-    loadBtn.type = 'button';
-    loadBtn.className = 'menu-item';
-    loadBtn.textContent = 'Carregar jogo';
-    loadBtn.addEventListener('click', () => this.load());
-
     const soundRow = document.createElement('label');
     soundRow.className = 'menu-item menu-sound';
     const soundCb = document.createElement('input');
@@ -1078,8 +1175,9 @@ export class GameApp {
     versionLabel.textContent = `You Decide v${GAME_VERSION}`;
 
     const saveSection = createMenuSection('Partida');
-    saveSection.appendChild(saveBtn);
-    saveSection.appendChild(loadBtn);
+    for (let s = 1; s <= SAVE_SLOT_COUNT; s++) {
+      saveSection.appendChild(this.buildMenuSaveSlot(s));
+    }
     if (this.devMode) {
       saveSection.appendChild(importBtn);
     }

@@ -122,7 +122,10 @@ button.hamburger:hover {
 }
 
 .menu-drawer-scroll {
+  /* Grid + flex: allow this pane to shrink below content height so overflow-y scrolls */
   min-height: 0;
+  min-width: 0;
+  align-self: stretch;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -131,7 +134,7 @@ button.hamburger:hover {
   display: flex;
   flex-direction: column;
   gap: 0.7rem;
-  padding-bottom: 0.5rem;
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
 }
 
 .menu-drawer.open {
@@ -142,6 +145,8 @@ button.hamburger:hover {
   border: 1px solid var(--border);
   border-radius: 2px;
   background: var(--menu-section-bg);
+  /* Don’t shrink inside the flex column — scrolling stays on .menu-drawer-scroll */
+  flex-shrink: 0;
   overflow: hidden;
 }
 
@@ -175,6 +180,72 @@ button.hamburger:hover {
 }
 
 .menu-item:hover {
+  border-color: var(--accent);
+}
+
+.menu-save-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.45rem 0.5rem;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}
+
+.menu-save-slot-info {
+  min-width: 0;
+}
+
+.menu-save-slot-title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-section);
+  margin-bottom: 0.15rem;
+}
+
+.menu-save-slot-meta {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.35;
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  min-width: 0;
+}
+
+.menu-save-slot-meta-line {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.menu-save-slot-meta-line--scene {
+  font-size: 0.74rem;
+  opacity: 0.92;
+}
+
+.menu-save-slot-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.menu-save-slot-btn {
+  flex: 1 1 auto;
+  min-width: 5rem;
+  padding: 0.45rem 0.5rem;
+  font-size: 0.85rem;
+}
+
+.menu-save-slot-btn:disabled,
+.menu-save-slot-btn.menu-save-slot-btn--disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.menu-save-slot-btn:hover:not(:disabled) {
   border-color: var(--accent);
 }
 

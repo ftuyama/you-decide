@@ -22,9 +22,9 @@ export function resolveSceneArt(registry: ContentRegistry, scene: LoadedScene): 
 }
 
 const CAMP_EQUIPMENT_SCENES = new Set([
-  'act2/manage_equip',
-  'act5/manage_equip',
-  'act6/manage_equip',
+  'act2/camp/manage_equip',
+  'act5/camp/manage_equip',
+  'act6/camp/manage_equip',
 ]);
 
 export function isCampEquipmentScene(sceneId: string): boolean {

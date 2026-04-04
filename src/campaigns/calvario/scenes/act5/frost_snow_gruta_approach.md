@@ -6,7 +6,7 @@ ambientTheme: frost_mystery
 artKey: frost_monk_gruta_mouth
 choices:
   - text: "Entrar na gruta — aceitar o que lá dentro não pede permissão"
-    next: act5/frost_monk_trial_mind
+    next: act5/frost_monk/trial_mind
 onEnter: []
 ---
 A abertura não convida; **absorve**. O ar interior é **estranhamente** morno, como se o gelo tivesse aprendido a **mentir** sobre a temperatura.

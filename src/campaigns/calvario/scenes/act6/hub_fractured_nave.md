@@ -37,7 +37,7 @@ choices:
         - { level: { gte: 30 } }
     preview: "Três provas feitas; o espelho final abre."
   - text: "Acender a fogueira de cinzas espelhadas (acampamento)"
-    next: act6/void_camp
+    next: act6/camp/void_camp
     preview: "Um sopro de suprimento e silêncio partido."
   - text: "Negociar com o mercador da banca esquecida"
     next: act6/fractured_merchant
@@ -46,7 +46,7 @@ choices:
     next: act6/encounters/fractured_void_router
     preview: "Sem decidir, o vazio empurra-te para a fogueira."
     timedMs: 14000
-    fallbackNext: act6/void_camp
+    fallbackNext: act6/camp/void_camp
   - text: "Ouvir o sussurro sob as colunas (rota de corrupção)"
     next: act6/void_secret_entry
     condition:

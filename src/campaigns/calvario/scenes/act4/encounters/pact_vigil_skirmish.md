@@ -8,7 +8,7 @@ choices:
     effects:
       - op: startCombat
         encounterId: vigil_hunter_fight
-        onVictory: act4/pact_coda
+        onVictory: act4/pact/pact_coda
         onDefeat: shared/game_over
 onEnter:
   - { op: addRep, faction: vigilia, delta: -1 }

@@ -11,29 +11,29 @@ choices:
     condition: { noFlag: rats_cleared }
     preview: "Ainda há rangido e fedor a ninho."
   - text: "Ir ao mercador fantasma"
-    next: act2/merchant_moon
+    next: act2/merchant/merchant_moon
     preview: "Comércio estranho; preço em ouro ou em segredo."
   - text: "Ouvir proposta de Mira"
     next: act2/recruit_offer
     condition: { noFlag: mira_recruited }
     preview: "Uma voz na sombra oferece companhia."
   - text: "Ritual do Círculo (evento)"
-    next: act2/circle_ritual
+    next: act2/circle_ritual/circle_ritual
     condition:
       all:
         - { level: { gte: 4 } }
         - { dayMod: { mod: 5, eq: 0 } }
     preview: "O Círculo cobra presença; a corrupção anota."
   - text: "Acampamento da Vigília"
-    next: act2/vigilia_camp
+    next: act2/camp/vigilia_camp
     preview: "Fogo, reza e um sopro de suprimento."
   - text: "Rota aleatória (demo)"
     next: act2/encounters/random_router
     preview: "O túnel exige decisão rápida — ou recuas para o acampamento."
     timedMs: 14000
-    fallbackNext: act2/vigilia_camp
+    fallbackNext: act2/camp/vigilia_camp
   - text: "Passagem marcada — eco de juramentos"
-    next: act2/lore_crossroads
+    next: act2/lore/lore_crossroads
     condition: { level: { gte: 7 } }
     preview: "Memória antiga; perícia e sorte pesam."
   - text: "Observar o cruzeiro: marcas no chão"

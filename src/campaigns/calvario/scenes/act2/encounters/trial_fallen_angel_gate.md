@@ -10,8 +10,8 @@ choices:
       - op: startCombat
         encounterId: boss_fallen_angel_trial
         onVictory: act2/path_knight_fallen
-        onDefeat: act2/lore_crossroads
-        onFlee: act2/lore_crossroads
+        onDefeat: act2/lore/lore_crossroads
+        onFlee: act2/lore/lore_crossroads
     preview: "Combate · vantagem do inimigo"
   - text: "Enfrentar o anjo com o arcano (mago)"
     condition: { class: mage }
@@ -19,8 +19,8 @@ choices:
       - op: startCombat
         encounterId: boss_fallen_angel_trial
         onVictory: act2/path_mage_dark
-        onDefeat: act2/lore_crossroads
-        onFlee: act2/lore_crossroads
+        onDefeat: act2/lore/lore_crossroads
+        onFlee: act2/lore/lore_crossroads
     preview: "Combate · vantagem do inimigo"
   - text: "Enfrentar o anjo com a fé (clérigo)"
     condition:
@@ -32,8 +32,8 @@ choices:
       - op: startCombat
         encounterId: boss_fallen_angel_trial
         onVictory: act2/path_cleric_penitent
-        onDefeat: act2/lore_crossroads
-        onFlee: act2/lore_crossroads
+        onDefeat: act2/lore/lore_crossroads
+        onFlee: act2/lore/lore_crossroads
     preview: "Combate · vantagem do inimigo"
 onEnter: []
 ---

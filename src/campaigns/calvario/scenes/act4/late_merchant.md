@@ -47,7 +47,7 @@ choices:
       - { op: grantItem, itemId: potion_stress }
       - { op: setFlag, key: act4_merch_stress_1, value: true }
   - text: "Afastar-me do mercador"
-    next: act4/throne_gate
+    next: act4/throne/throne_gate
 onEnter: []
 ---
 Entre **correntes** que não prendem, alguém **desdobra** um pano — frascos que **tremem** como se ainda tivessem **paciência**.

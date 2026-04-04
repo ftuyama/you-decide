@@ -7,7 +7,7 @@ ambientTheme: act3
 artKey: depths
 choices:
   - text: "Rumo ao trono de ossos"
-    next: act4/throne_gate
+    next: act4/throne/throne_gate
     condition: { level: { gte: 7 } }
     preview: "Capítulo 4 — confronto com Morvayn; o trono espera."
     timedMs: 15000

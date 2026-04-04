@@ -13,6 +13,7 @@ import {
   escHtml,
   hpBarMarkup,
   manaBarMarkup,
+  passiveSidebarIconSvg,
   spellEmoji,
   spellSidebarMechanicsLinePt,
   statBonusParen,
@@ -279,19 +280,28 @@ export function buildGameSidebar({
             .map((b) => `${b.attr.toUpperCase()} ${b.delta >= 0 ? '+' : ''}${b.delta} (${b.remainingScenes} cena(s))`)
             .join(' · ')}</div>`
         : '';
-    const monkPeaceLine = state.marks.includes('monk_inner_peace')
-      ? `<div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.tier)}<span><strong>Paz interior</strong> — +1 SOR permanente (bênção do monge).</span></div>`
-      : '';
     const passiveUnlocked =
       state.inventory.includes(PASSIVE_UNLOCK_ITEM_ID) ||
       p.weaponId === PASSIVE_UNLOCK_ITEM_ID ||
       p.armorId === PASSIVE_UNLOCK_ITEM_ID ||
       p.relicId === PASSIVE_UNLOCK_ITEM_ID;
+    const markPassiveBlocks: string[] = [];
+    for (const mark of state.marks) {
+      const def = registry.data.passivesByMark[mark];
+      if (def) {
+        const ic = passiveSidebarIconSvg(mark);
+        markPassiveBlocks.push(
+          `<p class="sidebar-passive-line sidebar-line--with-icon">${iconWrap(ic, 'ui-icon-wrap ui-icon-wrap--sm')}<span><strong>${escHtml(def.name)}</strong></span></p>
+            <p class="sidebar-line sidebar-muted">${escHtml(def.description)}</p>`
+        );
+      }
+    }
+    const showPassivesSection = passiveUnlocked || markPassiveBlocks.length > 0;
     const passiveDef = registry.data.passives[cid];
-    const passiveExtra =
-      cid === 'knight' && p.critRatio > 0
-        ? `<p class="sidebar-line sidebar-muted">Bônus do passivo: <strong>+3%</strong> · Total de crítico: <strong>${Math.round(p.critRatio * 100)}%</strong></p>`
-        : '';
+    const classPassiveBlock = passiveUnlocked
+      ? `<p class="sidebar-passive-line sidebar-line--with-icon">${iconWrap(passiveSidebarIconSvg(passiveDef?.id ?? ''), 'ui-icon-wrap ui-icon-wrap--sm')}<span><strong>${escHtml(passiveDef?.name ?? 'Passivo de classe')}</strong></span></p>
+            <p class="sidebar-line sidebar-muted">${escHtml(passiveDef?.description ?? 'Sem descrição.')}</p>`
+      : '';
     return `<div class="sidebar-line">Nome <strong>${escHtml(p.name)}</strong></div>
         <div class="sidebar-line sidebar-class-line">${escHtml(registry.ui.getHeroClassLabel(cid, p.path))}</div>
         ${xpLine}
@@ -301,7 +311,6 @@ export function buildGameSidebar({
         <div class="sidebar-line sidebar-stress-label">${hintedLabel('Stress')} <strong>${p.stress}</strong> / 4</div>
         ${stressBarMarkup(p.stress)}
         ${buffHint}
-        ${monkPeaceLine}
         ${formatStatAttrsLineHtml(p, state, registry)}
         ${(() => {
           const equipBody = sidebarEquipBodyHtml(p, registry);
@@ -310,12 +319,12 @@ export function buildGameSidebar({
           <div class="sidebar-collapse-body sidebar-lore-body">${equipBody}</div>
         </details>`;
         })()}
-        ${passiveUnlocked ? `<details class="sidebar-collapse sidebar-spells"${openPassive} data-section="personagem_passivos">
+        ${showPassivesSection ? `<details class="sidebar-collapse sidebar-spells"${openPassive} data-section="personagem_passivos">
           <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.tier, 'Passivos')}</summary>
           <div class="sidebar-collapse-body sidebar-lore-body">
-            <p class="sidebar-line"><strong>${escHtml(passiveDef?.name ?? 'Passivo de classe')}</strong></p>
-            <p class="sidebar-line sidebar-muted">${escHtml(passiveDef?.description ?? 'Sem descrição.')}</p>
-            ${passiveExtra}
+            ${classPassiveBlock}
+            ${passiveUnlocked && markPassiveBlocks.length > 0 ? '<hr class="sidebar-passive-divider" />' : ''}
+            ${markPassiveBlocks.join('')}
           </div>
         </details>` : ''}
         ${(() => {

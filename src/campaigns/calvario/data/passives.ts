@@ -23,3 +23,11 @@ export const passives: Record<ClassId, ClassPassiveDef> = {
     description: 'No início do teu turno, regeneras 1% da mana máxima (arredondado para cima).',
   },
 };
+
+/** Bênção da gruta do monge — alinhado à marca `monk_inner_peace` e ao +1 SOR em `triumph`. */
+export const passivesByMark = {
+  monk_inner_peace: {
+    name: 'Paz interior',
+    description: '+1 SOR permanente (bênção do monge da neve).',
+  },
+} as const;

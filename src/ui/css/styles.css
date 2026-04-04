@@ -1136,6 +1136,13 @@ button.hamburger:hover {
   font-size: 0.75rem;
 }
 
+.sidebar-passive-divider {
+  border: none;
+  border-top: 1px dashed var(--companion-border);
+  margin: 0.65rem 0;
+  opacity: 0.75;
+}
+
 .companion-sidebar-card {
   border: 1px dashed var(--companion-border);
   border-radius: 2px;
@@ -1316,6 +1323,25 @@ button.hamburger:hover {
 }
 
 .sidebar-spells .sidebar-spell-line:first-child {
+  margin-top: 0;
+}
+
+.sidebar-spells .sidebar-passive-line {
+  margin: 0.4rem 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--sidebar-spell);
+}
+
+.sidebar-spells .sidebar-passive-line.sidebar-line--with-icon {
+  gap: 0.35rem;
+}
+
+.sidebar-spells .sidebar-passive-line.sidebar-line--with-icon > .ui-icon-wrap {
+  margin-top: 0.16rem;
+}
+
+.sidebar-spells .sidebar-passive-line:first-child {
   margin-top: 0;
 }
 

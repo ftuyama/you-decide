@@ -1,4 +1,5 @@
 import type { CombatLogEntry, LevelUpStatDeltas, SpellDef } from '../engine/schema.ts';
+import { icons, type IconId } from './icons/index.ts';
 
 export type CombatLogDisplayItem =
   | { mode: 'single'; entry: CombatLogEntry }
@@ -32,6 +33,18 @@ export function spellEmoji(spellId: string, spellDef: SpellDef): string {
     buff_armor_class: '🛡️',
   };
   return byId[spellId] ?? byKind[spellDef.spellKind] ?? '✦';
+}
+
+/** SVG inline para passivo de classe (`passives[class].id`) ou chave em `passivesByMark` (marca). */
+export function passiveSidebarIconSvg(passiveKey: string): string {
+  const byId: Partial<Record<string, IconId>> = {
+    knight_crit_edge: 'weapon',
+    cleric_sacred_pulse: 'faith',
+    mage_ley_trickle: 'spellbook',
+    monk_inner_peace: 'faith',
+  };
+  const id = byId[passiveKey] ?? 'tier';
+  return icons[id];
 }
 
 /** Uma linha de descrição mecânica para a sidebar (PT). */

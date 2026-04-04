@@ -22,6 +22,9 @@ export type HeroNarrative = {
   getPathUnlockBonus(classId: ClassId, path: string | null | undefined): PathUnlockBonus | null;
 };
 
+/** Passivos concedidos por marcas de história (ex.: bênção do monge). */
+export type MarkPassiveDef = { name: string; description: string };
+
 export type GameData = {
   campaign: CampaignIndex;
   heroNarrative: HeroNarrative;
@@ -31,6 +34,8 @@ export type GameData = {
   companions: Record<string, CompanionDef>;
   spells: Record<string, SpellDef>;
   passives: Record<ClassId, { id: string; name: string; description: string }>;
+  /** Chave = id da marca (`marks` no estado). */
+  passivesByMark: Record<string, MarkPassiveDef>;
 };
 
 export function emptyGameData(campaign: CampaignIndex, heroNarrative: HeroNarrative): GameData {
@@ -55,5 +60,6 @@ export function emptyGameData(campaign: CampaignIndex, heroNarrative: HeroNarrat
         description: 'No início do teu turno, regeneras 1% da mana máxima (arredondado para cima).',
       },
     },
+    passivesByMark: {},
   };
 }

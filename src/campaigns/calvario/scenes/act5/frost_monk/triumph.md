@@ -12,7 +12,7 @@ onEnter:
   - { op: addMark, mark: monk_inner_peace }
   - {
       op: addDiary,
-      text: "Na gruta acima da tempestade, um monge sem rosto deu-me uma bênção estranha: não promessa, não milagre — só a certeza de que a sorte também pode ser disciplina. Sinto +1 em SOR (Paz interior).",
+      text: "Na gruta acima da tempestade, um monge sem rosto deu-me uma bênção estranha: não promessa, não milagre — só a certeza de que a sorte também pode ser disciplina. Ganhei a passiva Paz interior: +1 SOR, para sempre.",
     }
 ---
 O monge **inclina** a cabeça — não vitória, **encerramento**.

@@ -134,6 +134,8 @@ export function beginEncounter(
     enemyAdvantage: enc.enemyAdvantage,
     pendingSacrificeDamage: 0,
     pendingSacrificeCost: 0,
+    buffAttackRoll: 0,
+    buffArmorClass: 0,
     returnScene: opts.returnScene,
     onVictory: opts.onVictory,
     onFlee: opts.onFlee,
@@ -372,6 +374,10 @@ export function castSpell(
   });
 
   let newEnemies = [...c.enemies];
+  let combatBuffs: Pick<CombatState, 'buffAttackRoll' | 'buffArmorClass'> = {
+    buffAttackRoll: c.buffAttackRoll ?? 0,
+    buffArmorClass: c.buffArmorClass ?? 0,
+  };
 
   if (sp.spellKind === 'damage') {
     const enemyIndex = newEnemies.findIndex((e) => e.hp > 0);
@@ -407,7 +413,7 @@ export function castSpell(
         damageKind: 'normal',
       });
     }
-  } else {
+  } else if (sp.spellKind === 'heal_self') {
     const diceRolls: number[] = [];
     let sum = 0;
     for (let i = 0; i < sp.dice; i++) {
@@ -427,6 +433,20 @@ export function castSpell(
       actor: lead.name,
       target: lead.name,
     });
+  } else if (sp.spellKind === 'buff_attack_roll') {
+    combatBuffs = { ...combatBuffs, buffAttackRoll: 1 };
+    log.push({
+      kind: 'info',
+      message: `${lead.name} canaliza força — +1 no ataque até ao fim do combate.`,
+      actor: lead.name,
+    });
+  } else {
+    combatBuffs = { ...combatBuffs, buffArmorClass: 1 };
+    log.push({
+      kind: 'info',
+      message: `${lead.name} endurece a guarda — +1 CA até ao fim do combate.`,
+      actor: lead.name,
+    });
   }
 
   const party = state.party.map((p) => (p.id === lead.id ? newLead : p));
@@ -436,7 +456,13 @@ export function castSpell(
     log.push({ kind: 'info', message: 'Vitória!' });
     return finishCombat(
       { ...state, party, rngSeed: (state.rngSeed + 31) >>> 0 },
-      { ...c, enemies: newEnemies, log, phase: 'ended' },
+      {
+        ...c,
+        ...combatBuffs,
+        enemies: newEnemies,
+        log,
+        phase: 'ended',
+      },
       true,
       data,
       bus
@@ -449,7 +475,14 @@ export function castSpell(
       party,
       rngSeed: (state.rngSeed + 31) >>> 0,
     },
-    { ...c, enemies: newEnemies, log, phase: 'enemy', pendingStance: undefined },
+    {
+      ...c,
+      ...combatBuffs,
+      enemies: newEnemies,
+      log,
+      phase: 'enemy',
+      pendingStance: undefined,
+    },
     data,
     bus
   );
@@ -687,6 +720,10 @@ function physicalAttackForCharacter(
   let newAttacker = { ...attacker };
   let stress = newAttacker.stress;
   let rollTotal = total;
+  const spellAtk = c.buffAttackRoll ?? 0;
+  if (attackerIndex === 0 && spellAtk > 0) {
+    rollTotal += spellAtk;
+  }
 
   if (useSpecial && attackerIndex === 0 && !attacker.specialUsedThisCombat) {
     newAttacker.specialUsedThisCombat = true;
@@ -1163,7 +1200,8 @@ function advanceToEnemyTurn(state: GameState, c: CombatState, data: GameData, bu
       7 +
       statMod(effectiveLeadAttr(state, target, 'agi')) +
       getArmorValue(data, target) +
-      (c.pendingStance === 'defensive' ? 2 : 0);
+      (c.pendingStance === 'defensive' ? 2 : 0) +
+      (targetIndex === 0 ? (c.buffArmorClass ?? 0) : 0);
 
     const critConfirm = def.critConfirm ?? DEFAULT_ENEMY_CRIT_CONFIRM;
     let enemyHit = false;

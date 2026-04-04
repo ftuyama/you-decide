@@ -428,17 +428,17 @@ export const CompanionDefSchema = z.object({
 
 export type CompanionDef = z.infer<typeof CompanionDefSchema>;
 
-/** Magias de campanha — dano ou cura em si mesmo; base + N d6 + mod Mente */
+/** Magias de campanha — dano, cura em si mesmo ou buffs de combate (cavaleiro) */
 export const SpellDefSchema = z.object({
   id: z.string(),
   name: z.string(),
   manaCost: z.number().int().min(0),
   minLevel: z.number().int().min(1).default(1),
-  classId: z.enum(['mage', 'cleric', 'any']),
-  spellKind: z.enum(['damage', 'heal_self']),
-  /** Número de dados d6 */
+  classId: z.enum(['knight', 'mage', 'cleric', 'any']),
+  spellKind: z.enum(['damage', 'heal_self', 'buff_attack_roll', 'buff_armor_class']),
+  /** Número de dados d6 (ignorado em buffs) */
   dice: z.number().int().min(1),
-  /** Valor fixo somado aos dados e ao mod Mente */
+  /** Valor fixo somado aos dados e ao mod Mente (ignorado em buffs) */
   base: z.number().int().min(0).default(0),
   /** Só via narrativa (learnSpell), não no nível 1 nem ao subir de nível */
   learnOnly: z.boolean().optional(),
@@ -534,6 +534,10 @@ export const CombatStateSchema = z.object({
   pendingSacrificeDamage: z.number().int().min(0).default(0),
   /** Custo de HP aplicado no turno atual pelo selo de sacrifício. */
   pendingSacrificeCost: z.number().int().min(0).default(0),
+  /** Bónus de magia do líder: somado ao total do ataque físico (resto do combate). */
+  buffAttackRoll: z.number().int().min(0).default(0),
+  /** Bónus de magia do líder: somado à CA vs inimigos (resto do combate). */
+  buffArmorClass: z.number().int().min(0).default(0),
   playerAdvantage: z.boolean().optional(),
   enemyAdvantage: z.boolean().optional(),
   log: z.array(CombatLogEntrySchema),

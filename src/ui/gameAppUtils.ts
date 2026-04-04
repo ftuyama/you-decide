@@ -22,12 +22,30 @@ export function spellEmoji(spellId: string, spellDef: SpellDef): string {
     merciful_light: '🕯️',
     whisper_cache: '🫧',
     pilgrims_benediction: '🙏',
+    warriors_focus: '⚔️',
+    iron_ward: '🛡️',
   };
   const byKind: Record<SpellDef['spellKind'], string> = {
     damage: '✨',
     heal_self: '💚',
+    buff_attack_roll: '⚔️',
+    buff_armor_class: '🛡️',
   };
   return byId[spellId] ?? byKind[spellDef.spellKind] ?? '✦';
+}
+
+/** Uma linha de descrição mecânica para a sidebar (PT). */
+export function spellSidebarMechanicsLinePt(sp: SpellDef): string {
+  if (sp.spellKind === 'damage') {
+    return `dano (${sp.base > 0 ? `${sp.base} + ` : ''}${sp.dice}d6 + Mente)`;
+  }
+  if (sp.spellKind === 'heal_self') {
+    return `cura (${sp.base > 0 ? `${sp.base} + ` : ''}${sp.dice}d6 + Mente)`;
+  }
+  if (sp.spellKind === 'buff_attack_roll') {
+    return '+1 ao ataque (golpes físicos do líder) até ao fim do combate';
+  }
+  return '+1 CA (líder) até ao fim do combate';
 }
 
 export function fmtSignedMod(n: number): string {

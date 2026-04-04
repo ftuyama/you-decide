@@ -14,6 +14,7 @@ import {
   hpBarMarkup,
   manaBarMarkup,
   spellEmoji,
+  spellSidebarMechanicsLinePt,
   statBonusParen,
   stressBarMarkup,
 } from './gameAppUtils';
@@ -326,7 +327,7 @@ export function buildGameSidebar({
               : spellLines
                   .map(
                     (sp) =>
-                      `<p class="sidebar-spell-line sidebar-line--with-icon"><span class="spell-emoji" aria-hidden="true">${spellEmoji(sp.id, sp)}</span><span><strong>${escHtml(sp.name)}</strong> — ${sp.manaCost} mana · ${sp.spellKind === 'damage' ? 'dano' : 'cura'} (${sp.base > 0 ? `${sp.base} + ` : ''}${sp.dice}d6 + Mente)</span></p>`
+                      `<p class="sidebar-spell-line sidebar-line--with-icon"><span class="spell-emoji" aria-hidden="true">${spellEmoji(sp.id, sp)}</span><span><strong>${escHtml(sp.name)}</strong> — ${sp.manaCost} mana · ${spellSidebarMechanicsLinePt(sp)}</span></p>`
                   )
                   .join('');
           return `<details class="sidebar-collapse sidebar-spells"${openSpells} data-section="personagem_spells">

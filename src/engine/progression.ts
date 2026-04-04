@@ -65,6 +65,11 @@ function applyOneLevelUp(
     if (newLevel % 2 === 0) {
       agi += 1;
       d.agi = 1;
+      d.maxMana = 2;
+      maxMana += 2;
+      const manaBefore = mana;
+      mana = Math.min(maxMana, mana + 2);
+      d.mana = mana - manaBefore;
     }
   } else if (cls === 'mage') {
     mind += 1;

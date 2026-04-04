@@ -76,8 +76,8 @@ export function createPlayerCharacter(name: string, cls: ClassId): GameState['pa
       luck: 8,
       hp: 18,
       maxHp: 18,
-      mana: 0,
-      maxMana: 0,
+      mana: 2,
+      maxMana: 2,
       critRatio: 0.03,
       weaponId: 'rusty_sword',
       armorId: 'leather',
@@ -186,14 +186,23 @@ export function deserializeState(json: string): GameState {
     lastCombatLootLines: null,
     activeBuffs: Array.isArray((o as GameState).activeBuffs) ? (o as GameState).activeBuffs : [],
     knownSpells: Array.isArray((o as GameState).knownSpells) ? (o as GameState).knownSpells : [],
-    party: rawParty.map((p) => ({
-      ...p,
-      luck: typeof p.luck === 'number' ? p.luck : 8,
-      mana: typeof p.mana === 'number' ? p.mana : 0,
-      maxMana: typeof p.maxMana === 'number' ? p.maxMana : 0,
-      critRatio: typeof p.critRatio === 'number' ? p.critRatio : 0,
-      path: typeof p.path === 'string' ? p.path : null,
-    })),
+    party: rawParty.map((p) => {
+      let mana = typeof p.mana === 'number' ? p.mana : 0;
+      let maxMana = typeof p.maxMana === 'number' ? p.maxMana : 0;
+      if (p.class === 'knight' && maxMana === 0) {
+        maxMana = 10;
+        mana = Math.min(mana, maxMana);
+        if (mana === 0) mana = 8;
+      }
+      return {
+        ...p,
+        luck: typeof p.luck === 'number' ? p.luck : 8,
+        mana,
+        maxMana,
+        critRatio: typeof p.critRatio === 'number' ? p.critRatio : 0,
+        path: typeof p.path === 'string' ? p.path : null,
+      };
+    }),
   };
   return syncLeadPassiveStats(merged);
 }

@@ -1,6 +1,26 @@
 import type { SpellDef } from '../../../engine/schema';
 
 export const spells: Record<string, SpellDef> = {
+  warriors_focus: {
+    id: 'warriors_focus',
+    name: 'Foco de Guerreiro',
+    manaCost: 5,
+    minLevel: 1,
+    classId: 'knight',
+    spellKind: 'buff_attack_roll',
+    dice: 1,
+    base: 0,
+  },
+  iron_ward: {
+    id: 'iron_ward',
+    name: 'Muralha de Ferro',
+    manaCost: 20,
+    minLevel: 10,
+    classId: 'knight',
+    spellKind: 'buff_armor_class',
+    dice: 1,
+    base: 0,
+  },
   arcane_bolt: {
     id: 'arcane_bolt',
     name: 'Projétil Arcano',

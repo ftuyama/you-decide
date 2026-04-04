@@ -4,21 +4,76 @@ import type { Encounter } from './schema.ts';
 import type { EventBus } from './eventBus.ts';
 import { unlockSpellsForNewLevel } from './spellsKnown.ts';
 
-/** Nível máximo; acima disso o XP não aumenta nível */
-export const MAX_LEVEL = 40;
+/** Quando um efeito de subida de nível se aplica em relação ao nível alcançado */
+export type LevelUpWhen = 'every' | 'even' | 'odd';
 
-/** XP para o primeiro nível (1→2); cada nível seguinte exige isto a mais que o anterior. */
-const XP_TO_NEXT_LEVEL_START = 50;
-const XP_TO_NEXT_LEVEL_STEP = 10;
+export type LevelUpEffect =
+  | { kind: 'hp'; delta: number; when: LevelUpWhen }
+  | { kind: 'mana'; delta: number; when: LevelUpWhen }
+  | { kind: 'stat'; attr: 'str' | 'agi' | 'mind'; delta: number; when: LevelUpWhen };
+
+function whenMatches(when: LevelUpWhen, newLevel: number): boolean {
+  if (when === 'every') return true;
+  if (when === 'even') return newLevel % 2 === 0;
+  return newLevel % 2 === 1;
+}
+
+/** Curva de XP, ganhos por nível e regras por classe — valores de equilíbrio num só sítio */
+export const PROGRESSION = {
+  /** Nível máximo; acima disso o XP não aumenta nível */
+  maxLevel: 50,
+  /** XP para o primeiro nível (1→2); cada nível seguinte exige `step` a mais que o anterior */
+  xpToNextLevel: {
+    start: 50,
+    step: 10,
+  },
+  /** Quando `EnemyDef.xp` está omitido: `base + floor(maxHp / maxHpDivisor)` */
+  defaultEnemyXp: {
+    base: 10,
+    maxHpDivisor: 2,
+  },
+  levelUp: {
+    byClass: {
+      knight: {
+        effects: [
+          { kind: 'hp', delta: 3, when: 'every' },
+          { kind: 'stat', attr: 'str', delta: 1, when: 'every' },
+          { kind: 'stat', attr: 'agi', delta: 1, when: 'even' },
+          { kind: 'mana', delta: 2, when: 'even' },
+        ] as const satisfies readonly LevelUpEffect[],
+      },
+      mage: {
+        effects: [
+          { kind: 'hp', delta: 3, when: 'every' },
+          { kind: 'stat', attr: 'mind', delta: 1, when: 'every' },
+          { kind: 'stat', attr: 'agi', delta: 1, when: 'even' },
+          { kind: 'mana', delta: 2, when: 'every' },
+        ] as const satisfies readonly LevelUpEffect[],
+      },
+      cleric: {
+        effects: [
+          { kind: 'hp', delta: 3, when: 'every' },
+          { kind: 'stat', attr: 'mind', delta: 1, when: 'every' },
+          { kind: 'stat', attr: 'agi', delta: 1, when: 'even' },
+          { kind: 'mana', delta: 2, when: 'every' },
+        ] as const satisfies readonly LevelUpEffect[],
+      },
+    } satisfies Record<ClassId, { effects: readonly LevelUpEffect[] }>,
+  },
+} as const;
+
+/** Igual a `PROGRESSION.maxLevel`; export separado para compatibilidade com imports existentes */
+export const MAX_LEVEL = PROGRESSION.maxLevel;
 
 /** XP necessário para sair do nível `level` e ir para `level + 1` */
 export function xpToNextLevel(level: number): number {
-  if (level >= MAX_LEVEL) return 0;
-  return XP_TO_NEXT_LEVEL_START + (level - 1) * XP_TO_NEXT_LEVEL_STEP;
+  if (level >= PROGRESSION.maxLevel) return 0;
+  return PROGRESSION.xpToNextLevel.start + (level - 1) * PROGRESSION.xpToNextLevel.step;
 }
 
 function defaultXpFromEnemyDef(maxHp: number): number {
-  return 10 + Math.floor(maxHp / 2);
+  const { base, maxHpDivisor } = PROGRESSION.defaultEnemyXp;
+  return base + Math.floor(maxHp / maxHpDivisor);
 }
 
 export function computeCombatXp(enc: Encounter, data: GameData): number {
@@ -42,6 +97,42 @@ const ZERO_DELTAS: LevelUpStatDeltas = {
   mana: 0,
 };
 
+function applyLevelUpEffect(
+  effect: LevelUpEffect,
+  newLevel: number,
+  d: LevelUpStatDeltas,
+  stats: { str: number; agi: number; mind: number; maxHp: number; hp: number; maxMana: number; mana: number }
+): void {
+  if (!whenMatches(effect.when, newLevel)) return;
+
+  switch (effect.kind) {
+    case 'hp': {
+      const delta = effect.delta;
+      d.maxHp += delta;
+      stats.maxHp += delta;
+      const hpBefore = stats.hp;
+      stats.hp = Math.min(stats.maxHp, stats.hp + delta);
+      d.hp += stats.hp - hpBefore;
+      break;
+    }
+    case 'mana': {
+      const delta = effect.delta;
+      d.maxMana += delta;
+      stats.maxMana += delta;
+      const manaBefore = stats.mana;
+      stats.mana = Math.min(stats.maxMana, stats.mana + delta);
+      d.mana += stats.mana - manaBefore;
+      break;
+    }
+    case 'stat': {
+      const delta = effect.delta;
+      d[effect.attr] += delta;
+      stats[effect.attr] += delta;
+      break;
+    }
+  }
+}
+
 function applyOneLevelUp(
   state: GameState,
   newLevel: number,
@@ -52,51 +143,32 @@ function applyOneLevelUp(
     return { state: { ...state, level: newLevel, xp: newXp }, deltas: { ...ZERO_DELTAS } };
   }
   const cls: ClassId = lead.class;
+  const { effects } = PROGRESSION.levelUp.byClass[cls];
   const d: LevelUpStatDeltas = { ...ZERO_DELTAS };
-  let { str, agi, mind, maxHp, hp, mana, maxMana } = lead;
-  d.maxHp = 3;
-  maxHp += 3;
-  const hpBefore = hp;
-  hp = Math.min(maxHp, hp + 3);
-  d.hp = hp - hpBefore;
-  if (cls === 'knight') {
-    str += 1;
-    d.str = 1;
-    if (newLevel % 2 === 0) {
-      agi += 1;
-      d.agi = 1;
-      d.maxMana = 2;
-      maxMana += 2;
-      const manaBefore = mana;
-      mana = Math.min(maxMana, mana + 2);
-      d.mana = mana - manaBefore;
-    }
-  } else if (cls === 'mage') {
-    mind += 1;
-    d.mind = 1;
-    if (newLevel % 2 === 0) {
-      agi += 1;
-      d.agi = 1;
-    }
-    d.maxMana = 2;
-    maxMana += 2;
-    const manaBefore = mana;
-    mana = Math.min(maxMana, mana + 2);
-    d.mana = mana - manaBefore;
-  } else {
-    mind += 1;
-    d.mind = 1;
-    if (newLevel % 2 === 0) {
-      str += 1;
-      d.str = 1;
-    }
-    d.maxMana = 2;
-    maxMana += 2;
-    const manaBefore = mana;
-    mana = Math.min(maxMana, mana + 2);
-    d.mana = mana - manaBefore;
+  const stats = {
+    str: lead.str,
+    agi: lead.agi,
+    mind: lead.mind,
+    maxHp: lead.maxHp,
+    hp: lead.hp,
+    maxMana: lead.maxMana,
+    mana: lead.mana,
+  };
+
+  for (const effect of effects) {
+    applyLevelUpEffect(effect, newLevel, d, stats);
   }
-  const newLead = { ...lead, str, agi, mind, maxHp, hp, mana, maxMana };
+
+  const newLead = {
+    ...lead,
+    str: stats.str,
+    agi: stats.agi,
+    mind: stats.mind,
+    maxHp: stats.maxHp,
+    hp: stats.hp,
+    maxMana: stats.maxMana,
+    mana: stats.mana,
+  };
   return {
     state: {
       ...state,
@@ -114,7 +186,7 @@ export function addXp(
   opts?: { bus?: EventBus; data?: GameData }
 ): { state: GameState; levelUps: LevelUpStep[] } {
   if (amount <= 0) return { state, levelUps: [] };
-  if (state.level >= MAX_LEVEL) return { state, levelUps: [] };
+  if (state.level >= PROGRESSION.maxLevel) return { state, levelUps: [] };
   const bus = opts?.bus;
   const data = opts?.data;
   let level = state.level;
@@ -122,7 +194,7 @@ export function addXp(
   let s = state;
   const levelUps: LevelUpStep[] = [];
 
-  while (level < MAX_LEVEL && xp >= xpToNextLevel(level)) {
+  while (level < PROGRESSION.maxLevel && xp >= xpToNextLevel(level)) {
     xp -= xpToNextLevel(level);
     level += 1;
     const step = applyOneLevelUp(s, level, xp);
@@ -137,7 +209,7 @@ export function addXp(
     bus?.emit({ type: 'level.up', level });
   }
 
-  if (level >= MAX_LEVEL) {
+  if (level >= PROGRESSION.maxLevel) {
     s = { ...s, level: MAX_LEVEL, xp: 0 };
   } else {
     s = { ...s, level, xp };

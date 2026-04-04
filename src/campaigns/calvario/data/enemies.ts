@@ -187,7 +187,7 @@ export const enemies: Record<string, EnemyDef> = {
     sprite: E.act5_frost_whelp.sprite,
     spriteWounded: E.act5_frost_whelp.spriteWounded,
     attackStrategy: 'random',
-    lootDrops: [{ chance: 0.08, resource: 'gold', amount: 1 }],
+    lootDrops: [{ chance: 0.1, resource: 'gold', amount: 1 }],
   },
   frost_reaver: {
     id: 'frost_reaver',
@@ -197,14 +197,17 @@ export const enemies: Record<string, EnemyDef> = {
     str: 16,
     agi: 8,
     mind: 6,
-    armor: 2,
+    armor: 1,
     type: 'armored',
-    armorChips: 2,
-    xp: 28,
+    armorChips: 1,
+    xp: 38,
     sprite: E.act5_frost_reaver.sprite,
     spriteWounded: E.act5_frost_reaver.spriteWounded,
     attackStrategy: 'focus_leader',
-    lootDrops: [{ chance: 0.25, resource: 'gold', amount: 2 }],
+    lootDrops: [
+      { chance: 0.25, resource: 'gold', amount: 2 },
+      { chance: 0.15, resource: 'supply', amount: 1 }
+    ],
   },
   ice_dragon_p1: {
     id: 'ice_dragon_p1',

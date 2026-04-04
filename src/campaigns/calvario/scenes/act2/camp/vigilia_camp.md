@@ -10,6 +10,7 @@ choices:
     condition: { resource: { supply: { gte: 1 } } }
     effects:
       - { op: campRest }
+      - { op: advanceDay }
   - text: "Beber poção rubra (ti)"
     next: act2/camp/vigilia_camp
     condition: { hasItem: potion_hp }
@@ -49,6 +50,8 @@ choices:
     next: act2/camp/manage_equip
   - text: "Continuar"
     next: act2/hub_catacomb
+    effects:
+      - { op: advanceDay }
 onEnter:
   - { op: addRep, faction: vigilia, delta: 1 }
 ---

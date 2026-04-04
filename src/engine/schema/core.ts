@@ -316,8 +316,6 @@ export const SceneFrontmatterSchema = z.object({
   onEnter: z.array(EffectSchema).default([]),
   /** Efeitos em **cada** entrada na cena (ex.: avançar dia num hub) */
   repeatOnEnter: z.array(EffectSchema).default([]),
-  /** Efeitos ao sair da cena para outra `sceneId` (cada transição) */
-  repeatOnLeave: z.array(EffectSchema).default([]),
   choices: z.array(ChoiceSchema).default([]),
   skillCheck: SkillCheckSchema.optional(),
   dualAttrSkillCheck: DualAttrSkillCheckSchema.optional(),

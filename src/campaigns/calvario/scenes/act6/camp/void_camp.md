@@ -10,6 +10,7 @@ choices:
     condition: { resource: { supply: { gte: 1 } } }
     effects:
       - { op: campRest }
+      - { op: advanceDay }
   - text: "Beber poção rubra (ti)"
     next: act6/camp/void_camp
     condition: { hasItem: potion_hp }
@@ -45,6 +46,8 @@ choices:
     next: act6/camp/manage_equip
   - text: "Voltar à nave fraturada"
     next: act6/hub_fractured_nave
+    effects:
+      - { op: advanceDay }
 onEnter: []
 ---
 Não há **lenha** — só **restos** de quem já se queimou a si próprio. A fogueira **imita** calor; o teu corpo aceita a mentira porque **precisa** de um sítio onde fingir que ainda há **amanhã**.

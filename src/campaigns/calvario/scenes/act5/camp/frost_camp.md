@@ -10,6 +10,7 @@ choices:
     condition: { resource: { supply: { gte: 1 } } }
     effects:
       - { op: campRest }
+      - { op: advanceDay }
   - text: "Beber poção rubra (ti)"
     next: act5/camp/frost_camp
     condition: { hasItem: potion_hp }
@@ -40,6 +41,8 @@ choices:
     next: act5/camp/manage_equip
   - text: "Continuar"
     next: act5/frost_hub
+    effects:
+      - { op: advanceDay }
 onEnter:
   - { op: addRep, faction: culto, delta: 1 }
 ---

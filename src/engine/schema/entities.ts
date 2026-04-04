@@ -267,7 +267,7 @@ export const GameStateSchema = z.object({
   level: z.number().int().min(1).default(1),
   /** XP dentro do nível atual (0 até xpToNext(level)-1) */
   xp: z.number().int().min(0).default(0),
-  /** Dia narrativo (1 = início); avança ao sair de cenas de acampamento principais (`*_camp`). */
+  /** Dia narrativo (1 = início); avança com efeito `{ op: advanceDay }` (em `onEnter`, `choices[].effects`, etc.). */
   day: z.number().int().min(1).default(1),
   party: z.array(CharacterSchema),
   companionsAvailable: z.array(z.string()).default([]),

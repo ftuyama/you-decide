@@ -2,7 +2,6 @@ import { marked } from 'marked';
 import { splitFrontmatter } from './frontmatter.ts';
 import DOMPurify from 'dompurify';
 import {
-  GameStateSchema,
   SceneFrontmatterSchema,
   type Choice,
   type GameState,
@@ -39,49 +38,6 @@ export function parseSceneMarkdown(raw: string, sceneIdForErrors: string): Loade
 export function renderSceneBody(body: string, state: GameState): string {
   const bodyInj = injectText(body.trim(), state);
   return DOMPurify.sanitize(marked.parse(bodyInj) as string);
-}
-
-/**
- * Ao sair de um acampamento principal (`ambientTheme: camp` e id `*_camp`),
- * avança o dia narrativo. A lógica vive fora de `enterScene` porque o estado
- * já chega com `sceneId` do destino antes de `stabilize` (ex.: `applyChoice`).
- */
-export function maybeAdvanceDayLeavingCamp(
-  fromSceneId: string,
-  toSceneId: string,
-  state: GameState,
-  bus: EventBus,
-  getScene: (id: string) => LoadedScene | undefined
-): GameState {
-  if (fromSceneId === toSceneId) return state;
-  const from = getScene(fromSceneId);
-  if (!from) return state;
-  const fm = from.frontmatter;
-  if (fm.ambientTheme !== 'camp') return state;
-  if (!from.id.endsWith('_camp')) return state;
-  const nextDay = (state.day ?? 1) + 1;
-  bus.emit({ type: 'time.dayAdvanced', day: nextDay });
-  return GameStateSchema.parse({ ...state, day: nextDay });
-}
-
-/**
- * Ao sair da cena `fromSceneId` para outra (`toSceneId`), aplica `repeatOnLeave`
- * da cena de origem. Vive fora de `enterScene` como `maybeAdvanceDayLeavingCamp`.
- */
-export function maybeApplyRepeatOnLeave(
-  fromSceneId: string,
-  toSceneId: string,
-  state: GameState,
-  bus: EventBus,
-  getScene: (id: string) => LoadedScene | undefined,
-  data: GameData
-): GameState {
-  if (fromSceneId === toSceneId) return state;
-  const from = getScene(fromSceneId);
-  if (!from) return state;
-  const leave = from.frontmatter.repeatOnLeave ?? [];
-  if (leave.length === 0) return state;
-  return applyEffects(state, leave, { sceneId: fromSceneId, data, bus });
 }
 
 export function enterScene(

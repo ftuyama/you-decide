@@ -3,8 +3,6 @@ import { createInitialState, deserializeState, serializeState } from '../engine/
 import { EventBus, type GameEvent } from '../engine/eventBus.ts';
 import {
   enterScene,
-  maybeAdvanceDayLeavingCamp,
-  maybeApplyRepeatOnLeave,
   resolveLuckCheck,
   resolveDualAttrSkillCheck,
   resolveSkillCheck,
@@ -453,13 +451,6 @@ export class GameApp {
     }
     if (s.sceneId !== prevScene) {
       s = tickActiveBuffs(s);
-      s = maybeApplyRepeatOnLeave(prevScene, s.sceneId, s, this.bus, (id) =>
-        this.registry.getScene(id),
-        this.registry.data
-      );
-      s = maybeAdvanceDayLeavingCamp(prevScene, s.sceneId, s, this.bus, (id) =>
-        this.registry.getScene(id)
-      );
     }
     this.state = this.stabilize(s);
     this.render();
@@ -644,13 +635,6 @@ export class GameApp {
         let s = nextState;
         if (s.sceneId !== prevScene) {
           s = tickActiveBuffs(s);
-          s = maybeApplyRepeatOnLeave(prevScene, s.sceneId, s, this.bus, (id) =>
-            this.registry.getScene(id),
-            this.registry.data
-          );
-          s = maybeAdvanceDayLeavingCamp(prevScene, s.sceneId, s, this.bus, (id) =>
-            this.registry.getScene(id)
-          );
         }
         this.state = this.stabilize(s);
         this.audio.playUiClick();
@@ -818,15 +802,7 @@ export class GameApp {
               unlockAudio: () => this.unlockAudio(),
               stabilize: (s) => this.stabilize(s),
               commitState: (s) => {
-                const prev = this.state.sceneId;
-                let next = s;
-                if (s.sceneId !== prev && s.mode === 'story') {
-                  next = maybeApplyRepeatOnLeave(prev, s.sceneId, s, this.bus, (id) =>
-                    this.registry.getScene(id),
-                    this.registry.data
-                  );
-                }
-                this.state = this.stabilize(next);
+                this.state = this.stabilize(s);
                 this.render();
               },
             },

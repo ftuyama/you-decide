@@ -12,11 +12,10 @@ choices:
     effects:
       - { op: addResource, resource: corruption, delta: 1 }
       - { op: addRep, faction: circulo, delta: 1 }
+      - { op: advanceDay }
   - text: "Recusar"
     next: act2/circle_ritual/circle_ritual_refuse_mind
     preview: "Mente — manter a clareza ao recusar (TN 8)"
 onEnter: []
-repeatOnLeave:
-  - { op: advanceDay }
 ---
 Um mago do **Círculo** desenha cinza no chão. "Um preço leve", diz.

@@ -10,8 +10,7 @@ choices:
     next: act5/frost_ridgeline
     condition:
       all:
-        - { noFlag: tomas_rescued }
-        - { level: { gte: 15 } }
+        - { level: { gte: 18 } }
   - text: "Rumor do escudeiro — corda e ritual no gelo"
     next: act5/frost_tomas_intro
     condition:

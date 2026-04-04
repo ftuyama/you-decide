@@ -8,9 +8,16 @@ title: Desfiladeiro — acampamento improvisado
 choices:
   - text: "Seguir o rasto de garras na neve (missão)"
     next: act5/frost_ridgeline
+    condition:
+      all:
+        - { noFlag: tomas_rescued }
+        - { level: { gte: 15 } }
   - text: "Rumor do escudeiro — corda e ritual no gelo"
     next: act5/frost_tomas_intro
-    condition: { noFlag: tomas_rescued }
+    condition:
+      all:
+        - { noFlag: tomas_rescued }
+        - { level: { gte: 20 } }
   - text: "Viver o acampamento no gelo"
     next: act5/frost_camp
   - text: "Mercador de tenda azul-trovão"

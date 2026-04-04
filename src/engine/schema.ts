@@ -48,6 +48,7 @@ export const ConditionSchema: z.ZodType<Condition> = z.lazy(() =>
     z.object({ class: ClassIdSchema }),
     z.object({ path: z.string() }),
     z.object({ chapter: z.object({ gte: z.number().optional(), lte: z.number().optional() }) }),
+    z.object({ level: z.object({ gte: z.number().optional(), lte: z.number().optional() }) }),
     z.object({ corruption: z.object({ gte: z.number().optional(), lte: z.number().optional() }) }),
     z.object({
       companionCount: z.object({ gte: z.number().optional(), lte: z.number().optional() }),
@@ -78,6 +79,7 @@ export type Condition =
   | { class: ClassId }
   | { path: string }
   | { chapter: { gte?: number; lte?: number } }
+  | { level: { gte?: number; lte?: number } }
   | { corruption: { gte?: number; lte?: number } }
   | { companionCount: { gte?: number; lte?: number } };
 

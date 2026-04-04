@@ -8,11 +8,16 @@ choices:
     next: act3/well_lies
   - text: "Tentar o mapa (rumor)"
     next: act3/cult_passage
-    condition: { hasItem: rumor_map }
+    condition:
+      all:
+        - { hasItem: rumor_map }
+        - { level: { gte: 6 } }
   - text: "Mapa mini (exploração ASCII)"
     next: act3/ascii_explore
+    condition: { level: { gte: 8 } }
   - text: "Evento de corrupção"
     next: act3/corruption_event
+    condition: { level: { gte: 6 } }
   - text: "Nota no diário"
     next: act3/diary_trigger
     effects:

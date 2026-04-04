@@ -67,6 +67,11 @@ export function evaluateCondition(cond: Condition | undefined, state: GameState)
     if (cond.chapter.lte !== undefined && state.chapter > cond.chapter.lte) return false;
     return true;
   }
+  if ('level' in cond) {
+    if (cond.level.gte !== undefined && state.level < cond.level.gte) return false;
+    if (cond.level.lte !== undefined && state.level > cond.level.lte) return false;
+    return true;
+  }
   if ('corruption' in cond) {
     const c = state.resources.corruption;
     if (cond.corruption.gte !== undefined && c < cond.corruption.gte) return false;

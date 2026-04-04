@@ -7,6 +7,7 @@ artKey: depths
 choices:
   - text: "Rumo ao trono de ossos"
     next: act4/throne_gate
+    condition: { level: { gte: 7 } }
     effects:
       - { op: setChapter, chapter: 4 }
       - { op: addDiary, text: "O trono chama." }

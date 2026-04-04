@@ -2,7 +2,7 @@
 id: act2/merchant_circle_win
 chapter: 2
 ambientTheme: merchant
-artKey: merchant
+artKey: merchant_shocked
 title: O capuz paga
 onEnter: []
 choices:

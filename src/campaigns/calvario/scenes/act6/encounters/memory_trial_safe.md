@@ -7,7 +7,7 @@ artKey: void_well
 choices:
   - text: "Mergulhar com o eco sob controle"
     effects:
-      - { op: startCombat, encounterId: act6_echo_chorus, onVictory: act6/memory_after, onDefeat: act4/game_over, onFlee: act6/hub_fractured_nave }
+      - { op: startCombat, encounterId: act6_echo_chorus, onVictory: act6/memory_after, onDefeat: shared/game_over, onFlee: act6/hub_fractured_nave }
 onEnter:
   - { op: addDiary, text: "Repito meu nome como quem finca estaca num mar sem margem." }
 ---

@@ -10,7 +10,7 @@ choices:
       - op: startCombat
         encounterId: rats_cellar
         onVictory: act2/after_rats
-        onDefeat: act4/game_over
+        onDefeat: shared/game_over
         onFlee: act2/flee_rats
 onEnter: []
 ---

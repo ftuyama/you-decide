@@ -9,7 +9,7 @@ choices:
     effects:
       - { op: addResource, resource: corruption, delta: 1 }
       - { op: addResource, resource: supply, delta: -1 }
-      - { op: startCombat, encounterId: act6_echo_chorus, onVictory: act6/memory_after, onDefeat: act4/game_over, onFlee: act6/hub_fractured_nave }
+      - { op: startCombat, encounterId: act6_echo_chorus, onVictory: act6/memory_after, onDefeat: shared/game_over, onFlee: act6/hub_fractured_nave }
 onEnter:
   - { op: addDiary, text: "As memorias vieram em bando e nenhuma pedia permissao." }
 ---

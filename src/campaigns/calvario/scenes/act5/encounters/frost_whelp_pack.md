@@ -9,7 +9,7 @@ choices:
       - op: startCombat
         encounterId: frost_whelps
         onVictory: act5/frost_lair_approach
-        onDefeat: act4/game_over
+        onDefeat: shared/game_over
 onEnter: []
 ---
 Duas **crias** rodeiam-te com fome de calor vivo. Os olhos delas são **buracos** onde o luar foi congelado — e onde o teu reflexo **hesita** um segundo a mais do que devia.

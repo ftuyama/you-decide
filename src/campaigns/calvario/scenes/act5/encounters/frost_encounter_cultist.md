@@ -9,7 +9,7 @@ choices:
       - op: startCombat
         encounterId: cultist_patrol
         onVictory: act5/frost_hub
-        onDefeat: act4/game_over
+        onDefeat: shared/game_over
         onFlee: act5/frost_hub
 onEnter: []
 ---

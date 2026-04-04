@@ -10,7 +10,7 @@ choices:
       - op: startCombat
         encounterId: summit_ascent_3
         onVictory: act5/frost_summit_temple_gate
-        onDefeat: act4/game_over
+        onDefeat: shared/game_over
         onFlee: act5/frost_summit_temple_gate
 onEnter: []
 ---

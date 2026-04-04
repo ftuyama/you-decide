@@ -41,7 +41,8 @@ import {
 import { GameAudio, type AmbientTheme } from './sound';
 import { iconWrap, icons } from './icons';
 import { buildGameSidebar } from './gameAppSidebar';
-import './styles.css';
+import { buildScenesGraphHref } from './campaignUrl';
+import './css/styles.css';
 import gameVersionRaw from '../../VERSION?raw';
 
 const GAME_VERSION = gameVersionRaw.trim() || '?';
@@ -1170,6 +1171,15 @@ export class GameApp {
     creditsBtn.textContent = 'Créditos';
     creditsBtn.addEventListener('click', () => this.showCredits());
 
+    const graphBtn = document.createElement('button');
+    graphBtn.type = 'button';
+    graphBtn.className = 'menu-item';
+    graphBtn.textContent = 'Grafo de cenas';
+    graphBtn.title = 'Grafo por act (?view=scenes-graph). Disponível com modo desenvolvedor.';
+    graphBtn.addEventListener('click', () => {
+      window.location.href = buildScenesGraphHref(this.campaignId);
+    });
+
     const versionLabel = document.createElement('div');
     versionLabel.className = 'menu-version';
     versionLabel.textContent = `You Decide v${GAME_VERSION}`;
@@ -1191,6 +1201,9 @@ export class GameApp {
     settingsSection.appendChild(quickNavRow);
     if (this.isLocalhostHost()) {
       settingsSection.appendChild(devRow);
+    }
+    if (this.devMode) {
+      settingsSection.appendChild(graphBtn);
     }
 
     const aboutSection = createMenuSection('Sobre');

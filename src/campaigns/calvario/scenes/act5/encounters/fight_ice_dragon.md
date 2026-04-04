@@ -9,7 +9,7 @@ choices:
       - op: startCombat
         encounterId: boss_ice_dragon_1
         onVictory: act5/encounters/fight_ice_dragon_2
-        onDefeat: act4/game_over
+        onDefeat: shared/game_over
   - text: "Recuar — voltar ao desfiladeiro"
     next: act5/frost_hub
 onEnter: []

@@ -9,7 +9,7 @@ choices:
       - op: startCombat
         encounterId: act6_wild_fragments_pair
         onVictory: act6/hub_fractured_nave
-        onDefeat: act4/game_over
+        onDefeat: shared/game_over
         onFlee: act6/hub_fractured_nave
 onEnter: []
 ---

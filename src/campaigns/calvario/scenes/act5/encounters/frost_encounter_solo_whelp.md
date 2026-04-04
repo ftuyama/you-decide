@@ -9,7 +9,7 @@ choices:
       - op: startCombat
         encounterId: frost_whelp_solo
         onVictory: act5/frost_hub
-        onDefeat: act4/game_over
+        onDefeat: shared/game_over
         onFlee: act5/frost_hub
 onEnter: []
 ---

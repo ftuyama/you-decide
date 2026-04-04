@@ -9,7 +9,7 @@ choices:
     effects:
       - { op: addResource, resource: faith, delta: -1 }
       - { op: addResource, resource: corruption, delta: 1 }
-      - { op: startCombat, encounterId: act6_veil_herald, onVictory: act6/reality_after, onDefeat: act4/game_over, onFlee: act6/hub_fractured_nave }
+      - { op: startCombat, encounterId: act6_veil_herald, onVictory: act6/reality_after, onDefeat: shared/game_over, onFlee: act6/hub_fractured_nave }
 onEnter:
   - { op: addDiary, text: "Quando o real partiu, a sombra entrou primeiro." }
 ---

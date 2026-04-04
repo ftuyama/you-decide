@@ -1,5 +1,5 @@
 ---
-id: act4/game_over
+id: shared/game_over
 title: Fim de Jornada
 chapter: 4
 ambientTheme: explore

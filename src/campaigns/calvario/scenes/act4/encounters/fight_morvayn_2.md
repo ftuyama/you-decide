@@ -10,14 +10,14 @@ choices:
       - op: startCombat
         encounterId: boss_morvayn_2
         onVictory: act4/victory_peace
-        onDefeat: act4/game_over
+        onDefeat: shared/game_over
   - text: "Segunda fase — trono!"
     condition: { mark: soul_scarred_by_seal }
     effects:
       - op: startCombat
         encounterId: boss_morvayn_2_disadv
         onVictory: act4/victory_peace
-        onDefeat: act4/game_over
+        onDefeat: shared/game_over
 onEnter: []
 ---
 O trono **desperta**. Sua forma encorpa-se com ossos alheios.

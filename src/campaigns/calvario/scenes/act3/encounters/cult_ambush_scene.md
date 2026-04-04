@@ -9,7 +9,7 @@ choices:
       - op: startCombat
         encounterId: cult_ambush
         onVictory: act3/hub_depths
-        onDefeat: act4/game_over
+        onDefeat: shared/game_over
         onFlee: act3/flee_cult
 onEnter: []
 ---

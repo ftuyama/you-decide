@@ -10,7 +10,7 @@ choices:
       - op: startCombat
         encounterId: frost_whelps
         onVictory: act5/frost_snow_gruta_approach
-        onDefeat: act4/game_over
+        onDefeat: shared/game_over
         onFlee: act5/frost_hub
 onEnter: []
 ---

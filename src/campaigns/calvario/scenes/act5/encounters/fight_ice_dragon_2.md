@@ -32,7 +32,7 @@ choices:
       - op: startCombat
         encounterId: boss_ice_dragon_2
         onVictory: act5/frost_epilogue
-        onDefeat: act4/game_over
+        onDefeat: shared/game_over
 onEnter: []
 ---
 O dragão **rasga** o próprio rugido e deixa entrar um **silêncio** pior que o barulho.

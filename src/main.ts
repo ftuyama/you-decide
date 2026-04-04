@@ -1,7 +1,13 @@
 import { GameApp } from './ui/GameApp';
-import { resolveCampaignIdFromLocation } from './ui/campaignUrl';
+import { mountScenesGraphView } from './ui/scenesGraphView';
+import { resolveAppViewFromLocation, resolveCampaignIdFromLocation } from './ui/campaignUrl';
 
 const el = document.querySelector<HTMLElement>('#app');
 if (el) {
-  new GameApp(el, resolveCampaignIdFromLocation());
+  const campaignId = resolveCampaignIdFromLocation();
+  if (resolveAppViewFromLocation() === 'scenes-graph') {
+    mountScenesGraphView(el, campaignId);
+  } else {
+    new GameApp(el, campaignId);
+  }
 }

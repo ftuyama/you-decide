@@ -9,7 +9,7 @@ choices:
       - op: startCombat
         encounterId: rats_cellar_pair
         onVictory: act2/hub_catacomb
-        onDefeat: act4/game_over
+        onDefeat: shared/game_over
         onFlee: act2/flee_rats
 onEnter: []
 ---

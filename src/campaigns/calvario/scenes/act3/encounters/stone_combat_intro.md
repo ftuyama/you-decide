@@ -9,7 +9,7 @@ choices:
       - op: startCombat
         encounterId: stone_guard_fight
         onVictory: act3/stone_guard_victory
-        onDefeat: act4/game_over
+        onDefeat: shared/game_over
 onEnter: []
 ---
 Pedra **contra** carne. Três camadas de armadura antes da ferida real.

@@ -10,7 +10,7 @@ choices:
       - op: startCombat
         encounterId: act6_shadow_self
         onVictory: act6/encounters/mirror_boss_resolve
-        onDefeat: act4/game_over
+        onDefeat: shared/game_over
         onFlee: act6/hub_fractured_nave
 onEnter: []
 ---

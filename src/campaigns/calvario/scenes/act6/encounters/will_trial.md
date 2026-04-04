@@ -10,7 +10,7 @@ choices:
   - text: "Forcar confronto direto contra o penitente"
     effects:
       - { op: addResource, resource: supply, delta: -1 }
-      - { op: startCombat, encounterId: act6_penitent_blade, onVictory: act6/will_after, onDefeat: act4/game_over, onFlee: act6/hub_fractured_nave }
+      - { op: startCombat, encounterId: act6_penitent_blade, onVictory: act6/will_after, onDefeat: shared/game_over, onFlee: act6/hub_fractured_nave }
 onEnter: []
 ---
 No alto do altar, uma coroa de espinhos de obsidiana gira lentamente, esperando um rei cansado o bastante para chamá-la de destino.

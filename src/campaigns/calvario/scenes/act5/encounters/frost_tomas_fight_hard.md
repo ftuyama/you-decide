@@ -9,7 +9,7 @@ choices:
       - op: startCombat
         encounterId: frost_tomas_rescue_ambush
         onVictory: act5/frost_tomas_rescued
-        onDefeat: act4/game_over
+        onDefeat: shared/game_over
         onFlee: act5/frost_hub
 onEnter: []
 ---

@@ -9,7 +9,7 @@ choices:
       - op: startCombat
         encounterId: act2_rare_bone_sentinel
         onVictory: act2/hub_catacomb
-        onDefeat: act4/game_over
+        onDefeat: shared/game_over
         onFlee: act2/hub_catacomb
 onEnter: []
 ---

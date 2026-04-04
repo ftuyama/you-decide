@@ -8,7 +8,7 @@ choices:
   - text: "Romper o cerco de ecos famintos"
     effects:
       - { op: addResource, resource: corruption, delta: 1 }
-      - { op: startCombat, encounterId: act6_will_horde, onVictory: act6/will_after, onDefeat: act4/game_over, onFlee: act6/hub_fractured_nave }
+      - { op: startCombat, encounterId: act6_will_horde, onVictory: act6/will_after, onDefeat: shared/game_over, onFlee: act6/hub_fractured_nave }
 onEnter:
   - { op: addDiary, text: "A vontade sem freio chamou versoes minhas que so conhecem conquista." }
 ---

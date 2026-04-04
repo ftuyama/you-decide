@@ -1027,7 +1027,7 @@ function finishCombat(
   };
   const next = victory
     ? pick(c.onVictory ?? c.returnScene, c.returnScene)
-    : pick(c.onDefeat, 'act4/game_over');
+    : pick(c.onDefeat, 'shared/game_over');
   let s = state;
   if (victory) {
     const { state: afterLoot, lootLines } = applyEnemyLootOnVictory(s, c, data);

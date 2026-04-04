@@ -397,24 +397,56 @@ export class GameAudio {
   }
 
   /**
-   * Derrota / fim de combate mau — linha descendente.
+   * Derrota / fim de combate mau — descida lenta em sol menor, com legato e sub-grave no fim.
    */
   playDefeat(): void {
     const ctx = this.ensureContext();
     const g = this.gain(0.15);
     if (g <= 0) return;
-    [392, 349, 311, 277].forEach((freq, i) => {
+    const t0 = ctx.currentTime;
+    // G4 → G3 (escala menor natural), notas sobrepostas para frase mais longa e melancólica
+    const notes: { f: number; t: number; dur: number }[] = [
+      { f: 392.0, t: 0, dur: 0.58 },
+      { f: 349.23, t: 0.3, dur: 0.62 },
+      { f: 311.13, t: 0.64, dur: 0.65 },
+      { f: 293.66, t: 1.0, dur: 0.68 },
+      { f: 261.63, t: 1.38, dur: 0.72 },
+      { f: 233.08, t: 1.8, dur: 0.78 },
+      { f: 196.0, t: 2.28, dur: 0.95 },
+    ];
+    for (const { f, t, dur } of notes) {
       const o = ctx.createOscillator();
       const gn = ctx.createGain();
       o.type = 'triangle';
-      o.frequency.value = freq;
-      gn.gain.value = g * 0.85;
+      o.frequency.value = f;
+      gn.gain.setValueAtTime(0.001, t0 + t);
+      gn.gain.exponentialRampToValueAtTime(g * 0.78, t0 + t + 0.05);
+      gn.gain.exponentialRampToValueAtTime(g * 0.42, t0 + t + dur * 0.45);
+      gn.gain.exponentialRampToValueAtTime(0.001, t0 + t + dur);
       o.connect(gn);
       gn.connect(ctx.destination);
-      const t = ctx.currentTime + i * 0.12;
-      o.start(t);
-      o.stop(t + 0.22);
-    });
+      o.start(t0 + t);
+      o.stop(t0 + t + dur + 0.05);
+    }
+    const subNotes: { f: number; t: number; dur: number }[] = [
+      { f: 130.81, t: 1.38, dur: 0.75 },
+      { f: 116.54, t: 1.8, dur: 0.82 },
+      { f: 98.0, t: 2.28, dur: 1.05 },
+    ];
+    for (const { f, t, dur } of subNotes) {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = f;
+      gn.gain.setValueAtTime(0.001, t0 + t);
+      gn.gain.exponentialRampToValueAtTime(g * 0.28, t0 + t + 0.12);
+      gn.gain.exponentialRampToValueAtTime(g * 0.14, t0 + t + dur * 0.5);
+      gn.gain.exponentialRampToValueAtTime(0.001, t0 + t + dur);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(t0 + t);
+      o.stop(t0 + t + dur + 0.06);
+    }
   }
 
   /**

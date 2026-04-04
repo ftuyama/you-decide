@@ -7,7 +7,7 @@ choices:
   - text: "Voltar ao cruzeiro"
     next: act2/hub_catacomb
 onEnter:
-  - { op: addResource, resource: supply, delta: -1 }
+  - { op: addResource, resource: gold, delta: -1 }
   - { op: addDiary, text: "Corri de um morto que caminhava demasiado depressa." }
 ---
 O esqueleto **não cansa** — tu cansas. Cada **estalido** atrás de ti parece **perguntas** que não queres responder.

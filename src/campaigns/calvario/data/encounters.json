@@ -177,5 +177,70 @@
     "playerAdvantage": false,
     "enemyAdvantage": true,
     "xpReward": 8
+  },
+  "act6_wild_fragment_solo": {
+    "id": "act6_wild_fragment_solo",
+    "enemies": ["act6_wild_splinter"],
+    "playerAdvantage": false,
+    "enemyAdvantage": false
+  },
+  "act6_wild_fragments_pair": {
+    "id": "act6_wild_fragments_pair",
+    "enemies": ["act6_wild_splinter", "act6_wild_splinter"],
+    "playerAdvantage": false,
+    "enemyAdvantage": false,
+    "xpReward": 3
+  },
+  "act6_wild_triple_fragments": {
+    "id": "act6_wild_triple_fragments",
+    "enemies": ["act6_wild_splinter", "act6_wild_splinter", "act6_wild_splinter"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 8
+  },
+  "act6_wild_veil_fragment": {
+    "id": "act6_wild_veil_fragment",
+    "enemies": ["act6_wild_veil_scribe", "act6_wild_splinter"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 5
+  },
+  "act6_wild_echo_fragment": {
+    "id": "act6_wild_echo_fragment",
+    "enemies": ["act6_wild_murmur_host", "act6_wild_splinter"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 5
+  },
+  "act6_wild_scribe_solo": {
+    "id": "act6_wild_scribe_solo",
+    "enemies": ["act6_wild_veil_scribe"],
+    "playerAdvantage": false,
+    "enemyAdvantage": false
+  },
+  "act6_wild_murmur_solo": {
+    "id": "act6_wild_murmur_solo",
+    "enemies": ["act6_wild_murmur_host"],
+    "playerAdvantage": false,
+    "enemyAdvantage": false
+  },
+  "act6_wild_chain_solo": {
+    "id": "act6_wild_chain_solo",
+    "enemies": ["act6_wild_chain_penitent"],
+    "playerAdvantage": false,
+    "enemyAdvantage": false
+  },
+  "act6_wild_regent_solo": {
+    "id": "act6_wild_regent_solo",
+    "enemies": ["act6_wild_glass_regent"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true
+  },
+  "act6_wild_stain_horde": {
+    "id": "act6_wild_stain_horde",
+    "enemies": ["act6_wild_stain_preacher", "act6_wild_splinter"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 8
   }
 }

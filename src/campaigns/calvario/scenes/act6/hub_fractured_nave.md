@@ -36,6 +36,8 @@ choices:
     next: act6/void_camp
   - text: "Negociar com o mercador da banca esquecida"
     next: act6/fractured_merchant
+  - text: "Vagar entre as colunas — o vazio escolhe o próximo passo"
+    next: act6/fractured_void_router
   - text: "Ouvir o sussurro sob as colunas (rota de corrupção)"
     next: act6/void_secret_entry
     condition:

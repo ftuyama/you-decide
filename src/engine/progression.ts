@@ -1,4 +1,4 @@
-import type { ClassId, GameState, LevelUpStatDeltas, LevelUpStep } from './schema.ts';
+import type { Character, ClassId, GameState, LevelUpStatDeltas, LevelUpStep } from './schema.ts';
 import type { GameData } from './gameData.ts';
 import type { Encounter } from './schema.ts';
 import type { EventBus } from './eventBus.ts';
@@ -133,15 +133,8 @@ function applyLevelUpEffect(
   }
 }
 
-function applyOneLevelUp(
-  state: GameState,
-  newLevel: number,
-  newXp: number
-): { state: GameState; deltas: LevelUpStatDeltas } {
-  const lead = state.party[0];
-  if (!lead) {
-    return { state: { ...state, level: newLevel, xp: newXp }, deltas: { ...ZERO_DELTAS } };
-  }
+/** Aplica os efeitos de um único nível (nível alcançado = `newLevel`) ao personagem. */
+export function applyLevelUpEffectsToCharacter(lead: Character, newLevel: number): Character {
   const cls: ClassId = lead.class;
   const { effects } = PROGRESSION.levelUp.byClass[cls];
   const d: LevelUpStatDeltas = { ...ZERO_DELTAS };
@@ -159,7 +152,7 @@ function applyOneLevelUp(
     applyLevelUpEffect(effect, newLevel, d, stats);
   }
 
-  const newLead = {
+  return {
     ...lead,
     str: stats.str,
     agi: stats.agi,
@@ -169,6 +162,49 @@ function applyOneLevelUp(
     maxMana: stats.maxMana,
     mana: stats.mana,
   };
+}
+
+/**
+ * Projeta o líder como se tivesse subido de nível 1 até `targetLevel` só com a tabela de `PROGRESSION`
+ * (sem feitiços, buffs ou XP real). Útil para estimativas de equilíbrio.
+ */
+export function projectCharacterToLevel(lead: Character, targetLevel: number): Character {
+  const cap = Math.min(Math.max(1, Math.floor(targetLevel)), PROGRESSION.maxLevel);
+  let c = lead;
+  for (let newLevel = 2; newLevel <= cap; newLevel++) {
+    c = applyLevelUpEffectsToCharacter(c, newLevel);
+  }
+  return c;
+}
+
+function applyOneLevelUp(
+  state: GameState,
+  newLevel: number,
+  newXp: number
+): { state: GameState; deltas: LevelUpStatDeltas } {
+  const lead = state.party[0];
+  if (!lead) {
+    return { state: { ...state, level: newLevel, xp: newXp }, deltas: { ...ZERO_DELTAS } };
+  }
+  const newLead = applyLevelUpEffectsToCharacter(lead, newLevel);
+  const d: LevelUpStatDeltas = { ...ZERO_DELTAS };
+  const prev = {
+    str: lead.str,
+    agi: lead.agi,
+    mind: lead.mind,
+    maxHp: lead.maxHp,
+    hp: lead.hp,
+    maxMana: lead.maxMana,
+    mana: lead.mana,
+  };
+  d.str = newLead.str - prev.str;
+  d.agi = newLead.agi - prev.agi;
+  d.mind = newLead.mind - prev.mind;
+  d.maxHp = newLead.maxHp - prev.maxHp;
+  d.hp = newLead.hp - prev.hp;
+  d.maxMana = newLead.maxMana - prev.maxMana;
+  d.mana = newLead.mana - prev.mana;
+
   return {
     state: {
       ...state,

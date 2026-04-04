@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { MAX_LEVEL, addXp, computeCombatXp, xpToNextLevel } from '../../src/engine/progression.ts';
+import {
+  MAX_LEVEL,
+  addXp,
+  computeCombatXp,
+  projectCharacterToLevel,
+  xpToNextLevel,
+} from '../../src/engine/progression.ts';
 import { createInitialState, createPlayerCharacter } from '../../src/engine/state.ts';
 import { emptyGameData } from '../../src/engine/gameData.ts';
 import type { CampaignIndex, Encounter } from '../../src/engine/schema.ts';
@@ -59,6 +65,17 @@ describe('computeCombatXp', () => {
       },
     };
     expect(computeCombatXp(enc, data)).toBe(12 + 5);
+  });
+});
+
+describe('projectCharacterToLevel', () => {
+  it('applies PROGRESSION from nível 1 até N (cavaleiro: +3 maxHp por nível)', () => {
+    const l1 = createPlayerCharacter('H', 'knight');
+    expect(l1.maxHp).toBe(18);
+    const l2 = projectCharacterToLevel(l1, 2);
+    expect(l2.maxHp).toBe(21);
+    const l5 = projectCharacterToLevel(l1, 5);
+    expect(l5.maxHp).toBe(18 + 3 * 4);
   });
 });
 

@@ -9,11 +9,13 @@
     "preview": "vite preview",
     "validate:scenes": "node scripts/validate-scenes.mjs",
     "validate:unreachable": "node scripts/find-unreachable-scenes.mjs",
+    "estimate:balance": "tsx scripts/balance-estimate.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "devDependencies": {
     "@types/dompurify": "^3.0.5",
+    "tsx": "^4.21.0",
     "typescript": "~5.9.3",
     "vite": "^8.0.1",
     "vitest": "^3.2.4"

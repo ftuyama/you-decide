@@ -1604,10 +1604,10 @@ button.camp-equip-btn--unequip:hover {
   color: var(--fg);
 }
 
-/** ~55% / ~45% no desktop — coluna dos inimigos ligeiramente maior */
+/** ~65% / ~35% no desktop — coluna dos inimigos mais larga */
 .combat-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.22fr) minmax(17rem, 1fr);
+  grid-template-columns: minmax(0, 13fr) minmax(17rem, 7fr);
   gap: 1rem;
   align-items: start;
 }
@@ -1664,12 +1664,12 @@ button.camp-equip-btn--unequip:hover {
   border-bottom: 1px solid var(--combat-actions-hdr-border);
 }
 
-.combat-actions-panel .combat-allies-hint {
-  margin: 0 0 0.45rem;
+.combat-actions-panel .combat-attack-bar {
+  margin: 0 0 0.35rem;
 }
 
-.combat-actions-panel .stance-bar {
-  margin: 0 0 0.35rem;
+.combat-actions-panel .combat-attack-bar .stance-bar {
+  margin: 0;
   padding: 0;
   border: none;
 }
@@ -2075,6 +2075,12 @@ button.combat-flee-btn:hover {
   padding: 0.35rem 0.45rem;
   border-left: 2px solid #4a5a48;
   background: rgba(40, 50, 40, 0.25);
+  line-height: 1.35;
+}
+
+/** Dica de combate no acampamento (abaixo da arte ASCII da cena, se houver) */
+.shell .camp-combat-hint {
+  margin: 0.35rem 0 0.85rem;
 }
 
 .stance-bar {
@@ -2100,6 +2106,22 @@ button.stance:hover {
 
 button.special {
   border-color: var(--danger);
+}
+
+.combat-attack-bar {
+  margin: 0.5rem 0 0.75rem;
+  padding: 0.5rem 0.55rem;
+  border: 1px dashed #5a4a38;
+  border-radius: 4px;
+  background: rgba(32, 26, 18, 0.35);
+}
+
+.combat-attack-hdr {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
 }
 
 .combat-spell-bar {

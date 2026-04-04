@@ -6,7 +6,7 @@ import {
 } from '../engine/sceneRuntime.ts';
 import type { Choice, Effect, GameState } from '../engine/schema.ts';
 import type { ContentRegistry } from '../content/registry.ts';
-import { formatLevelUpDeltaLine } from './gameAppUtils.ts';
+import { formatLevelUpDeltaLine, randomCampCombatHint } from './gameAppUtils.ts';
 import { formatDiceAscii } from './diceAscii.ts';
 import { iconWrap, icons } from './icons/index.ts';
 import type { GameEvent } from '../engine/eventBus.ts';
@@ -531,6 +531,13 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     pre.className = 'scene-art';
     pre.textContent = artText;
     inner.appendChild(pre);
+  }
+
+  if (ctx.scene.frontmatter.ambientTheme === 'camp') {
+    const campHint = document.createElement('div');
+    campHint.className = 'combat-allies-hint camp-combat-hint';
+    campHint.textContent = randomCampCombatHint(ctx.state.party.length);
+    inner.appendChild(campHint);
   }
 
   const body = document.createElement('div');

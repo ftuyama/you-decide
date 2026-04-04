@@ -54,4 +54,4 @@ Não há **lenha** — só **restos** de quem já se queimou a si próprio. A fo
 
 *Mesmo aqui, o número segue: **dia {{day}}** — espelhado em cinza.*
 
-**Suprimento** aqui compra **descanso**: recuperas HP e mana ao máximo e alivias 1 de stress (custa 1 suprimento). O fumo sobe em **espirais** que lembram corredores — não perguntes para onde vão.
+O fumo sobe em **espirais** que lembram corredores — não perguntes para onde vão.

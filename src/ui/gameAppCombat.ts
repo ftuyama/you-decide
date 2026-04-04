@@ -263,20 +263,19 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
   };
 
   if (c.phase === 'choose_stance' && lead) {
-    if (ctx.state.party.length > 1) {
-      const allyHint = document.createElement('div');
-      allyHint.className = 'combat-allies-hint';
-      allyHint.textContent =
-        'Cada companheiro ataca em seguida (mesma postura), contra o primeiro inimigo vivo.';
-      actionsPanel.appendChild(allyHint);
-    }
+    const attackBar = document.createElement('div');
+    attackBar.className = 'combat-attack-bar';
+    const attackHdr = document.createElement('div');
+    attackHdr.className = 'combat-attack-hdr';
+    attackHdr.textContent = 'Ataques';
+    attackBar.appendChild(attackHdr);
     const bar = document.createElement('div');
     bar.className = 'stance-bar';
     const stances: Stance[] = ['aggressive', 'defensive', 'focus'];
     const labels: Record<Stance, string> = {
-      aggressive: 'Agressivo (+atk / −def)',
-      defensive: 'Defensivo (−atk / +def)',
-      focus: 'Foco (magia: Mente)',
+      aggressive: 'Agressivo',
+      defensive: 'Defensivo',
+      focus: 'Foco',
     };
     for (const st of stances) {
       const btn = document.createElement('button');
@@ -300,7 +299,8 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
       sacrifice.className = 'stance special';
       decorateCombatQuickNav(sacrifice, (key, quickLabel) => {
         const corr = ctx.state.resources.corruption;
-        const base = `Selo do Vazio (Corr ${corr})`;
+        const base = 'Selo do Vazio';
+        sacrifice.title = `Corrupção: ${corr}`;
         sacrifice.textContent = quickLabel && key != null ? `${key} - ${base}` : base;
       });
       sacrifice.disabled = lead.hp <= 1;
@@ -319,7 +319,7 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     const sp = document.createElement('button');
     sp.className = 'stance special';
     decorateCombatQuickNav(sp, (key, quickLabel) => {
-      const base = lead.specialUsedThisCombat ? 'Especial já usado' : 'Golpe especial (+2, +Stress)';
+      const base = lead.specialUsedThisCombat ? 'Especial já usado' : 'Golpe especial';
       sp.textContent = quickLabel && key != null ? `${key} - ${base}` : base;
     });
     sp.disabled = lead.specialUsedThisCombat;
@@ -335,7 +335,8 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
       }
     });
     bar.appendChild(sp);
-    actionsPanel.appendChild(bar);
+    attackBar.appendChild(bar);
+    actionsPanel.appendChild(attackBar);
 
     if (lead.maxMana > 0) {
       const spellBar = document.createElement('div');

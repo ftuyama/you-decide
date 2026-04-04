@@ -14,6 +14,34 @@ export function escHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
+/** Dicas aleatórias de combate (mostradas no acampamento). */
+const CAMP_COMBAT_HINTS = [
+  'Posturas: Agressivo favorece ataques físicos; Defensivo aumenta a CA contra inimigos; Foco alinha magias com Mente.',
+  'Ataques usam 2d6 + modificadores; com vantagem, rola 3d6 e descarta o menor dado.',
+  'Dois 6s no ataque ameaçam crítico; dois 1s podem resultar em falha crítica.',
+  'Golpe especial acerta mais forte mas aumenta Stress — em 4, entras em pânico.',
+  'Iniciativa: cada combatente rola 2d6 + AGI; ordem decrescente decide quem age primeiro.',
+  'Em postura Defensiva, contra inimigos ganhas +2 de CA (somado ao equipamento e buffs).',
+  'Cada dano que sofreres aumenta o Stress em 1 (até 4).',
+  'Em alguns encontros há vantagem para ti ou para os inimigos: 3d6, descarta o menor.',
+  'Magias custam mana; no início do teu turno, alguns heróis recuperam um pouco de vida ou mana (passivo).',
+  'Fugir termina o combate sem vitória (sem XP nem loot desse embate).',
+  'Contra mortos-vivos, clérigos somam +1 de dano sagrado nos ataques físicos.',
+  'Ao terminar um combate, o Stress de cada herói baixa um pouco (−1).',
+  'Com fé ao máximo (5), se o líder morrer no combate podes ser salvo à custa da fé — não conta como vitória.',
+  'Dano físico inclui 1d6, arma e bónus de postura; a armadura equipada reduz o que recebes.',
+  'Alguns inimigos têm placas de armadura: absorvem golpes antes de o HP baixar.',
+] as const;
+
+const CAMP_COMBAT_HINT_PARTY =
+  'Companheiros: cada um age na sua vez com a mesma postura, visando o primeiro inimigo vivo.';
+
+export function randomCampCombatHint(partySize: number): string {
+  const pool: string[] = [...CAMP_COMBAT_HINTS];
+  if (partySize > 1) pool.push(CAMP_COMBAT_HINT_PARTY);
+  return pool[Math.floor(Math.random() * pool.length)]!;
+}
+
 export function spellEmoji(spellId: string, spellDef: SpellDef): string {
   const byId: Partial<Record<string, string>> = {
     ember_spark: '🔥',

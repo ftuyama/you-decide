@@ -58,5 +58,3 @@ onEnter:
 Soldados da **Vigília** partilham pão seco. Honra tem gosto de cinza.
 
 *Sem sol de referência, a pedra regista na mesma: **dia {{day}}**.*
-
-**Suprimento** aqui serve para **descansar**: recuperas HP e mana ao máximo e alivias 1 de stress (custa 1 suprimento).

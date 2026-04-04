@@ -10,6 +10,8 @@ choices:
     next: act4/throne_gate
     condition: { level: { gte: 7 } }
     preview: "Capítulo 4 — confronto com Morvayn; o trono espera."
+    timedMs: 15000
+    fallbackNext: act3/stone_corridor
     effects:
       - { op: setChapter, chapter: 4 }
       - { op: addDiary, text: "O trono chama." }

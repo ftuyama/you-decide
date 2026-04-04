@@ -8,6 +8,9 @@ choices:
   - text: "Submeter o impulso ao acaso do altar"
     next: act6/encounters/will_random_router
   - text: "Forcar confronto direto contra o penitente"
+    preview: "Ferro imediato — ou hesitar e deixar o altar decidir."
+    timedMs: 12000
+    fallbackNext: act6/encounters/will_random_router
     effects:
       - { op: addResource, resource: supply, delta: -1 }
       - { op: startCombat, encounterId: act6_penitent_blade, onVictory: act6/will_after, onDefeat: shared/game_over, onFlee: act6/hub_fractured_nave }

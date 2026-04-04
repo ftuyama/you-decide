@@ -22,6 +22,7 @@ export function createInitialState(campaign: CampaignIndex, seed?: number): Game
     playerName: 'Viajante',
     level: 1,
     xp: 0,
+    day: 1,
     party: [],
     companionsAvailable: [...campaign.startingCompanionPool],
     inventory: [],
@@ -181,6 +182,10 @@ export function deserializeState(json: string): GameState {
     extraLifeReady: extraLifeReadyFromFaith(resources.faith),
     level: typeof (o as GameState).level === 'number' ? (o as GameState).level : 1,
     xp: typeof (o as GameState).xp === 'number' ? (o as GameState).xp : 0,
+    day:
+      typeof (o as GameState).day === 'number' && (o as GameState).day! >= 1
+        ? (o as GameState).day!
+        : 1,
     lastCombatXpGain: null,
     lastCombatLevelUps: null,
     lastCombatLootLines: null,

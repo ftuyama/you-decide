@@ -45,6 +45,8 @@ choices:
   - text: "Vagar entre as colunas — o vazio escolhe o próximo passo"
     next: act6/encounters/fractured_void_router
     preview: "Sem decidir, o vazio empurra-te para a fogueira."
+    timedMs: 14000
+    fallbackNext: act6/void_camp
   - text: "Ouvir o sussurro sob as colunas (rota de corrupção)"
     next: act6/void_secret_entry
     condition:

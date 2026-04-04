@@ -6,6 +6,9 @@ ambientTheme: explore
 choices:
   - text: "Recrutar Mira"
     next: act2/recruit_mira
+    preview: "Compromisso na sombra — ou o silêncio decide."
+    timedMs: 12000
+    fallbackNext: act2/hub_catacomb
     effects:
       - { op: recruit, companionId: rogue_mira }
       - { op: addRep, faction: circulo, delta: 1 }

@@ -7,6 +7,9 @@ artKey: frost_peaks
 choices:
   - text: "Seguir o rumor até o fundo da clareira"
     next: act5/frost_tomas_trial
+    preview: "Ouvir o gelo — ou hesitar e voltar ao desfiladeiro."
+    timedMs: 12000
+    fallbackNext: act5/frost_hub
   - text: "Voltar ao desfiladeiro"
     next: act5/frost_hub
 onEnter: []

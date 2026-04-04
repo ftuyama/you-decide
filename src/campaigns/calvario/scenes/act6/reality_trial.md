@@ -13,6 +13,9 @@ skillCheck:
 choices:
   - text: "Tentar fixar um unico mundo com a mente"
     next: act6/encounters/reality_trial_focus
+    preview: "Sem fixar a tempo, o véu parte."
+    timedMs: 12000
+    fallbackNext: act6/encounters/reality_trial_shatter
   - text: "Fechar os olhos e aceitar o colapso"
     next: act6/encounters/reality_trial_shatter
 onEnter: []

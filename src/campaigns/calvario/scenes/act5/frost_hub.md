@@ -28,6 +28,8 @@ choices:
   - text: "Patrulhar ao acaso — a cordilheira morde"
     next: act5/encounters/frost_random_router
     preview: "Sem escolher rota a tempo, recuas para o acampamento."
+    timedMs: 14000
+    fallbackNext: act5/frost_camp
   - text: "Montanhas de neve — rumor de um monge na gruta"
     next: act5/frost_snow_mountains_enter
     condition:

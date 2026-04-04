@@ -300,6 +300,8 @@ export type StoryRenderContext = {
   campaignId: string;
   devMode: boolean;
   quickNavMode: boolean;
+  /** Se true, escolhas com `timedMs` + `fallbackNext` disparam barra e auto-navegação. */
+  timedChoiceEnabled: boolean;
   state: GameState;
   registry: ContentRegistry;
   scene: LoadedScene;
@@ -634,8 +636,9 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
 export function setupTimedChoices(
   choices: Choice[],
   shell: HTMLElement,
-  ctx: Pick<StoryRenderContext, 'navigation' | 'setTimedChoiceTimer'>
+  ctx: Pick<StoryRenderContext, 'navigation' | 'setTimedChoiceTimer' | 'timedChoiceEnabled'>
 ): void {
+  if (!ctx.timedChoiceEnabled) return;
   const timed = choices.find((c) => c.timedMs && c.fallbackNext);
   if (!timed || !timed.timedMs || !timed.fallbackNext) return;
   const bar = document.createElement('div');

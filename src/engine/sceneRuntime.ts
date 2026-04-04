@@ -1,7 +1,13 @@
 import { marked } from 'marked';
 import { splitFrontmatter } from './frontmatter.ts';
 import DOMPurify from 'dompurify';
-import { SceneFrontmatterSchema, type GameState, type SceneFrontmatter } from './schema.ts';
+import {
+  GameStateSchema,
+  SceneFrontmatterSchema,
+  type Choice,
+  type GameState,
+  type SceneFrontmatter,
+} from './schema.ts';
 import { evaluateCondition } from './conditions.ts';
 import { applyEffects, tickActiveBuffs } from './effects.ts';
 import { injectText } from './template.ts';
@@ -9,7 +15,6 @@ import type { EventBus } from './eventBus.ts';
 import type { GameData } from './gameData.ts';
 import { getEffectiveLuck } from './luck.ts';
 import { mulberry32, roll2d6 } from './rng.ts';
-import type { Choice } from './schema.ts';
 
 export type LoadedScene = {
   id: string;

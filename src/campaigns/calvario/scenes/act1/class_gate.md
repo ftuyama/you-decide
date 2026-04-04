@@ -8,6 +8,8 @@ choices:
   - text: "[#] Forjar o caminho como Cavaleiro"
     next: act1/pick_knight
     preview: "Honra da Vigília; combate corpo a corpo."
+    timedMs: 15000
+    fallbackNext: act1/class_gate_water
   - text: "[*] Desvendar segredos como Mago"
     next: act1/pick_mage
     preview: "Rituais do Círculo; mente afiada."

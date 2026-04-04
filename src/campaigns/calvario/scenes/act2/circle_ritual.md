@@ -6,6 +6,9 @@ ambientTheme: explore
 choices:
   - text: "Participar"
     next: act2/hub_catacomb
+    preview: "Aceitar o cinza — ou hesitar e recuar."
+    timedMs: 12000
+    fallbackNext: act2/circle_ritual_refuse_mind
     effects:
       - { op: addResource, resource: corruption, delta: 1 }
       - { op: addRep, faction: circulo, delta: 1 }

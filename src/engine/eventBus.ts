@@ -8,6 +8,8 @@ export type GameEvent =
   | { type: 'effect.applied'; op: string }
   | { type: 'xp.gained'; amount: number }
   | { type: 'level.up'; level: number }
+  /** Passagem de tempo ao entrar num acampamento (dia narrativo). */
+  | { type: 'time.dayAdvanced'; day: number }
   | { type: 'item.acquired'; itemId: string }
   | { type: 'camp.rest' }
   | {

@@ -27,6 +27,8 @@ choices:
   - text: "Rota aleatória (demo)"
     next: act2/encounters/random_router
     preview: "O túnel exige decisão rápida — ou recuas para o acampamento."
+    timedMs: 14000
+    fallbackNext: act2/vigilia_camp
   - text: "Passagem marcada — eco de juramentos"
     next: act2/lore_crossroads
     condition: { level: { gte: 7 } }

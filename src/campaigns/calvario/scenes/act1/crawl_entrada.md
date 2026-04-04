@@ -8,6 +8,8 @@ choices:
   - text: "Aceitar o chamado e seguir"
     next: act1/class_gate
     preview: "Escolha de classe e primeiro passo firme."
+    timedMs: 12000
+    fallbackNext: act1/mirror_descent
     effects:
       - { op: addDiary, text: "Entrei no Calvário." }
   - text: "Um caco de espelho brilha na argamassa — ver o próprio rosto"

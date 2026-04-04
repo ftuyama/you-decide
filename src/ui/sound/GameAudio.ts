@@ -275,6 +275,29 @@ export class GameAudio {
     }
   }
 
+  /** Virada de dia narrativo (ao entrar no acampamento) — sino curto, tom ascendente. */
+  playDayAdvance(): void {
+    const ctx = this.ensureContext();
+    const g = this.gain(0.065);
+    if (g <= 0) return;
+    const t0 = ctx.currentTime;
+    const notes = [523.25, 659.25, 783.99];
+    notes.forEach((freq, i) => {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = freq;
+      const start = t0 + i * 0.09;
+      gn.gain.setValueAtTime(0.001, start);
+      gn.gain.exponentialRampToValueAtTime(g, start + 0.02);
+      gn.gain.exponentialRampToValueAtTime(0.001, start + 0.2);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(start);
+      o.stop(start + 0.22);
+    });
+  }
+
   /** Item novo no inventário (fanfarra curta em três notas). */
   playItemAcquire(): void {
     const ctx = this.ensureContext();

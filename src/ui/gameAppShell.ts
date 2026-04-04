@@ -10,6 +10,7 @@ export type MountAppChromeOptions = {
   campaignId: string;
   devMode: boolean;
   quickNavMode: boolean;
+  timedChoiceEnabled: boolean;
   state: GameState;
   registry: ContentRegistry;
   sidebarSections: Record<string, boolean>;
@@ -21,6 +22,7 @@ export type MountAppChromeOptions = {
   setVolume: (n: number) => void;
   onDevModeChange: (v: boolean) => void;
   onQuickNavChange: (v: boolean) => void;
+  onTimedChoiceChange: (v: boolean) => void;
   onCycleFont: () => void;
   fullscreenSupported: boolean;
   getFullscreenActive: () => boolean;
@@ -151,6 +153,19 @@ export function mountAppChrome(root: HTMLElement, opts: MountAppChromeOptions): 
   quickNavRow.appendChild(quickNavCb);
   quickNavRow.appendChild(document.createTextNode(' Navegação rápida (números clicáveis)'));
 
+  const timedChoiceRow = document.createElement('label');
+  timedChoiceRow.className = 'menu-item menu-sound menu-dev';
+  const timedChoiceCb = document.createElement('input');
+  timedChoiceCb.type = 'checkbox';
+  timedChoiceCb.checked = opts.timedChoiceEnabled;
+  timedChoiceCb.addEventListener('change', () => {
+    opts.onTimedChoiceChange(timedChoiceCb.checked);
+  });
+  timedChoiceRow.appendChild(timedChoiceCb);
+  timedChoiceRow.appendChild(
+    document.createTextNode(' Limite de tempo nas escolhas (barra e decisão automática)')
+  );
+
   const fontBtn = document.createElement('button');
   fontBtn.type = 'button';
   fontBtn.className = 'menu-item';
@@ -232,6 +247,7 @@ export function mountAppChrome(root: HTMLElement, opts: MountAppChromeOptions): 
   settingsSection.appendChild(fontBtn);
   settingsSection.appendChild(fullscreenRow);
   settingsSection.appendChild(quickNavRow);
+  settingsSection.appendChild(timedChoiceRow);
   if (opts.showDevModeToggle) {
     settingsSection.appendChild(devRow);
   }

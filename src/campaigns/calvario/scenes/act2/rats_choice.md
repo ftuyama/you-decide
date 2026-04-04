@@ -8,6 +8,8 @@ choices:
   - text: "Enfrentar o enxame"
     next: act2/encounters/rats_combat_intro
     preview: "Combate: roedores famintos."
+    timedMs: 12000
+    fallbackNext: act2/rats_listen
   - text: "Ouvir o som antes de avançar"
     next: act2/rats_listen
   - text: "Cheirar o ar: sangue ou mofo?"

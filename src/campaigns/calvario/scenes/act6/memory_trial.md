@@ -12,6 +12,9 @@ luckCheck:
 choices:
   - text: "Manter um nome na lingua antes de mergulhar"
     next: act6/encounters/memory_trial_safe
+    preview: "Sem âncora a tempo, o poço bebe sem pedir."
+    timedMs: 12000
+    fallbackNext: act6/encounters/memory_trial_bleed
   - text: "Cair no poço sem amarras"
     next: act6/encounters/memory_trial_bleed
 onEnter: []

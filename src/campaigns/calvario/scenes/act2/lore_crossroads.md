@@ -22,7 +22,9 @@ choices:
     preview: "Provação · anjo caído; título só se venceres"
   - text: "Mergulhar o braço no lodo que sussurra"
     next: act2/luck_mire
-    preview: Sorte — 2d6 + SOR
+    preview: Sorte — 2d6 + SOR · sem decidir, recuas ao cruzeiro.
+    timedMs: 12000
+    fallbackNext: act2/hub_catacomb
   - text: "Recordar o cavaleiro caído (eco do path)"
     next: act2/hub_catacomb
     condition: { path: fallen }

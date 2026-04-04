@@ -5,7 +5,7 @@ chapter: 4
 ambientTheme: explore
 choices:
   - text: "Recusar o pacto e lutar"
-    next: act4/fight_morvayn
+    next: act4/encounters/fight_morvayn
     effects:
       - { op: addRep, faction: vigilia, delta: 1 }
   - text: "Aceitar servir ao Terceiro Sino"

@@ -5,7 +5,7 @@ chapter: 4
 ambientTheme: explore
 choices:
   - text: "O selo quebra. Lutar contra Morvayn"
-    next: act4/fight_morvayn
+    next: act4/encounters/fight_morvayn
 onEnter:
   - { op: addMark, mark: soul_scarred_by_seal }
 ---

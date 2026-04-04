@@ -6,7 +6,7 @@ ambientTheme: explore
 artKey: throne_sweep
 choices:
   - text: "À segunda fase — trono!"
-    next: act4/fight_morvayn_2
+    next: act4/encounters/fight_morvayn_2
     effects:
       - { op: addResource, resource: gold, delta: 2 }
       - { op: addDiary, text: "A sílaba caiu como moeda — o vácuo aceitou o pagamento." }

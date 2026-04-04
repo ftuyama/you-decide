@@ -6,7 +6,7 @@ ambientTheme: explore
 artKey: throne_sweep
 choices:
   - text: "À segunda fase — trono!"
-    next: act4/fight_morvayn_2
+    next: act4/encounters/fight_morvayn_2
 onEnter:
   - { op: addResource, resource: corruption, delta: 1 }
   - { op: addDiary, text: "Perdi a conta e o trono acrescentou uma linha ao meu medo." }

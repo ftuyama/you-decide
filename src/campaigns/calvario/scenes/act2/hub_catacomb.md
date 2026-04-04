@@ -20,7 +20,7 @@ choices:
   - text: "Acampamento da Vigília"
     next: act2/vigilia_camp
   - text: "Rota aleatória (demo)"
-    next: act2/random_router
+    next: act2/encounters/random_router
   - text: "Passagem marcada — eco de juramentos"
     next: act2/lore_crossroads
     condition: { level: { gte: 7 } }

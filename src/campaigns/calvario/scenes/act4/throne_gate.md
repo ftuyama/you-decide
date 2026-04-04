@@ -8,7 +8,7 @@ choices:
   - text: "Ouvir o necromante antes de cruzar ferro"
     next: act4/morvayn_parley
   - text: "Atacar de imediato (sem palavras)"
-    next: act4/fight_morvayn
+    next: act4/encounters/fight_morvayn
   - text: "Observar o trono: ossos, runas, correntes"
     next: act4/throne_observe
   - text: "Negociar com o mercador à sombra das correntes"

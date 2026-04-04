@@ -6,7 +6,7 @@ artKey: rats
 title: Chiar no escuro
 choices:
   - text: "Enfrentar o enxame"
-    next: act2/rats_combat_intro
+    next: act2/encounters/rats_combat_intro
     preview: "Combate: roedores famintos."
   - text: "Ouvir o som antes de avançar"
     next: act2/rats_listen

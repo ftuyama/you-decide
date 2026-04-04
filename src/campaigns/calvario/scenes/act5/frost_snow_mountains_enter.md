@@ -6,7 +6,7 @@ ambientTheme: frost_mystery
 artKey: frost_monk_path
 choices:
   - text: "Seguir o rumor — subir até onde o vento fica quieto"
-    next: act5/frost_snow_mountains_combat
+    next: act5/encounters/frost_snow_mountains_combat
 onEnter: []
 ---
 Há quem diga que, acima da linha onde a **tempestade** aprende silêncio, uma **gruta** respira como um peito antigo. Não consta em mapas de mercador — só em **sussurro** de patrulheiro e em culpa de quem voltou **meio** de lá.

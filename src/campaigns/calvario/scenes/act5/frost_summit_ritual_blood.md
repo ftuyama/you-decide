@@ -10,7 +10,7 @@ dualAttrSkillCheck:
   tn: 14
   rounds: 3
   successNext: act5/frost_summit_ritual_pacified
-  failNext: act5/frost_summit_fallen_god_combat
+  failNext: act5/encounters/frost_summit_fallen_god_combat
   label: "Três selos — vontade e ferro"
 onEnter: []
 ---

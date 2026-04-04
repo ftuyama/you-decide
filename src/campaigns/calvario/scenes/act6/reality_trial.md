@@ -8,13 +8,13 @@ skillCheck:
   id: act6_reality_focus
   attr: mind
   tn: 11
-  successNext: act6/reality_trial_focus
-  failNext: act6/reality_trial_shatter
+  successNext: act6/encounters/reality_trial_focus
+  failNext: act6/encounters/reality_trial_shatter
 choices:
   - text: "Tentar fixar um unico mundo com a mente"
-    next: act6/reality_trial_focus
+    next: act6/encounters/reality_trial_focus
   - text: "Fechar os olhos e aceitar o colapso"
-    next: act6/reality_trial_shatter
+    next: act6/encounters/reality_trial_shatter
 onEnter: []
 ---
 Os espelhos não mostram o teu rosto: mostram versões de ti que fizeram escolhas mais fáceis. Numa delas, nunca entraste no Calvário. Noutra, foste amado por todos e lembrado por ninguém.

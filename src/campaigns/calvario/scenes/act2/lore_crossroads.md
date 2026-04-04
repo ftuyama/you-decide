@@ -5,15 +5,15 @@ ambientTheme: explore
 title: Eco de juramentos
 choices:
   - text: "Aceitar o nome de Cavaleiro caído (cavaleiro)"
-    next: act2/trial_fallen_angel_gate
+    next: act2/encounters/trial_fallen_angel_gate
     condition: { class: knight }
     preview: "Provação · anjo caído; título só se venceres"
   - text: "Aceitar o título de Mago das trevas (arcanista)"
-    next: act2/trial_fallen_angel_gate
+    next: act2/encounters/trial_fallen_angel_gate
     condition: { class: mage }
     preview: "Provação · anjo caído; título só se venceres"
   - text: "Voltar-se ao Clérigo penitente"
-    next: act2/trial_fallen_angel_gate
+    next: act2/encounters/trial_fallen_angel_gate
     condition:
       all:
         - { class: cleric }

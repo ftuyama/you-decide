@@ -5,7 +5,7 @@ chapter: 4
 ambientTheme: explore
 choices:
   - text: "Atravessar a praça sem vacilar"
-    next: act4/pact_vigil_skirmish
+    next: act4/encounters/pact_vigil_skirmish
 onEnter: []
 ---
 O eco **assenta**. Não desaparece — aprende o teu nome e cala-se por educação.

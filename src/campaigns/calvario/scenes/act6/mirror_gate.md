@@ -6,7 +6,7 @@ ambientTheme: void
 artKey: mirror_chamber
 choices:
   - text: "Entrar e encarar quem me habita"
-    next: act6/mirror_boss_intro
+    next: act6/encounters/mirror_boss_intro
 onEnter:
   - { op: addDiary, text: "Passei pelas três perguntas e nenhuma me absolveu." }
 ---

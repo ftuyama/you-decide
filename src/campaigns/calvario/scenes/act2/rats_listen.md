@@ -5,7 +5,7 @@ chapter: 2
 ambientTheme: explore
 choices:
   - text: "Preparar-se e enfrentar"
-    next: act2/rats_combat_intro
+    next: act2/encounters/rats_combat_intro
   - text: "Voltar ao cruzeiro"
     next: act2/catacomb_entry
 onEnter: []

@@ -6,7 +6,7 @@ ambientTheme: act5
 artKey: frost_summit_ascent
 choices:
   - text: "Seguir a linha de pedra que morde o céu"
-    next: act5/frost_summit_path_1
+    next: act5/encounters/frost_summit_path_1
 onEnter:
   - { op: addDiary, text: "Subi onde o mapa acaba. O vento aqui não pede desculpa — pede testemunhas." }
 ---

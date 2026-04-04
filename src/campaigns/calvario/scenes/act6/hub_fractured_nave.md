@@ -19,7 +19,7 @@ choices:
         - { noFlag: act6_memory_done }
         - { level: { gte: 25 } }
   - text: "Subir ao altar da vontade nua (Prova da Vontade)"
-    next: act6/will_trial
+    next: act6/encounters/will_trial
     condition:
       all:
         - { noFlag: act6_will_done }
@@ -37,7 +37,7 @@ choices:
   - text: "Negociar com o mercador da banca esquecida"
     next: act6/fractured_merchant
   - text: "Vagar entre as colunas — o vazio escolhe o próximo passo"
-    next: act6/fractured_void_router
+    next: act6/encounters/fractured_void_router
   - text: "Ouvir o sussurro sob as colunas (rota de corrupção)"
     next: act6/void_secret_entry
     condition:

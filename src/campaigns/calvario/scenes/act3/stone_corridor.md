@@ -6,7 +6,7 @@ ambientTheme: act3
 artKey: stone_corridor
 choices:
   - text: "Despertar o guardião"
-    next: act3/stone_combat_intro
+    next: act3/encounters/stone_combat_intro
     condition: { noFlag: stone_guard_defeated }
   - text: "Ler as runas de contenção"
     next: act3/stone_rune_trial

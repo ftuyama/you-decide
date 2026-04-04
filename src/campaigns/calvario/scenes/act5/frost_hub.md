@@ -23,7 +23,7 @@ choices:
   - text: "Mercador de tenda azul-trovão"
     next: act5/frost_merchant
   - text: "Patrulhar ao acaso — a cordilheira morde"
-    next: act5/frost_random_router
+    next: act5/encounters/frost_random_router
   - text: "Montanhas de neve — rumor de um monge na gruta"
     next: act5/frost_snow_mountains_enter
     condition:

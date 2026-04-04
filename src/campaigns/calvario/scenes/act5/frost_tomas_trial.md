@@ -8,8 +8,8 @@ skillCheck:
   id: frost_tomas_trail
   attr: agi
   tn: 9
-  successNext: act5/frost_tomas_fight_adv
-  failNext: act5/frost_tomas_fight_hard
+  successNext: act5/encounters/frost_tomas_fight_adv
+  failNext: act5/encounters/frost_tomas_fight_hard
   label: "Aproximar-te sem que o vento te venda"
 onEnter: []
 ---

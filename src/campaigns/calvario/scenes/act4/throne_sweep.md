@@ -13,7 +13,7 @@ choices:
   - text: "Soltar uma sílaba proibida ao vácuo (sorte)"
     next: act4/throne_sweep_word
   - text: "Não dar mais tempo ao osso — à segunda fase"
-    next: act4/fight_morvayn_2
+    next: act4/encounters/fight_morvayn_2
 onEnter: []
 ---
 Antes que o trono **feche** a conta, podes tratar o salão como **mesa** — medições, apostas, **erros** honestos.

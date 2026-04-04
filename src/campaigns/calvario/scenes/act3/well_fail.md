@@ -5,7 +5,7 @@ chapter: 3
 ambientTheme: act3
 choices:
   - text: "Avançar mesmo assim"
-    next: act3/cult_ambush_scene
+    next: act3/encounters/cult_ambush_scene
 onEnter:
   - { op: setFlag, key: false_map, value: true }
 ---

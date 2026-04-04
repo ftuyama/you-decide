@@ -6,7 +6,7 @@ ambientTheme: explore
 artKey: skeleton
 choices:
   - text: "Forçar a porta"
-    next: act2/skeleton_combat_intro
+    next: act2/encounters/skeleton_combat_intro
 onEnter: []
 ---
 Restos armados erguem-se por **hábito**, não por vontade.

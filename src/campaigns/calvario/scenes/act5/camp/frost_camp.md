@@ -4,6 +4,7 @@ title: Brasas sob a tempestade
 chapter: 5
 ambientTheme: camp
 artKey: frost_camp
+campCombatHint: true
 choices:
   - text: "Descansar junto ao fogareiro (−1 suprimento)"
     next: act5/frost_hub

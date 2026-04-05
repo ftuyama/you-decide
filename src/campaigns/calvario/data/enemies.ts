@@ -15,7 +15,6 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 0,
     xp: 13,
     sprite: E.act1_rat_swarm.sprite,
-    spriteWounded: E.act1_rat_swarm.spriteWounded,
     attackStrategy: 'random',
     lootDrops: [
       { chance: 0.01, itemId: 'potion_hp' },
@@ -35,7 +34,6 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 0,
     xp: 15,
     sprite: E.act2_skeleton.sprite,
-    spriteWounded: E.act2_skeleton.spriteWounded,
     attackStrategy: 'random',
     lootDrops: [
       { chance: 0.05, itemId: 'iron_dagger' },
@@ -106,7 +104,6 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 1,
     xp: 50,
     sprite: E.act4_morvayn_p1.sprite,
-    spriteWounded: E.act4_morvayn_p1.spriteWounded,
     attackStrategy: 'focus_leader',
     lootDrops: [
       { chance: 1, resource: 'gold', amount: 2 },
@@ -145,7 +142,6 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 2,
     xp: 60,
     sprite: E.act2_fallen_angel.sprite,
-    spriteWounded: E.act2_fallen_angel.spriteWounded,
     attackStrategy: 'focus_leader',
     lootDrops: [
       { chance: 0.75, resource: 'supply', amount: 1 },
@@ -165,7 +161,6 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 1,
     xp: 45,
     sprite: E.act4_vigil_hunter.sprite,
-    spriteWounded: E.act4_vigil_hunter.spriteWounded,
     attackStrategy: 'random',
     lootDrops: [
       { chance: 0.25, resource: 'supply', amount: 1 },
@@ -185,7 +180,6 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 0,
     xp: 28,
     sprite: E.act5_frost_whelp.sprite,
-    spriteWounded: E.act5_frost_whelp.spriteWounded,
     attackStrategy: 'random',
     lootDrops: [{ chance: 0.1, resource: 'gold', amount: 1 }],
   },
@@ -202,7 +196,6 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 2,
     xp: 38,
     sprite: E.act5_frost_reaver.sprite,
-    spriteWounded: E.act5_frost_reaver.spriteWounded,
     attackStrategy: 'focus_leader',
     lootDrops: [
       { chance: 0.25, resource: 'gold', amount: 2 },
@@ -222,7 +215,6 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 1,
     xp: 115,
     sprite: E.act5_ice_dragon_p1.sprite,
-    spriteWounded: E.act5_ice_dragon_p1.spriteWounded,
     attackStrategy: 'focus_leader',
     lootDrops: [
       { chance: 1, resource: 'gold', amount: 5 },
@@ -261,7 +253,6 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 2,
     xp: 210,
     sprite: E.act5_summit_fallen_god.sprite,
-    spriteWounded: E.act5_summit_fallen_god.spriteWounded,
     attackStrategy: 'focus_leader',
     critConfirm: 0.35,
     combatLines: [
@@ -284,7 +275,6 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 1,
     xp: 180,
     sprite: E.act6_veil_herald.sprite,
-    spriteWounded: E.act6_veil_herald.spriteWounded,
     attackStrategy: 'focus_leader',
     combatLines: [
       'Tu chamas isto de mundo porque ainda não viste as costuras.',
@@ -333,7 +323,6 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 2,
     xp: 210,
     sprite: E.act6_penitent_blade.sprite,
-    spriteWounded: E.act6_penitent_blade.spriteWounded,
     attackStrategy: 'focus_leader',
     combatLines: [
       'Vontade sem limite é só fome com armadura.',
@@ -431,7 +420,6 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 1,
     xp: 145,
     sprite: E.act6_wild_veil_scribe.sprite,
-    spriteWounded: E.act6_wild_veil_scribe.spriteWounded,
     attackStrategy: 'focus_leader',
     combatLines: [
       'Não arauto — arquivo. Registo do que te falta coragem para rasgar.',
@@ -480,7 +468,6 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 2,
     xp: 165,
     sprite: E.act6_wild_chain_penitent.sprite,
-    spriteWounded: E.act6_wild_chain_penitent.spriteWounded,
     attackStrategy: 'focus_leader',
     combatLines: [
       'Os elos não prendem o corpo — prendem a desculpa.',
@@ -505,7 +492,6 @@ export const enemies: Record<string, EnemyDef> = {
     armorChips: 3,
     xp: 230,
     sprite: E.act6_wild_glass_regent.sprite,
-    spriteWounded: E.act6_wild_glass_regent.spriteWounded,
     attackStrategy: 'focus_leader',
     combatLines: [
       'Reino sobre cacos — ainda é reino.',

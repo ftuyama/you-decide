@@ -219,8 +219,7 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     if (!def) continue;
     const panel = document.createElement('div');
     panel.className = 'enemy-panel';
-    const wounded = inst.hp / inst.maxHp < 0.35;
-    const sprite = wounded && def.spriteWounded ? def.spriteWounded : def.sprite;
+    const sprite = def.sprite;
     const pre = document.createElement('pre');
     pre.className = 'enemy-sprite';
     pre.textContent = sprite;

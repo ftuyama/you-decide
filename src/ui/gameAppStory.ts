@@ -533,7 +533,7 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     inner.appendChild(pre);
   }
 
-  if (ctx.scene.frontmatter.ambientTheme === 'camp') {
+  if (ctx.scene.frontmatter.campCombatHint === true) {
     const campHint = document.createElement('div');
     campHint.className = 'combat-allies-hint camp-combat-hint';
     campHint.textContent = randomCampCombatHint(ctx.state.party.length);

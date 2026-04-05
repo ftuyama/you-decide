@@ -1,13 +1,21 @@
-export { sprite as iron_dagger } from './iron_dagger.ts';
-export { sprite as rusty_sword } from './rusty_sword.ts';
-export { sprite as oak_staff } from './oak_staff.ts';
-export { sprite as mace } from './mace.ts';
-export { sprite as leather } from './leather.ts';
-export { sprite as cloth_robe } from './cloth_robe.ts';
-export { sprite as chain_shirt } from './chain_shirt.ts';
-export { sprite as third_bell } from './third_bell.ts';
-export { sprite as rumor_map } from './rumor_map.ts';
-export { sprite as frost_wyrm_scale } from './frost_wyrm_scale.ts';
-export { sprite as potion_hp } from './potion_hp.ts';
-export { sprite as potion_mana } from './potion_mana.ts';
-export { sprite as potion_stress } from './potion_stress.ts';
+import { ITEM_SPRITES } from '../../itemSprites.ts';
+
+const S = (key: string): string => {
+  const v = ITEM_SPRITES[key];
+  if (v === undefined) throw new Error(`Missing item sprite: ${key}`);
+  return v;
+};
+
+export const iron_dagger = S('iron_dagger');
+export const rusty_sword = S('rusty_sword');
+export const oak_staff = S('oak_staff');
+export const mace = S('mace');
+export const leather = S('leather');
+export const cloth_robe = S('cloth_robe');
+export const chain_shirt = S('chain_shirt');
+export const third_bell = S('third_bell');
+export const rumor_map = S('rumor_map');
+export const frost_wyrm_scale = S('frost_wyrm_scale');
+export const potion_hp = S('potion_hp');
+export const potion_mana = S('potion_mana');
+export const potion_stress = S('potion_stress');

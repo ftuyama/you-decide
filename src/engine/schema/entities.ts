@@ -38,7 +38,6 @@ export const EnemyDefSchema = z.object({
   /** Para tipo armored: camadas antes do HP “real” */
   armorChips: z.number().int().min(0).default(0),
   sprite: z.string(),
-  spriteWounded: z.string().optional(),
   advantageOnFirstRound: z.boolean().optional(),
   /** XP base ao derrotar este inimigo; se omitido, usa fórmula do engine (10 + floor(maxHp/2)) */
   xp: z.number().int().min(0).optional(),

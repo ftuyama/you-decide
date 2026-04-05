@@ -312,6 +312,8 @@ export const SceneFrontmatterSchema = z.object({
       'ancient_macabre',
     ])
     .optional(),
+  /** Dica de combate com aliados no acampamento (UI). */
+  campCombatHint: z.boolean().optional(),
   /** Efeitos ao entrar na cena (após primeira renderização; idempotência por visit) */
   onEnter: z.array(EffectSchema).default([]),
   /** Efeitos em **cada** entrada na cena (ex.: avançar dia num hub) */

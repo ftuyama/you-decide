@@ -4,6 +4,7 @@ title: Fogueira de cinzas espelhadas
 chapter: 6
 ambientTheme: camp
 artKey: fractured_nave
+campCombatHint: true
 choices:
   - text: "Alimentar a chama com memória (−1 suprimento)"
     next: act6/hub_fractured_nave

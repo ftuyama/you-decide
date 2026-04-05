@@ -4,6 +4,7 @@ title: Acampamento da Vigília
 chapter: 2
 ambientTheme: camp
 artKey: vigilia_camp
+campCombatHint: true
 choices:
   - text: "Descansar no acampamento (−1 suprimento)"
     next: act2/hub_catacomb

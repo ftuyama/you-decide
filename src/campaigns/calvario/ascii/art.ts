@@ -1,4 +1,4 @@
-const sceneArtRaw = import.meta.glob<string>('./scenes/files/**/*.txt', {
+const sceneArtRaw = import.meta.glob<string>('./scenes/**/*.txt', {
   query: '?raw',
   import: 'default',
   eager: true,

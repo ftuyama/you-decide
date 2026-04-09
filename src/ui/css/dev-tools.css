@@ -219,7 +219,7 @@
 
 .dev-tools-scene-layout {
   display: grid;
-  grid-template-columns: minmax(200px, 340px) 1fr;
+  grid-template-columns: minmax(250px, 340px) 1fr;
   gap: 1rem;
   align-items: start;
 }
@@ -872,6 +872,13 @@
   white-space: pre;
   overflow: auto;
   max-width: 100%;
+}
+
+.dev-tools-ascii-browser-empty {
+  list-style: none;
+  font-size: 0.9rem;
+  opacity: 0.85;
+  padding: 0.25rem 0;
 }
 
 .dev-tools-braille-pre--hidden {

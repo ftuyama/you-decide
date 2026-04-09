@@ -1,6 +1,6 @@
 /**
  * Lista arte ASCII de cena pendente: `artKey` sem ficheiro `.txt` correspondente,
- * ficheiro vazio/só espaços, ou `art` inline declarado mas em branco.
+ * ficheiro vazio/só espaços, conteúdo só "PLACEHOLDER", ou `art` inline declarado mas em branco / placeholder.
  *
  * Alinha-se ao carregamento em `ascii/art.ts` (chave = basename do `.txt` em `ascii/scenes/**`).
  *
@@ -65,6 +65,11 @@ if (!fs.existsSync(scenesDir)) {
 const byKey = indexAsciiSceneFiles();
 const duplicateKeys = [...byKey.entries()].filter(([, paths]) => paths.length > 1);
 
+/** Ficheiros gerados como stub: conteúdo após trim === "PLACEHOLDER" (case-insensitive). */
+function isPlaceholderAsciiContent(text) {
+  return text.trim().toUpperCase() === 'PLACEHOLDER';
+}
+
 const pending = [];
 const files = walkMd(scenesDir);
 
@@ -84,7 +89,18 @@ for (const f of files) {
   }
 
   /** Cena resolve arte: inline não vazio ganha (como `resolveSceneArtFromFrontmatter`). */
-  if (inline) continue;
+  if (inline) {
+    if (isPlaceholderAsciiContent(inline)) {
+      pending.push({
+        sceneId,
+        file: rel,
+        reason: 'placeholder_inline_art',
+        artKey: null,
+        detail: 'campo `art` é só PLACEHOLDER',
+      });
+    }
+    continue;
+  }
 
   if (artKey) {
     const paths = byKey.get(artKey);
@@ -98,15 +114,21 @@ for (const f of files) {
       });
       continue;
     }
-    const nonBlank = paths.find((p) => {
+    const meaningful = paths.find((p) => {
       const full = path.join(repoRoot, p);
-      return fs.readFileSync(full, 'utf8').trim() !== '';
+      const raw = fs.readFileSync(full, 'utf8');
+      const t = raw.trim();
+      return t !== '' && !isPlaceholderAsciiContent(raw);
     });
-    if (!nonBlank) {
+    if (!meaningful) {
+      const anyNonEmpty = paths.some((p) => {
+        const full = path.join(repoRoot, p);
+        return fs.readFileSync(full, 'utf8').trim() !== '';
+      });
       pending.push({
         sceneId,
         file: rel,
-        reason: 'blank_file',
+        reason: anyNonEmpty ? 'placeholder_file' : 'blank_file',
         artKey,
         detail: paths.join(', '),
       });
@@ -140,7 +162,7 @@ if (duplicateKeys.length) {
 
 if (pending.length) {
   failed = true;
-  console.error('Arte ASCII pendente (sem ficheiro ou ficheiro em branco):');
+  console.error('Arte ASCII pendente (ficheiro em falta, em branco, ou PLACEHOLDER):');
   for (const p of pending) {
     const keyPart = p.artKey ? `artKey=${p.artKey}` : '';
     console.error(`  ${p.sceneId} (${p.file})`);

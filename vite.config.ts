@@ -1,5 +1,6 @@
 import { Buffer } from 'node:buffer';
 import { defineConfig } from 'vite';
+import { asciiSceneDevManifestPlugin } from './scripts/vite-ascii-scene-manifest-plugin.mjs';
 
 /**
  * `base: './'` gera URLs relativas no HTML/JS, compatível com GitHub Pages em
@@ -8,6 +9,7 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   base: './',
   plugins: [
+    asciiSceneDevManifestPlugin(),
     {
       name: 'dev-image-proxy',
       configureServer(server) {

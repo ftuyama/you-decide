@@ -369,7 +369,7 @@ export function mountBrailleAsciiPanel(parent: HTMLElement): void {
     })();
   });
 
-  let urlLoadTimer: ReturnType<typeof setTimeout> | null = null;
+  let urlLoadTimer: number | null = null;
   const URL_DEBOUNCE_MS = 450;
 
   function loadFromUrlField(): void {

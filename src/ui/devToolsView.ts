@@ -14,11 +14,14 @@ import {
   buildDevToolsHref,
   resolveDevToolsTabFromLocation,
   resolveDevToolsSceneIdFromLocation,
+  resolveDevToolsAsciiPathFromLocation,
+  resolveDevToolsAsciiSortFromLocation,
   DEV_TOOLS_TABS,
   type DevToolsTab,
 } from './campaignUrl.ts';
 import { mountBejamasAsciiPanel } from './devToolsBejamasAscii.ts';
 import { mountBrailleAsciiPanel } from './devToolsBrailleAscii.ts';
+import { mountAsciiBrowserPanel } from './devToolsAsciiBrowser.ts';
 
 function pathToSceneId(path: string): string {
   return path.replace(/^.*\/scenes\//, '').replace(/\.md$/, '');
@@ -558,7 +561,7 @@ function mountScenesPanel(
       const li = document.createElement('li');
       const a = document.createElement('a');
       a.className = 'dev-tools-scene-link';
-      a.href = buildDevToolsHref(campaignId, 'scenes', id);
+      a.href = buildDevToolsHref(campaignId, 'scenes', { sceneId: id });
       const sc = scenes.get(id);
       const shortTitle = sc?.frontmatter.title?.trim() || id.split('/').pop() || id;
       a.textContent = `${id} — ${shortTitle}`;
@@ -631,7 +634,7 @@ function mountScenesPanel(
     e.preventDefault();
     const id = a.dataset.sceneId;
     selectedId = id;
-    window.history.pushState({}, '', buildDevToolsHref(campaignId, 'scenes', id));
+    window.history.pushState({}, '', buildDevToolsHref(campaignId, 'scenes', { sceneId: id }));
     renderList();
     showDetail(id);
   });
@@ -650,6 +653,8 @@ export function mountDevToolsView(root: HTMLElement, campaignId: string): void {
 
   const tab = resolveDevToolsTabFromLocation();
   const sceneParam = resolveDevToolsSceneIdFromLocation();
+  const asciiPathParam = resolveDevToolsAsciiPathFromLocation();
+  const asciiSortParam = resolveDevToolsAsciiSortFromLocation();
 
   const bundle = loadCampaignContent(campaignId);
   const scenes = new Map<string, LoadedScene>();
@@ -689,7 +694,11 @@ export function mountDevToolsView(root: HTMLElement, campaignId: string): void {
     select.appendChild(opt);
   }
   select.addEventListener('change', () => {
-    window.location.href = buildDevToolsHref(select.value, tab, tab === 'scenes' ? sceneParam : null);
+    window.location.href = buildDevToolsHref(select.value, tab, {
+      sceneId: tab === 'scenes' ? sceneParam : null,
+      asciiPath: tab === 'ascii-browser' ? asciiPathParam : null,
+      asciiSort: tab === 'ascii-browser' ? asciiSortParam : null,
+    });
   });
   campaignWrap.appendChild(select);
 
@@ -718,7 +727,11 @@ export function mountDevToolsView(root: HTMLElement, campaignId: string): void {
   for (const t of DEV_TOOLS_TABS) {
     const a = document.createElement('a');
     a.className = 'dev-tools-tab' + (t === tab ? ' dev-tools-tab--active' : '');
-    a.href = buildDevToolsHref(campaignId, t, t === 'scenes' ? sceneParam : null);
+    a.href = buildDevToolsHref(campaignId, t, {
+      sceneId: t === 'scenes' ? sceneParam : null,
+      asciiPath: t === 'ascii-browser' ? asciiPathParam : null,
+      asciiSort: t === 'ascii-browser' ? asciiSortParam : null,
+    });
     const labels: Record<DevToolsTab, string> = {
       scenes: 'Cenas',
       items: 'Itens',
@@ -727,6 +740,7 @@ export function mountDevToolsView(root: HTMLElement, campaignId: string): void {
       enemies: 'Inimigos',
       ascii: 'Arte ASCII (Braille)',
       'ascii-bejamas': 'Arte ASCII (Bejamas IA)',
+      'ascii-browser': 'Navegador ASCII',
     };
     a.textContent = labels[t];
     tabRow.appendChild(a);
@@ -753,6 +767,9 @@ export function mountDevToolsView(root: HTMLElement, campaignId: string): void {
       break;
     case 'ascii-bejamas':
       mountBejamasAsciiPanel(main);
+      break;
+    case 'ascii-browser':
+      mountAsciiBrowserPanel(main, campaignId, bundle.ui.sceneArt);
       break;
     case 'scenes':
     default:

@@ -503,3 +503,264 @@
   max-width: 100%;
   box-sizing: border-box;
 }
+
+/* Arte ASCII Braille (?view=dev&tab=ascii) */
+.dev-tools-braille {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.dev-tools-braille-intro {
+  max-width: 52rem;
+}
+
+.dev-tools-braille-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 0.35rem;
+}
+
+.dev-tools-braille-blurb {
+  font-size: 0.88rem;
+  line-height: 1.45;
+  opacity: 0.88;
+  margin: 0;
+  max-width: 62ch;
+}
+
+.dev-tools-braille-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 1rem;
+  align-items: start;
+  max-width: 56rem;
+}
+
+.dev-tools-braille-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.85rem 1rem 1rem;
+  background: color-mix(in srgb, var(--panel) 92%, transparent);
+  min-width: 0;
+}
+
+.dev-tools-braille-card-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.75;
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.dev-tools-braille-card-title--plain {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+  opacity: 0.9;
+}
+
+.dev-tools-braille-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.85rem;
+}
+
+.dev-tools-braille-field:last-child {
+  margin-bottom: 0;
+}
+
+.dev-tools-braille-field--inline {
+  flex-direction: row;
+  align-items: center;
+}
+
+.dev-tools-braille-label {
+  font-size: 0.82rem;
+  font-weight: 500;
+  opacity: 0.92;
+}
+
+.dev-tools-braille-hint {
+  font-size: 0.78rem;
+  opacity: 0.72;
+  margin: 0.15rem 0 0;
+  line-height: 1.35;
+  max-width: 36ch;
+}
+
+.dev-tools-braille-file-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.dev-tools-braille-file-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.dev-tools-braille-file-face {
+  user-select: none;
+}
+
+.dev-tools-braille-url-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.dev-tools-braille-url-input {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.dev-tools-braille-slider-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+}
+
+.dev-tools-braille-num {
+  width: 4.25rem;
+  flex-shrink: 0;
+  font: inherit;
+  padding: 0.25rem 0.45rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.dev-tools-braille-range {
+  flex: 1 1 100px;
+  min-width: 0;
+  max-width: 100%;
+  accent-color: var(--link);
+}
+
+.dev-tools-braille-range--grow {
+  flex: 1 1 auto;
+}
+
+.dev-tools-braille-value-pill {
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  min-width: 2.75rem;
+  text-align: center;
+}
+
+.dev-tools-braille-select {
+  max-width: 100%;
+}
+
+.dev-tools-braille-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.88rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.dev-tools-btn--primary {
+  font-weight: 600;
+  border-color: color-mix(in srgb, var(--link) 55%, var(--border));
+  background: color-mix(in srgb, var(--link) 14%, var(--bg));
+  color: var(--text);
+}
+
+.dev-tools-btn--primary:hover {
+  filter: brightness(1.06);
+  border-color: color-mix(in srgb, var(--link) 70%, var(--border));
+}
+
+.dev-tools-btn--secondary {
+  opacity: 0.95;
+}
+
+.dev-tools-braille-out {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 56rem;
+}
+
+.dev-tools-braille-out-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 1rem;
+  justify-content: space-between;
+}
+
+.dev-tools-braille-out-head .dev-tools-braille-meta {
+  flex: 1 1 auto;
+  text-align: right;
+  font-size: 0.82rem;
+  opacity: 0.85;
+  min-height: 1.2em;
+}
+
+.dev-tools-braille-status {
+  font-size: 0.85rem;
+  min-height: 1.35em;
+  opacity: 0.9;
+}
+
+.dev-tools-braille-pre-wrap {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  padding: 0.85rem 1rem;
+  overflow: auto;
+  max-height: min(70vh, 560px);
+  min-height: 140px;
+  transition: box-shadow 0.15s ease;
+}
+
+.dev-tools-braille-pre-wrap:focus-within {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--link) 35%, transparent);
+}
+
+.dev-tools-braille-empty {
+  font-size: 0.88rem;
+  line-height: 1.45;
+  opacity: 0.65;
+  margin: 0;
+  max-width: 40ch;
+}
+
+.dev-tools-braille-empty--gone {
+  display: none;
+}
+
+.dev-tools-braille-pre {
+  margin: 0;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  line-height: 1.15;
+  white-space: pre;
+  overflow: auto;
+  max-width: 100%;
+}
+
+.dev-tools-braille-pre--hidden {
+  display: none;
+}

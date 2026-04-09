@@ -17,6 +17,7 @@ import {
   DEV_TOOLS_TABS,
   type DevToolsTab,
 } from './campaignUrl.ts';
+import { mountBrailleAsciiPanel } from './devToolsBrailleAscii.ts';
 
 function pathToSceneId(path: string): string {
   return path.replace(/^.*\/scenes\//, '').replace(/\.md$/, '');
@@ -723,6 +724,7 @@ export function mountDevToolsView(root: HTMLElement, campaignId: string): void {
       music: 'Música',
       visual: 'Paleta visual',
       enemies: 'Inimigos',
+      ascii: 'Arte ASCII (Braille)',
     };
     a.textContent = labels[t];
     tabRow.appendChild(a);
@@ -743,6 +745,9 @@ export function mountDevToolsView(root: HTMLElement, campaignId: string): void {
       break;
     case 'visual':
       mountVisualPanel(main, visualCounts);
+      break;
+    case 'ascii':
+      mountBrailleAsciiPanel(main);
       break;
     case 'scenes':
     default:

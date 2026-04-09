@@ -14,7 +14,7 @@ onEnter:
 ---
 O gelo não termina: ele **abre**. Debaixo das Cimeiras, encontras uma nave sem altar, pendurada entre pedra e noite, como se alguém tivesse construído uma catedral para abrigar uma pergunta.
 
-Cada passo devolve um eco teu, mas atrasado o suficiente para parecer **outra pessoa**. O ar não cheira a morte nem a incenso. Cheira a **verdade antes de ter nome**.
+Cada passo devolve um eco teu, mas atrasado o suficiente para parecer **outra pessoa** — o mesmo truque do **caco** entre degraus, lá em baixo: estranho com o teu nome, só que agora o nome **responde** sem pedir licença. O ar não cheira a morte nem a incenso. Cheira a **verdade antes de ter nome**.
 
 Uma inscrição corre pelas colunas quebradas:
 

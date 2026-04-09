@@ -89,4 +89,4 @@ O cruzeiro **segura** o peso de quem passa. Velas novas e velhas misturam-se; **
 
 *Quem conta o tempo conta **dia {{day}}** — o subsolo come folhas de calendário.*
 
-Toda escolha **paga** algo — às vezes suprimento, às vezes **só um bocado de alma**.
+Toda escolha **paga** algo — às vezes suprimento, às vezes **só um bocado de alma**. Um **eco** de sino sobe das profundezas e morre na garganta da cidade — lá em cima, alguém finge não ouvir.

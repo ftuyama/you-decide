@@ -18,6 +18,8 @@ onEnter: []
 **Mira** não se encolhe contra o vento: usa-o. O capuz faz sombra extra no rosto; só os olhos ficam vivos, a reflectir o fogareiro.
 
 > *"Neve é boa para **apagar pegadas**", diz. "Má para esquecer onde puseste os pés. Escolhe o que queres apagar."*
+
+No reflexo do fogareiro, o teu rosto **duplica** um instante — não é magia; é o mesmo truque do subsolo: quem olha de lado já viu o fim **antes** de lhe darem nome.
 ---
 
 {{companionLine}}

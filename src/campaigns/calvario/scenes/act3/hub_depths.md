@@ -31,4 +31,4 @@ choices:
 onEnter:
   - { op: clearAsciiMap }
 ---
-Profundezas **silenciosas**. Morvayn não está longe.
+Profundezas **silenciosas**. Morvayn não está longe — e o silêncio dele já foi **política** antes de ser magia: rede no teto, facção no corredor, cadáver no trono como **factura** pendente.

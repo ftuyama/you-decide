@@ -13,4 +13,4 @@ skillCheck:
 choices: []
 onEnter: []
 ---
-O **Poço que Mentiu** reflete um mapa que não corresponde às paredes.
+O **Poço que Mentiu** reflete um mapa que não corresponde às paredes — mentira de quem lucra com **cada** desvio: não é o poço que erra, é a mão que gravou o mapa para outro bolso.

@@ -10,9 +10,9 @@ choices:
 onEnter:
   - { op: addResource, resource: faith, delta: 1 }
 ---
-A nave fraturada adormece atrás de ti, mas levas uma parte dela nos olhos. O mundo acima continua igual para quem olha depressa.
+A nave fraturada adormece atrás de ti, mas levas uma parte dela nos olhos — o mesmo **caco** de espelho que mentiu bonito no primeiro degrau, só que desta vez levas o corte na palma. O mundo acima continua igual para quem olha depressa.
 
-Para ti, não: agora cada rua parece uma hipótese, cada rosto uma máscara possível, cada certeza uma tábua sobre abismo.
+Para ti, não: agora cada rua parece uma hipótese, cada rosto uma máscara possível, cada certeza uma tábua sobre abismo. O **pulso verde** na garganta da cidade não mudou de tom; mudaste tu a forma de o **contar**.
 
 Ainda assim, dás um passo. Não por pureza. Por escolha.
 

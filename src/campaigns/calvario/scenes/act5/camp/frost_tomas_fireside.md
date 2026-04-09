@@ -16,6 +16,8 @@ onEnter: []
 **Tomás** esfrega as mãos devagar, sem drama — trabalho de quem já aprendeu que o frio não negocia. O escudo está perto, sempre, como segunda pele.
 
 > *"A montanha não é inimigo", diz. "Inimigo é **confundir** cansaço com sinal de Deus."*
+
+O escudo devolve uma **sombra** tua mais estreita — como espelho mentiroso, só que útil: lembra que **postura** também é máscara, e máscara cansa menos que ferida aberta.
 ---
 
 {{companionLine}}

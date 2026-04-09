@@ -16,6 +16,9 @@ onEnter: []
 Um riso curto, sem alegria.
 
 > *"Contigo, talvez seja só mais um beco. Becos eu conheço."*
+
+Se o **Vazio** é espelho que não perdoa, então o beco acabou: daqui para a frente, o que te segue não é sombra — é **decisão** com o teu peso real.
+
 ---
 
 {{companionLine}}

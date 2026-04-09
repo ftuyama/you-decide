@@ -24,3 +24,5 @@ onEnter:
   - { op: setFlag, key: throne_acted_chains, value: true }
 ---
 As correntes **querem** dedos. Não prendem só o trono — **ensaiam** o teu nome como quem experimenta uma corrente nova.
+
+Entre elas, preso em resina negra: um **dedo** com anel de sino partido e marcas de dentes humanos — não de fera — como se alguém tivesse **mordido** a mão que jurou antes de a Vigília raspar o juramento da pedra.

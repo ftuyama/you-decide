@@ -26,4 +26,6 @@ onEnter: []
 ---
 A escada **afunda**. O pulso verde pulsa no tempo do teu coração.
 
+Isto não é só **pedra** que nos empurra: há **conta-corrente** entre facções — Vigília, Círculo, culto — e cada rota escavada foi acordo antes de ser túnel. Quem manda no mapa manda no **silêncio** que o mapa vende.
+
 Com o **Mapa Rasgado** no inventário, abre-se um atalho narrativo.

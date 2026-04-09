@@ -13,5 +13,5 @@ onEnter:
 ---
 A máscara do arauto racha em linhas perfeitas, como vidro que já sabia onde cair. Atrás dela não há carne, só um vazio com tua respiração.
 
-Recolhes um fragmento de espelho negro. Ele não reflete luz; reflete **decisão**.
+Recolhes um fragmento de espelho negro. Ele não reflete luz; reflete **decisão** — não é promessa nova: é o **resto** da primeira descida, quando já sabias que o reflexo não era heroísmo.
 

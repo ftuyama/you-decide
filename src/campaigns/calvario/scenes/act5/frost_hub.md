@@ -17,8 +17,19 @@ choices:
     condition:
       all:
         - { noFlag: tomas_rescued }
+        - { noFlag: tomas_rescue_missed }
         - { level: { gte: 20 } }
-    preview: "História de Tomas; corda e gelo como teste."
+        - { day: { lte: 15 } }
+    preview: "História de Tomás; corda e gelo — mas o rumor esfria depois do dia 15."
+  - text: "Rumor do escudeiro — só eco e corda vazia no gelo"
+    next: act5/frost_tomas/missed
+    condition:
+      all:
+        - { noFlag: tomas_rescued }
+        - { noFlag: tomas_rescue_missed }
+        - { level: { gte: 20 } }
+        - { day: { gte: 16 } }
+    preview: "Demasiado tarde; o desfiladeiro já aprendeu outro nome para justiça."
   - text: "Viver o acampamento no gelo"
     next: act5/camp/frost_camp
     preview: "Descanso, suprimento e conversa ao fogo."

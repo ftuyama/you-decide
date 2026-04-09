@@ -12,7 +12,8 @@ choices:
     preview: "Ainda há rangido e fedor a ninho."
   - text: "Ir ao mercador fantasma"
     next: act2/merchant/merchant_moon
-    preview: "Comércio estranho; preço em ouro ou em segredo."
+    condition: { day: { gte: 2 } }
+    preview: "Comércio estranho; preço em ouro ou em segredo — raramente aparece no primeiro dia."
   - text: "Ouvir proposta de Mira"
     next: act2/recruit_offer
     condition: { noFlag: mira_recruited }
@@ -34,8 +35,11 @@ choices:
     fallbackNext: act2/camp/vigilia_camp
   - text: "Passagem marcada — eco de juramentos"
     next: act2/lore/lore_crossroads
-    condition: { level: { gte: 7 } }
-    preview: "Memória antiga; perícia e sorte pesam."
+    condition:
+      all:
+        - { level: { gte: 7 } }
+        - { day: { lte: 25 } }
+    preview: "Memória antiga; perícia e sorte pesam — mas o eco some se demorares demasiado."
   - text: "Observar o cruzeiro: marcas no chão"
     next: act2/hub_observe
     preview: "Ler o chão como mapa de quem passou antes."

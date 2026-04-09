@@ -19,3 +19,4 @@ export const frost_wyrm_scale = S('frost_wyrm_scale');
 export const potion_hp = S('potion_hp');
 export const potion_mana = S('potion_mana');
 export const potion_stress = S('potion_stress');
+export const morvayn_heart_shard = S('morvayn_heart_shard');

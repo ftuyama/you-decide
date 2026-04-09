@@ -32,6 +32,7 @@ export type MountAppChromeOptions = {
   onExportSave: () => void;
   onImportSave: () => void;
   onCredits: () => void;
+  onDevTools: () => void;
   onScenesGraph: () => void;
   showImportInPartida: boolean;
   showGraphInSettings: boolean;
@@ -218,6 +219,13 @@ export function mountAppChrome(root: HTMLElement, opts: MountAppChromeOptions): 
   creditsBtn.textContent = 'Créditos';
   creditsBtn.addEventListener('click', () => opts.onCredits());
 
+  const devToolsBtn = document.createElement('button');
+  devToolsBtn.type = 'button';
+  devToolsBtn.className = 'menu-item';
+  devToolsBtn.textContent = 'Ferramentas de desenvolvimento';
+  devToolsBtn.title = 'Itens, cenas, música, inimigos (?view=dev). Disponível com modo desenvolvedor.';
+  devToolsBtn.addEventListener('click', () => opts.onDevTools());
+
   const graphBtn = document.createElement('button');
   graphBtn.type = 'button';
   graphBtn.className = 'menu-item';
@@ -254,6 +262,7 @@ export function mountAppChrome(root: HTMLElement, opts: MountAppChromeOptions): 
     settingsSection.appendChild(devRow);
   }
   if (opts.showGraphInSettings) {
+    settingsSection.appendChild(devToolsBtn);
     settingsSection.appendChild(graphBtn);
   }
 

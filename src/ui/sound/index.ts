@@ -1,2 +1,2 @@
 export { GameAudio } from './GameAudio.ts';
-export type { AmbientTheme } from './types.ts';
+export { AMBIENT_THEMES, type AmbientTheme } from './types.ts';

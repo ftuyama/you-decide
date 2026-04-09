@@ -1,0 +1,505 @@
+/* Vista ?view=dev — hub de ferramentas (cenas, itens, música, inimigos) */
+#app.app--dev-tools {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.dev-tools-root {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.dev-tools-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 1.25rem 2rem;
+}
+
+.dev-tools-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.dev-tools-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0;
+  flex: 1 1 200px;
+}
+
+.dev-tools-campaign {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+}
+
+.dev-tools-select {
+  font: inherit;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+}
+
+.dev-tools-back {
+  font-size: 0.9rem;
+  color: var(--link);
+  text-decoration: none;
+}
+
+.dev-tools-back:hover {
+  text-decoration: underline;
+}
+
+.dev-tools-back--secondary {
+  opacity: 0.9;
+}
+
+.dev-tools-stats {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  width: 100%;
+}
+
+.dev-tools-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+
+.dev-tools-tab {
+  display: inline-block;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: var(--text);
+  border: 1px solid transparent;
+}
+
+.dev-tools-tab:hover {
+  background: var(--panel);
+  border-color: var(--border);
+}
+
+.dev-tools-tab--active {
+  background: var(--panel);
+  border-color: var(--border);
+  font-weight: 600;
+}
+
+.dev-tools-main {
+  min-height: 40vh;
+  min-width: 0;
+}
+
+.dev-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  min-width: 0;
+}
+
+.dev-tools-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  background: var(--panel);
+  /* Permite que o cartão encolha no grid e que ASCII largo role em vez de vazar */
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Sprites no catálogo dev: mesma ideia que .item-sprite no jogo */
+.dev-tools-card .enemy-sprite,
+.dev-tools-card .item-sprite {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  box-sizing: border-box;
+}
+
+.dev-tools-card-title {
+  font-size: 1rem;
+  margin: 0 0 0.35rem;
+}
+
+.dev-tools-card-meta {
+  font-size: 0.8rem;
+  opacity: 0.85;
+  margin-bottom: 0.5rem;
+}
+
+.dev-tools-stat-list {
+  margin: 0 0 0.5rem;
+  padding-left: 1.1rem;
+  font-size: 0.85rem;
+}
+
+.dev-tools-subhdr {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.75;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.dev-tools-missing {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  font-style: italic;
+  margin: 0.5rem 0;
+}
+
+.dev-tools-details {
+  margin: 0.5rem 0;
+  font-size: 0.85rem;
+}
+
+.dev-tools-lines {
+  margin: 0.35rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.dev-tools-note {
+  font-size: 0.85rem;
+  opacity: 0.9;
+  margin: 0 0 1rem;
+  max-width: 70ch;
+}
+
+.dev-tools-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.dev-tools-table th,
+.dev-tools-table td {
+  border: 1px solid var(--border);
+  padding: 0.4rem 0.6rem;
+  text-align: left;
+}
+
+.dev-tools-table th {
+  background: var(--panel);
+}
+
+.dev-tools-music-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.dev-tools-btn {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.dev-tools-btn:hover {
+  filter: brightness(1.08);
+}
+
+.dev-tools-scene-layout {
+  display: grid;
+  grid-template-columns: minmax(200px, 340px) 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (max-width: 720px) {
+  .dev-tools-scene-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dev-tools-scene-sidebar {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem;
+  background: var(--panel);
+  max-height: min(70vh, 560px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.dev-tools-filter-row {
+  flex-shrink: 0;
+}
+
+.dev-tools-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+}
+
+.dev-tools-search {
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  padding: 0.25rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.dev-tools-scene-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  flex: 1;
+  min-height: 120px;
+}
+
+.dev-tools-scene-list li {
+  margin: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.dev-tools-scene-link {
+  display: block;
+  padding: 0.35rem 0.25rem;
+  font-size: 0.8rem;
+  color: var(--link);
+  text-decoration: none;
+  line-height: 1.35;
+}
+
+.dev-tools-scene-link:hover {
+  text-decoration: underline;
+}
+
+.dev-tools-scene-link--active {
+  background: color-mix(in srgb, var(--link) 12%, transparent);
+  font-weight: 600;
+}
+
+.dev-tools-scene-detail {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  background: var(--panel);
+  min-height: 200px;
+}
+
+.dev-tools-detail-title {
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem;
+}
+
+.dev-tools-detail-meta {
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.9;
+}
+
+.dev-tools-detail-meta code {
+  font-size: 0.85em;
+}
+
+.dev-tools-scene-section-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 1rem 0 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.dev-tools-scene-detail > .dev-tools-scene-section-title:first-of-type {
+  margin-top: 0.75rem;
+  padding-top: 0;
+  border-top: none;
+}
+
+.dev-tools-choices-list {
+  margin: 0 0 0.5rem;
+  padding-left: 1.25rem;
+  font-size: 0.88rem;
+}
+
+.dev-tools-choice-item {
+  margin-bottom: 0.65rem;
+}
+
+.dev-tools-choice-text {
+  font-weight: 500;
+  margin-bottom: 0.2rem;
+}
+
+.dev-tools-choice-meta {
+  font-size: 0.78rem;
+  opacity: 0.88;
+  line-height: 1.35;
+}
+
+.dev-tools-choice-json {
+  margin: 0.35rem 0 0;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.68rem;
+  line-height: 1.3;
+  overflow: auto;
+  max-height: 8rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.dev-tools-choice-effects {
+  font-size: 0.75rem;
+  opacity: 0.9;
+  margin-top: 0.25rem;
+}
+
+.dev-tools-md-preview {
+  margin: 0 0 0.5rem;
+  padding: 0.75rem 1rem;
+  overflow: auto;
+  max-height: min(45vh, 360px);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  background: color-mix(in srgb, var(--bg) 92%, var(--panel));
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.dev-tools-md-preview.story-body {
+  max-width: none;
+}
+
+/* Miniatura do inimigo — clique ou pausa (~320ms) no hover para modal */
+.dev-tools-enemy-sprite-thumb-wrap {
+  position: relative;
+  cursor: zoom-in;
+  border-radius: 6px;
+  outline: none;
+}
+
+.dev-tools-enemy-sprite-thumb-wrap:focus-visible {
+  outline: 2px solid var(--link);
+  outline-offset: 2px;
+}
+
+.dev-tools-sprite-hover-hint {
+  position: absolute;
+  right: 0.35rem;
+  top: 0.35rem;
+  font-size: 0.65rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--panel) 88%, #000);
+  border: 1px solid var(--border);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+.dev-tools-enemy-sprite-thumb-wrap:hover .dev-tools-sprite-hover-hint,
+.dev-tools-enemy-sprite-thumb-wrap:focus-visible .dev-tools-sprite-hover-hint {
+  opacity: 1;
+}
+
+/* Modal — painel com largura/altura da sprite (ASCII); fundo escuro clicável */
+.dev-tools-sprite-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.dev-tools-sprite-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  background: rgba(0, 0, 0, 0.62);
+}
+
+.dev-tools-sprite-modal-panel {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: max-content;
+  max-width: min(96vw, calc(100vw - 2rem));
+  max-height: min(92vh, calc(100vh - 2rem));
+  min-height: 0;
+  overflow: hidden;
+  padding: 0.75rem 1rem 1rem;
+  box-sizing: border-box;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+}
+
+.dev-tools-sprite-modal-header {
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  margin-bottom: 0.5rem;
+}
+
+.dev-tools-sprite-modal-close {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.dev-tools-sprite-modal-close:hover {
+  filter: brightness(1.08);
+}
+
+/* Largura/altura intrínsecas da arte ASCII; scroll interno se passar do viewport */
+.dev-tools-enemy-sprite-modal-pre {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  overflow: auto;
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: clamp(0.55rem, 1.1vw, 0.85rem);
+  line-height: 1.2;
+  white-space: pre;
+  color: var(--fg);
+  padding: 0.75rem;
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  width: max-content;
+  max-width: 100%;
+  box-sizing: border-box;
+}

@@ -59,6 +59,33 @@ choices:
       - { op: addRep, faction: vigilia, delta: 1 }
       - { op: addDiary, text: "Um capeador desenhou uma linha na neve entre mim e o rumor do sino." }
     preview: "Culto cai; Vigília sobe (lento)"
+  - text: "Consagrar neve derretida como água benta (clérigo)"
+    condition:
+      all:
+        - { class: cleric }
+        - { resource: { supply: { gte: 1 } } }
+        - { noFlag: frost_camp_cleric_rite_done }
+    next: act5/camp/frost_camp
+    effects:
+      - { op: setFlag, key: frost_camp_cleric_rite_done, value: true }
+      - { op: addResource, resource: supply, delta: -1 }
+      - { op: addResource, resource: faith, delta: 2 }
+      - { op: addDiary, text: "Derreti neve na lata do báculo até doer a mão — Deus ouve melhor quando a carne paga o calor." }
+    preview: "−1 suprimento · +2 fé (uma vez)"
+  - text: "Enterrar duas moedas no gelo para o Terceiro Sino"
+    condition:
+      all:
+        - { rep: { faction: culto, gte: 1 } }
+        - { resource: { gold: { gte: 2 } } }
+        - { noFlag: frost_camp_cult_ice_gift_done }
+    next: act5/camp/frost_camp
+    effects:
+      - { op: setFlag, key: frost_camp_cult_ice_gift_done, value: true }
+      - { op: addResource, resource: gold, delta: -2 }
+      - { op: addRep, faction: culto, delta: 1 }
+      - { op: addResource, resource: corruption, delta: 1 }
+      - { op: addDiary, text: "O gelo engoliu o ouro sem som — o rumor do sino ficou mais perto, ou foi o ouvido que cedeu." }
+    preview: "−2 ouro · culto +1 · +1 corrupção (uma vez)"
   - text: "Continuar"
     next: act5/frost_hub
     effects:

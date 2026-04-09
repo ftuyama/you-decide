@@ -110,6 +110,7 @@ export const items: Record<string, ItemDef> = {
     bonusMind: 0,
     bonusLuck: 0,
     armor: 0,
+    sprite: itemSprites.morvayn_heart_shard,
   }),
   potion_hp: z({
     id: 'potion_hp',

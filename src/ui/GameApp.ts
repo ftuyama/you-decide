@@ -14,7 +14,7 @@ import { tickActiveBuffs } from '../engine/leadStats.ts';
 import type { Choice, GameState } from '../engine/schema.ts';
 import { migrateLegacyKnownSpells } from '../engine/spellsKnown.ts';
 import { GameAudio, type AmbientTheme } from './sound/index.ts';
-import { buildScenesGraphHref } from './campaignUrl.ts';
+import { buildDevToolsHref, buildScenesGraphHref } from './campaignUrl.ts';
 import {
   SAVE_SLOT_COUNT,
   migrateLegacySaveIfNeeded as migrateLegacySaveSlot,
@@ -771,6 +771,9 @@ export class GameApp {
       onExportSave: () => this.exportSaveToClipboard(),
       onImportSave: () => this.importSaveFromClipboard(),
       onCredits: () => this.showCredits(),
+      onDevTools: () => {
+        window.location.href = buildDevToolsHref(this.campaignId, 'scenes');
+      },
       onScenesGraph: () => {
         window.location.href = buildScenesGraphHref(this.campaignId);
       },

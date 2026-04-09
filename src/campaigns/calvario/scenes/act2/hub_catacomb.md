@@ -70,6 +70,13 @@ choices:
   - text: "Observar o cruzeiro: marcas no chão"
     next: act2/hub_observe
     preview: "Ler o chão como mapa de quem passou antes."
+  - text: "Mexer na cera das velas — moeda presa (uma vez)"
+    next: act2/cruzeiro_echo_once
+    condition:
+      all:
+        - { noFlag: act2_echo_done }
+        - { day: { gte: 10 } }
+    preview: "+1 ouro; sem combate."
   - text: "Escutar um eco que sussurra o dia"
     next: act2/hub_catacomb
     condition: { day: { gte: 6 } }

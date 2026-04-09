@@ -4,21 +4,27 @@ import {
   type LoadedScene,
   type StoryDiceRollBreakdown,
 } from '../engine/sceneRuntime.ts';
-import type { Choice, Effect, GameState } from '../engine/schema.ts';
+import type { Choice, Effect, GameState, SceneFrontmatter } from '../engine/schema.ts';
 import type { ContentRegistry } from '../content/registry.ts';
 import { formatLevelUpDeltaLine, randomCampCombatHint } from './gameAppUtils.ts';
 import { formatDiceAscii } from './diceAscii.ts';
 import { iconWrap, icons } from './icons/index.ts';
 import type { GameEvent } from '../engine/eventBus.ts';
 
-export function resolveSceneArt(registry: ContentRegistry, scene: LoadedScene): string | undefined {
-  const fm = scene.frontmatter;
+/** Arte de cena: YAML `art` inline ou `artKey` na tabela `sceneArt` da campanha. */
+export function resolveSceneArtFromFrontmatter(
+  fm: Pick<SceneFrontmatter, 'art' | 'artKey'>,
+  sceneArt: Record<string, string>
+): string | undefined {
   const inline = fm.art?.trim();
   if (inline) return inline;
   const key = fm.artKey;
-  const art = registry.ui.sceneArt;
-  if (key && art[key]) return art[key];
+  if (key && sceneArt[key]) return sceneArt[key];
   return undefined;
+}
+
+export function resolveSceneArt(registry: ContentRegistry, scene: LoadedScene): string | undefined {
+  return resolveSceneArtFromFrontmatter(scene.frontmatter, registry.ui.sceneArt);
 }
 
 const CAMP_EQUIPMENT_SCENES = new Set([
@@ -325,13 +331,6 @@ export type StoryRenderContext = {
 export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): void {
   const inner = document.createElement('div');
   inner.className = 'shell';
-
-  if (ctx.devMode) {
-    const bc = document.createElement('div');
-    bc.className = 'breadcrumb';
-    bc.textContent = `📁 campaigns/${ctx.campaignId}/scenes/${ctx.scene.id}.md`;
-    inner.appendChild(bc);
-  }
 
   if (ctx.overlay.pendingStoryDiceRoll) {
     appendStoryDiceRollBanner(inner, ctx.overlay.storyDiceHost, ctx.overlay.pendingStoryDiceRoll);

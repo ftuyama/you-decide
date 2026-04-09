@@ -7,6 +7,10 @@ artKey: crawl
 choices:
   - text: "Reparar num espelho partido num nicho — encarar o reflexo"
     next: act1/mirror_entrance
+  - text: "Escutar vozes que descem da cidade (sorte)"
+    next: act1/surface_whisper
+    condition: { noFlag: act1_surface_whisper_done }
+    preview: "Ouro ou corrupção — rumor da superfície."
   - text: "Voltar à entrada"
     next: act1/title
 onEnter: []

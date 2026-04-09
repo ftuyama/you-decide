@@ -8,7 +8,7 @@ artKey: depths
 choices:
   - text: "Rumo ao trono de ossos"
     next: act4/throne/throne_gate
-    condition: { level: { gte: 7 } }
+    condition: { level: { gte: 10 } }
     preview: "Capítulo 4 — confronto com Morvayn; o trono espera."
     timedMs: 15000
     fallbackNext: act3/stone_corridor
@@ -23,6 +23,20 @@ choices:
     next: act3/stone_corridor
     condition: { flag: stone_guard_defeated }
     preview: "O silêncio agora é teu — runas e nicho, sem o golem."
+  - text: "Seguir rasto de cinza e corda — mensageiro interrompido"
+    next: act3/messenger_cold_trail
+    condition:
+      all:
+        - { level: { gte: 8 } }
+        - { noFlag: act3_messenger_done }
+    preview: "Furtividade ou força; Vigília ou Círculo cobram o despacho."
+  - text: "Ouvir tubagens sob a pedra"
+    next: act3/pipes_whisper
+    condition:
+      all:
+        - { level: { gte: 7 } }
+        - { noFlag: act3_pipes_done }
+    preview: "Sorte; sucesso dá pista, falha gasta suprimento."
   - text: "Voltar ao Cruzeiro — hub"
     next: act2/hub_catacomb
     preview: "Sobe ao cruzeiro; capítulo 2 no mapa da história."

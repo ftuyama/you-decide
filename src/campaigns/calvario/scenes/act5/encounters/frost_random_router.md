@@ -11,6 +11,9 @@ randomBranch:
     - { weight: 1, next: act5/encounters/frost_encounter_cultist }
     - { weight: 0.25, next: act5/encounters/frost_encounter_hunt_party }
     - { weight: 0.1, next: act5/encounters/frost_encounter_howl_horde }
+    - weight: 0.35
+      next: act5/encounters/frost_stranded_traveler
+      condition: { noFlag: frost_stranded_traveler_done }
     - { weight: 1, next: act5/frost_hub }
 choices: []
 onEnter: []

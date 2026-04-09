@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&display=swap');
 @import './theme-tokens.css';
 @import './scenes-graph.css';
+@import './dev-tools.css';
 
 * {
   box-sizing: border-box;
@@ -1437,13 +1438,6 @@ h1 {
   border: none;
   border-top: 1px solid color-mix(in srgb, var(--border) 32%, transparent);
   margin: 1.05em 0;
-}
-
-.breadcrumb {
-  font-size: 0.75rem;
-  color: var(--muted);
-  margin-bottom: 0.75rem;
-  word-break: break-all;
 }
 
 .hud {

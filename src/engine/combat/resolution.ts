@@ -125,13 +125,46 @@ function combatVictoryResourceLootLine(
   }
 }
 
+function consolidatedLootLinesFromTallies(
+  resourceTotals: Record<'gold' | 'supply' | 'faith' | 'corruption', number>,
+  itemOrder: string[],
+  itemCounts: Map<string, { display: string; count: number }>
+): string[] {
+  const lines: string[] = [];
+  const resourceOrder: Array<keyof typeof resourceTotals> = [
+    'gold',
+    'supply',
+    'faith',
+    'corruption',
+  ];
+  for (const r of resourceOrder) {
+    const n = resourceTotals[r];
+    if (n > 0) lines.push(combatVictoryResourceLootLine(r, n));
+  }
+  for (const itemId of itemOrder) {
+    const row = itemCounts.get(itemId);
+    if (!row || row.count < 1) continue;
+    lines.push(
+      row.count === 1 ? `+ ${row.display}` : `+ ${row.count}× ${row.display}`
+    );
+  }
+  return lines;
+}
+
 function applyEnemyLootOnVictory(
   state: GameState,
   c: CombatState,
   data: GameData
 ): { state: GameState; lootLines: string[] } {
   let s = state;
-  const lootLines: string[] = [];
+  const resourceTotals: Record<'gold' | 'supply' | 'faith' | 'corruption', number> = {
+    gold: 0,
+    supply: 0,
+    faith: 0,
+    corruption: 0,
+  };
+  const itemCounts = new Map<string, { display: string; count: number }>();
+  const itemOrder: string[] = [];
   const rng = mulberry32(state.rngSeed + c.round * 131 + c.enemies.length * 17);
   for (const inst of c.enemies) {
     const def = data.enemies[inst.defId];
@@ -143,12 +176,20 @@ function applyEnemyLootOnVictory(
       s = next;
       if ('itemId' in drop) {
         const item = data.items[drop.itemId];
-        lootLines.push(item ? `+ ${item.name}` : `+ ${drop.itemId}`);
+        const display = item ? item.name : drop.itemId;
+        const prev = itemCounts.get(drop.itemId);
+        if (prev) {
+          prev.count += 1;
+        } else {
+          itemCounts.set(drop.itemId, { display, count: 1 });
+          itemOrder.push(drop.itemId);
+        }
       } else {
-        lootLines.push(combatVictoryResourceLootLine(drop.resource, drop.amount ?? 1));
+        resourceTotals[drop.resource] += drop.amount ?? 1;
       }
     }
   }
+  const lootLines = consolidatedLootLinesFromTallies(resourceTotals, itemOrder, itemCounts);
   return { state: s, lootLines };
 }
 

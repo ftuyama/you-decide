@@ -38,6 +38,7 @@ export const enemies: Record<string, EnemyDef> = {
     lootDrops: [
       { chance: 0.05, itemId: 'iron_dagger' },
       { chance: 0.05, resource: 'gold', amount: 1 },
+      { chance: 0.025, resource: 'gold', amount: 1 },
     ],
   },
   cultist: {
@@ -54,7 +55,10 @@ export const enemies: Record<string, EnemyDef> = {
     xp: 16,
     sprite: E.act2_cultist.sprite,
     attackStrategy: 'random',
-    lootDrops: [{ chance: 0.05, resource: 'gold', amount: 1 }],
+    lootDrops: [
+      { chance: 0.05, resource: 'gold', amount: 1 },
+      { chance: 0.025, resource: 'gold', amount: 1 },
+    ],
   },
   frost_cultist: {
     id: 'frost_cultist',
@@ -70,7 +74,10 @@ export const enemies: Record<string, EnemyDef> = {
     xp: 23,
     sprite: E.act2_cultist.sprite,
     attackStrategy: 'random',
-    lootDrops: [{ chance: 0.12, resource: 'gold', amount: 1 }],
+    lootDrops: [
+      { chance: 0.1, resource: 'gold', amount: 1 },
+      { chance: 0.05, resource: 'gold', amount: 1 },
+    ],
   },
   stone_guard: {
     id: 'stone_guard',
@@ -87,6 +94,7 @@ export const enemies: Record<string, EnemyDef> = {
     sprite: E.act3_stone_guard.sprite,
     attackStrategy: 'random',
     lootDrops: [
+      { chance: 0.5, resource: 'gold', amount: 1 },
       { chance: 0.25, resource: 'gold', amount: 1 },
       { chance: 0.5, resource: 'supply', amount: 1 },
     ],
@@ -107,7 +115,10 @@ export const enemies: Record<string, EnemyDef> = {
     attackStrategy: 'focus_leader',
     lootDrops: [
       { chance: 1, resource: 'gold', amount: 2 },
-      { chance: 1, itemId: 'potion_mana' },
+      { chance: 0.5, resource: 'gold', amount: 1 },
+      { chance: 0.25, resource: 'gold', amount: 1 },
+      { chance: 0.5, resource: 'supply', amount: 1 },
+      { chance: 0.8, itemId: 'potion_mana' },
     ],
   },
   morvayn_p2: {
@@ -126,7 +137,10 @@ export const enemies: Record<string, EnemyDef> = {
     attackStrategy: 'focus_leader',
     lootDrops: [
       { chance: 1, resource: 'gold', amount: 4 },
-      { chance: 1, itemId: 'potion_mana' },
+      { chance: 0.5, resource: 'gold', amount: 1 },
+      { chance: 0.25, resource: 'gold', amount: 1 },
+      { chance: 0.5, resource: 'supply', amount: 1 },
+      { chance: 0.8, itemId: 'potion_mana' },
     ],
   },
   fallen_angel: {
@@ -181,7 +195,10 @@ export const enemies: Record<string, EnemyDef> = {
     xp: 28,
     sprite: E.act5_frost_whelp.sprite,
     attackStrategy: 'random',
-    lootDrops: [{ chance: 0.1, resource: 'gold', amount: 1 }],
+    lootDrops: [
+      { chance: 0.1, resource: 'gold', amount: 1 },
+      { chance: 0.05, resource: 'gold', amount: 1 },
+    ],
   },
   frost_reaver: {
     id: 'frost_reaver',
@@ -199,6 +216,7 @@ export const enemies: Record<string, EnemyDef> = {
     attackStrategy: 'focus_leader',
     lootDrops: [
       { chance: 0.25, resource: 'gold', amount: 2 },
+      { chance: 0.05, resource: 'gold', amount: 1 },
       { chance: 0.15, resource: 'supply', amount: 1 }
     ],
   },
@@ -218,6 +236,7 @@ export const enemies: Record<string, EnemyDef> = {
     attackStrategy: 'focus_leader',
     lootDrops: [
       { chance: 1, resource: 'gold', amount: 5 },
+      { chance: 0.5, resource: 'gold', amount: 2 },
       { chance: 0.5, resource: 'supply', amount: 1 }
     ],
   },
@@ -237,6 +256,7 @@ export const enemies: Record<string, EnemyDef> = {
     attackStrategy: 'focus_leader',
     lootDrops: [
       { chance: 1, resource: 'gold', amount: 5 },
+      { chance: 0.5, resource: 'gold', amount: 2 },
       { chance: 0.5, resource: 'supply', amount: 1 }
     ],
   },
@@ -260,7 +280,10 @@ export const enemies: Record<string, EnemyDef> = {
       'O teu sangue ainda acredita em milagre — eu não.',
       'Ouve: o silêncio também reza, só que por ti.',
     ],
-    lootDrops: [{ chance: 0.4, resource: 'gold', amount: 4 }],
+    lootDrops: [
+      { chance: 0.8, resource: 'gold', amount: 4 },
+      { chance: 0.4, resource: 'gold', amount: 2 },
+    ],
   },
   act6_veil_herald: {
     id: 'act6_veil_herald',
@@ -282,7 +305,8 @@ export const enemies: Record<string, EnemyDef> = {
       'A verdade não consola. Ela exige.',
     ],
     lootDrops: [
-      { chance: 0.3, resource: 'gold', amount: 5 },
+      { chance: 0.8, resource: 'gold', amount: 3 },
+      { chance: 0.3, resource: 'gold', amount: 1 },
       { chance: 0.2, resource: 'supply', amount: 1 }
     ],
   },
@@ -306,7 +330,8 @@ export const enemies: Record<string, EnemyDef> = {
       'Qual de nós é o original?',
     ],
     lootDrops: [
-      { chance: 0.3, resource: 'gold', amount: 5 },
+      { chance: 0.8, resource: 'gold', amount: 3 },
+      { chance: 0.3, resource: 'gold', amount: 1 },
       { chance: 0.2, resource: 'supply', amount: 1 }
     ],
   },
@@ -330,7 +355,8 @@ export const enemies: Record<string, EnemyDef> = {
       'Não é poder. É abstinência de misericórdia.',
     ],
     lootDrops: [
-      { chance: 0.3, resource: 'gold', amount: 5 },
+      { chance: 0.8, resource: 'gold', amount: 3 },
+      { chance: 0.3, resource: 'gold', amount: 1 },
       { chance: 0.2, resource: 'supply', amount: 1 }
     ],
   },
@@ -354,7 +380,8 @@ export const enemies: Record<string, EnemyDef> = {
       'Se eu vencer, tu sobrevives. Só não escolhes mais.',
     ],
     lootDrops: [
-      { chance: 0.3, resource: 'gold', amount: 5 },
+      { chance: 0.8, resource: 'gold', amount: 3 },
+      { chance: 0.3, resource: 'gold', amount: 1 },
       { chance: 0.2, resource: 'corruption', amount: 3 }
     ],
   },
@@ -378,7 +405,8 @@ export const enemies: Record<string, EnemyDef> = {
       'Não me mates. Assume-me.',
     ],
     lootDrops: [
-      { chance: 0.3, resource: 'gold', amount: 5 },
+      { chance: 0.8, resource: 'gold', amount: 3 },
+      { chance: 0.3, resource: 'gold', amount: 1 },
       { chance: 0.2, resource: 'supply', amount: 1 }
     ],
   },
@@ -403,7 +431,8 @@ export const enemies: Record<string, EnemyDef> = {
       'Cada passo teu aqui deixou lascas. Eu sou uma delas.',
     ],
     lootDrops: [
-      { chance: 0.25, resource: 'gold', amount: 4 },
+      { chance: 0.65, resource: 'gold', amount: 2 },
+      { chance: 0.25, resource: 'gold', amount: 2 },
       { chance: 0.15, resource: 'supply', amount: 1 }
     ],
   },
@@ -427,7 +456,8 @@ export const enemies: Record<string, EnemyDef> = {
       'O véu não esconde; arquiva.',
     ],
     lootDrops: [
-      { chance: 0.3, resource: 'gold', amount: 5 },
+      { chance: 0.8, resource: 'gold', amount: 3 },
+      { chance: 0.3, resource: 'gold', amount: 1 },
       { chance: 0.2, resource: 'supply', amount: 1 }
     ],
   },
@@ -451,7 +481,8 @@ export const enemies: Record<string, EnemyDef> = {
       'Abre-me e ouves um coro; fecha-me e ouves ti.',
     ],
     lootDrops: [
-      { chance: 0.3, resource: 'gold', amount: 5 },
+      { chance: 0.8, resource: 'gold', amount: 3 },
+      { chance: 0.3, resource: 'gold', amount: 1 },
       { chance: 0.2, resource: 'supply', amount: 1 }
     ],
   },
@@ -475,7 +506,8 @@ export const enemies: Record<string, EnemyDef> = {
       'Cada batida é um “e se” temperado em ferro.',
     ],
     lootDrops: [
-      { chance: 0.3, resource: 'gold', amount: 5 },
+      { chance: 0.8, resource: 'gold', amount: 3 },
+      { chance: 0.3, resource: 'gold', amount: 1 },
       { chance: 0.2, resource: 'supply', amount: 1 }
     ],
   },
@@ -499,7 +531,8 @@ export const enemies: Record<string, EnemyDef> = {
       'Não sou o teu duplo. Sou o que sobrou quando o duplo caiu.',
     ],
     lootDrops: [
-      { chance: 0.35, resource: 'gold', amount: 6 },
+      { chance: 0.8, resource: 'gold', amount: 3 },
+      { chance: 0.3, resource: 'gold', amount: 1 },
       { chance: 0.25, resource: 'corruption', amount: 2 }
     ],
   },
@@ -523,7 +556,8 @@ export const enemies: Record<string, EnemyDef> = {
       'A mancha obedece a quem deixa de fingir pureza.',
     ],
     lootDrops: [
-      { chance: 0.3, resource: 'gold', amount: 5 },
+      { chance: 0.8, resource: 'gold', amount: 3 },
+      { chance: 0.3, resource: 'gold', amount: 1 },
       { chance: 0.2, resource: 'corruption', amount: 1 }
     ],
   },

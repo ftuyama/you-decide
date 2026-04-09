@@ -43,8 +43,22 @@ export function mountBrailleAsciiPanel(parent: HTMLElement): void {
   hImage.textContent = 'Imagem';
   cardImage.appendChild(hImage);
 
+  const sourceList = document.createElement('div');
+  sourceList.className = 'dev-tools-braille-source-list';
+
+  const step1 = document.createElement('div');
+  step1.className = 'dev-tools-braille-step';
+  const step1Num = document.createElement('span');
+  step1Num.className = 'dev-tools-braille-step-num';
+  step1Num.textContent = '1';
+  step1Num.setAttribute('aria-hidden', 'true');
+  const step1Body = document.createElement('div');
+  step1Body.className = 'dev-tools-braille-step-body';
+  const step1Title = document.createElement('div');
+  step1Title.className = 'dev-tools-braille-step-title';
+  step1Title.textContent = 'Ficheiro no disco';
   const fileRow = document.createElement('div');
-  fileRow.className = 'dev-tools-braille-field';
+  fileRow.className = 'dev-tools-braille-step-content';
   const fileLab = document.createElement('label');
   fileLab.className = 'dev-tools-braille-file-wrap';
   const fileBtn = document.createElement('span');
@@ -56,36 +70,69 @@ export function mountBrailleAsciiPanel(parent: HTMLElement): void {
   fileInp.className = 'dev-tools-braille-file-input';
   fileLab.appendChild(fileBtn);
   fileLab.appendChild(fileInp);
-  const fileHint = document.createElement('p');
-  fileHint.className = 'dev-tools-braille-hint';
-  fileHint.textContent = 'Ou cole uma imagem com Ctrl+V em qualquer parte deste painel.';
   fileRow.appendChild(fileLab);
-  fileRow.appendChild(fileHint);
+  step1Body.appendChild(step1Title);
+  step1Body.appendChild(fileRow);
+  step1.appendChild(step1Num);
+  step1.appendChild(step1Body);
 
+  const step2 = document.createElement('div');
+  step2.className = 'dev-tools-braille-step';
+  const step2Num = document.createElement('span');
+  step2Num.className = 'dev-tools-braille-step-num';
+  step2Num.textContent = '2';
+  step2Num.setAttribute('aria-hidden', 'true');
+  const step2Body = document.createElement('div');
+  step2Body.className = 'dev-tools-braille-step-body';
+  const step2Title = document.createElement('div');
+  step2Title.className = 'dev-tools-braille-step-title';
+  step2Title.textContent = 'Colar do clipboard';
+  const pasteHint = document.createElement('p');
+  pasteHint.className = 'dev-tools-braille-hint dev-tools-braille-hint--step';
+  pasteHint.textContent =
+    'Ctrl+V (ou ⌘+V) em qualquer parte deste painel, ou com foco na pré-visualização abaixo.';
+  step2Body.appendChild(step2Title);
+  step2Body.appendChild(pasteHint);
+  step2.appendChild(step2Num);
+  step2.appendChild(step2Body);
+
+  const step3 = document.createElement('div');
+  step3.className = 'dev-tools-braille-step';
+  const step3Num = document.createElement('span');
+  step3Num.className = 'dev-tools-braille-step-num';
+  step3Num.textContent = '3';
+  step3Num.setAttribute('aria-hidden', 'true');
+  const step3Body = document.createElement('div');
+  step3Body.className = 'dev-tools-braille-step-body';
+  const step3Title = document.createElement('div');
+  step3Title.className = 'dev-tools-braille-step-title';
+  step3Title.textContent = 'URL remota';
   const urlRow = document.createElement('div');
-  urlRow.className = 'dev-tools-braille-field';
-  const urlLab = document.createElement('label');
-  urlLab.className = 'dev-tools-braille-label';
-  urlLab.textContent = 'URL (dev: proxy anti-CORS)';
+  urlRow.className = 'dev-tools-braille-step-content';
+  const urlSub = document.createElement('p');
+  urlSub.className = 'dev-tools-braille-hint dev-tools-braille-hint--step';
+  urlSub.textContent = 'Em dev, o proxy contorna CORS; carrega ao editar o campo.';
   const urlInp = document.createElement('input');
   urlInp.type = 'url';
   urlInp.className = 'dev-tools-search dev-tools-braille-url-input';
   urlInp.placeholder = 'https://exemplo.com/imagem.png';
   urlInp.autocomplete = 'off';
   urlInp.name = 'braille-image-url';
-  const urlBtn = document.createElement('button');
-  urlBtn.type = 'button';
-  urlBtn.className = 'dev-tools-btn dev-tools-btn--secondary';
-  urlBtn.textContent = 'Carregar URL';
   const urlActions = document.createElement('div');
   urlActions.className = 'dev-tools-braille-url-actions';
   urlActions.appendChild(urlInp);
-  urlActions.appendChild(urlBtn);
-  urlRow.appendChild(urlLab);
+  urlRow.appendChild(urlSub);
   urlRow.appendChild(urlActions);
+  step3Body.appendChild(step3Title);
+  step3Body.appendChild(urlRow);
+  step3.appendChild(step3Num);
+  step3.appendChild(step3Body);
 
-  cardImage.appendChild(fileRow);
-  cardImage.appendChild(urlRow);
+  sourceList.appendChild(step1);
+  sourceList.appendChild(step2);
+  sourceList.appendChild(step3);
+
+  cardImage.appendChild(sourceList);
 
   const cardTuning = document.createElement('section');
   cardTuning.className = 'dev-tools-braille-card';
@@ -105,14 +152,14 @@ export function mountBrailleAsciiPanel(parent: HTMLElement): void {
   widthNum.type = 'number';
   widthNum.min = '1';
   widthNum.max = '500';
-  widthNum.value = '80';
+  widthNum.value = '160';
   widthNum.className = 'dev-tools-braille-num';
   widthNum.setAttribute('aria-label', 'Largura numérica');
   const widthRange = document.createElement('input');
   widthRange.type = 'range';
   widthRange.min = '20';
   widthRange.max = '500';
-  widthRange.value = '80';
+  widthRange.value = '160';
   widthRange.className = 'dev-tools-braille-range dev-tools-braille-range--grow';
   widthInner.appendChild(widthNum);
   widthInner.appendChild(widthRange);
@@ -137,6 +184,7 @@ export function mountBrailleAsciiPanel(parent: HTMLElement): void {
     o.textContent = opt[1];
     ditherSel.appendChild(o);
   }
+  ditherSel.value = 'atkinson';
   ditherRow.appendChild(ditherLab);
   ditherRow.appendChild(ditherSel);
 
@@ -167,6 +215,7 @@ export function mountBrailleAsciiPanel(parent: HTMLElement): void {
   invLab.className = 'dev-tools-braille-check';
   const invCb = document.createElement('input');
   invCb.type = 'checkbox';
+  invCb.checked = true;
   invLab.appendChild(invCb);
   invLab.appendChild(document.createTextNode(' Inverter tons'));
   invRow.appendChild(invLab);
@@ -212,14 +261,23 @@ export function mountBrailleAsciiPanel(parent: HTMLElement): void {
   const meta = document.createElement('div');
   meta.className = 'dev-tools-braille-meta';
   meta.setAttribute('aria-live', 'polite');
+  const copyRow = document.createElement('div');
+  copyRow.className = 'dev-tools-braille-copy-row';
   const copyBtn = document.createElement('button');
   copyBtn.type = 'button';
   copyBtn.className = 'dev-tools-btn dev-tools-btn--primary';
   copyBtn.textContent = 'Copiar texto';
   copyBtn.title = 'Copia o Braille para a área de transferência';
+  const copyImgBtn = document.createElement('button');
+  copyImgBtn.type = 'button';
+  copyImgBtn.className = 'dev-tools-btn dev-tools-btn--secondary';
+  copyImgBtn.textContent = 'Copiar imagem';
+  copyImgBtn.title = 'Copia a imagem atual (PNG) para a área de transferência';
+  copyRow.appendChild(copyBtn);
+  copyRow.appendChild(copyImgBtn);
   outHead.appendChild(outTitle);
   outHead.appendChild(meta);
-  outHead.appendChild(copyBtn);
+  outHead.appendChild(copyRow);
 
   const status = document.createElement('div');
   status.className = 'dev-tools-braille-status';
@@ -229,7 +287,8 @@ export function mountBrailleAsciiPanel(parent: HTMLElement): void {
   preWrap.className = 'dev-tools-braille-pre-wrap';
   const emptyHint = document.createElement('div');
   emptyHint.className = 'dev-tools-braille-empty';
-  emptyHint.textContent = 'Nenhuma imagem carregada. Escolha um ficheiro, cole uma imagem ou carregue uma URL (em dev).';
+  emptyHint.textContent =
+    'Nenhuma imagem carregada. Acima: 1 — ficheiro, 2 — colar, 3 — URL (em dev).';
   const pre = document.createElement('pre');
   pre.className = 'dev-tools-braille-pre';
   pre.classList.add('dev-tools-braille-pre--hidden');
@@ -255,7 +314,7 @@ export function mountBrailleAsciiPanel(parent: HTMLElement): void {
   }
 
   function readOptions(): BrailleAsciiOptions {
-    const asciiWidth = Math.max(1, Math.min(500, parseInt(widthNum.value, 10) || 80));
+    const asciiWidth = Math.max(1, Math.min(500, parseInt(widthNum.value, 10) || 160));
     return {
       asciiWidth,
       ditherer: parseDitherer(ditherSel.value),
@@ -310,10 +369,12 @@ export function mountBrailleAsciiPanel(parent: HTMLElement): void {
     })();
   });
 
+  let urlLoadTimer: ReturnType<typeof setTimeout> | null = null;
+  const URL_DEBOUNCE_MS = 450;
+
   function loadFromUrlField(): void {
     const raw = urlInp.value.trim();
     if (!raw) {
-      status.textContent = 'Indique uma URL.';
       return;
     }
     void (async () => {
@@ -337,10 +398,24 @@ export function mountBrailleAsciiPanel(parent: HTMLElement): void {
     })();
   }
 
-  urlBtn.addEventListener('click', loadFromUrlField);
+  function scheduleUrlLoad(): void {
+    if (urlLoadTimer !== null) {
+      clearTimeout(urlLoadTimer);
+    }
+    urlLoadTimer = window.setTimeout(() => {
+      urlLoadTimer = null;
+      loadFromUrlField();
+    }, URL_DEBOUNCE_MS);
+  }
+
+  urlInp.addEventListener('input', scheduleUrlLoad);
   urlInp.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
+      if (urlLoadTimer !== null) {
+        clearTimeout(urlLoadTimer);
+        urlLoadTimer = null;
+      }
       loadFromUrlField();
     }
   });
@@ -371,7 +446,7 @@ export function mountBrailleAsciiPanel(parent: HTMLElement): void {
   pre.addEventListener('paste', onPaste);
 
   widthNum.addEventListener('input', () => {
-    const n = Math.max(1, Math.min(500, parseInt(widthNum.value, 10) || 80));
+    const n = Math.max(1, Math.min(500, parseInt(widthNum.value, 10) || 160));
     widthNum.value = String(n);
     widthRange.value = String(Math.max(20, Math.min(500, n)));
     render();
@@ -393,6 +468,21 @@ export function mountBrailleAsciiPanel(parent: HTMLElement): void {
     pre.style.fontSize = `${px}px`;
   });
 
+  async function imageBitmapToPngBlob(bmp: ImageBitmap): Promise<Blob> {
+    const canvas = document.createElement('canvas');
+    canvas.width = bmp.width;
+    canvas.height = bmp.height;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('Canvas 2D indisponível.');
+    ctx.drawImage(bmp, 0, 0);
+    return new Promise((resolve, reject) => {
+      canvas.toBlob((b) => {
+        if (b) resolve(b);
+        else reject(new Error('Falha ao exportar PNG.'));
+      }, 'image/png');
+    });
+  }
+
   copyBtn.addEventListener('click', async () => {
     if (!lastAscii) {
       status.textContent = 'Nada para copiar.';
@@ -400,12 +490,33 @@ export function mountBrailleAsciiPanel(parent: HTMLElement): void {
     }
     try {
       await navigator.clipboard.writeText(lastAscii);
-      status.textContent = 'Copiado.';
+      status.textContent = 'Texto copiado.';
       window.setTimeout(() => {
-        if (status.textContent === 'Copiado.') status.textContent = '';
+        if (status.textContent === 'Texto copiado.') status.textContent = '';
       }, 1200);
     } catch {
       status.textContent = 'Clipboard indisponível.';
+    }
+  });
+
+  copyImgBtn.addEventListener('click', async () => {
+    if (!currentSource || !(currentSource instanceof ImageBitmap)) {
+      status.textContent = 'Nenhuma imagem para copiar.';
+      return;
+    }
+    try {
+      const blob = await imageBitmapToPngBlob(currentSource);
+      await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+      status.textContent = 'Imagem copiada.';
+      window.setTimeout(() => {
+        if (status.textContent === 'Imagem copiada.') status.textContent = '';
+      }, 1200);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      status.textContent =
+        msg.includes('ClipboardItem') || msg.includes('write')
+          ? 'Cópia de imagem não suportada neste browser.'
+          : `Erro: ${msg}`;
     }
   });
 }

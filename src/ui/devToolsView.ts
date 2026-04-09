@@ -17,6 +17,7 @@ import {
   DEV_TOOLS_TABS,
   type DevToolsTab,
 } from './campaignUrl.ts';
+import { mountBejamasAsciiPanel } from './devToolsBejamasAscii.ts';
 import { mountBrailleAsciiPanel } from './devToolsBrailleAscii.ts';
 
 function pathToSceneId(path: string): string {
@@ -725,6 +726,7 @@ export function mountDevToolsView(root: HTMLElement, campaignId: string): void {
       visual: 'Paleta visual',
       enemies: 'Inimigos',
       ascii: 'Arte ASCII (Braille)',
+      'ascii-bejamas': 'Arte ASCII (Bejamas IA)',
     };
     a.textContent = labels[t];
     tabRow.appendChild(a);
@@ -748,6 +750,9 @@ export function mountDevToolsView(root: HTMLElement, campaignId: string): void {
       break;
     case 'ascii':
       mountBrailleAsciiPanel(main);
+      break;
+    case 'ascii-bejamas':
+      mountBejamasAsciiPanel(main);
       break;
     case 'scenes':
     default:

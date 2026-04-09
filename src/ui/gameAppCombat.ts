@@ -15,7 +15,9 @@ import {
   buildCombatLogDisplayItems,
   escHtml,
   fmtSignedMod,
+  parseCombatLogRounds,
   spellEmoji,
+  type CombatLogDisplayItem,
 } from './gameAppUtils.ts';
 import type { GameAudio } from './sound/index.ts';
 
@@ -139,6 +141,113 @@ function appendCombatLogMeta(wrap: HTMLElement, entry: CombatLogEntry): void {
   meta.className = 'combat-log-meta';
   meta.textContent = parts.join(' · ');
   wrap.appendChild(meta);
+}
+
+type CombatLogRenderCtx = {
+  partyNames: Set<string>;
+  combatantNames: readonly string[];
+};
+
+function appendCombatLogDisplayItems(
+  parent: HTMLElement,
+  items: CombatLogDisplayItem[],
+  ctx: CombatLogRenderCtx
+): void {
+  const { partyNames, combatantNames } = ctx;
+
+  for (const item of items) {
+    if (item.mode === 'merged_hit') {
+      const { attack, damage, quaseCritico } = item;
+      const wrap = document.createElement('div');
+      wrap.className = 'combat-log-entry combat-log-attack combat-outcome-hit combat-log-damage';
+      if (damage.target) {
+        wrap.classList.add(
+          partyNames.has(damage.target) ? 'combat-damage-to-hero' : 'combat-damage-to-enemy'
+        );
+      }
+      if (damage.damageKind === 'crit') {
+        wrap.classList.add('combat-damage-crit');
+      }
+
+      const msg = document.createElement('div');
+      msg.className = 'combat-log-msg';
+      appendCombatLogMessageWithBoldNames(msg, attack.message, combatantNames);
+      wrap.appendChild(msg);
+
+      if (quaseCritico) {
+        const qc = document.createElement('div');
+        qc.className = 'combat-log-msg combat-log-msg--sub';
+        appendCombatLogMessageWithBoldNames(qc, quaseCritico.message, combatantNames);
+        wrap.appendChild(qc);
+      }
+
+      const diceRow = document.createElement('div');
+      diceRow.className = 'dice-ascii-row';
+      if (attack.dice?.length) {
+        const preAtk = document.createElement('pre');
+        preAtk.className = 'dice-ascii-block';
+        preAtk.textContent = formatDiceAscii(attack.dice);
+        diceRow.appendChild(preAtk);
+      }
+      if (damage.dice?.length) {
+        const preDmg = document.createElement('pre');
+        preDmg.className = 'dice-ascii-block';
+        preDmg.textContent = formatDiceAscii(damage.dice);
+        diceRow.appendChild(preDmg);
+      }
+      if (diceRow.childElementCount) wrap.appendChild(diceRow);
+
+      appendCombatLogMergedHitMeta(wrap, attack, damage);
+      parent.appendChild(wrap);
+      continue;
+    }
+
+    const entry = item.entry;
+    if (entry.kind === 'enemy_line') {
+      continue;
+    }
+    const wrap = document.createElement('div');
+    wrap.className = `combat-log-entry combat-log-${entry.kind}`;
+    if (entry.kind === 'attack' && entry.outcome) {
+      wrap.classList.add(entry.outcome === 'hit' ? 'combat-outcome-hit' : 'combat-outcome-miss');
+    }
+    if (entry.kind === 'damage' && entry.target) {
+      wrap.classList.add(
+        partyNames.has(entry.target) ? 'combat-damage-to-hero' : 'combat-damage-to-enemy'
+      );
+    }
+    if (entry.kind === 'damage' && entry.damageKind === 'crit') {
+      wrap.classList.add('combat-damage-crit');
+    }
+
+    const msg = document.createElement('div');
+    msg.className = 'combat-log-msg';
+    appendCombatLogMessageWithBoldNames(msg, entry.message, combatantNames);
+    wrap.appendChild(msg);
+
+    if (entry.dice?.length) {
+      const pre = document.createElement('pre');
+      pre.className = 'dice-ascii-block';
+      pre.textContent = formatDiceAscii(entry.dice);
+      wrap.appendChild(pre);
+    }
+
+    appendCombatLogMeta(wrap, entry);
+    parent.appendChild(wrap);
+  }
+}
+
+function scrollCombatLogToLatestRound(scrollEl: HTMLElement, stackEl: HTMLElement): void {
+  const lastRound = stackEl.querySelector('.combat-log-round:last-of-type') as HTMLElement | null;
+  if (!lastRound) {
+    scrollEl.scrollTop = scrollEl.scrollHeight;
+    return;
+  }
+  const top =
+    lastRound.getBoundingClientRect().top -
+    scrollEl.getBoundingClientRect().top +
+    scrollEl.scrollTop;
+  scrollEl.scrollTop = Math.max(0, top);
 }
 
 /**
@@ -461,10 +570,13 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
   const hdr = document.createElement('div');
   hdr.className = 'dice-panel-header';
   hdr.textContent = 'Dados & log de batalha';
+  hdr.title =
+    'A rodada atual fica visível abaixo; role para cima dentro deste painel para ver rodadas anteriores.';
   dice.appendChild(hdr);
 
   const logScroll = document.createElement('div');
   logScroll.className = 'combat-log-scroll';
+  logScroll.title = hdr.title;
 
   const partyNames = new Set(ctx.state.party.map((x) => x.name));
   const combatantNames = [
@@ -474,96 +586,68 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
       .filter((name): name is string => Boolean(name)),
   ];
 
-  const displayItems = buildCombatLogDisplayItems(c.log.slice(-64));
+  const logRenderCtx: CombatLogRenderCtx = { partyNames, combatantNames };
 
-  for (const item of displayItems) {
-    if (item.mode === 'merged_hit') {
-      const { attack, damage, quaseCritico } = item;
-      const wrap = document.createElement('div');
-      wrap.className = 'combat-log-entry combat-log-attack combat-outcome-hit combat-log-damage';
-      if (damage.target) {
-        wrap.classList.add(
-          partyNames.has(damage.target) ? 'combat-damage-to-hero' : 'combat-damage-to-enemy'
-        );
-      }
-      if (damage.damageKind === 'crit') {
-        wrap.classList.add('combat-damage-crit');
-      }
+  const stack = document.createElement('div');
+  stack.className = 'combat-log-stack';
 
-      const msg = document.createElement('div');
-      msg.className = 'combat-log-msg';
-      appendCombatLogMessageWithBoldNames(msg, attack.message, combatantNames);
-      wrap.appendChild(msg);
+  const { preamble, rounds } = parseCombatLogRounds(c.log.slice(-64));
 
-      if (quaseCritico) {
-        const qc = document.createElement('div');
-        qc.className = 'combat-log-msg combat-log-msg--sub';
-        appendCombatLogMessageWithBoldNames(qc, quaseCritico.message, combatantNames);
-        wrap.appendChild(qc);
-      }
-
-      const diceRow = document.createElement('div');
-      diceRow.className = 'dice-ascii-row';
-      if (attack.dice?.length) {
-        const preAtk = document.createElement('pre');
-        preAtk.className = 'dice-ascii-block';
-        preAtk.textContent = formatDiceAscii(attack.dice);
-        diceRow.appendChild(preAtk);
-      }
-      if (damage.dice?.length) {
-        const preDmg = document.createElement('pre');
-        preDmg.className = 'dice-ascii-block';
-        preDmg.textContent = formatDiceAscii(damage.dice);
-        diceRow.appendChild(preDmg);
-      }
-      if (diceRow.childElementCount) wrap.appendChild(diceRow);
-
-      appendCombatLogMergedHitMeta(wrap, attack, damage);
-      logScroll.appendChild(wrap);
-      continue;
-    }
-
-    const entry = item.entry;
-    if (entry.kind === 'enemy_line') {
-      continue;
-    }
-    const wrap = document.createElement('div');
-    wrap.className = `combat-log-entry combat-log-${entry.kind}`;
-    if (entry.kind === 'attack' && entry.outcome) {
-      wrap.classList.add(entry.outcome === 'hit' ? 'combat-outcome-hit' : 'combat-outcome-miss');
-    }
-    if (entry.kind === 'damage' && entry.target) {
-      wrap.classList.add(
-        partyNames.has(entry.target) ? 'combat-damage-to-hero' : 'combat-damage-to-enemy'
-      );
-    }
-    if (entry.kind === 'damage' && entry.damageKind === 'crit') {
-      wrap.classList.add('combat-damage-crit');
-    }
-
-    const msg = document.createElement('div');
-    msg.className = 'combat-log-msg';
-    appendCombatLogMessageWithBoldNames(msg, entry.message, combatantNames);
-    wrap.appendChild(msg);
-
-    if (entry.dice?.length) {
-      const pre = document.createElement('pre');
-      pre.className = 'dice-ascii-block';
-      pre.textContent = formatDiceAscii(entry.dice);
-      wrap.appendChild(pre);
-    }
-
-    appendCombatLogMeta(wrap, entry);
-    logScroll.appendChild(wrap);
+  if (preamble.length) {
+    const pre = document.createElement('div');
+    pre.className = 'combat-log-preamble';
+    const preHdr = document.createElement('div');
+    preHdr.className = 'combat-log-preamble-hdr';
+    preHdr.textContent = 'Abertura';
+    pre.appendChild(preHdr);
+    const preBody = document.createElement('div');
+    preBody.className = 'combat-log-preamble-body';
+    appendCombatLogDisplayItems(
+      preBody,
+      buildCombatLogDisplayItems(preamble),
+      logRenderCtx
+    );
+    pre.appendChild(preBody);
+    stack.appendChild(pre);
   }
+
+  for (const bundle of rounds) {
+    const roundEl = document.createElement('div');
+    roundEl.className = 'combat-log-round';
+    const roundHdr = document.createElement('div');
+    roundHdr.className = 'combat-log-round-header';
+    roundHdr.textContent = `Rodada ${bundle.round}`;
+    roundEl.appendChild(roundHdr);
+
+    for (const section of bundle.sections) {
+      const phase = document.createElement('div');
+      phase.className = `combat-log-phase combat-log-phase--${section.kind}`;
+      const label = document.createElement('div');
+      label.className = 'combat-log-phase-label';
+      label.textContent = section.kind === 'player' ? 'Seu turno' : 'Inimigos';
+      phase.appendChild(label);
+      const body = document.createElement('div');
+      body.className = 'combat-log-phase-body';
+      appendCombatLogDisplayItems(
+        body,
+        buildCombatLogDisplayItems(section.body),
+        logRenderCtx
+      );
+      phase.appendChild(body);
+      roundEl.appendChild(phase);
+    }
+    stack.appendChild(roundEl);
+  }
+
+  logScroll.appendChild(stack);
   dice.appendChild(logScroll);
 
-  const scrollLogToEnd = (): void => {
-    logScroll.scrollTop = logScroll.scrollHeight;
+  const scrollLogToLatestRound = (): void => {
+    scrollCombatLogToLatestRound(logScroll, stack);
   };
   requestAnimationFrame(() => {
-    scrollLogToEnd();
-    requestAnimationFrame(scrollLogToEnd);
+    scrollLogToLatestRound();
+    requestAnimationFrame(scrollLogToLatestRound);
   });
   logOuter.appendChild(dice);
   right.appendChild(logOuter);

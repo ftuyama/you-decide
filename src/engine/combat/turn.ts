@@ -251,13 +251,13 @@ function physicalAttackForCharacter(
   const rollOutcome = toRollOutcome(special);
   let attackMsg: string;
   if (special === 'fumble') {
-    attackMsg = `${attacker.name} falha criticamente (dados 1+1).`;
+    attackMsg = `${attacker.name} falha criticamente.`;
   } else if (special === 'crit') {
     attackMsg = `${attacker.name} acerta ${def.name} em cheio (crítico)!`;
   } else if (hit) {
     attackMsg = `${attacker.name} acerta ${def.name}!`;
   } else {
-    attackMsg = `${attacker.name} erra o golpe (${rollTotal} vs CA ${defense}).`;
+    attackMsg = `${attacker.name} erra o golpe.`;
   }
 
   logOut.push({
@@ -548,13 +548,13 @@ export function advanceToEnemyTurn(
     const rollOutcome = toRollOutcome(special);
     let enemyAtkMsg: string;
     if (special === 'fumble') {
-      enemyAtkMsg = `${def.name} falha criticamente (dados 1+1).`;
+      enemyAtkMsg = `${def.name} falha criticamente.`;
     } else if (enemyHit && enemyCritDmg) {
       enemyAtkMsg = `${def.name} acerta ${target.name} em cheio (crítico)!`;
     } else if (enemyHit) {
       enemyAtkMsg = `${def.name} acerta ${target.name}!`;
     } else {
-      enemyAtkMsg = `${def.name} erra (${atk} vs CA ${defScore}).`;
+      enemyAtkMsg = `${def.name} erra.`;
     }
 
     log.push({
@@ -571,7 +571,10 @@ export function advanceToEnemyTurn(
     });
 
     if (special === 'crit' && !enemyCritDmg && enemyHit) {
-      log.push({ kind: 'info', message: 'Quase crítico…' });
+      log.push({
+        kind: 'info',
+        message: 'Quase crítico…',
+      });
     }
 
     if (enemyHit) {

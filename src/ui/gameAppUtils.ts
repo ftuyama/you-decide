@@ -94,6 +94,96 @@ export function fmtSignedMod(n: number): string {
   return `−${Math.abs(n)}`;
 }
 
+/** Trecho do log entre marcadores `turn_banner` (Rodada N — …). */
+export type CombatLogPhaseSection = {
+  kind: 'player' | 'enemy';
+  banner: CombatLogEntry;
+  body: CombatLogEntry[];
+};
+
+export type CombatLogRoundBundle = {
+  round: number;
+  sections: CombatLogPhaseSection[];
+};
+
+/**
+ * Separa abertura (aparições, ordem de iniciativa) das rodadas.
+ * Reconhece mensagens `Rodada N — sua vez` / `Rodada N — inimigos` (hífen ou travessão).
+ */
+export function parseTurnBannerMessage(
+  message: string
+): { round: number; phase: 'player' | 'enemy' } | null {
+  const m = message.match(/^Rodada (\d+)\s*[—–-]\s*(.+)$/);
+  if (!m) return null;
+  const round = Number(m[1]);
+  const tail = (m[2] ?? '').trim();
+  if (tail.startsWith('sua vez')) return { round, phase: 'player' };
+  if (tail.startsWith('inimigos')) return { round, phase: 'enemy' };
+  return null;
+}
+
+export function parseCombatLogRounds(log: CombatLogEntry[]): {
+  preamble: CombatLogEntry[];
+  rounds: CombatLogRoundBundle[];
+} {
+  const preamble: CombatLogEntry[] = [];
+  let i = 0;
+  while (i < log.length) {
+    const e = log[i]!;
+    if (e.kind === 'turn_banner') break;
+    preamble.push(e);
+    i++;
+  }
+
+  const rounds: CombatLogRoundBundle[] = [];
+
+  while (i < log.length) {
+    const e = log[i]!;
+    if (e.kind !== 'turn_banner') {
+      if (rounds.length === 0) preamble.push(e);
+      else {
+        const last = rounds[rounds.length - 1]!;
+        const lastSec = last.sections[last.sections.length - 1]!;
+        lastSec.body.push(e);
+      }
+      i++;
+      continue;
+    }
+
+    const parsed = parseTurnBannerMessage(e.message);
+    i++;
+    const body: CombatLogEntry[] = [];
+    while (i < log.length && log[i]!.kind !== 'turn_banner') {
+      body.push(log[i]!);
+      i++;
+    }
+
+    if (!parsed) {
+      preamble.push(e, ...body);
+      continue;
+    }
+
+    if (parsed.phase === 'player') {
+      rounds.push({
+        round: parsed.round,
+        sections: [{ kind: 'player', banner: e, body }],
+      });
+    } else {
+      const last = rounds[rounds.length - 1];
+      if (last && last.round === parsed.round) {
+        last.sections.push({ kind: 'enemy', banner: e, body });
+      } else {
+        rounds.push({
+          round: parsed.round,
+          sections: [{ kind: 'enemy', banner: e, body }],
+        });
+      }
+    }
+  }
+
+  return { preamble, rounds };
+}
+
 export function buildCombatLogDisplayItems(log: CombatLogEntry[]): CombatLogDisplayItem[] {
   const out: CombatLogDisplayItem[] = [];
   let i = 0;
@@ -103,7 +193,7 @@ export function buildCombatLogDisplayItems(log: CombatLogEntry[]): CombatLogDisp
       let j = i + 1;
       let quase: CombatLogEntry | undefined;
       const next = log[j];
-      if (next?.kind === 'info' && next.message === 'Quase crítico…') {
+      if (next?.kind === 'info' && next.message.startsWith('Quase crítico')) {
         quase = next;
         j++;
       }

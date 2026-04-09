@@ -1896,8 +1896,99 @@ button.combat-flee-btn:hover {
   overflow-x: hidden;
   padding: 0.5rem 0.65rem 0.75rem;
   flex: 1;
-  min-height: 12rem;
+  min-height: 14rem;
   scrollbar-gutter: stable;
+}
+
+/** Pilha: abertura + blocos por rodada (role para cima para histórico) */
+.combat-log-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.combat-log-preamble {
+  border: 1px solid color-mix(in srgb, var(--combat-log-entry-border) 80%, transparent);
+  border-radius: 4px;
+  background: rgba(15, 22, 28, 0.35);
+  overflow: hidden;
+}
+
+.combat-log-preamble-hdr {
+  padding: 0.32rem 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.combat-log-preamble-body {
+  padding: 0.45rem 0.5rem 0.55rem;
+}
+
+.combat-log-round {
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--combat-log-entry-border));
+  border-radius: 4px;
+  background: rgba(18, 32, 24, 0.4);
+  overflow: hidden;
+}
+
+.combat-log-round-header {
+  padding: 0.38rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: color-mix(in srgb, var(--fg) 88%, var(--accent));
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  background: rgba(25, 45, 32, 0.55);
+}
+
+.combat-log-phase {
+  padding: 0;
+}
+
+.combat-log-phase + .combat-log-phase {
+  border-top: 1px dashed color-mix(in srgb, var(--border) 65%, transparent);
+}
+
+.combat-log-phase-label {
+  padding: 0.28rem 0.55rem 0.15rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #9ab89a;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.combat-log-phase-label::before {
+  content: '';
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.85;
+}
+
+.combat-log-phase--enemy .combat-log-phase-label {
+  color: #c4a080;
+}
+
+.combat-log-phase--enemy .combat-log-phase-label::before {
+  background: #b06050;
+}
+
+.combat-log-phase-body {
+  padding: 0.2rem 0.5rem 0.55rem;
+}
+
+.combat-log-phase-body .combat-log-entry:last-child {
+  margin-bottom: 0;
 }
 
 .combat-log-scroll::-webkit-scrollbar {

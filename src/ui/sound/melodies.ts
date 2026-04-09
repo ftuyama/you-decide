@@ -98,3 +98,16 @@ export const ANCIENT_MACABRE_MELODY: number[] = [
   130.81, // C3
   155.56, // D#3
 ];
+
+/** Cinzas do céu (ato final): linha irregular, trítonos e descidas — apocalipse sem consolo maior. */
+export const ASH_SKY_MELODY: number[] = [
+  174.61, // F3
+  233.08, // Bb3
+  146.83, // D3
+  196.0, // G3
+  311.13, // D#4
+  261.63, // C4
+  174.61, // F3
+  130.81, // C3
+  116.54, // A#2
+];

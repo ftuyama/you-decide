@@ -9,7 +9,8 @@ choices:
     effects:
       - { op: addResource, resource: supply, delta: -1 }
       - { op: startCombat, encounterId: act6_penitent_blade, onVictory: act6/will_after, onDefeat: shared/game_over, onFlee: act6/hub_fractured_nave }
-onEnter: []
+onEnter:
+  - { op: addMark, mark: act6_will_measured }
 ---
 O altar escolhe silencio. Apenas o Penitente avanca, como se cada passo dele fosse uma palavra que nao pode ser desdita.
 

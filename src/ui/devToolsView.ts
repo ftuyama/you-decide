@@ -264,6 +264,96 @@ function aggregateAmbientCounts(scenes: Map<string, LoadedScene>): Map<AmbientTh
   return m;
 }
 
+/** Alinhado a `GameApp.resolveVisualTheme` — paleta CSS (`html[data-theme]`). */
+type DevToolsVisualThemeId = 'default' | 'snow' | 'void' | 'ash';
+
+const DEV_TOOLS_VISUAL_THEMES: readonly DevToolsVisualThemeId[] = ['default', 'snow', 'void', 'ash'];
+
+function inferVisualThemeForScene(id: string, chapter: number | undefined): DevToolsVisualThemeId {
+  if (chapter === 6 || id.startsWith('act6/')) return 'void';
+  if (chapter === 7 || id.startsWith('act7/')) return 'ash';
+  if (chapter === 5 || id.startsWith('act5/')) return 'snow';
+  return 'default';
+}
+
+function aggregateVisualThemeCounts(scenes: Map<string, LoadedScene>): Map<DevToolsVisualThemeId, number> {
+  const m = new Map<DevToolsVisualThemeId, number>();
+  for (const t of DEV_TOOLS_VISUAL_THEMES) m.set(t, 0);
+  for (const [id, sc] of scenes) {
+    const th = inferVisualThemeForScene(id, sc.frontmatter.chapter);
+    m.set(th, (m.get(th) ?? 0) + 1);
+  }
+  return m;
+}
+
+function applyDevToolsVisualTheme(theme: DevToolsVisualThemeId): void {
+  if (theme === 'default') {
+    document.documentElement.removeAttribute('data-theme');
+  } else {
+    document.documentElement.setAttribute('data-theme', theme);
+  }
+}
+
+function mountVisualPanel(
+  parent: HTMLElement,
+  counts: Map<DevToolsVisualThemeId, number>
+): void {
+  const note = document.createElement('p');
+  note.className = 'dev-tools-note';
+  note.textContent =
+    'Paleta da interface (`html[data-theme]` em theme-tokens.css): padrão, neve (ato 5), vazio (ato 6), cinzas (ato 7). A pré-visualização altera esta página até clicar em Restaurar.';
+
+  const table = document.createElement('table');
+  table.className = 'dev-tools-table';
+  const thead = document.createElement('thead');
+  thead.innerHTML = '<tr><th>Tema</th><th>Cenas (inferido)</th><th>Pré-visualizar</th></tr>';
+  table.appendChild(thead);
+  const tbody = document.createElement('tbody');
+  const labels: Record<DevToolsVisualThemeId, string> = {
+    default: 'default (sem data-theme)',
+    snow: 'snow',
+    void: 'void',
+    ash: 'ash',
+  };
+  for (const theme of DEV_TOOLS_VISUAL_THEMES) {
+    const tr = document.createElement('tr');
+    const td1 = document.createElement('td');
+    td1.textContent = labels[theme];
+    const td2 = document.createElement('td');
+    td2.textContent = String(counts.get(theme) ?? 0);
+    const td3 = document.createElement('td');
+    td3.className = 'dev-tools-music-actions';
+    const previewBtn = document.createElement('button');
+    previewBtn.type = 'button';
+    previewBtn.className = 'dev-tools-btn';
+    previewBtn.textContent = 'Aplicar';
+    previewBtn.addEventListener('click', () => {
+      applyDevToolsVisualTheme(theme);
+    });
+    td3.appendChild(previewBtn);
+    tr.appendChild(td1);
+    tr.appendChild(td2);
+    tr.appendChild(td3);
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+
+  const restore = document.createElement('p');
+  restore.className = 'dev-tools-note';
+  const restoreBtn = document.createElement('button');
+  restoreBtn.type = 'button';
+  restoreBtn.className = 'dev-tools-btn';
+  restoreBtn.textContent = 'Restaurar tema padrão';
+  restoreBtn.addEventListener('click', () => {
+    applyDevToolsVisualTheme('default');
+  });
+  restore.appendChild(restoreBtn);
+
+  parent.appendChild(note);
+  parent.appendChild(table);
+  parent.appendChild(restore);
+}
+
 function mountMusicPanel(
   parent: HTMLElement,
   campaignId: string,
@@ -496,10 +586,14 @@ function mountScenesPanel(
     const codeId = document.createElement('code');
     codeId.textContent = id;
     meta.appendChild(codeId);
-    meta.appendChild(document.createTextNode(` · Capítulo ${fm.chapter} · `));
+    meta.appendChild(document.createTextNode(` · Capítulo ${fm.chapter} · ambient `));
     const codeTheme = document.createElement('code');
     codeTheme.textContent = fm.ambientTheme ?? '—';
     meta.appendChild(codeTheme);
+    meta.appendChild(document.createTextNode(' · visual '));
+    const codeVisual = document.createElement('code');
+    codeVisual.textContent = inferVisualThemeForScene(id, fm.chapter);
+    meta.appendChild(codeVisual);
     detail.appendChild(meta);
     const artInfo = document.createElement('div');
     artInfo.className = 'dev-tools-detail-meta';
@@ -568,6 +662,7 @@ export function mountDevToolsView(root: HTMLElement, campaignId: string): void {
   }
 
   const ambientCounts = aggregateAmbientCounts(scenes);
+  const visualCounts = aggregateVisualThemeCounts(scenes);
 
   const shell = document.createElement('div');
   shell.className = 'dev-tools-shell';
@@ -626,6 +721,7 @@ export function mountDevToolsView(root: HTMLElement, campaignId: string): void {
       scenes: 'Cenas',
       items: 'Itens',
       music: 'Música',
+      visual: 'Paleta visual',
       enemies: 'Inimigos',
     };
     a.textContent = labels[t];
@@ -644,6 +740,9 @@ export function mountDevToolsView(root: HTMLElement, campaignId: string): void {
       break;
     case 'music':
       mountMusicPanel(main, campaignId, ambientCounts);
+      break;
+    case 'visual':
+      mountVisualPanel(main, visualCounts);
       break;
     case 'scenes':
     default:

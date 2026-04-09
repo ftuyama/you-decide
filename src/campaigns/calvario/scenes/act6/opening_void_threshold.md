@@ -6,7 +6,7 @@ ambientTheme: void
 artKey: void_threshold
 choices:
   - text: "Entrar na nave fraturada e ouvir o que resta do mundo"
-    next: act6/hub_fractured_nave
+    next: act6/nave_summons
 onEnter:
   - { op: setChapter, chapter: 6 }
   - { op: setNarrativeTier, tier: 4 }

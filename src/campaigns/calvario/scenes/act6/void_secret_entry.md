@@ -3,7 +3,7 @@ id: act6/void_secret_entry
 title: Nervura do Abismo
 chapter: 6
 ambientTheme: void
-artKey: fractured_nave
+artKey: act6_secret_maw
 choices:
   - text: "Seguir o corredor que nao existe no mapa"
     next: act6/void_secret_pact

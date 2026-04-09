@@ -3,7 +3,7 @@ id: act6/reality_trial
 title: Prova da Realidade
 chapter: 6
 ambientTheme: void
-artKey: fractured_nave
+artKey: act6_reality_corridor
 skillCheck:
   id: act6_reality_focus
   attr: mind

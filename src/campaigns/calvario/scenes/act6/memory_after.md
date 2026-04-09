@@ -6,7 +6,7 @@ ambientTheme: void
 artKey: void_well
 choices:
   - text: "Subir de volta à nave fraturada"
-    next: act6/hub_fractured_nave
+    next: act6/litany_after_memory
 onEnter:
   - { op: setFlag, key: act6_memory_done, value: true }
   - { op: addDiary, text: "As minhas memórias não são arquivo. São campo de batalha." }

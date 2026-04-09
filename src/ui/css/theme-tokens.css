@@ -1,6 +1,6 @@
 /**
- * Paleta semântica + temas por ato (default / neve escura / vazio).
- * Todos os temas são escuros; neve = frio/azulado sem fundos claros.
+ * Paleta semântica + temas por ato (default / neve escura / vazio / cinzas).
+ * Todos os temas são escuros; neve = frio/azulado; cinzas = fim do mundo (quente/carvão).
  * `html[data-theme]` é definido em GameApp (capítulo + prefixo da cena).
  */
 
@@ -242,4 +242,84 @@ html[data-theme='void'] {
   --scrollbar-thumb-hover: #5a4880;
   --combat-log-entry-border: #3a2850;
   --combat-log-msg: #c8b8d8;
+}
+
+/** Ato 7 — cinzas do céu: carvão quente, ferrugem, pouca saturação (apocalipse terrestre). */
+html[data-theme='ash'] {
+  --bg: #100c0a;
+  --fg: #c8b0a0;
+  --muted: #7a6860;
+  --accent: #b07050;
+  --danger: #b04038;
+  --magic: #8a7068;
+  --corrupt: #8a5048;
+  --border: #4a3830;
+  --glow: rgba(200, 90, 50, 0.14);
+  --ui-grid-line: rgba(140, 80, 60, 0.12);
+  --surface-raised: #1a1410;
+  --surface-drawer: #120e0c;
+  --surface-inset: #161210;
+  --text-section: #9a8880;
+  --surface-hover: #221a14;
+  --surface-hover-alt: #1e1812;
+  --text-strong: #e8d8c8;
+  --text-emphasis: #e0c8b0;
+  --sidebar-buff: #b89870;
+  --backdrop-scrim: rgba(20, 8, 0, 0.62);
+  --shadow-menu: -8px 0 24px rgba(40, 15, 0, 0.5);
+  --menu-section-bg: rgba(30, 15, 8, 0.38);
+  --panel-overlay: rgba(25, 12, 6, 0.42);
+  --panel-overlay-strong: rgba(25, 12, 6, 0.52);
+  --sidebar-collapse-bg: rgba(35, 18, 10, 0.42);
+  --panel-overlay-15: rgba(30, 15, 8, 0.28);
+  --panel-overlay-28: rgba(25, 12, 6, 0.45);
+  --panel-overlay-32: rgba(25, 12, 6, 0.5);
+  --panel-overlay-35: rgba(25, 12, 6, 0.55);
+  --panel-overlay-45: rgba(25, 12, 6, 0.62);
+  --sidebar-gradient: linear-gradient(165deg, #181210 0%, #0c0806 100%);
+  --shell-gradient: linear-gradient(180deg, #14100c 0%, #0a0806 100%);
+  --shell-inset-glow: rgba(120, 50, 30, 0.28);
+  --scene-art-color: #a08070;
+  --companion-border: #4a3428;
+  --companion-name: #e0d0c0;
+  --stat-build-bonus: #8a8860;
+  --faction-rep-track-bg: #181410;
+  --faction-rep-track-border: #3a3028;
+  --sidebar-lore: #a89888;
+  --sidebar-spell: #b0a090;
+  --sidebar-equip: #a89880;
+  --sidebar-equip-stats: #908070;
+  --sidebar-attr: #8e8078;
+  --sidebar-attr-underline: rgba(180, 140, 110, 0.75);
+  --hp-bar-track-bg: #1c1410;
+  --hp-bar-track-border: #3a3028;
+  --mana-bar-track-bg: #181612;
+  --mana-bar-track-border: #403830;
+  --stress-bar-track-bg: #1c1610;
+  --stress-bar-track-border: #483828;
+  --camp-equip-hint: #6a6058;
+  --camp-equip-unequip-border: #4a4038;
+  --camp-equip-unequip-hover: #6a5850;
+  --combat-border: #6a5040;
+  --combat-log-bg: linear-gradient(165deg, #120e0c 0%, #080604 55%, #100c0a 100%);
+  --combat-actions-border: #5a4838;
+  --combat-actions-bg: rgba(20, 12, 8, 0.58);
+  --combat-actions-hdr: #c0a898;
+  --combat-actions-hdr-border: rgba(120, 80, 60, 0.45);
+  --combat-flee-bg: #1c1410;
+  --combat-flee-fg: #e0c8b0;
+  --combat-flee-border: #6a5040;
+  --combat-flee-hover: #c08060;
+  --crit-highlight: #e8a020;
+  --crit-highlight-glow: rgba(240, 160, 40, 0.45);
+  --dice-panel-border: #3a3028;
+  --dice-panel-bg: linear-gradient(180deg, #0c0a08 0%, #060504 100%);
+  --dice-panel-header-color: #c8b0a0;
+  --dice-panel-header-border: #4a3830;
+  --dice-panel-header-bg: linear-gradient(180deg, rgba(36, 28, 20, 0.98) 0%, rgba(16, 12, 8, 0.95) 100%);
+  --scrollbar-track: #100c0a;
+  --scrollbar-thumb: #4a3830;
+  --scrollbar-thumb-hover: #5a4838;
+  --combat-log-entry-border: #3a3028;
+  --combat-log-msg: #c8b0a0;
 }

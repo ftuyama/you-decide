@@ -6,7 +6,7 @@ ambientTheme: void
 artKey: void_altar
 choices:
   - text: "Descer para a nave fraturada"
-    next: act6/hub_fractured_nave
+    next: act6/litany_after_will
 onEnter:
   - { op: setFlag, key: act6_will_done, value: true }
   - { op: addDiary, text: "Vontade não é força para vencer todos. É disciplina para não obedecer o pior em mim." }

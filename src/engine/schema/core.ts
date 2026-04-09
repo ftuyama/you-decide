@@ -316,6 +316,7 @@ export const SceneFrontmatterSchema = z.object({
       'merchant',
       'void',
       'ancient_macabre',
+      'ash_sky',
     ])
     .optional(),
   /** Dica de combate com aliados no acampamento (UI). */

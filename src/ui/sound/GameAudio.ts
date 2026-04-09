@@ -1,6 +1,7 @@
 import {
   ACT3_DEPTH_MELODY,
   ACT5_ICE_MELODY,
+  ASH_SKY_MELODY,
   ANCIENT_MACABRE_MELODY,
   BOSS_LEAD_MELODY,
   CAMP_MELODY,
@@ -140,6 +141,9 @@ export class GameAudio {
         break;
       case 'ancient_macabre':
         this.playAmbientAncientMacabre();
+        break;
+      case 'ash_sky':
+        this.playAmbientAshSky();
         break;
     }
   }
@@ -1169,6 +1173,93 @@ export class GameAudio {
       triggerPluck(ctx, master, when + 0.14, note * 1.414, this.gain(0.11), 'triangle', 2.2);
       triggerHat(ctx, master, when + 0.28, this.gain(0.038));
     }, 2100);
+
+    this.bgCleanup = () => {
+      if (this.bgPulseTimer) {
+        clearInterval(this.bgPulseTimer);
+        this.bgPulseTimer = null;
+      }
+      if (this.bgRhythmTimer) {
+        clearInterval(this.bgRhythmTimer);
+        this.bgRhythmTimer = null;
+      }
+      for (const o of oscillators) {
+        try {
+          o.stop();
+        } catch {
+          /* noop */
+        }
+      }
+      try {
+        master.disconnect();
+        comp.disconnect();
+      } catch {
+        /* noop */
+      }
+    };
+  }
+
+  /**
+   * Cinzas do céu: drones desalinhados + melodia lenta com trítonos — “fim visível”.
+   */
+  private playAmbientAshSky(): void {
+    if (this.muted || this.bgCleanup) return;
+    const ctx = this.ensureContext();
+    const master = ctx.createGain();
+    master.gain.value = this.gain(0.2);
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -27;
+    comp.knee.value = 11;
+    comp.ratio.value = 3.4;
+    comp.attack.value = 0.004;
+    comp.release.value = 0.26;
+    master.connect(comp);
+    comp.connect(ctx.destination);
+
+    const layers: { freq: number; level: number; type: OscillatorType }[] = [
+      { freq: 48.99, level: 0.2, type: 'sine' }, // G1 — terra em vibração
+      { freq: 61.74, level: 0.17, type: 'triangle' },
+      { freq: 73.42, level: 0.14, type: 'sine' },
+      { freq: 92.5, level: 0.11, type: 'sawtooth' },
+      { freq: 103.83, level: 0.09, type: 'triangle' },
+    ];
+
+    const oscillators: OscillatorNode[] = [];
+    for (const { freq, level, type } of layers) {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      o.detune.value = (Math.random() - 0.5) * 22;
+      g.gain.value = level * 0.48;
+      o.connect(g);
+      g.connect(master);
+      o.start();
+      oscillators.push(o);
+    }
+
+    let t = 0;
+    this.bgPulseTimer = setInterval(() => {
+      if (this.muted || !this.ctx) return;
+      t += 0.034;
+      const breathe = 0.17 + Math.sin(t * 0.31) * 0.11 + Math.sin(t * 0.09) * 0.05;
+      try {
+        master.gain.setTargetAtTime(this.gain(breathe), this.ctx.currentTime, 0.55);
+      } catch {
+        /* noop */
+      }
+    }, 340);
+
+    let melodyStep = 0;
+    this.bgRhythmTimer = setInterval(() => {
+      if (this.muted || !this.ctx) return;
+      const note = ASH_SKY_MELODY[melodyStep % ASH_SKY_MELODY.length];
+      melodyStep++;
+      const when = this.ctx.currentTime + 0.02;
+      triggerPluck(ctx, master, when, note, this.gain(0.19), 'sawtooth', 2.4);
+      triggerPluck(ctx, master, when + 0.11, note * 0.5, this.gain(0.12), 'triangle', 2.0);
+      triggerHat(ctx, master, when + 0.35, this.gain(melodyStep % 3 === 0 ? 0.045 : 0.028));
+    }, 1320);
 
     this.bgCleanup = () => {
       if (this.bgPulseTimer) {

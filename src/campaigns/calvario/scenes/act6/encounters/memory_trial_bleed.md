@@ -11,6 +11,7 @@ choices:
       - { op: addResource, resource: supply, delta: -1 }
       - { op: startCombat, encounterId: act6_echo_chorus, onVictory: act6/memory_after, onDefeat: shared/game_over, onFlee: act6/hub_fractured_nave }
 onEnter:
+  - { op: addMark, mark: act6_memory_spoiled }
   - { op: addDiary, text: "As memorias vieram em bando e nenhuma pedia permissao." }
 ---
 Caes sem eixo no poço. Rostos antigos agarram teus pulsos como se fosses devedor de todos eles.

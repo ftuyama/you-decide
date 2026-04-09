@@ -277,5 +277,12 @@
     "playerAdvantage": false,
     "enemyAdvantage": false,
     "xpReward": 2
+  },
+  "act7_hollow_procession": {
+    "id": "act7_hollow_procession",
+    "enemies": ["cultist", "skeleton"],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 6
   }
 }

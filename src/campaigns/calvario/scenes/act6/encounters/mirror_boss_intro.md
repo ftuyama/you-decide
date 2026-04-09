@@ -3,7 +3,7 @@ id: act6/encounters/mirror_boss_intro
 title: O Outro Nome
 chapter: 6
 ambientTheme: void
-artKey: mirror_chamber
+artKey: act6_mirror_final
 choices:
   - text: "Lutar contra o meu reflexo soberano"
     effects:

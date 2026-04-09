@@ -402,9 +402,10 @@ export class GameApp {
     this.audio.setAmbientTheme(this.resolveAmbientTheme());
   }
 
-  /** Paleta CSS (`html[data-theme]`) — ato 5 neve (escuro frio) / ato 6 vazio. */
-  private resolveVisualTheme(): 'snow' | 'void' | null {
+  /** Paleta CSS (`html[data-theme]`) — ato 5 neve / ato 6 vazio / ato 7 cinzas. */
+  private resolveVisualTheme(): 'snow' | 'void' | 'ash' | null {
     if (this.state.chapter === 6 || this.state.sceneId.startsWith('act6/')) return 'void';
+    if (this.state.chapter === 7 || this.state.sceneId.startsWith('act7/')) return 'ash';
     if (this.state.chapter === 5 || this.state.sceneId.startsWith('act5/')) return 'snow';
     return null;
   }

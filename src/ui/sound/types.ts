@@ -8,7 +8,8 @@ export type AmbientTheme =
   | 'frost_mystery'
   | 'merchant'
   | 'void'
-  | 'ancient_macabre';
+  | 'ancient_macabre'
+  | 'ash_sky';
 
 /** Lista canónica (alinhada ao switch em `GameAudio` e ao YAML `ambientTheme`). */
 export const AMBIENT_THEMES: readonly AmbientTheme[] = [
@@ -22,4 +23,5 @@ export const AMBIENT_THEMES: readonly AmbientTheme[] = [
   'merchant',
   'void',
   'ancient_macabre',
+  'ash_sky',
 ];

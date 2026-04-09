@@ -3,8 +3,10 @@ id: act6/epilogue
 title: Epílogo do Espelho Quebrado
 chapter: 6
 ambientTheme: void
-artKey: void_threshold
+artKey: act6_epilogue_crossing
 choices:
+  - text: "Levantar os olhos — o céu já não pede desculpa"
+    next: act7/opening_terminal_glow
   - text: "Fechar o diário por agora"
     next: act4/epilogue_close
 onEnter:

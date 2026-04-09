@@ -3,7 +3,7 @@ import { isCampaignRegistered } from '../campaigns/registry.ts';
 export type AppView = 'game' | 'scenes-graph' | 'dev';
 
 /** Tabs for `?view=dev`. */
-export const DEV_TOOLS_TABS = ['scenes', 'items', 'music', 'enemies'] as const;
+export const DEV_TOOLS_TABS = ['scenes', 'items', 'music', 'visual', 'enemies'] as const;
 export type DevToolsTab = (typeof DEV_TOOLS_TABS)[number];
 
 /** Reads `?campaign=<id>`; falls back to calvario if missing or unknown. */

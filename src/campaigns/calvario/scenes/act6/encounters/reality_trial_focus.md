@@ -9,6 +9,7 @@ choices:
     effects:
       - { op: startCombat, encounterId: act6_veil_herald, onVictory: act6/reality_after, onDefeat: shared/game_over, onFlee: act6/hub_fractured_nave }
 onEnter:
+  - { op: addMark, mark: act6_veil_aligned }
   - { op: addDiary, text: "Segurei o mundo por um fio de pensamento. Descobri que pensamento tambem corta." }
 ---
 Consegues sustentar uma unica versao da sala por alguns segundos. O suficiente para distinguir pedra de reflexo e medo de aviso.

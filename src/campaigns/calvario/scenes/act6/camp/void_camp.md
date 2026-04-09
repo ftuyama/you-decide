@@ -3,7 +3,7 @@ id: act6/camp/void_camp
 title: Fogueira de cinzas espelhadas
 chapter: 6
 ambientTheme: camp
-artKey: fractured_nave
+artKey: act6_camp_ember
 campCombatHint: true
 choices:
   - text: "Alimentar a chama com memória (−1 suprimento)"

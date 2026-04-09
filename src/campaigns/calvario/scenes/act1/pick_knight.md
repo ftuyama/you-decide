@@ -9,7 +9,7 @@ choices:
     next: act1/dungeon_mouth
     effects:
       - { op: initClass, class: knight }
-      - { op: addRep, faction: vigilia, delta: 1 }
+      - { op: addRep, faction: vigilia, delta: 1, directGain: true }
 onEnter: []
 ---
 O metal obedece. A **Ordem da Vigília** sussurra aprovação nas dobras da couraça.

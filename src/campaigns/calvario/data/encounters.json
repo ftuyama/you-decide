@@ -270,5 +270,12 @@
     "playerAdvantage": false,
     "enemyAdvantage": true,
     "xpReward": 8
+  },
+  "faction_circle_initiate": {
+    "id": "faction_circle_initiate",
+    "enemies": ["skeleton"],
+    "playerAdvantage": false,
+    "enemyAdvantage": false,
+    "xpReward": 2
   }
 }

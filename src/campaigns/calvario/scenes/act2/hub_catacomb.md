@@ -14,6 +14,33 @@ choices:
     next: act2/merchant/merchant_moon
     condition: { day: { gte: 2 } }
     preview: "Comércio estranho; preço em ouro ou em segredo — raramente aparece no primeiro dia."
+  - text: "Farol — voz da Vigília no cruzeiro"
+    next: act2/faction/vigilia_envoy
+    condition:
+      all:
+        - { noFlag: act2_faction_envoy_vigilia_done }
+        - any:
+            - { rep: { faction: vigilia, gte: 2 } }
+            - { rep: { faction: vigilia, lte: -2 } }
+    preview: "Reputação forte com a ordem — ou inimizade aberta. Uma vez só."
+  - text: "Símbolos frescos — eco do Círculo"
+    next: act2/faction/circulo_envoy
+    condition:
+      all:
+        - { noFlag: act2_faction_envoy_circulo_done }
+        - any:
+            - { rep: { faction: circulo, gte: 2 } }
+            - { rep: { faction: circulo, lte: -2 } }
+    preview: "Círculo de confiança ou cinza hostil. Uma vez só."
+  - text: "Carne de sino — rumor do Culto"
+    next: act2/faction/culto_envoy
+    condition:
+      all:
+        - { noFlag: act2_faction_envoy_culto_done }
+        - any:
+            - { rep: { faction: culto, gte: 2 } }
+            - { rep: { faction: culto, lte: -2 } }
+    preview: "Devção ou ruptura com o Terceiro Sino. Uma vez só."
   - text: "Ouvir proposta de Mira"
     next: act2/recruit_offer
     condition: { noFlag: mira_recruited }
@@ -38,7 +65,7 @@ choices:
     condition:
       all:
         - { level: { gte: 7 } }
-        - { day: { lte: 25 } }
+        - { day: { lte: 5 } }
     preview: "Memória antiga; perícia e sorte pesam — mas o eco some se demorares demasiado."
   - text: "Observar o cruzeiro: marcas no chão"
     next: act2/hub_observe

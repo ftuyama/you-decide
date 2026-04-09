@@ -503,7 +503,7 @@ export function advanceToEnemyTurn(
       const idx = Math.floor(rng() * def.combatLines.length);
       const line = def.combatLines[idx];
       if (line) {
-        log.push({ kind: 'info', message: `${def.name}: "${line}"` });
+        log.push({ kind: 'enemy_line', message: line, enemyIndex: i });
       }
     }
     const targetIndex = pickEnemyMeleeTarget(party, def, rng);

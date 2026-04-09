@@ -20,6 +20,12 @@ export const enemies: Record<string, EnemyDef> = {
       { chance: 0.01, itemId: 'potion_hp' },
       { chance: 0.05, resource: 'gold', amount: 1 },
     ],
+    combatLines: [
+      'Dentes e fome — nada de honra.',
+      'Cheiro de medo. Cheiro de jantar.',
+      'Mil corpos, um único estômago.',
+      'Corre. Cansa. Depois morde.',
+    ],
   },
   skeleton: {
     id: 'skeleton',
@@ -40,6 +46,12 @@ export const enemies: Record<string, EnemyDef> = {
       { chance: 0.05, resource: 'gold', amount: 1 },
       { chance: 0.025, resource: 'gold', amount: 1 },
     ],
+    combatLines: [
+      'Sem pulmão, sem piedade.',
+      'O osso lembra o golpe — eu só repito.',
+      'Carne é passageira. Geometria é eterna.',
+      'Tu tremes; eu só estalo.',
+    ],
   },
   cultist: {
     id: 'cultist',
@@ -58,6 +70,12 @@ export const enemies: Record<string, EnemyDef> = {
     lootDrops: [
       { chance: 0.05, resource: 'gold', amount: 1 },
       { chance: 0.025, resource: 'gold', amount: 1 },
+    ],
+    combatLines: [
+      'O sussurro já te escolheu.',
+      'Sangue por oferta — não por acidente.',
+      'Abre a pele; deixa entrar o que reza por ti.',
+      'Não é loucura. É liturgia com dentes.',
     ],
   },
   frost_cultist: {
@@ -78,6 +96,12 @@ export const enemies: Record<string, EnemyDef> = {
       { chance: 0.1, resource: 'gold', amount: 1 },
       { chance: 0.05, resource: 'gold', amount: 1 },
     ],
+    combatLines: [
+      'A geada não perdoa — ela só lembra.',
+      'Frio de altar. Frio de cova.',
+      'O ritual não aquece. Ele completa.',
+      'Transpiras medo; eu acendo incenso congelado.',
+    ],
   },
   stone_guard: {
     id: 'stone_guard',
@@ -97,6 +121,12 @@ export const enemies: Record<string, EnemyDef> = {
       { chance: 0.5, resource: 'gold', amount: 1 },
       { chance: 0.25, resource: 'gold', amount: 1 },
       { chance: 0.5, resource: 'supply', amount: 1 },
+    ],
+    combatLines: [
+      'Pedra não cansa. Pedra só permanece.',
+      'O salão lembra de ti — eu só executo a lembrança.',
+      'Um golpe por século, se for preciso.',
+      'Não discuto intrusos. Eu nivelo-os ao limiar.',
     ],
   },
   morvayn_p1: {
@@ -120,6 +150,13 @@ export const enemies: Record<string, EnemyDef> = {
       { chance: 0.5, resource: 'supply', amount: 1 },
       { chance: 0.8, itemId: 'potion_mana' },
     ],
+    combatLines: [
+      'Carne é rude. Osso é elegante.',
+      'Eu não mato — eu reciclo.',
+      'Tua coragem é barulho; meu trabalho é silêncio ordenado.',
+      'Cada cadáver é um rascunho melhor que o anterior.',
+      'O trono não pede desculpas ao que vira estrado.',
+    ],
   },
   morvayn_p2: {
     id: 'morvayn_p2',
@@ -142,6 +179,13 @@ export const enemies: Record<string, EnemyDef> = {
       { chance: 0.5, resource: 'supply', amount: 1 },
       { chance: 0.8, itemId: 'potion_mana' },
     ],
+    combatLines: [
+      'Isto não é osso — é arquitetura.',
+      'Ajoelha ou vira material.',
+      'O trono pesa porque alguém ainda respira debaixo dele.',
+      'Eu não governo vidas. Eu empilho consequências.',
+      'Vê como a coroa cresce quando a carne cede.',
+    ],
   },
   fallen_angel: {
     id: 'fallen_angel',
@@ -160,6 +204,12 @@ export const enemies: Record<string, EnemyDef> = {
     lootDrops: [
       { chance: 0.75, resource: 'supply', amount: 1 },
       { chance: 0.15, itemId: 'potion_hp' },
+    ],
+    combatLines: [
+      'A misericórdia morreu antes do véu.',
+      'Eu era luz — agora sou lembrete.',
+      'Tu pediste sentido; eu trago veredicto.',
+      'Asas cortadas ainda fazem som ao cair.',
     ],
   },
   vigil_hunter: {
@@ -180,6 +230,12 @@ export const enemies: Record<string, EnemyDef> = {
       { chance: 0.25, resource: 'supply', amount: 1 },
       { chance: 0.4, resource: 'gold', amount: 3 },
     ],
+    combatLines: [
+      'Rastreado. Registado. Rematado.',
+      'A Vigília não negocia com fuga.',
+      'Teu rasto cheira a culpa — facilita.',
+      'Ordem acima de piedade. Sempre.',
+    ],
   },
   frost_whelp: {
     id: 'frost_whelp',
@@ -198,6 +254,12 @@ export const enemies: Record<string, EnemyDef> = {
     lootDrops: [
       { chance: 0.1, resource: 'gold', amount: 1 },
       { chance: 0.05, resource: 'gold', amount: 1 },
+    ],
+    combatLines: [
+      'Dente novo, fome velha.',
+      'Rosna se quiser — o gelo não ouve.',
+      'Pequeno demais para trono, grande demais para pena.',
+      'Mamãe geada não embala; ela quebra.',
     ],
   },
   frost_reaver: {
@@ -219,6 +281,12 @@ export const enemies: Record<string, EnemyDef> = {
       { chance: 0.05, resource: 'gold', amount: 1 },
       { chance: 0.15, resource: 'supply', amount: 1 }
     ],
+    combatLines: [
+      'Saque não pede licença ao congelado.',
+      'O teu calor é mapa — eu sigo.',
+      'Geada no machado, geada na consciência.',
+      'Ruína com método ainda é arte.',
+    ],
   },
   ice_dragon_p1: {
     id: 'ice_dragon_p1',
@@ -238,6 +306,13 @@ export const enemies: Record<string, EnemyDef> = {
       { chance: 1, resource: 'gold', amount: 5 },
       { chance: 0.5, resource: 'gold', amount: 2 },
       { chance: 0.5, resource: 'supply', amount: 1 }
+    ],
+    combatLines: [
+      'O vento não julga — só corta.',
+      'Vetrnax: nome que o gelo aprende a soletrar em sangue.',
+      'Tu és quente demais para este céu.',
+      'Asas de neve, vontade de lâmina.',
+      'Não sou tempestade. Sou o que resta depois dela.',
     ],
   },
   ice_dragon_p2: {
@@ -259,6 +334,13 @@ export const enemies: Record<string, EnemyDef> = {
       { chance: 0.5, resource: 'gold', amount: 2 },
       { chance: 0.5, resource: 'supply', amount: 1 }
     ],
+    combatLines: [
+      'Coração de inverno — pulso lento, golpe certo.',
+      'Descongela a esperança e vê o que sobra: eu.',
+      'O frio profundo não grita. Ele ocupa.',
+      'Partiste o gelo da forma — não da fome.',
+      'Neve no peito, trovão na mandíbula.',
+    ],
   },
   summit_fallen_god: {
     id: 'summit_fallen_god',
@@ -279,6 +361,9 @@ export const enemies: Record<string, EnemyDef> = {
       'Eu era número antes de ter nome.',
       'O teu sangue ainda acredita em milagre — eu não.',
       'Ouve: o silêncio também reza, só que por ti.',
+      'Deus não morreu; fragmentou-se em vozes que te obedecem mal.',
+      'Cada hino teu ecoa aqui — distorcido, mas obediente.',
+      'O panteão não caiu: escolheu o chão.',
     ],
     lootDrops: [
       { chance: 0.8, resource: 'gold', amount: 4 },
@@ -303,6 +388,8 @@ export const enemies: Record<string, EnemyDef> = {
       'Tu chamas isto de mundo porque ainda não viste as costuras.',
       'Toda certeza é uma cela com paredes invisíveis.',
       'A verdade não consola. Ela exige.',
+      'Eu não anuncio o fim — só torno o fim legível.',
+      'O véu respira quando mentes param de inventar explicações.',
     ],
     lootDrops: [
       { chance: 0.8, resource: 'gold', amount: 3 },
@@ -328,6 +415,8 @@ export const enemies: Record<string, EnemyDef> = {
       'Lembrar e reescrever.',
       'A memória mente para proteger quem a consulta.',
       'Qual de nós é o original?',
+      'Repetição não é eco — é revisão.',
+      'Cada voz aqui já foi tua; só mudou o tom.',
     ],
     lootDrops: [
       { chance: 0.8, resource: 'gold', amount: 3 },
@@ -353,6 +442,8 @@ export const enemies: Record<string, EnemyDef> = {
       'Vontade sem limite é só fome com armadura.',
       'Tu tremes porque ainda tens algo a perder.',
       'Não é poder. É abstinência de misericórdia.',
+      'Penitência boa sangra em silêncio — a tua ainda grita.',
+      'O rosto sumiu; a culpa não coube na viseira.',
     ],
     lootDrops: [
       { chance: 0.8, resource: 'gold', amount: 3 },
@@ -378,6 +469,8 @@ export const enemies: Record<string, EnemyDef> = {
       'Eu sou tu sem a tua culpa.',
       'Tu pedes sentido; eu imponho direção.',
       'Se eu vencer, tu sobrevives. Só não escolhes mais.',
+      'Espelho partido ainda corta se apertares a mão.',
+      'Soberania é aceitar o reflexo que não pede perdão.',
     ],
     lootDrops: [
       { chance: 0.8, resource: 'gold', amount: 3 },
@@ -403,6 +496,8 @@ export const enemies: Record<string, EnemyDef> = {
       'Eu sou uma decisão tua que continuou viva.',
       'Toda renúncia deixa filhos no escuro.',
       'Não me mates. Assume-me.',
+      'Fragmento é nome honesto: incompleto e cortante.',
+      'Tu fugiste ao custo; eu sou o recibo.',
     ],
     lootDrops: [
       { chance: 0.8, resource: 'gold', amount: 3 },
@@ -429,6 +524,8 @@ export const enemies: Record<string, EnemyDef> = {
       'Sou o que sobrou quando fingiste que não escolheste.',
       'Pequena demais para te nomear — grande demais para te ignorar.',
       'Cada passo teu aqui deixou lascas. Eu sou uma delas.',
+      'Errante: não por geografia — por recusa em encaixar.',
+      'A Nave range; eu sou a tradução do rangido.',
     ],
     lootDrops: [
       { chance: 0.65, resource: 'gold', amount: 2 },
@@ -454,6 +551,8 @@ export const enemies: Record<string, EnemyDef> = {
       'Não arauto — arquivo. Registo do que te falta coragem para rasgar.',
       'Cada linha que traço é uma promessa tua mal escrita.',
       'O véu não esconde; arquiva.',
+      'Tinta e sangue — a mesma assinatura, só muda o juiz.',
+      'Se leres em voz alta, o texto exige testemunhas.',
     ],
     lootDrops: [
       { chance: 0.8, resource: 'gold', amount: 3 },
@@ -479,6 +578,8 @@ export const enemies: Record<string, EnemyDef> = {
       'Trago bocas que não são minhas — todas lembram o teu nome errado.',
       'Murmúrio é memória com vergonha de ser alta.',
       'Abre-me e ouves um coro; fecha-me e ouves ti.',
+      'Hospedeiro: palavra bonita para caixa de ecos.',
+      'Não sou possessão — sou multidão com endereço único.',
     ],
     lootDrops: [
       { chance: 0.8, resource: 'gold', amount: 3 },
@@ -504,6 +605,8 @@ export const enemies: Record<string, EnemyDef> = {
       'Os elos não prendem o corpo — prendem a desculpa.',
       'Penitência sem testemunhas ainda pesa.',
       'Cada batida é um “e se” temperado em ferro.',
+      'A corrente canta — tu é que chamas de tortura.',
+      'Arrasto o peso que juraste carregar sozinho.',
     ],
     lootDrops: [
       { chance: 0.8, resource: 'gold', amount: 3 },
@@ -529,6 +632,8 @@ export const enemies: Record<string, EnemyDef> = {
       'Reino sobre cacos — ainda é reino.',
       'O espelho partiu; o trono ficou.',
       'Não sou o teu duplo. Sou o que sobrou quando o duplo caiu.',
+      'Vidro quebrado ainda reflete — só não perdoa o suave.',
+      'Coroa de estilhaços: cada face corta quem ajoelha errado.',
     ],
     lootDrops: [
       { chance: 0.8, resource: 'gold', amount: 3 },
@@ -554,6 +659,8 @@ export const enemies: Record<string, EnemyDef> = {
       'A corrupção que carregas tem sermão — eu só leio em voz alta.',
       'Não vim salvar. Vim explicar o cheiro.',
       'A mancha obedece a quem deixa de fingir pureza.',
+      'Púlpito sujo ainda é altar para quem tem fome de absolvição.',
+      'O sermão arde — a culpa é que acende.',
     ],
     lootDrops: [
       { chance: 0.8, resource: 'gold', amount: 3 },

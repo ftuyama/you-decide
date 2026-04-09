@@ -7,7 +7,7 @@ choices:
   - text: "Recusar o pacto e lutar"
     next: act4/encounters/fight_morvayn
     effects:
-      - { op: addRep, faction: vigilia, delta: 1 }
+      - { op: addRep, faction: vigilia, delta: 1, directGain: true }
   - text: "Aceitar servir ao Terceiro Sino"
     next: act4/pact/pact_ascent
     condition: { rep: { faction: culto, gte: 0 } }

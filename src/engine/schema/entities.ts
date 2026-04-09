@@ -177,6 +177,7 @@ export type EnemyInstance = z.infer<typeof EnemyInstanceSchema>;
 export const CombatLogEntrySchema = z.object({
   kind: z.enum([
     'info',
+    'enemy_line',
     'attack',
     'damage',
     'heal',
@@ -186,6 +187,8 @@ export const CombatLogEntrySchema = z.object({
     'turn_banner',
   ]),
   message: z.string(),
+  /** Índice em `combat.enemies` — falas de combate (`enemy_line`) */
+  enemyIndex: z.number().int().min(0).optional(),
   dice: z.array(z.number()).optional(),
   total: z.number().optional(),
   modifier: z.number().optional(),
@@ -272,6 +275,17 @@ export const GameStateSchema = z.object({
   companionsAvailable: z.array(z.string()).default([]),
   inventory: z.array(z.string()),
   reputation: z.record(FactionIdSchema, z.number().int().min(-3).max(3)),
+  /**
+   * Progresso parcial ao ganhar reputação (modo “lento” sem directGain).
+   * 0 = nada pendente; 1 = um ganho positivo já “contou” e falta outro para +1 em reputation.
+   */
+  factionGainPending: z
+    .object({
+      vigilia: z.union([z.literal(0), z.literal(1)]),
+      circulo: z.union([z.literal(0), z.literal(1)]),
+      culto: z.union([z.literal(0), z.literal(1)]),
+    })
+    .default({ vigilia: 0, circulo: 0, culto: 0 }),
   flags: z.record(z.string(), z.boolean()),
   marks: z.array(z.string()),
   resources: z.object({

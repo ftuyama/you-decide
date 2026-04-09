@@ -214,6 +214,19 @@ function repBarMarkup(
   </div>`;
 }
 
+const FACTION_LORE_PT: Record<'vigilia' | 'circulo' | 'culto', string> = {
+  vigilia:
+    'Ordem de patrulhas e juramentos na escuridão: honra tem gosto de cinza, e quem serve não é cidadão — é ferramenta até provar o contrário.',
+  circulo:
+    'O Círculo Cinzento troca símbolos por sorte: rituais frágeis, empréstimos de destino e preços que não se pagam só em ouro. Hesitar é deixar o cinza fechar sem ti.',
+  culto:
+    'O Terceiro Sino ecoa onde não há torre: devotos carregam o som como relíquia, e a corrupção é moeda de quem quer ouvir o mundo calar quando respira.',
+};
+
+function factionLoreBlurb(variant: 'vigilia' | 'circulo' | 'culto'): string {
+  return `<p class="faction-lore-blurb">${escHtml(FACTION_LORE_PT[variant])}</p>`;
+}
+
 function wireSidebarDetails(
   hud: HTMLElement,
   sidebarSections: Record<string, boolean>,
@@ -393,8 +406,11 @@ export function buildGameSidebar({
         <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.factions, 'Facções')}</summary>
         <div class="sidebar-collapse-body sidebar-faccoes">
           ${repBarMarkup('Vigília', rep.vigilia, 'vigilia')}
+          ${factionLoreBlurb('vigilia')}
           ${repBarMarkup('Círculo', rep.circulo, 'circulo')}
+          ${factionLoreBlurb('circulo')}
           ${repBarMarkup('Culto', rep.culto, 'culto')}
+          ${factionLoreBlurb('culto')}
         </div>
       </details>
     `;

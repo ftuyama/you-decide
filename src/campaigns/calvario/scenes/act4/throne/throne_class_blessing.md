@@ -8,7 +8,7 @@ choices:
     next: act4/throne/throne_gate
     condition: { class: cleric }
     effects:
-      - { op: addRep, faction: vigilia, delta: 1 }
+      - { op: addRep, faction: vigilia, delta: 1, directGain: true }
       - { op: addDiary, text: "O trono não aceita luz — mas aceita que eu a nomeie sem a oferecer de graça." }
   - text: "Medir o espaço com o corpo — postura de muralha"
     next: act4/throne/throne_gate

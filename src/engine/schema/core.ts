@@ -102,7 +102,13 @@ export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
   z.object({ op: z.literal('toggleFlag'), key: z.string() }),
   z.object({ op: z.literal('addMark'), mark: z.string() }),
   z.object({ op: z.literal('removeMark'), mark: z.string() }),
-  z.object({ op: z.literal('addRep'), faction: FactionIdSchema, delta: z.number().int() }),
+  z.object({
+    op: z.literal('addRep'),
+    faction: FactionIdSchema,
+    delta: z.number().int(),
+    /** Se true, ganhos positivos aplicam-se de imediato (comportamento clássico). Omitido ou false: ganhos positivos exigem dois “passos” para subir 1 de reputação. */
+    directGain: z.boolean().optional(),
+  }),
   z.object({
     op: z.literal('setRep'),
     faction: FactionIdSchema,
@@ -171,7 +177,7 @@ export type Effect =
   | { op: 'toggleFlag'; key: string }
   | { op: 'addMark'; mark: string }
   | { op: 'removeMark'; mark: string }
-  | { op: 'addRep'; faction: FactionId; delta: number }
+  | { op: 'addRep'; faction: FactionId; delta: number; directGain?: boolean }
   | { op: 'setRep'; faction: FactionId; value: number }
   | { op: 'addResource'; resource: 'supply' | 'faith' | 'corruption' | 'gold'; delta: number }
   | { op: 'campRest' }

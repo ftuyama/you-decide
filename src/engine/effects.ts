@@ -14,12 +14,13 @@ import {
 import { clampLeadStat, tickActiveBuffs, type LeadStatAttr } from './leadStats.ts';
 import { applyConsumableToCharacter, isConsumable, removeOneInventoryItem } from './consumables.ts';
 import { injectText } from './template.ts';
+import {
+  clampReputation,
+  computeAddRepResult,
+  defaultFactionGainPending,
+} from './reputation.ts';
 
 export { tickActiveBuffs };
-
-function clampRep(n: number): number {
-  return Math.max(-3, Math.min(3, n));
-}
 
 const ATTR_LABEL: Record<LeadStatAttr, string> = {
   str: 'STR',
@@ -135,18 +136,41 @@ function applyOne(
     case 'addRep': {
       const faction = e.faction;
       const prev = state.reputation[faction] ?? 0;
-      const value = clampRep(prev + e.delta);
-      bus.emit({ type: 'reputation.changed', faction, value });
+      const fgp = state.factionGainPending ?? defaultFactionGainPending();
+      const pendingIn: 0 | 1 = fgp[faction] === 1 ? 1 : 0;
+
+      if (e.delta === 0) {
+        return state;
+      }
+
+      const { rep, pending } = computeAddRepResult({
+        prevRep: prev,
+        pending: pendingIn,
+        delta: e.delta,
+        directGain: e.directGain,
+      });
+
+      bus.emit({ type: 'reputation.changed', faction, value: rep });
+
+      const isDirectPositiveGain = e.delta > 0 && e.directGain === true;
+      if (isDirectPositiveGain) {
+        return {
+          ...state,
+          reputation: { ...state.reputation, [faction]: rep },
+        };
+      }
+
       return {
         ...state,
-        reputation: { ...state.reputation, [faction]: value },
+        reputation: { ...state.reputation, [faction]: rep },
+        factionGainPending: { ...fgp, [faction]: pending },
       };
     }
     case 'setRep':
       bus.emit({ type: 'reputation.changed', faction: e.faction, value: e.value });
       return {
         ...state,
-        reputation: { ...state.reputation, [e.faction]: clampRep(e.value) },
+        reputation: { ...state.reputation, [e.faction]: clampReputation(e.value) },
       };
     case 'addResource': {
       const r = { ...state.resources };

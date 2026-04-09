@@ -47,4 +47,63 @@ describe('applyEffects', () => {
     });
     expect(next.resources.gold).toBe(999);
   });
+
+  it('addRep directGain aplica ganho imediato', () => {
+    let s = createInitialState(testCampaign, 1);
+    s = { ...s, party: [createPlayerCharacter('H', 'knight')] };
+    const bus = new EventBus();
+    const data = emptyGameData(testCampaign, {
+      defaultHeroName: () => 'H',
+      getHeroClassLabel: () => '—',
+      getPathUnlockBonus: () => null,
+    });
+    const next = applyEffects(
+      s,
+      [{ op: 'addRep', faction: 'vigilia', delta: 1, directGain: true }],
+      { sceneId: 'test/scene', data, bus }
+    );
+    expect(next.reputation.vigilia).toBe(1);
+    expect(next.factionGainPending.vigilia).toBe(0);
+  });
+
+  it('addRep sem directGain exige dois ganhos para +1 reputação', () => {
+    let s = createInitialState(testCampaign, 1);
+    s = { ...s, party: [createPlayerCharacter('H', 'knight')] };
+    const bus = new EventBus();
+    const data = emptyGameData(testCampaign, {
+      defaultHeroName: () => 'H',
+      getHeroClassLabel: () => '—',
+      getPathUnlockBonus: () => null,
+    });
+    const ctx = { sceneId: 'test/scene', data, bus };
+    const a = applyEffects(s, [{ op: 'addRep', faction: 'circulo', delta: 1 }], ctx);
+    expect(a.reputation.circulo).toBe(0);
+    expect(a.factionGainPending.circulo).toBe(1);
+    const b = applyEffects(a, [{ op: 'addRep', faction: 'circulo', delta: 1 }], ctx);
+    expect(b.reputation.circulo).toBe(1);
+    expect(b.factionGainPending.circulo).toBe(0);
+  });
+
+  it('addRep negativo zera pending e aplica perda', () => {
+    let s = createInitialState(testCampaign, 1);
+    s = {
+      ...s,
+      party: [createPlayerCharacter('H', 'knight')],
+      factionGainPending: { vigilia: 1, circulo: 0, culto: 0 },
+      reputation: { ...s.reputation, vigilia: 1 },
+    };
+    const bus = new EventBus();
+    const data = emptyGameData(testCampaign, {
+      defaultHeroName: () => 'H',
+      getHeroClassLabel: () => '—',
+      getPathUnlockBonus: () => null,
+    });
+    const next = applyEffects(s, [{ op: 'addRep', faction: 'vigilia', delta: -1 }], {
+      sceneId: 'test/scene',
+      data,
+      bus,
+    });
+    expect(next.reputation.vigilia).toBe(0);
+    expect(next.factionGainPending.vigilia).toBe(0);
+  });
 });

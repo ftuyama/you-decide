@@ -9,7 +9,7 @@ choices:
     next: act1/dungeon_mouth
     effects:
       - { op: initClass, class: mage }
-      - { op: addRep, faction: circulo, delta: 1 }
+      - { op: addRep, faction: circulo, delta: 1, directGain: true }
 onEnter: []
 ---
 Símbolos acendem na retina. O **Círculo Cinzento** não perdoa hesitação.

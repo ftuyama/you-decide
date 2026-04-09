@@ -9,7 +9,7 @@ choices:
     next: act1/dungeon_mouth
     effects:
       - { op: initClass, class: cleric }
-      - { op: addRep, faction: vigilia, delta: 1 }
+      - { op: addRep, faction: vigilia, delta: 1, directGain: true }
       - { op: addResource, resource: faith, delta: 1 }
 onEnter: []
 ---

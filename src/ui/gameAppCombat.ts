@@ -145,11 +145,29 @@ function appendCombatLogMeta(wrap: HTMLElement, entry: CombatLogEntry): void {
  * Entorno amarelo no painel do campo: último dano resolvido foi crítico
  * (ignora rodada / vitória / pânico após o golpe).
  */
+/** Última fala de combate registada para o inimigo nesse índice (log pode crescer). */
+export function lastEnemyCombatLine(
+  log: CombatLogEntry[],
+  enemyIndex: number
+): string | undefined {
+  for (let i = log.length - 1; i >= 0; i--) {
+    const e = log[i]!;
+    if (e.kind === 'enemy_line' && e.enemyIndex === enemyIndex) {
+      return e.message;
+    }
+  }
+  return undefined;
+}
+
 export function combatLastResolvedDamageWasCrit(log: CombatLogEntry[]): boolean {
   let i = log.length - 1;
   while (i >= 0) {
     const e = log[i]!;
     if (e.kind === 'turn_banner') {
+      i--;
+      continue;
+    }
+    if (e.kind === 'enemy_line') {
       i--;
       continue;
     }
@@ -213,7 +231,8 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
   if (combatLastResolvedDamageWasCrit(c.log)) {
     left.classList.add('combat-enemies-column--crit-damage');
   }
-  for (const inst of c.enemies) {
+  for (let enemyIdx = 0; enemyIdx < c.enemies.length; enemyIdx++) {
+    const inst = c.enemies[enemyIdx]!;
     if (inst.hp <= 0) continue;
     const def = ctx.registry.data.enemies[inst.defId];
     if (!def) continue;
@@ -224,7 +243,7 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     pre.className = 'enemy-sprite';
     pre.textContent = sprite;
     const hpPct = Math.max(0, Math.min(100, Math.round((inst.hp / inst.maxHp) * 100)));
-    panel.innerHTML = `<div class="enemy-panel-header"><strong>${def.name}</strong><span class="enemy-hp-text">${inst.hp}/${inst.maxHp}</span></div>
+    panel.innerHTML = `<div class="enemy-panel-header"><strong>${escHtml(def.name)}</strong><span class="enemy-hp-text">${inst.hp}/${inst.maxHp}</span></div>
       <div class="enemy-hp-track" title="HP ${inst.hp}/${inst.maxHp}">
         <div class="enemy-hp-fill" style="width:${hpPct}%"></div>
       </div>`;
@@ -236,6 +255,13 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
       panel.appendChild(armorLine);
     }
     panel.appendChild(pre);
+    const line = lastEnemyCombatLine(c.log, enemyIdx);
+    if (line) {
+      const quote = document.createElement('blockquote');
+      quote.className = 'enemy-combat-quote';
+      quote.textContent = line;
+      panel.appendChild(quote);
+    }
     left.appendChild(panel);
   }
 
@@ -498,6 +524,9 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     }
 
     const entry = item.entry;
+    if (entry.kind === 'enemy_line') {
+      continue;
+    }
     const wrap = document.createElement('div');
     wrap.className = `combat-log-entry combat-log-${entry.kind}`;
     if (entry.kind === 'attack' && entry.outcome) {

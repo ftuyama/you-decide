@@ -27,6 +27,7 @@ export function createInitialState(campaign: CampaignIndex, seed?: number): Game
     companionsAvailable: [...campaign.startingCompanionPool],
     inventory: [],
     reputation: { ...defaultRep },
+    factionGainPending: { vigilia: 0, circulo: 0, culto: 0 },
     flags: {},
     marks: [],
     resources: { supply: 5, faith: 3, corruption: 0, gold: 8 },
@@ -174,10 +175,17 @@ export function deserializeState(json: string): GameState {
   };
   const legacyId = (o as Partial<GameState>).campaignId;
   const campaignId = typeof legacyId === 'string' && legacyId.length > 0 ? legacyId : 'calvario';
+  const fgp = (o as GameState).factionGainPending;
+  const factionGainPending: GameState['factionGainPending'] = {
+    vigilia: fgp?.vigilia === 1 ? 1 : 0,
+    circulo: fgp?.circulo === 1 ? 1 : 0,
+    culto: fgp?.culto === 1 ? 1 : 0,
+  };
 
   const merged: GameState = {
     ...(o as GameState),
     campaignId,
+    factionGainPending,
     resources,
     extraLifeReady: extraLifeReadyFromFaith(resources.faith),
     level: typeof (o as GameState).level === 'number' ? (o as GameState).level : 1,

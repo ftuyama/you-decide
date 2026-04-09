@@ -1282,6 +1282,13 @@ button.hamburger:hover {
   box-shadow: 0 0 8px rgba(80, 100, 60, 0.35);
 }
 
+.sidebar-faccoes .faction-lore-blurb {
+  margin: 0 0 0.65rem;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--sidebar-muted);
+}
+
 .sidebar-lore {
   margin: 0.35rem 0 0.5rem;
 }
@@ -1823,9 +1830,24 @@ button.combat-flee-btn:hover {
   line-height: 1.2;
   white-space: pre;
   color: var(--fg);
-  margin: 0.5rem 0;
+  margin: 0.5rem 0 0;
   min-height: 6rem;
   transition: transform 0.12s ease;
+}
+
+/** Fala de combate do inimigo — logo abaixo da sprite, estilo citação */
+.enemy-combat-quote {
+  margin: 0.4rem 0 0;
+  padding: 0.4rem 0.5rem 0.45rem 0.7rem;
+  border-left: 3px solid color-mix(in srgb, var(--border) 70%, var(--muted));
+  font-size: 0.72rem;
+  line-height: 1.4;
+  font-style: italic;
+  color: color-mix(in srgb, var(--fg) 78%, var(--muted));
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: color-mix(in srgb, var(--panel-overlay-35) 55%, transparent);
+  border-radius: 0 3px 3px 0;
 }
 
 .enemy-sprite.crit-flash {

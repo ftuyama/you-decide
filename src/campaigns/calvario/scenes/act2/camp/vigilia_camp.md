@@ -49,6 +49,17 @@ choices:
       - { op: addDiary, text: "Riscaste na terra o dia {{day}}. O relógio de cima já não manda." }
   - text: "Manusear equipamento no acampamento"
     next: act2/camp/manage_equip
+  - text: "Denunciar uma marca do Culto ao oficial (−1 culto)"
+    condition:
+      all:
+        - { rep: { faction: vigilia, gte: 1 } }
+        - { rep: { faction: culto, gte: 0 } }
+    next: act2/camp/vigilia_camp
+    effects:
+      - { op: addRep, faction: culto, delta: -1, directGain: true }
+      - { op: addRep, faction: vigilia, delta: 1 }
+      - { op: addDiary, text: "Falei alto demais sobre o Terceiro Sino — o oficial anotou como vitória pequena." }
+    preview: "Troca de reputação · Vigília lenta, Culto imediato"
   - text: "Continuar"
     next: act2/hub_catacomb
     effects:

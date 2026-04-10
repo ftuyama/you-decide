@@ -1,0 +1,106 @@
+/** Rola dados (perícia / sorte) — mesmo sítio que penalidade / item: topo do texto da cena */
+/* Skill check / luck dice UI above scene text */
+
+.story-dice-banner {
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.85rem 0.85rem;
+  background: linear-gradient(145deg, #1c1a16 0%, var(--surface-inset) 100%);
+  border-radius: 3px;
+  border: 1px solid rgba(100, 96, 80, 0.45);
+  box-shadow: 0 0 18px rgba(0, 0, 0, 0.35);
+}
+
+.story-dice-banner-panel {
+  border-radius: 2px;
+  padding: 0;
+  border: 1px solid #3d5248;
+  background: linear-gradient(165deg, rgba(22, 32, 26, 0.9) 0%, rgba(10, 14, 10, 0.96) 100%);
+}
+
+.story-dice-banner-kicker {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a8c4a0;
+  margin: 0 0 0.45rem;
+  padding: 0.5rem 0.65rem 0;
+}
+
+.story-dice-banner .dice-ascii-block {
+  margin: 0 0.65rem 0.5rem;
+  font-size: 0.38rem;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.story-dice-pre--rolling {
+  animation: storyDiceTumble 0.12s ease-in-out infinite;
+}
+
+@keyframes storyDiceTumble {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-0.5deg);
+  }
+  50% {
+    transform: translateY(-1px) rotate(0.5deg);
+  }
+}
+
+.story-dice-result {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #c4baa8;
+  margin: 0 0.65rem 0.5rem;
+  padding: 0.45rem 0.5rem;
+  border-radius: 2px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid #2a2824;
+  white-space: pre-wrap;
+}
+
+.story-dice-banner-panel--success {
+  border-color: #3d6b48;
+  box-shadow: 0 0 14px rgba(74, 122, 82, 0.2);
+}
+
+.story-dice-banner-panel--success .story-dice-result {
+  border-color: #3d6b48;
+  background: rgba(35, 65, 40, 0.22);
+  color: #b8e8c4;
+}
+
+.story-dice-banner-panel--fail {
+  border-color: #7a3d3d;
+  box-shadow: 0 0 14px rgba(138, 58, 56, 0.22);
+}
+
+.story-dice-banner-panel--fail .story-dice-result {
+  border-color: #7a3d3d;
+  background: rgba(55, 28, 28, 0.35);
+  color: #f0b0b0;
+}
+
+.story-dice-banner-dismiss {
+  display: block;
+  width: 100%;
+  margin: 0 0.65rem 0.65rem;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  color: #dfe8d8;
+  background: #2a3028;
+  border: 1px solid #5a6252;
+  border-radius: 2px;
+  box-sizing: border-box;
+}
+
+.story-dice-banner-dismiss:hover:not(:disabled) {
+  background: #343a32;
+}
+
+.story-dice-banner-dismiss:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

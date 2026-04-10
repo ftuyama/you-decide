@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-  <path fill="#5c4a38" d="M3.5 5.5h9l1.2 2.2v6.8H2.3V7.7l1.2-2.2z"/>
-  <path fill="#7d6548" d="M6 4c0-1.1 1-2 2-2s2 .9 2 2v1.5H6V4z"/>
-  <path fill="#3d3024" d="M5 9h6v1H5V9z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true">
+  <path fill="var(--muted)" d="M3.25 5.85h9.5l1.15 2.1v6.3H2.1V7.95l1.15-2.1z"/>
+  <path fill="var(--sidebar-buff)" opacity="0.65" d="M5.85 3.85c0-1.15 1-2.1 2.15-2.1s2.15.95 2.15 2.1v1.5H5.85v-1.5z"/>
+  <path fill="var(--fg)" opacity="0.35" d="M4.85 9.15h6.3v1.05H4.85V9.15z"/>
+  <path fill="none" stroke="var(--fg)" stroke-width="0.5" stroke-linecap="round" opacity="0.4" d="M4.5 12.25h7"/>
 </svg>

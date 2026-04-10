@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-  <path fill="#4a3058" d="M8 1.2c-.8 1.8-2.8 3.8-2.8 6.4a2.8 2.8 0 0 0 5.6 0c0-2.6-2-4.6-2.8-6.4z"/>
-  <path fill="#7a5090" d="M8 14.8l1.2-3.2H6.8L8 14.8z" opacity=".85"/>
-  <circle cx="8" cy="6.5" r="1.1" fill="#1a1018"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true">
+  <path fill="var(--corrupt)" d="M8 1.35c-.75 1.65-2.55 3.55-2.55 5.95a2.55 2.55 0 0 0 5.1 0c0-2.4-1.8-4.3-2.55-5.95z"/>
+  <path fill="var(--muted)" d="M8 14.65l1.15-2.95H6.85L8 14.65z"/>
+  <circle cx="8" cy="6.65" r="1.05" fill="var(--bg)"/>
+  <path fill="none" stroke="var(--fg)" stroke-width="0.45" stroke-linecap="round" opacity="0.35" d="M5.25 11.5c.65-.5 1.45-.75 2.75-.75s2.1.25 2.75.75"/>
 </svg>

@@ -1,0 +1,132 @@
+/** Banner de nova entrada (`addDiary`) — tom memorial fixo; modais usam `.diary-entry-kicker` etc. fora deste wrapper. */
+/* Diary: inline banner + sidebar open affordances */
+
+.diary-entry-banner {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem 1rem;
+  background: linear-gradient(160deg, #1e1a16 0%, #12100c 55%, #0c0a08 100%);
+  border: 1px solid rgba(120, 100, 72, 0.45);
+  border-radius: 3px;
+  box-shadow: 0 0 20px rgba(40, 32, 20, 0.45), inset 0 1px 0 rgba(200, 180, 140, 0.06);
+}
+
+.diary-entry-banner .diary-entry-kicker {
+  color: #c4a574;
+}
+
+.diary-entry-banner .diary-entry-subkicker {
+  color: #9a8a72;
+  border-bottom-color: rgba(120, 100, 72, 0.25);
+}
+
+.diary-entry-banner .diary-entry-body {
+  color: #e8dcc8;
+}
+
+.diary-entry-banner .diary-entry-body + .diary-entry-body {
+  border-top: 1px dashed rgba(120, 100, 72, 0.2);
+}
+
+.diary-entry-banner .diary-entry-dismiss {
+  color: #e8dcc8;
+  background: #2a241c;
+  border: 1px solid #6a5a42;
+}
+
+.diary-entry-banner .diary-entry-dismiss:hover {
+  background: #352e22;
+  border-color: #7a6a52;
+}
+
+/** Cabeçalhos/rodapé de modais (diário, ficha) — `html[data-theme]` */
+.diary-entry-kicker {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--accent) 88%, var(--fg));
+  margin: 0 0 0.35rem;
+}
+
+.diary-entry-subkicker {
+  font-size: 0.72rem;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 82%, var(--accent) 14%);
+}
+
+.diary-entry-body {
+  font-family: 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  font-style: italic;
+  color: var(--text-strong);
+  margin: 0.5rem 0 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.diary-entry-body + .diary-entry-body {
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed color-mix(in srgb, var(--border) 78%, var(--accent) 14%);
+}
+
+.diary-entry-dismiss {
+  display: block;
+  margin: 0.95rem 0 0;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  color: var(--text-strong);
+  background: var(--surface-inset);
+  border: 1px solid color-mix(in srgb, var(--accent) 32%, var(--border));
+  border-radius: 2px;
+}
+
+.diary-entry-dismiss:hover {
+  background: var(--surface-hover);
+  border-color: color-mix(in srgb, var(--accent) 48%, var(--border));
+}
+
+/** Diário na sidebar — abre modal (não colapsável) */
+.diary-sidebar-card .diary-sidebar-open-btn,
+.character-sheet-sidebar-card .diary-sidebar-open-btn {
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: 0.35rem;
+  column-gap: 0.45rem;
+}
+
+.diary-sidebar-card .diary-sidebar-open-btn::after,
+.character-sheet-sidebar-card .diary-sidebar-open-btn::after {
+  content: none;
+}
+
+.diary-sidebar-open-btn .sidebar-collapse-trigger-start {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.diary-sidebar-open-btn .diary-sidebar-open-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-basis: 100%;
+  justify-content: flex-end;
+  margin-left: 0;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  color: var(--muted);
+}
+
+.diary-sidebar-open-hint {
+  font-size: 0.85rem;
+  color: var(--accent);
+  opacity: 0.85;
+}

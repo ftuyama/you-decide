@@ -1,0 +1,1023 @@
+/**
+ * Combate: layout, inimigos, log, posturas, magias, poções, FX de golpe.
+ * Variáveis em tokens/theme-tokens.css (importada antes em styles.css).
+ */
+
+/** Área principal: log ao lado do campo */
+main.main--combat {
+  min-width: 0;
+}
+
+/** ~65% / ~35% no desktop — coluna dos inimigos mais larga */
+.combat-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 13fr) minmax(17rem, 7fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (max-width: 719px) {
+  .combat-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.combat-enemies-column {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.75rem 0.85rem;
+  background: var(--panel-overlay-28);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/** Último dano aplicado foi crítico — destaque no “quadrado” do campo (inimigos) */
+.combat-enemies-column.combat-enemies-column--crit-damage {
+  border-color: var(--crit-highlight);
+  box-shadow:
+    0 0 0 2px var(--crit-highlight-glow),
+    inset 0 0 0 1px rgba(230, 194, 0, 0.2),
+    inset 0 0 32px rgba(230, 194, 0, 0.07);
+}
+
+/** Postura, magias, itens e fugir — grelha visível (mesmo padrão que --ui-grid-*) */
+.combat-actions-panel {
+  margin-top: 0.85rem;
+  padding: 0.6rem 0.65rem 0.65rem;
+  border: 1px solid var(--combat-actions-border);
+  border-radius: 4px;
+  background-color: var(--combat-actions-bg);
+  background-image:
+    linear-gradient(var(--ui-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--ui-grid-line) 1px, transparent 1px);
+  background-size: var(--ui-grid-size) var(--ui-grid-size);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.35),
+    0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.combat-actions-panel-hdr {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--combat-actions-hdr);
+  margin: 0 0 0.45rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--combat-actions-hdr-border);
+}
+
+.combat-actions-panel .combat-attack-bar {
+  margin: 0 0 0.35rem;
+}
+
+.combat-actions-panel .combat-attack-bar .stance-bar {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.combat-actions-panel .combat-spell-bar {
+  margin: 0.45rem 0 0.35rem;
+}
+
+.combat-actions-panel .combat-potion-bar {
+  margin: 0.35rem 0 0.35rem;
+}
+
+button.combat-flee-btn {
+  font: inherit;
+  font-size: 0.78rem;
+  text-align: left;
+  cursor: pointer;
+  padding: 0.35rem 0.5rem;
+  background: var(--combat-flee-bg);
+  color: var(--combat-flee-fg);
+  border: 1px solid var(--combat-flee-border);
+  display: block;
+  width: 100%;
+  margin-top: 0.55rem;
+  box-sizing: border-box;
+}
+
+button.combat-flee-btn:hover {
+  border-color: var(--combat-flee-hover);
+}
+
+/** Log ao lado do campo de batalha; sticky para acompanhar scroll sem ficar “embaixo” do layout */
+.combat-log-column {
+  min-width: 0;
+  position: sticky;
+  top: 0.5rem;
+  align-self: start;
+  max-height: calc(100vh - 4.5rem);
+  z-index: 2;
+}
+
+@media (max-width: 719px) {
+  .combat-log-column {
+    position: relative;
+    top: auto;
+    max-height: none;
+  }
+}
+
+/** Caixa: dados + log — contraste e altura útil na coluna direita */
+.combat-log-outer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: min(74vh, 46rem);
+  min-height: 18rem;
+  padding: 0.55rem 0.6rem;
+  border: 2px solid var(--combat-border);
+  border-radius: 4px;
+  background: var(--combat-log-bg);
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.65),
+    0 6px 20px rgba(0, 0, 0, 0.45),
+    inset 0 1px 0 rgba(120, 160, 130, 0.08);
+}
+
+@media (max-width: 719px) {
+  .combat-log-outer {
+    max-height: min(56vh, 28rem);
+    min-height: 14rem;
+  }
+}
+
+.enemy-panel {
+  border: 1px solid var(--border);
+  padding: 0.75rem;
+  background: var(--panel-overlay-35);
+}
+
+.enemy-panel + .enemy-panel {
+  margin-top: 0.65rem;
+}
+
+.enemy-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.enemy-hp-text {
+  font-size: 0.78rem;
+  color: #f0c4c4;
+  font-variant-numeric: tabular-nums;
+}
+
+.enemy-hp-track {
+  height: 7px;
+  margin: 0 0 0.4rem;
+  background: linear-gradient(180deg, #351010 0%, #220b0b 100%);
+  border: 1px solid #5a2a2a;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.enemy-hp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6a1616 0%, #b32020 55%, #de4a4a 100%);
+  box-shadow: 0 0 8px rgba(210, 70, 70, 0.35);
+  transition: width 0.2s ease;
+}
+
+.enemy-armor-line {
+  margin: 0 0 0.45rem;
+  font-size: 0.8rem;
+  color: #8fa0c6;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.enemy-armor-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.75rem;
+  color: #2f4d78;
+  text-shadow: none;
+}
+
+.enemy-armor-slot--filled {
+  color: #6aa8ff;
+  text-shadow: 0 0 6px rgba(106, 168, 255, 0.35);
+}
+
+/** Pilha: ASCII do inimigo + camada de FX (animações) */
+.enemy-sprite-stack {
+  position: relative;
+  display: block;
+  margin: 0.5rem 0 0;
+  min-height: 6rem;
+}
+
+.enemy-sprite-stack--defeated {
+  margin-top: 0.45rem;
+}
+
+.enemy-fx-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.enemy-sprite {
+  position: relative;
+  z-index: 1;
+  font-size: 0.72rem;
+  line-height: 1.2;
+  white-space: pre;
+  color: var(--fg);
+  margin: 0;
+  min-height: 6rem;
+  transition: transform 0.12s ease;
+}
+
+.enemy-sprite--defeated {
+  filter: grayscale(0.35) brightness(0.72);
+  min-height: 4rem;
+}
+
+.enemy-hp-text--defeated {
+  color: color-mix(in srgb, var(--muted) 70%, #6a9a7a);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.enemy-panel--defeated {
+  opacity: 0.92;
+  border-style: dashed;
+  animation: enemyDefeatedPanel 0.85s ease forwards;
+}
+
+@keyframes enemyDefeatedPanel {
+  from {
+    opacity: 0.35;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 0.92;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/** Golpes corpo a corpo — variações por arma / classe */
+@keyframes combatFxSlash {
+  0% {
+    opacity: 0;
+    background: linear-gradient(
+      115deg,
+      transparent 40%,
+      rgba(220, 200, 160, 0.45) 48%,
+      rgba(255, 245, 220, 0.65) 50%,
+      rgba(220, 200, 160, 0.45) 52%,
+      transparent 60%
+    );
+    transform: translateX(-18%) skewX(-8deg);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(18%) skewX(-8deg);
+  }
+}
+
+@keyframes combatFxBlunt {
+  0% {
+    opacity: 0;
+    box-shadow: inset 0 0 0 0 rgba(180, 160, 120, 0);
+    transform: scale(1);
+  }
+  25% {
+    opacity: 1;
+    box-shadow: inset 0 -6px 14px rgba(200, 180, 140, 0.45);
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 0;
+    box-shadow: inset 0 0 0 0 transparent;
+    transform: scale(1);
+  }
+}
+
+@keyframes combatFxStaff {
+  0% {
+    opacity: 0;
+    background: radial-gradient(
+      ellipse 80% 60% at 30% 50%,
+      rgba(140, 180, 255, 0.35),
+      transparent 70%
+    );
+  }
+  40% {
+    opacity: 1;
+    background: radial-gradient(
+      ellipse 90% 70% at 50% 45%,
+      rgba(160, 200, 255, 0.5),
+      transparent 72%
+    );
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes combatFxCritExtra {
+  0%,
+  100% {
+    box-shadow: inset 0 0 0 0 transparent;
+  }
+  40% {
+    box-shadow:
+      inset 0 0 24px rgba(230, 194, 0, 0.35),
+      0 0 20px rgba(230, 194, 0, 0.2);
+  }
+}
+
+.combat-fx-melee-slash {
+  animation: combatFxSlash 0.38s ease-out forwards;
+}
+
+.combat-fx-melee-slash--crit {
+  animation:
+    combatFxSlash 0.38s ease-out forwards,
+    combatFxCritExtra 0.48s ease-out forwards;
+}
+
+.combat-fx-melee-blunt {
+  animation: combatFxBlunt 0.4s ease-out forwards;
+}
+
+.combat-fx-melee-blunt--crit {
+  animation:
+    combatFxBlunt 0.4s ease-out forwards,
+    combatFxCritExtra 0.48s ease-out forwards;
+}
+
+.combat-fx-melee-staff {
+  animation: combatFxStaff 0.42s ease-out forwards;
+}
+
+.combat-fx-melee-staff--crit {
+  animation:
+    combatFxStaff 0.42s ease-out forwards,
+    combatFxCritExtra 0.48s ease-out forwards;
+}
+
+@keyframes combatFxSpellArcane {
+  0% {
+    opacity: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(160, 120, 220, 0.55), transparent 65%);
+    transform: scale(0.65);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes combatFxSpellEmber {
+  0% {
+    opacity: 0;
+    background: radial-gradient(circle at 40% 55%, rgba(255, 120, 60, 0.55), transparent 62%);
+  }
+  50% {
+    opacity: 1;
+    background: radial-gradient(circle at 50% 45%, rgba(255, 160, 80, 0.5), transparent 68%);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes combatFxSpellSilver {
+  0% {
+    opacity: 0;
+    background: radial-gradient(circle at 50% 40%, rgba(220, 235, 255, 0.55), transparent 58%);
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.combat-fx-spell-arcane {
+  animation: combatFxSpellArcane 0.45s ease-out forwards;
+}
+
+.combat-fx-spell-arcane--crit {
+  animation:
+    combatFxSpellArcane 0.45s ease-out forwards,
+    combatFxCritExtra 0.48s ease-out forwards;
+}
+
+.combat-fx-spell-ember {
+  animation: combatFxSpellEmber 0.44s ease-out forwards;
+}
+
+.combat-fx-spell-ember--crit {
+  animation:
+    combatFxSpellEmber 0.44s ease-out forwards,
+    combatFxCritExtra 0.48s ease-out forwards;
+}
+
+.combat-fx-spell-silver {
+  animation: combatFxSpellSilver 0.44s ease-out forwards;
+}
+
+.combat-fx-spell-silver--crit {
+  animation:
+    combatFxSpellSilver 0.44s ease-out forwards,
+    combatFxCritExtra 0.48s ease-out forwards;
+}
+
+@keyframes combatFxMiss {
+  0% {
+    opacity: 0;
+    background: linear-gradient(90deg, transparent, rgba(140, 150, 170, 0.25), transparent);
+    transform: translateX(-12px);
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+}
+
+@keyframes combatFxFumble {
+  0%,
+  100% {
+    opacity: 0;
+    background: transparent;
+  }
+  35% {
+    opacity: 1;
+    background: radial-gradient(circle at 50% 50%, rgba(180, 60, 60, 0.4), transparent 70%);
+  }
+}
+
+.combat-fx-miss {
+  animation: combatFxMiss 0.42s ease-out forwards;
+}
+
+.combat-fx-fumble {
+  animation:
+    combatFxMiss 0.35s ease-out forwards,
+    combatFxFumble 0.5s ease-out forwards;
+}
+
+.combat-fx-enemy-whiff {
+  animation: combatFxMiss 0.36s ease-out forwards;
+}
+
+@keyframes combatFxArmorBreak {
+  0% {
+    opacity: 0;
+    box-shadow: inset 0 0 0 1px rgba(106, 168, 255, 0);
+  }
+  30% {
+    opacity: 1;
+    box-shadow: inset 0 0 12px rgba(106, 168, 255, 0.45);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.combat-fx-armor-break {
+  animation: combatFxArmorBreak 0.45s ease-out forwards;
+}
+
+@keyframes combatFxDeath {
+  0% {
+    opacity: 0.85;
+    background: radial-gradient(circle at 50% 40%, rgba(40, 20, 30, 0.5), transparent 75%);
+  }
+  100% {
+    opacity: 0;
+    background: radial-gradient(circle at 50% 60%, rgba(20, 10, 15, 0.65), transparent 85%);
+  }
+}
+
+.combat-fx-death {
+  animation: combatFxDeath 0.75s ease-out forwards;
+}
+
+.combat-enemies-column--pulse-heal {
+  animation: combatColPulseHeal 0.65s ease-out;
+}
+
+.combat-enemies-column--pulse-buff {
+  animation: combatColPulseBuff 0.65s ease-out;
+}
+
+@keyframes combatColPulseHeal {
+  0%,
+  100% {
+    box-shadow: inset 0 0 0 0 transparent;
+  }
+  40% {
+    box-shadow: inset 0 0 28px rgba(100, 180, 130, 0.18);
+  }
+}
+
+@keyframes combatColPulseBuff {
+  0%,
+  100% {
+    box-shadow: inset 0 0 0 0 transparent;
+  }
+  40% {
+    box-shadow: inset 0 0 28px rgba(120, 150, 220, 0.2);
+  }
+}
+
+/** Fala de combate do inimigo — logo abaixo da sprite, estilo citação */
+.enemy-combat-quote {
+  margin: 0.4rem 0 0;
+  padding: 0.4rem 0.5rem 0.45rem 0.7rem;
+  border-left: 3px solid color-mix(in srgb, var(--border) 70%, var(--muted));
+  font-size: 0.72rem;
+  line-height: 1.4;
+  font-style: italic;
+  color: color-mix(in srgb, var(--fg) 78%, var(--muted));
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: color-mix(in srgb, var(--panel-overlay-35) 55%, transparent);
+  border-radius: 0 3px 3px 0;
+}
+
+.enemy-sprite.crit-flash {
+  animation: shake 0.35s ease;
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-3px);
+  }
+  75% {
+    transform: translateX(3px);
+  }
+}
+.dice-panel {
+  font-size: 0.82rem;
+  flex: 1;
+  min-height: 0;
+  border: 1px solid var(--dice-panel-border);
+  padding: 0;
+  border-radius: 2px;
+  background: var(--dice-panel-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.dice-panel-header {
+  flex-shrink: 0;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--dice-panel-header-color);
+  border-bottom: 1px solid var(--dice-panel-header-border);
+  background: var(--dice-panel-header-bg);
+}
+
+.combat-log-scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.5rem 0.65rem 0.75rem;
+  flex: 1;
+  min-height: 14rem;
+  scrollbar-gutter: stable;
+}
+
+/** Pilha: abertura + blocos por rodada (role para cima para histórico) */
+.combat-log-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.combat-log-preamble {
+  border: 1px solid color-mix(in srgb, var(--combat-log-entry-border) 80%, transparent);
+  border-radius: 4px;
+  background: rgba(15, 22, 28, 0.35);
+  overflow: hidden;
+}
+
+.combat-log-preamble-hdr {
+  padding: 0.32rem 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.combat-log-preamble-body {
+  padding: 0.45rem 0.5rem 0.55rem;
+}
+
+.combat-log-round {
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--combat-log-entry-border));
+  border-radius: 4px;
+  background: rgba(18, 32, 24, 0.4);
+  overflow: hidden;
+}
+
+.combat-log-round-header {
+  padding: 0.38rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: color-mix(in srgb, var(--fg) 88%, var(--accent));
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
+  background: rgba(25, 45, 32, 0.55);
+}
+
+.combat-log-phase {
+  padding: 0;
+}
+
+.combat-log-phase + .combat-log-phase {
+  border-top: 1px dashed color-mix(in srgb, var(--border) 65%, transparent);
+}
+
+.combat-log-phase-label {
+  padding: 0.28rem 0.55rem 0.15rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #9ab89a;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.combat-log-phase-label::before {
+  content: '';
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.85;
+}
+
+.combat-log-phase--enemy .combat-log-phase-label {
+  color: #c4a080;
+}
+
+.combat-log-phase--enemy .combat-log-phase-label::before {
+  background: #b06050;
+}
+
+.combat-log-phase-body {
+  padding: 0.2rem 0.5rem 0.55rem;
+}
+
+.combat-log-phase-body .combat-log-entry:last-child {
+  margin-bottom: 0;
+}
+
+.combat-log-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.combat-log-scroll::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 2px;
+}
+
+.combat-log-scroll::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 2px;
+}
+
+.combat-log-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+.combat-log-entry {
+  margin: 0 0 0.42rem;
+  padding: 0.32rem 0.45rem;
+  background: var(--panel-overlay-35);
+  border: 1px solid var(--combat-log-entry-border);
+  border-radius: 2px;
+}
+
+.combat-log-entry:last-child {
+  margin-bottom: 0;
+}
+
+.combat-log-msg {
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--combat-log-msg);
+}
+
+/** Ataque: cores por acerto / erro (verde / vermelho) */
+.combat-log-entry.combat-outcome-hit {
+  border-color: #3d6b48;
+  background: rgba(35, 65, 40, 0.28);
+}
+
+.combat-log-entry.combat-outcome-hit .combat-log-msg {
+  color: #b8e8c4;
+}
+
+.combat-log-entry.combat-outcome-hit .combat-log-meta {
+  color: #9ec9a8;
+}
+
+.combat-log-entry.combat-outcome-miss {
+  border-color: #7a3d3d;
+  background: rgba(55, 28, 28, 0.35);
+}
+
+.combat-log-entry.combat-outcome-miss .combat-log-msg {
+  color: #f0b0b0;
+}
+
+.combat-log-entry.combat-outcome-miss .combat-log-meta {
+  color: #d89898;
+}
+
+.combat-log-entry.combat-log-damage.combat-damage-to-enemy .combat-log-msg {
+  color: #a8d4b0;
+}
+
+.combat-log-entry.combat-log-damage.combat-damage-to-enemy {
+  border-color: #3a5c42;
+  background: rgba(30, 50, 35, 0.2);
+}
+
+/**
+ * Dano no herói (inimigo acerta): verde — leitura de “golpe certeiro”, não panfleto de erro.
+ * Crítico: amarelo (mesma família do crítico em dano a inimigo).
+ */
+.combat-log-entry.combat-log-damage.combat-damage-to-hero {
+  border-color: #3d6b48;
+  background: rgba(35, 65, 40, 0.28);
+}
+
+.combat-log-entry.combat-log-damage.combat-damage-to-hero .combat-log-msg {
+  color: #b8e8c4;
+}
+
+.combat-log-entry.combat-log-damage.combat-damage-to-hero .combat-log-meta--attack-roll {
+  color: #9ec9a8;
+}
+
+.combat-log-entry.combat-log-damage.combat-damage-to-hero.combat-damage-crit {
+  border-color: #8a7a28;
+  background: rgba(65, 55, 20, 0.35);
+}
+
+.combat-log-entry.combat-log-damage.combat-damage-to-hero.combat-damage-crit .combat-log-msg {
+  color: #e6c200;
+  font-weight: 600;
+}
+
+.combat-log-entry.combat-log-damage.combat-damage-to-hero.combat-damage-crit .combat-log-meta--attack-roll {
+  color: #e0c860;
+  font-weight: 600;
+}
+
+.combat-log-entry.combat-log-damage.combat-damage-crit:not(.combat-damage-to-hero) .combat-log-msg {
+  color: #e6c200;
+  font-weight: 600;
+}
+
+.combat-log-entry.combat-log-damage:not(.combat-damage-to-hero):not(.combat-damage-to-enemy) .combat-log-msg {
+  color: #d09090;
+}
+
+.combat-log-entry.combat-log-magic .combat-log-msg {
+  color: #8fc4a8;
+}
+
+.combat-log-entry.combat-log-stance .combat-log-msg,
+.combat-log-entry.combat-log-info .combat-log-msg {
+  color: #9a9a8a;
+}
+
+.combat-log-entry.combat-log-stress .combat-log-msg {
+  color: #b898a8;
+}
+
+.combat-log-entry.combat-log-armor_break .combat-log-msg {
+  color: #c4b080;
+}
+
+/** Marcador de rodada / fase */
+.combat-log-entry.combat-log-turn_banner {
+  margin: 0.55rem 0 0.42rem;
+  padding: 0.4rem 0.5rem;
+  border: 1px dashed #4a5f4a;
+  border-left: 4px solid var(--accent);
+  border-radius: 2px;
+  background: rgba(25, 40, 28, 0.45);
+}
+
+.combat-log-entry.combat-log-turn_banner:first-child {
+  margin-top: 0;
+}
+
+.combat-log-entry.combat-log-turn_banner .combat-log-msg {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #c8e2c8;
+}
+
+.combat-log-meta {
+  margin-top: 0.22rem;
+  font-size: 0.76rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  color: #aab8a8;
+}
+
+/** Rolagem de ataque: comparação (resultado vs CA) + bônus — mais legível que mod/total soltos */
+.combat-log-meta--attack-roll {
+  font-variant-numeric: tabular-nums;
+}
+
+.combat-log-entry.combat-outcome-hit .combat-log-meta--attack-roll {
+  color: #b8e0c4;
+}
+
+.combat-log-entry.combat-outcome-miss .combat-log-meta--attack-roll {
+  color: #f0c0c0;
+}
+
+.combat-log-msg--sub {
+  font-size: 0.72em;
+  opacity: 0.92;
+  margin-top: 0.12rem;
+}
+
+.combat-allies-hint {
+  font-size: 0.75rem;
+  color: var(--sidebar-equip-stats);
+  margin: 0.5rem 0 0.25rem;
+  padding: 0.35rem 0.45rem;
+  border-left: 2px solid #4a5a48;
+  background: rgba(40, 50, 40, 0.25);
+  line-height: 1.35;
+}
+
+/** Dica de combate no acampamento (abaixo da arte ASCII da cena, se houver) */
+.shell .camp-combat-hint {
+  margin: 0.35rem 0 0.85rem;
+}
+
+.stance-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.75rem 0;
+}
+
+button.stance {
+  font: inherit;
+  font-size: 0.82rem;
+  padding: 0.4rem 0.6rem;
+  cursor: pointer;
+  background: #151715;
+  color: var(--fg);
+  border: 1px solid var(--border);
+}
+
+button.stance:hover {
+  border-color: var(--accent);
+}
+
+button.special {
+  border-color: var(--danger);
+}
+
+.combat-attack-bar {
+  margin: 0.5rem 0 0.75rem;
+  padding: 0.5rem 0.55rem;
+  border: 1px dashed #5a4a38;
+  border-radius: 4px;
+  background: rgba(32, 26, 18, 0.35);
+}
+
+.combat-attack-hdr {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
+}
+
+.combat-spell-bar {
+  margin: 0.5rem 0 0.75rem;
+  padding: 0.5rem 0.55rem;
+  border: 1px dashed #3a4a5a;
+  border-radius: 4px;
+  background: rgba(20, 28, 36, 0.35);
+}
+
+.combat-spell-hdr {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
+}
+
+button.combat-spell {
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.5rem;
+  margin: 0.2rem 0.35rem 0 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  background: #1a1e28;
+  color: #c8d0e8;
+  border: 1px solid #4a5a78;
+}
+
+button.combat-spell:hover:not(:disabled) {
+  border-color: #6a8ac8;
+}
+
+button.combat-spell:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.combat-potion-bar {
+  margin: 0.5rem 0 0.75rem;
+  padding: 0.5rem 0.55rem;
+  border: 1px dashed #3a5a4a;
+  border-radius: 4px;
+  background: rgba(18, 32, 28, 0.35);
+}
+
+.combat-potion-hdr {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
+}
+
+button.combat-potion {
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 0.35rem 0.5rem;
+  margin: 0.2rem 0.35rem 0 0;
+  cursor: pointer;
+  background: #161f22;
+  color: #b8e0c8;
+  border: 1px solid #4a6a58;
+}
+
+button.combat-potion:hover:not(:disabled) {
+  border-color: #5ac890;
+}
+
+button.combat-potion:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.combat-log-entry.combat-log-heal .combat-log-msg {
+  color: #7ec8a0;
+}

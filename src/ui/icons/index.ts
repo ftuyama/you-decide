@@ -6,6 +6,7 @@ import equipment from './equipment.svg?raw';
 import factions from './factions.svg?raw';
 import faith from './faith.svg?raw';
 import gold from './gold.svg?raw';
+import heart from './heart.svg?raw';
 import inventory from './inventory.svg?raw';
 import item from './item.svg?raw';
 import map from './map.svg?raw';
@@ -30,6 +31,7 @@ export const icons = {
   factions,
   faith,
   gold,
+  heart,
   inventory,
   item,
   map,

@@ -306,7 +306,7 @@ function mountVisualPanel(
   const note = document.createElement('p');
   note.className = 'dev-tools-note';
   note.textContent =
-    'Paleta da interface (`html[data-theme]` em theme-tokens.css): padrão, neve (ato 5), vazio (ato 6), cinzas (ato 7). A pré-visualização altera esta página até clicar em Restaurar.';
+    'Paleta da interface (`html[data-theme]` em tokens/theme-tokens.css): padrão, neve (ato 5), vazio (ato 6), cinzas (ato 7). A pré-visualização altera esta página até clicar em Restaurar.';
 
   const table = document.createElement('table');
   table.className = 'dev-tools-table';

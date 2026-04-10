@@ -1,6 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-  <path fill="#5a5040" d="M1 3.5l4.5-1.2v10.4L1 13.7V3.5zm9 1.3L14.5 3v10l-4.5 1.2V4.8z"/>
-  <path fill="#8a7a58" d="M7 3.2l5.5 1.6v8.4L7 11.6V3.2z" opacity=".9"/>
-  <path fill="#c9a84b" d="M8.5 6.5l1.2.8-.4 1.4-1.6-.2-.6-1.5.4-.5z"/>
-  <circle cx="9.2" cy="7.6" r=".45" fill="#1a1810"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true">
+  <path fill="var(--muted)" d="M1.25 3.75L5.5 2.6v9.05l-4.25 1.15V3.75z"/>
+  <path fill="var(--muted)" opacity="0.75" d="M10.5 2.6L14.75 3.75v9.05l-4.25-1.15V2.6z"/>
+  <path fill="var(--fg)" opacity="0.88" d="M5.5 2.6l5 1.45v8.65l-5-1.45V2.6z"/>
+  <circle cx="9.35" cy="7.15" r="1.05" fill="var(--accent)"/>
+  <circle cx="9.35" cy="7.15" r="0.35" fill="var(--bg)"/>
 </svg>

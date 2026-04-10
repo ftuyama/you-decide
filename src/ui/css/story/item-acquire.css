@@ -1,0 +1,62 @@
+/* New item / loot reveal banner */
+
+.item-acquire-banner {
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.85rem 0.85rem;
+  background: linear-gradient(145deg, #1a1e22 0%, #121510 100%);
+  border: 1px solid #4a5a48;
+  border-radius: 3px;
+  box-shadow: 0 0 16px rgba(74, 90, 72, 0.35);
+}
+
+.item-acquire-kicker {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a8c4a0;
+  margin-bottom: 0.65rem;
+}
+
+.item-acquire-block + .item-acquire-block {
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgba(90, 106, 88, 0.35);
+}
+
+.item-acquire-name {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #e4dcc8;
+  margin-bottom: 0.35rem;
+}
+
+.item-sprite {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.28rem;
+  line-height: 1.2;
+  white-space: pre;
+  margin: 0;
+  padding: 0.45rem 0.5rem;
+  color: #c8d4c0;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(90, 106, 88, 0.4);
+  border-radius: 2px;
+  overflow-x: auto;
+}
+
+.item-acquire-dismiss {
+  display: block;
+  margin: 0.85rem 0 0;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  color: #dfe8d8;
+  background: #2a3328;
+  border: 1px solid #5a6a52;
+  border-radius: 2px;
+}
+
+.item-acquire-dismiss:hover {
+  background: #354038;
+}

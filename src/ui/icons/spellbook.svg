@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
-  <path fill="#4a5048" d="M3 2h5v12H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/>
-  <path fill="#3a4038" d="M8 2h5a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H8V2z"/>
-  <path fill="#6a8f7b" d="M4.5 4.5h2v1h-2v-1zm0 2.5h2v1h-2v-1zm0 2.5h2v.8h-2v-.8z"/>
-  <path fill="#5a7f6b" d="M9.5 4.5h2.5v.8H9.5v-.8zm0 2h2.5v.8H9.5v-.8z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true">
+  <path fill="var(--muted)" d="M3.1 1.85h4.95v12.3H3.1a.95.95 0 0 1-.95-.95V2.8a.95.95 0 0 1 .95-.95z"/>
+  <path fill="var(--fg)" opacity="0.25" d="M8.05 1.85h4.95a.95.95 0 0 1 .95.95v10.4a.95.95 0 0 1-.95.95h-4.95V1.85z"/>
+  <path fill="var(--magic)" d="M4.55 4.55h2.15v1.05H4.55V4.55zm0 2.45h2.15v1.05H4.55V6.1zm0 2.45h2.15v.95H4.55V8.55z"/>
+  <path fill="var(--magic)" opacity="0.65" d="M9.55 4.55h2.65v.95H9.55v-.95zm0 2h2.65v.95H9.55v-.95z"/>
 </svg>

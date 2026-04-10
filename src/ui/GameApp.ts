@@ -28,7 +28,7 @@ import {
   type StoryRenderContext,
 } from './gameAppStory.ts';
 import { formatCampaignHeaderTitle } from './campaignHeaderTitle.ts';
-import { mountAppChrome } from './gameAppShell.ts';
+import { mountAppChrome, syncAppChrome, type AppChromeRefs } from './gameAppShell.ts';
 import './css/styles.css';
 import gameVersionRaw from '../../VERSION?raw';
 
@@ -62,6 +62,7 @@ export class GameApp {
   private audio: GameAudio;
   private state: GameState;
   private root: HTMLElement;
+  private chromeRefs: AppChromeRefs | null = null;
   private timedTimer: ReturnType<typeof setTimeout> | null = null;
   private menuOpen = false;
   /** 0 = 100%, 1 = 110%, 2 = 120% */
@@ -447,6 +448,7 @@ export class GameApp {
     }
     const prevScene = this.state.sceneId;
     let s = applyEffects(this.state, choice.effects, this.ctx());
+    s = { ...s, timedChoiceDeadline: null };
     if (choice.next && s.mode === 'story') {
       s = { ...s, sceneId: choice.next };
     }
@@ -459,6 +461,11 @@ export class GameApp {
 
   private onSkillRoll(scene: LoadedScene): void {
     if (this.pendingStoryDiceRoll) return;
+    if (this.timedTimer) {
+      clearTimeout(this.timedTimer);
+      this.timedTimer = null;
+    }
+    this.state = { ...this.state, timedChoiceDeadline: null };
     this.unlockAudio();
     this.audio.playDice();
     const r = resolveSkillCheck(this.state, scene);
@@ -469,6 +476,11 @@ export class GameApp {
 
   private onDualAttrSkillRoll(scene: LoadedScene): void {
     if (this.pendingStoryDiceRoll) return;
+    if (this.timedTimer) {
+      clearTimeout(this.timedTimer);
+      this.timedTimer = null;
+    }
+    this.state = { ...this.state, timedChoiceDeadline: null };
     this.unlockAudio();
     this.audio.playDice();
     const r = resolveDualAttrSkillCheck(this.state, scene);
@@ -483,6 +495,11 @@ export class GameApp {
 
   private onLuckRoll(scene: LoadedScene): void {
     if (this.pendingStoryDiceRoll) return;
+    if (this.timedTimer) {
+      clearTimeout(this.timedTimer);
+      this.timedTimer = null;
+    }
+    this.state = { ...this.state, timedChoiceDeadline: null };
     this.unlockAudio();
     this.audio.playDice();
     const r = resolveLuckCheck(this.state, scene, this.registry.data);
@@ -633,7 +650,7 @@ export class GameApp {
         this.clearDiceRollTimers();
         this.pendingStoryDiceRoll = null;
         const prevScene = this.state.sceneId;
-        let s = nextState;
+        let s: GameState = { ...nextState, timedChoiceDeadline: null };
         if (s.sceneId !== prevScene) {
           s = tickActiveBuffs(s);
         }
@@ -687,17 +704,28 @@ export class GameApp {
         unlockAudio: () => this.unlockAudio(),
         playUiClick: () => this.audio.playUiClick(),
         commitEquipEffects: (effects) => {
-          this.state = this.stabilize(applyEffects(this.state, effects, this.ctx()));
+          this.state = this.stabilize({
+            ...applyEffects(this.state, effects, this.ctx()),
+            timedChoiceDeadline: null,
+          });
           this.render();
         },
       },
       setTimedChoiceTimer: (t) => {
         this.timedTimer = t;
       },
+      onTimedChoiceScheduled: (deadlineEpochMs) => {
+        this.state = { ...this.state, timedChoiceDeadline: deadlineEpochMs };
+      },
     };
   }
 
   private render(): void {
+    if (this.state.mode === 'combat' || !this.timedChoiceMode) {
+      if (this.state.timedChoiceDeadline != null) {
+        this.state = { ...this.state, timedChoiceDeadline: null };
+      }
+    }
     if (this.timedTimer) {
       clearTimeout(this.timedTimer);
       this.timedTimer = null;
@@ -706,12 +734,11 @@ export class GameApp {
     if (this.state.mode !== 'combat') {
       this.combatLogSoundCursor = { encounterId: '', index: 0 };
     }
-    this.root.innerHTML = '';
 
     const headerTitle = formatCampaignHeaderTitle(this.registry.data.campaign, this.state.chapter);
     document.title = headerTitle;
 
-    mountAppChrome(this.root, {
+    const chromeOpts = {
       headerTitle,
       gameVersion: GAME_VERSION,
       fontStep: this.fontStep,
@@ -723,15 +750,15 @@ export class GameApp {
       registry: this.registry,
       sidebarSections: this.sidebarSections,
       audio: this.audio,
-      onMenuHamburgerClick: (hBtn) => {
+      onMenuHamburgerClick: (hBtn: HTMLButtonElement) => {
         this.toggleMenu();
         hBtn.setAttribute('aria-expanded', this.menuOpen ? 'true' : 'false');
       },
-      onMenuBackdropClick: (hBtn) => {
+      onMenuBackdropClick: (hBtn: HTMLButtonElement) => {
         this.closeMenu();
         hBtn.setAttribute('aria-expanded', 'false');
       },
-      onSoundMuteChange: (muted) => {
+      onSoundMuteChange: (muted: boolean) => {
         this.audio.setMuted(muted);
         if (!muted) {
           this.unlockAudio();
@@ -740,20 +767,20 @@ export class GameApp {
         }
       },
       getVolume: () => this.audio.getVolume(),
-      setVolume: (n) => this.audio.setVolume(n),
-      onDevModeChange: (v) => {
+      setVolume: (n: number) => this.audio.setVolume(n),
+      onDevModeChange: (v: boolean) => {
         this.devMode = v;
         this.saveDevMode();
         this.closeMenu();
         this.render();
       },
-      onQuickNavChange: (v) => {
+      onQuickNavChange: (v: boolean) => {
         this.quickNavMode = v;
         this.saveQuickNavMode();
         this.closeMenu();
         this.render();
       },
-      onTimedChoiceChange: (v) => {
+      onTimedChoiceChange: (v: boolean) => {
         this.timedChoiceMode = v;
         this.saveTimedChoiceMode();
         this.closeMenu();
@@ -762,7 +789,7 @@ export class GameApp {
       onCycleFont: () => this.cycleFontSize(),
       fullscreenSupported: this.isFullscreenSupported(),
       getFullscreenActive: () => this.getFullscreenElement() != null,
-      onFullscreenChange: async (want) => {
+      onFullscreenChange: async (want: boolean) => {
         if (want) {
           await this.requestGameFullscreen();
         } else {
@@ -781,13 +808,13 @@ export class GameApp {
       showImportInPartida: this.devMode,
       showGraphInSettings: this.devMode,
       showDevModeToggle: this.isLocalhostHost(),
-      onSaveSlot: (slot) => this.saveToSlot(slot),
-      onLoadSlot: (slot) => this.loadFromSlot(slot),
-      onSidebarSectionToggle: (key, open) => {
+      onSaveSlot: (slot: number) => this.saveToSlot(slot),
+      onLoadSlot: (slot: number) => this.loadFromSlot(slot),
+      onSidebarSectionToggle: (key: string, open: boolean) => {
         this.sidebarSections[key] = open;
         this.saveSidebarSections();
       },
-      fillMain: (main) => {
+      fillMain: (main: HTMLElement) => {
         if (this.state.mode === 'combat') {
           main.classList.add('main--combat');
           renderCombatInto(main, {
@@ -820,7 +847,13 @@ export class GameApp {
           }
         }
       },
-    });
+    };
+
+    if (this.chromeRefs == null) {
+      this.chromeRefs = mountAppChrome(this.root, chromeOpts);
+    } else {
+      syncAppChrome(this.chromeRefs, chromeOpts);
+    }
 
     if (
       this.state.lastCombatXpGain != null ||

@@ -92,6 +92,14 @@ function resourceGainSubtitle(resource: keyof typeof RESOURCE_LABEL): string {
   }
 }
 
+/** Validação Zod completa só em dev; em build de produção confia nos ramos de `applyOne` (save/load valida à parte). */
+function finalizeAppliedState(s: GameState): GameState {
+  if (import.meta.env.DEV) {
+    return GameStateSchema.parse(s);
+  }
+  return s;
+}
+
 export function applyEffects(
   state: GameState,
   effects: Effect[],
@@ -102,7 +110,7 @@ export function applyEffects(
     s = applyOne(s, e, ctx);
     s = syncLeadPassiveStats(s);
   }
-  return GameStateSchema.parse(s);
+  return finalizeAppliedState(s);
 }
 
 function applyOne(

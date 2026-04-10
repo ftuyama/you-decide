@@ -11,6 +11,7 @@ choices:
     condition:
       all:
         - { level: { gte: 18 } }
+        - { day: { lte: 10 } }
     preview: "Rasto, emboscada ou caça — a neve não julga."
   - text: "Rumor do escudeiro — corda e ritual no gelo"
     next: act5/frost_tomas/intro
@@ -48,11 +49,14 @@ choices:
         - { noFlag: monk_cave_banished }
         - { noMark: monk_inner_peace }
         - { level: { gte: 22 } }
+        - { day: { lte: 10 } }
     preview: "Gruta e provas do monge; paz ou banimento."
   - text: "Rumo ao cume — templo de pedra negra (caminho perigoso)"
     next: act5/frost_summit/ascend
     condition:
-      level: { gte: 25 }
+      all:
+        - { level: { gte: 25 } }
+        - { day: { lte: 10 } }
     preview: "Ascensão perigosa ao templo e ao que dorme no cume."
 onEnter: []
 ---

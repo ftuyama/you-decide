@@ -65,7 +65,7 @@ choices:
     condition:
       all:
         - { level: { gte: 7 } }
-        - { day: { lte: 5 } }
+        - { day: { lte: 6 } }
     preview: "Memória antiga; perícia e sorte pesam — mas o eco some se demorares demasiado."
   - text: "Observar o cruzeiro: marcas no chão"
     next: act2/hub_observe
@@ -79,7 +79,10 @@ choices:
     preview: "+1 ouro; sem combate."
   - text: "Escutar um eco que sussurra o dia"
     next: act2/hub_catacomb
-    condition: { day: { gte: 6 } }
+    condition:
+      all:
+        - { level: { gte: 6 } }
+        - { day: { lte: 5 } }
     preview: "Voz seca no cruzeiro; registo no diário."
     effects:
       - { op: addDiary, text: "Uma voz presa ao teto: \"Já vais no dia {{day}}.\"" }

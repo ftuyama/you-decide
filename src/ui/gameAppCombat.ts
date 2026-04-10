@@ -480,8 +480,9 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
       spellHdr.textContent = 'Magias';
       spellBar.appendChild(spellHdr);
       const spells = ctx.registry.data.spells;
-      for (const [spellId, spellDef] of Object.entries(spells)) {
-        if (!ctx.state.knownSpells.includes(spellId)) continue;
+      for (const spellId of ctx.state.knownSpells) {
+        const spellDef = spells[spellId];
+        if (!spellDef) continue;
         if (spellDef.classId !== 'any' && spellDef.classId !== lead.class) continue;
         if (ctx.state.level < spellDef.minLevel) continue;
         const btn = document.createElement('button');

@@ -3,6 +3,7 @@ import type { ContentRegistry } from '../content/registry.ts';
 import type { GameAudio } from './sound/index.ts';
 import { buildGameSidebar } from './gameAppSidebar.ts';
 import { SAVE_SLOT_COUNT, buildMenuSaveSlot } from './gameAppSaveSlots.ts';
+
 /** Layout persistente: cabeçalho, menu lateral, sidebar do jogador e área principal (`main.story-shell`). */
 export type MountAppChromeOptions = {
   /** Texto do título no topo (`{campanha} / {ato}`). */
@@ -45,8 +46,26 @@ export type MountAppChromeOptions = {
   fillMain: (main: HTMLElement) => void;
 };
 
-/** Monta frame, menu, sidebar e `main`; o chamador deve fazer `root.innerHTML = ''` antes. */
-export function mountAppChrome(root: HTMLElement, opts: MountAppChromeOptions): void {
+/** Referências estáveis ao chrome montado uma vez (menu + layout). */
+export type AppChromeRefs = {
+  frame: HTMLElement;
+  titleEl: HTMLElement;
+  sidebarEl: HTMLElement;
+  mainEl: HTMLElement;
+  hamburgerBtn: HTMLButtonElement;
+  soundCb: HTMLInputElement;
+  volumeRange: HTMLInputElement;
+  volumeValue: HTMLElement;
+  devCb: HTMLInputElement;
+  quickNavCb: HTMLInputElement;
+  timedChoiceCb: HTMLInputElement;
+  fontBtn: HTMLButtonElement;
+  fullscreenCb: HTMLInputElement;
+  devSaveExtrasEl: HTMLElement;
+  devSettingsExtrasEl: HTMLElement;
+};
+
+function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
   const frame = document.createElement('div');
   frame.className = 'app-frame';
   frame.style.setProperty('--app-font-pct', `${100 + opts.fontStep * 10}%`);
@@ -61,7 +80,7 @@ export function mountAppChrome(root: HTMLElement, opts: MountAppChromeOptions): 
   hBtn.className = 'hamburger';
   hBtn.setAttribute('aria-label', 'Menu');
   hBtn.setAttribute('aria-expanded', 'false');
-  hBtn.innerHTML = '☰';
+  hBtn.innerHTML = '\u2630';
   hBtn.addEventListener('click', () => opts.onMenuHamburgerClick(hBtn));
   header.appendChild(title);
   header.appendChild(hBtn);
@@ -237,6 +256,15 @@ export function mountAppChrome(root: HTMLElement, opts: MountAppChromeOptions): 
   versionLabel.className = 'menu-version';
   versionLabel.textContent = `You Decide v${opts.gameVersion}`;
 
+  const devSaveExtrasEl = document.createElement('div');
+  devSaveExtrasEl.className = 'menu-dev-save-extras';
+  devSaveExtrasEl.appendChild(importBtn);
+
+  const devSettingsExtrasEl = document.createElement('div');
+  devSettingsExtrasEl.className = 'menu-dev-settings-extras';
+  devSettingsExtrasEl.appendChild(devToolsBtn);
+  devSettingsExtrasEl.appendChild(graphBtn);
+
   const saveSection = createMenuSection('Partida');
   for (let s = 1; s <= SAVE_SLOT_COUNT; s++) {
     saveSection.appendChild(
@@ -246,9 +274,7 @@ export function mountAppChrome(root: HTMLElement, opts: MountAppChromeOptions): 
       })
     );
   }
-  if (opts.showImportInPartida) {
-    saveSection.appendChild(importBtn);
-  }
+  saveSection.appendChild(devSaveExtrasEl);
   saveSection.appendChild(exportBtn);
 
   const settingsSection = createMenuSection('Configurações');
@@ -261,10 +287,7 @@ export function mountAppChrome(root: HTMLElement, opts: MountAppChromeOptions): 
   if (opts.showDevModeToggle) {
     settingsSection.appendChild(devRow);
   }
-  if (opts.showGraphInSettings) {
-    settingsSection.appendChild(devToolsBtn);
-    settingsSection.appendChild(graphBtn);
-  }
+  settingsSection.appendChild(devSettingsExtrasEl);
 
   const aboutSection = createMenuSection('Sobre');
   aboutSection.appendChild(creditsBtn);
@@ -279,9 +302,9 @@ export function mountAppChrome(root: HTMLElement, opts: MountAppChromeOptions): 
   const bodyRow = document.createElement('div');
   bodyRow.className = 'app-body';
 
-  const sidebar = document.createElement('aside');
-  sidebar.className = 'player-sidebar';
-  sidebar.appendChild(
+  const sidebarEl = document.createElement('aside');
+  sidebarEl.className = 'player-sidebar';
+  sidebarEl.appendChild(
     buildGameSidebar({
       state: opts.state,
       registry: opts.registry,
@@ -291,13 +314,74 @@ export function mountAppChrome(root: HTMLElement, opts: MountAppChromeOptions): 
     })
   );
 
-  const main = document.createElement('main');
-  main.className = 'story-shell';
-  opts.fillMain(main);
+  const mainEl = document.createElement('main');
+  mainEl.className = 'story-shell';
+  opts.fillMain(mainEl);
 
-  bodyRow.appendChild(sidebar);
-  bodyRow.appendChild(main);
+  bodyRow.appendChild(sidebarEl);
+  bodyRow.appendChild(mainEl);
   frame.appendChild(bodyRow);
 
-  root.appendChild(frame);
+  return {
+    frame,
+    titleEl: title,
+    sidebarEl,
+    mainEl,
+    hamburgerBtn: hBtn,
+    soundCb,
+    volumeRange,
+    volumeValue,
+    devCb,
+    quickNavCb,
+    timedChoiceCb,
+    fontBtn,
+    fullscreenCb,
+    devSaveExtrasEl,
+    devSettingsExtrasEl,
+  };
+}
+
+/** Monta frame, menu, sidebar e `main` uma vez; anexa a `root`. */
+export function mountAppChrome(root: HTMLElement, opts: MountAppChromeOptions): AppChromeRefs {
+  const refs = buildChromeDom(opts);
+  root.appendChild(refs.frame);
+  return refs;
+}
+
+/** Atualiza título, tipografia, sidebar, área principal e estado do menu sem destruir listeners. */
+export function syncAppChrome(refs: AppChromeRefs, opts: MountAppChromeOptions): void {
+  refs.frame.style.setProperty('--app-font-pct', `${100 + opts.fontStep * 10}%`);
+  refs.titleEl.textContent = opts.headerTitle;
+
+  refs.devSaveExtrasEl.hidden = !opts.showImportInPartida;
+  refs.devSettingsExtrasEl.hidden = !opts.showGraphInSettings;
+
+  refs.soundCb.checked = !opts.audio.isMuted();
+  const pct = Math.round(opts.getVolume() * 100);
+  refs.volumeRange.value = String(pct);
+  refs.volumeValue.textContent = `${pct}%`;
+  refs.volumeRange.setAttribute('aria-valuetext', `${pct}%`);
+
+  refs.devCb.checked = opts.devMode;
+  refs.quickNavCb.checked = opts.quickNavMode;
+  refs.timedChoiceCb.checked = opts.timedChoiceEnabled;
+  refs.fontBtn.textContent = `Tamanho do texto (${100 + opts.fontStep * 10}%)`;
+  refs.fullscreenCb.checked = opts.getFullscreenActive();
+
+  while (refs.sidebarEl.firstChild) {
+    refs.sidebarEl.removeChild(refs.sidebarEl.firstChild);
+  }
+  refs.sidebarEl.appendChild(
+    buildGameSidebar({
+      state: opts.state,
+      registry: opts.registry,
+      sidebarSections: opts.sidebarSections,
+      devMode: opts.devMode,
+      onSectionToggle: opts.onSidebarSectionToggle,
+    })
+  );
+
+  refs.mainEl.classList.remove('main--combat');
+  refs.mainEl.replaceChildren();
+  opts.fillMain(refs.mainEl);
 }

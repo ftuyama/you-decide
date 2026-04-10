@@ -52,18 +52,16 @@
     "id": "act2_rare_bone_sentinel",
     "enemies": [
       "skeleton",
-      "skeleton",
       "skeleton"
     ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
     "xpReward": 10,
-    "fleeRate": 0.51
+    "fleeRate": 0.55
   },
   "act2_rare_lone_swarm": {
     "id": "act2_rare_lone_swarm",
     "enemies": [
-      "rat_swarm",
       "rat_swarm",
       "rat_swarm",
       "rat_swarm",
@@ -72,7 +70,7 @@
     "playerAdvantage": false,
     "enemyAdvantage": true,
     "xpReward": 10,
-    "fleeRate": 0.4
+    "fleeRate": 0.45
   },
   "cult_ambush": {
     "id": "cult_ambush",
@@ -261,14 +259,13 @@
     "id": "summit_ascent_3",
     "enemies": [
       "frost_whelp",
-      "frost_whelp",
       "frost_reaver",
       "frost_cultist"
     ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 12,
-    "fleeRate": 0.42
+    "xpReward": 10,
+    "fleeRate": 0.46
   },
   "summit_fallen_god": {
     "id": "summit_fallen_god",
@@ -287,6 +284,7 @@
     ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
+    "xpReward": 6,
     "fleeRate": 0.5
   },
   "act6_echo_chorus": {
@@ -296,6 +294,7 @@
     ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
+    "xpReward": 6,
     "fleeRate": 0.5
   },
   "act6_penitent_blade": {
@@ -305,6 +304,7 @@
     ],
     "playerAdvantage": false,
     "enemyAdvantage": false,
+    "xpReward": 6,
     "fleeRate": 0.61
   },
   "act6_shadow_self": {
@@ -314,6 +314,7 @@
     ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
+    "xpReward": 6,
     "fleeRate": 0.5
   },
   "act6_will_horde": {

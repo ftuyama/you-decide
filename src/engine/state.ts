@@ -153,8 +153,13 @@ export function syncLeadPassiveStats(state: GameState): GameState {
 }
 
 export function serializeState(state: GameState): string {
-  const { lastCombatXpGain: _x, lastCombatLevelUps: _l, lastCombatLootLines: _loot, ...rest } =
-    state;
+  const {
+    lastCombatXpGain: _x,
+    lastCombatLevelUps: _l,
+    lastCombatLootLines: _loot,
+    timedChoiceDeadline: _td,
+    ...rest
+  } = state;
   return JSON.stringify(rest);
 }
 
@@ -197,6 +202,7 @@ export function deserializeState(json: string): GameState {
     lastCombatXpGain: null,
     lastCombatLevelUps: null,
     lastCombatLootLines: null,
+    timedChoiceDeadline: null,
     activeBuffs: Array.isArray((o as GameState).activeBuffs) ? (o as GameState).activeBuffs : [],
     knownSpells: Array.isArray((o as GameState).knownSpells) ? (o as GameState).knownSpells : [],
     party: rawParty.map((p) => {

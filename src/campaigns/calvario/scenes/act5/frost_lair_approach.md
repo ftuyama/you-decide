@@ -7,6 +7,8 @@ artKey: ice_dragon
 choices:
   - text: "Entrar na câmara do hálito branco"
     next: act5/encounters/fight_ice_dragon
+  - text: "Retornar ao acampamento"
+    next: act5/frost_hub
 onEnter:
   - { op: addDiary, text: "O covil não cheira a enxofre — cheira a tempestade adiada. Vetrnax dorme acordado." }
 ---

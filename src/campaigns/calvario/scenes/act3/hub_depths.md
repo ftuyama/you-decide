@@ -9,7 +9,10 @@ highlight: true
 choices:
   - text: "Rumo ao trono de ossos"
     next: act4/throne/throne_gate
-    condition: { level: { gte: 10 } }
+    condition:
+      all:
+        - { level: { gte: 10 } }
+        - { flag: stone_guard_defeated }
     preview: "Capítulo 4 — confronto com Morvayn; o trono espera."
     timedMs: 15000
     fallbackNext: act3/stone_corridor

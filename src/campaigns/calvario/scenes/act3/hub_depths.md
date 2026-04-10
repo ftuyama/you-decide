@@ -5,6 +5,7 @@ chapter: 3
 type: hub
 ambientTheme: act3
 artKey: depths
+highlight: true
 choices:
   - text: "Rumo ao trono de ossos"
     next: act4/throne/throne_gate

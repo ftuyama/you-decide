@@ -4,6 +4,7 @@ title: Antes do último horizonte
 chapter: 7
 ambientTheme: ash_sky
 artKey: last_horizon
+highlight: true
 choices:
   - text: "Oferecer fé como moeda — comprar silêncio ao céu por um instante"
     next: act7/epilogue_apocalypse

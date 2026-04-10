@@ -4,6 +4,7 @@ title: O espelho d'água
 chapter: 1
 ambientTheme: explore
 artKey: class_gate
+highlight: true
 choices:
   - text: "[#] Forjar o caminho como Cavaleiro"
     next: act1/pick_knight

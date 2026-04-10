@@ -24,6 +24,7 @@ import {
 import { renderCombatInto } from './gameAppCombat.ts';
 import {
   renderStoryInto,
+  resolveSceneArt,
   type StoryDiceBannerHost,
   type StoryRenderContext,
 } from './gameAppStory.ts';
@@ -83,6 +84,8 @@ export class GameApp {
   private faithMiraclePending = false;
   /** Só reproduz efeitos de som para entradas novas do log de combate */
   private combatLogSoundCursor: { encounterId: string; index: number } = { encounterId: '', index: 0 };
+  /** Mesmo slice do log que `combatLogSoundCursor` — animações FX por entrada nova. */
+  private combatLogFxCursor: { encounterId: string; index: number } = { encounterId: '', index: 0 };
   /** Rola teste de perícia/sorte: estado só aplica após o overlay (dados já resolvidos no motor). */
   private pendingStoryDiceRoll: {
     nextState: GameState;
@@ -90,6 +93,10 @@ export class GameApp {
   } | null = null;
   private diceRollIntervalTimer: ReturnType<typeof setInterval> | null = null;
   private diceRollEnterHandler: ((e: KeyboardEvent) => void) | null = null;
+  /** Overlay `highlight`: cena ativa se o jogador re-renderizar antes do fim da animação. */
+  private activeSceneArtHighlight: string | null = null;
+  /** Incrementado a cada `render()` para cancelar timeouts do overlay de arte. */
+  private sceneArtHighlightGen = 0;
 
   constructor(root: HTMLElement, campaignId: string) {
     this.root = root;
@@ -646,6 +653,44 @@ export class GameApp {
     };
   }
 
+  private flushSceneArtHighlightIfInterrupted(): void {
+    const sid = this.activeSceneArtHighlight;
+    if (sid == null) return;
+    this.activeSceneArtHighlight = null;
+    if (this.state.sceneArtHighlightShown[sid]) return;
+    this.state = {
+      ...this.state,
+      sceneArtHighlightShown: { ...this.state.sceneArtHighlightShown, [sid]: true },
+    };
+  }
+
+  private buildSceneArtHighlightPayload(scene: LoadedScene): StoryRenderContext['sceneArtHighlight'] {
+    const fm = scene.frontmatter;
+    if (fm.highlight !== true) return null;
+    const s = this.state;
+    if (s.sceneArtHighlightShown[scene.id]) return null;
+    const artText = resolveSceneArt(this.registry, scene);
+    if (!artText) return null;
+    const gen = this.sceneArtHighlightGen;
+    const sid = scene.id;
+    return {
+      sceneId: sid,
+      artText,
+      onBegin: () => {
+        this.activeSceneArtHighlight = sid;
+      },
+      onEnd: () => {
+        this.activeSceneArtHighlight = null;
+        this.state = {
+          ...this.state,
+          sceneArtHighlightShown: { ...this.state.sceneArtHighlightShown, [sid]: true },
+        };
+        this.render();
+      },
+      isCurrentGeneration: () => this.sceneArtHighlightGen === gen,
+    };
+  }
+
   private buildStoryRenderContext(scene: LoadedScene): StoryRenderContext {
     return {
       campaignId: this.campaignId,
@@ -654,6 +699,7 @@ export class GameApp {
       state: this.state,
       registry: this.registry,
       scene,
+      sceneArtHighlight: this.buildSceneArtHighlightPayload(scene),
       overlay: {
         pendingStoryDiceRoll: this.pendingStoryDiceRoll,
         storyDiceHost: this.storyDiceHostBinding(),
@@ -707,6 +753,8 @@ export class GameApp {
   }
 
   private render(): void {
+    this.flushSceneArtHighlightIfInterrupted();
+    this.sceneArtHighlightGen += 1;
     if (this.state.mode === 'combat' || !this.timedChoiceMode) {
       if (this.state.timedChoiceDeadline != null) {
         this.state = { ...this.state, timedChoiceDeadline: null };
@@ -719,6 +767,7 @@ export class GameApp {
     this.clearDiceRollTimers();
     if (this.state.mode !== 'combat') {
       this.combatLogSoundCursor = { encounterId: '', index: 0 };
+      this.combatLogFxCursor = { encounterId: '', index: 0 };
     }
 
     const headerTitle = formatCampaignHeaderTitle(this.registry.data.campaign, this.state.chapter);
@@ -795,8 +844,10 @@ export class GameApp {
             audio: this.audio,
             combatLog: {
               soundCursor: this.combatLogSoundCursor,
+              fxCursor: this.combatLogFxCursor,
               setSoundCursor: (v) => {
                 this.combatLogSoundCursor = v;
+                this.combatLogFxCursor = v;
               },
             },
             lifecycle: {

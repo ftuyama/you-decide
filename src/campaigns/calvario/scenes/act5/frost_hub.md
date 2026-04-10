@@ -4,6 +4,7 @@ chapter: 5
 type: hub
 ambientTheme: act5
 artKey: frost_peaks
+highlight: true
 title: Desfiladeiro — acampamento improvisado
 choices:
   - text: "Seguir o rasto de garras na neve (missão)"

@@ -5,6 +5,7 @@ chapter: 5
 type: hub
 ambientTheme: act5
 artKey: frost_summit_temple
+highlight: true
 choices:
   - text: "Descer ao desfiladeiro — o corpo pede menos altitude"
     next: act5/frost_hub

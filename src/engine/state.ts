@@ -39,6 +39,7 @@ export function createInitialState(campaign: CampaignIndex, seed?: number): Game
     diary: [],
     knownSpells: [],
     visitedScenes: {},
+    sceneArtHighlightShown: {},
     asciiMap: null,
     pendingInterleave: null,
     timedChoiceDeadline: null,
@@ -209,6 +210,12 @@ export function deserializeState(json: string): GameState {
     flags.frost_monk_blessing_done = true;
   }
 
+  const rawHighlight = (o as Partial<GameState>).sceneArtHighlightShown;
+  const sceneArtHighlightShown: GameState['sceneArtHighlightShown'] =
+    rawHighlight && typeof rawHighlight === 'object' && !Array.isArray(rawHighlight)
+      ? { ...(rawHighlight as Record<string, boolean>) }
+      : {};
+
   const merged: GameState = {
     ...(o as GameState),
     campaignId,
@@ -217,6 +224,7 @@ export function deserializeState(json: string): GameState {
     marks,
     leadStoryPassives,
     flags,
+    sceneArtHighlightShown,
     extraLifeReady: extraLifeReadyFromFaith(resources.faith),
     level: typeof (o as GameState).level === 'number' ? (o as GameState).level : 1,
     xp: typeof (o as GameState).xp === 'number' ? (o as GameState).xp : 0,

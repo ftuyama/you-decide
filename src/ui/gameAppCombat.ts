@@ -20,6 +20,7 @@ import {
   type CombatLogDisplayItem,
 } from './gameAppUtils.ts';
 import type { GameAudio } from './sound/index.ts';
+import { extractLethalGhosts, resolveCombatLogFx, type CombatLogFxResult } from './combatFx.ts';
 
 /** Atalhos no combate: 1–9, depois letras (ordem QWERTY). */
 const COMBAT_QUICK_KEYS_AFTER_9 = 'qwertyuiopasdfghjklzxcvbnm';
@@ -302,6 +303,8 @@ export type CombatRenderContext = {
   audio: GameAudio;
   combatLog: {
     soundCursor: { encounterId: string; index: number };
+    /** Mesmo índice que sound — FX de combate usam este slice do log. */
+    fxCursor: { encounterId: string; index: number };
     setSoundCursor: (v: { encounterId: string; index: number }) => void;
   };
   lifecycle: {
@@ -317,15 +320,27 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
 
   const encId = c.encounterId;
   const leadName = ctx.state.party[0]?.name;
+  let newLogEntries: CombatLogEntry[] = [];
   if (ctx.combatLog.soundCursor.encounterId !== encId) {
-    ctx.combatLog.setSoundCursor({ encounterId: encId, index: c.log.length });
+    const v = { encounterId: encId, index: c.log.length };
+    ctx.combatLog.setSoundCursor(v);
   } else {
-    const newEntries = c.log.slice(ctx.combatLog.soundCursor.index);
-    for (const entry of newEntries) {
+    newLogEntries = c.log.slice(ctx.combatLog.fxCursor.index);
+    for (const entry of newLogEntries) {
       playCombatLogSound(entry, leadName, ctx.audio);
     }
-    ctx.combatLog.setSoundCursor({ encounterId: encId, index: c.log.length });
+    const v = { encounterId: encId, index: c.log.length };
+    ctx.combatLog.setSoundCursor(v);
   }
+
+  const combatFx: CombatLogFxResult =
+    newLogEntries.length > 0
+      ? resolveCombatLogFx(newLogEntries, ctx.state.party, ctx.registry.data)
+      : { byEnemyIndex: new Map(), columnPulse: null };
+  const lethalGhosts =
+    newLogEntries.length > 0
+      ? extractLethalGhosts(newLogEntries, c, ctx.registry.data)
+      : [];
 
   const inner = document.createElement('div');
   inner.className = 'shell combat-shell';
@@ -339,6 +354,12 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
   if (combatLastResolvedDamageWasCrit(c.log)) {
     left.classList.add('combat-enemies-column--crit-damage');
   }
+  if (combatFx.columnPulse === 'heal') {
+    left.classList.add('combat-enemies-column--pulse-heal');
+  } else if (combatFx.columnPulse === 'buff') {
+    left.classList.add('combat-enemies-column--pulse-buff');
+  }
+
   for (let enemyIdx = 0; enemyIdx < c.enemies.length; enemyIdx++) {
     const inst = c.enemies[enemyIdx]!;
     if (inst.hp <= 0) continue;
@@ -347,9 +368,23 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     const panel = document.createElement('div');
     panel.className = 'enemy-panel';
     const sprite = def.sprite;
+    const fx = combatFx.byEnemyIndex.get(enemyIdx);
+    const stack = document.createElement('div');
+    stack.className = 'enemy-sprite-stack';
     const pre = document.createElement('pre');
     pre.className = 'enemy-sprite';
+    if (fx?.spriteCritShake) pre.classList.add('crit-flash');
     pre.textContent = sprite;
+    const fxLayer = document.createElement('div');
+    fxLayer.className = 'enemy-fx-layer';
+    fxLayer.setAttribute('aria-hidden', 'true');
+    if (fx?.layerClasses.length) {
+      for (const cls of fx.layerClasses) {
+        fxLayer.classList.add(cls);
+      }
+    }
+    stack.appendChild(pre);
+    stack.appendChild(fxLayer);
     const hpPct = Math.max(0, Math.min(100, Math.round((inst.hp / inst.maxHp) * 100)));
     panel.innerHTML = `<div class="enemy-panel-header"><strong>${escHtml(def.name)}</strong><span class="enemy-hp-text">${inst.hp}/${inst.maxHp}</span></div>
       <div class="enemy-hp-track" title="HP ${inst.hp}/${inst.maxHp}">
@@ -362,7 +397,7 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
       armorLine.innerHTML = `Armadura <span class="enemy-armor-slot${armorChips >= 1 ? ' enemy-armor-slot--filled' : ''}">■</span><span class="enemy-armor-slot${armorChips >= 2 ? ' enemy-armor-slot--filled' : ''}">■</span>`;
       panel.appendChild(armorLine);
     }
-    panel.appendChild(pre);
+    panel.appendChild(stack);
     const line = lastEnemyCombatLine(c.log, enemyIdx);
     if (line) {
       const quote = document.createElement('blockquote');
@@ -370,6 +405,24 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
       quote.textContent = line;
       panel.appendChild(quote);
     }
+    left.appendChild(panel);
+  }
+
+  for (const ghost of lethalGhosts) {
+    const panel = document.createElement('div');
+    panel.className = 'enemy-panel enemy-panel--defeated';
+    const stack = document.createElement('div');
+    stack.className = 'enemy-sprite-stack enemy-sprite-stack--defeated';
+    const pre = document.createElement('pre');
+    pre.className = 'enemy-sprite enemy-sprite--defeated';
+    pre.textContent = ghost.sprite;
+    const fxLayer = document.createElement('div');
+    fxLayer.className = 'enemy-fx-layer combat-fx-death';
+    fxLayer.setAttribute('aria-hidden', 'true');
+    stack.appendChild(pre);
+    stack.appendChild(fxLayer);
+    panel.innerHTML = `<div class="enemy-panel-header"><strong>${escHtml(ghost.name)}</strong><span class="enemy-hp-text enemy-hp-text--defeated">Abatido</span></div>`;
+    panel.appendChild(stack);
     left.appendChild(panel);
   }
 

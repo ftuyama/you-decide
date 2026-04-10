@@ -189,7 +189,7 @@ export const CombatLogEntrySchema = z.object({
     'turn_banner',
   ]),
   message: z.string(),
-  /** Índice em `combat.enemies` — falas de combate (`enemy_line`) */
+  /** Índice em `combat.enemies` — `enemy_line`, ataques/dano/armadura vs inimigo (FX) */
   enemyIndex: z.number().int().min(0).optional(),
   dice: z.array(z.number()).optional(),
   total: z.number().optional(),
@@ -205,6 +205,10 @@ export const CombatLogEntrySchema = z.object({
   rollOutcome: z.enum(['crit_threat', 'fumble_threat', 'normal']).optional(),
   /** Dano crítico vs normal */
   damageKind: z.enum(['crit', 'normal']).optional(),
+  /** Este dano reduziu o inimigo a 0 HP */
+  lethal: z.boolean().optional(),
+  /** Magia associada à linha de log (lançamento, cura, buff) */
+  spellId: z.string().optional(),
 });
 
 export type CombatLogEntry = z.infer<typeof CombatLogEntrySchema>;
@@ -313,6 +317,8 @@ export const GameStateSchema = z.object({
   /** IDs de magias conhecidas pelo líder (combate e sidebar) */
   knownSpells: z.array(z.string()).default([]),
   visitedScenes: z.record(z.string(), z.boolean()).default({}),
+  /** Cenas em que o overlay `highlight` da arte já foi mostrado (persiste na gravação). */
+  sceneArtHighlightShown: z.record(z.string(), z.boolean()).default({}),
   /** Mapa ASCII ativo (só visual; sem posição de jogador no estado) */
   asciiMap: z
     .object({

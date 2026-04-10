@@ -4,6 +4,7 @@ title: A Oferta de Mira
 chapter: 2
 ambientTheme: explore
 artKey: mira_offer
+highlight: true
 choices:
   - text: "Recrutar Mira"
     next: act2/recruit_mira

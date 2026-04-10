@@ -303,6 +303,16 @@ export type StoryOverlayState = {
   setDiaryEntryQueue: (q: string[]) => void;
 };
 
+/** Overlay automático: arte em tela cheia (~1s + fade); `onBegin`/`onEnd` ligam ao ciclo de vida no GameApp. */
+export type SceneArtHighlightPayload = {
+  sceneId: string;
+  artText: string;
+  onBegin: () => void;
+  onEnd: () => void;
+  /** Invalida timeouts se `render()` voltar a correr (novo valor de `sceneArtHighlightGen`). */
+  isCurrentGeneration: () => boolean;
+};
+
 export type StoryRenderContext = {
   campaignId: string;
   devMode: boolean;
@@ -313,6 +323,8 @@ export type StoryRenderContext = {
   state: GameState;
   registry: ContentRegistry;
   scene: LoadedScene;
+  /** Primeira visita + `highlight` no frontmatter + arte resolvida (overlay por cima de diário, facções, itens, dados, etc.). */
+  sceneArtHighlight: SceneArtHighlightPayload | null;
   overlay: StoryOverlayState;
   audio: {
     unlockAudio: () => void;
@@ -329,6 +341,31 @@ export type StoryRenderContext = {
   campCallbacks: CampEquipmentCallbacks;
   setTimedChoiceTimer: (t: ReturnType<typeof setTimeout> | null) => void;
 };
+
+const SCENE_ART_HIGHLIGHT_HOLD_MS = 1000;
+const SCENE_ART_HIGHLIGHT_FADE_MS = 350;
+
+function mountSceneArtHighlight(shell: HTMLElement, payload: SceneArtHighlightPayload): void {
+  payload.onBegin();
+  const layer = document.createElement('div');
+  layer.className = 'scene-art-highlight-layer';
+  layer.setAttribute('aria-hidden', 'true');
+  const pre = document.createElement('pre');
+  pre.className = 'scene-art-highlight-pre';
+  pre.textContent = payload.artText;
+  layer.appendChild(pre);
+  shell.appendChild(layer);
+
+  window.setTimeout(() => {
+    if (!payload.isCurrentGeneration()) return;
+    layer.classList.add('scene-art-highlight-layer--out');
+  }, SCENE_ART_HIGHLIGHT_HOLD_MS);
+
+  window.setTimeout(() => {
+    if (!payload.isCurrentGeneration()) return;
+    payload.onEnd();
+  }, SCENE_ART_HIGHLIGHT_HOLD_MS + SCENE_ART_HIGHLIGHT_FADE_MS);
+}
 
 export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): void {
   const inner = document.createElement('div');
@@ -679,6 +716,10 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
   }
 
   shell.appendChild(inner);
+
+  if (ctx.sceneArtHighlight) {
+    mountSceneArtHighlight(shell, ctx.sceneArtHighlight);
+  }
 }
 
 export function setupTimedChoices(

@@ -4,6 +4,7 @@ title: Bênção da neve quieta
 chapter: 5
 ambientTheme: frost_mystery
 artKey: frost_monk_blessing
+highlight: true
 choices:
   - text: "Regressar ao desfiladeiro — levar o silêncio no peito"
     next: act5/frost_hub

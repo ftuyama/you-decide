@@ -43,6 +43,7 @@ export function castSpell(
     kind: 'info',
     message: `${lead.name} lança ${sp.name} (−${sp.manaCost} mana).`,
     actor: lead.name,
+    spellId,
   });
 
   let newEnemies = [...c.enemies];
@@ -71,6 +72,7 @@ export function castSpell(
         kind: 'armor_break',
         message: 'Camada de armadura quebrada (magia)!',
         target: def.name,
+        enemyIndex,
       });
       newEnemies[enemyIndex] = { ...chipTarget };
     } else {
@@ -83,6 +85,9 @@ export function castSpell(
         final: dmg,
         target: def.name,
         damageKind: 'normal',
+        enemyIndex,
+        lethal: nh <= 0,
+        spellId,
       });
     }
   } else if (sp.spellKind === 'heal_self') {
@@ -104,6 +109,7 @@ export function castSpell(
       final: healed,
       actor: lead.name,
       target: lead.name,
+      spellId,
     });
   } else if (sp.spellKind === 'buff_attack_roll') {
     combatBuffs = { ...combatBuffs, buffAttackRoll: 1 };
@@ -111,6 +117,7 @@ export function castSpell(
       kind: 'info',
       message: `${lead.name} canaliza força — +1 no ataque até ao fim do combate.`,
       actor: lead.name,
+      spellId,
     });
   } else {
     combatBuffs = { ...combatBuffs, buffArmorClass: 1 };
@@ -118,6 +125,7 @@ export function castSpell(
       kind: 'info',
       message: `${lead.name} endurece a guarda — +1 CA até ao fim do combate.`,
       actor: lead.name,
+      spellId,
     });
   }
 

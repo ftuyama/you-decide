@@ -5,6 +5,7 @@ chapter: 6
 type: hub
 ambientTheme: void
 artKey: fractured_nave
+highlight: true
 choices:
   - text: "Seguir o corredor dos espelhos partidos (Prova da Realidade)"
     next: act6/reality_trial

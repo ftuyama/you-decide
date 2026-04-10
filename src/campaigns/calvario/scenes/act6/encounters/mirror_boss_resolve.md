@@ -4,6 +4,7 @@ title: Costura da Sombra
 chapter: 6
 ambientTheme: void
 artKey: act6_mirror_final
+highlight: true
 choices:
   - text: "Aceitar a fissura e seguir"
     next: act6/epilogue

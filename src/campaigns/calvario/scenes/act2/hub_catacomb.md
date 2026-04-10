@@ -4,6 +4,7 @@ chapter: 2
 type: hub
 ambientTheme: explore
 artKey: hub
+highlight: true
 title: Cruzeiro — hub
 choices:
   - text: "Voltar ao corredor dos ratos"

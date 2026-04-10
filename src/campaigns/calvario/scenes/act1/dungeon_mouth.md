@@ -4,6 +4,7 @@ title: Boca da masmorra
 chapter: 1
 ambientTheme: explore
 artKey: dungeon_mouth
+highlight: true
 choices:
   - text: "Entrar na catacumba"
     next: act2/catacomb_entry

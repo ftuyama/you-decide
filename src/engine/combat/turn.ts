@@ -271,6 +271,7 @@ function physicalAttackForCharacter(
     outcome: hit ? 'hit' : 'miss',
     vsDefense: defense,
     rollOutcome,
+    enemyIndex,
   });
 
   if (hit) {
@@ -302,6 +303,7 @@ function physicalAttackForCharacter(
         kind: 'armor_break',
         message: 'Camada de armadura quebrada!',
         target: def.name,
+        enemyIndex,
       });
       newEnemies[enemyIndex] = ct;
     } else {
@@ -336,6 +338,8 @@ function physicalAttackForCharacter(
         final: dmg,
         target: def.name,
         damageKind: isPlayerCrit ? 'crit' : 'normal',
+        enemyIndex,
+        lethal: nh <= 0,
       });
     }
   }
@@ -568,6 +572,7 @@ export function advanceToEnemyTurn(
       outcome: enemyHit ? 'hit' : 'miss',
       vsDefense: defScore,
       rollOutcome,
+      enemyIndex: i,
     });
 
     if (special === 'crit' && !enemyCritDmg && enemyHit) {

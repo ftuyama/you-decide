@@ -347,6 +347,11 @@ export const SceneFrontmatterSchema = z.object({
   art: z.string().optional(),
   /** Chave para arte na tabela `sceneArt` da campanha ativa */
   artKey: z.string().optional(),
+  /**
+   * Se true, na primeira visita com arte resolvida (`art` / `artKey`), mostra a arte em overlay
+   * em tela cheia (~1s) com fade-out (UI).
+   */
+  highlight: z.boolean().optional(),
   /** Combate embutido: após texto, se encounterId presente */
   encounterId: z.string().optional(),
   onVictory: z.string().optional(),

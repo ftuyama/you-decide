@@ -3,6 +3,7 @@ id: act4/throne/throne_gate
 chapter: 4
 ambientTheme: explore
 artKey: throne
+highlight: true
 title: Ante-sala do trono
 choices:
   - text: "Ouvir o necromante antes de cruzar ferro"

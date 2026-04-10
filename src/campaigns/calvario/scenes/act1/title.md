@@ -4,6 +4,7 @@ title: Abertura
 chapter: 1
 ambientTheme: explore
 artKey: title
+highlight: true
 choices:
   - text: "Descer os degraus rumo ao texto gravado na pedra"
     next: act1/crawl_entrada

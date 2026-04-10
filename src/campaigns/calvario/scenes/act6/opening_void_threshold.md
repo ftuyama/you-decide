@@ -4,6 +4,7 @@ title: Umbral do Vazio
 chapter: 6
 ambientTheme: void
 artKey: void_threshold
+highlight: true
 choices:
   - text: "Entrar na nave fraturada e ouvir o que resta do mundo"
     next: act6/nave_summons

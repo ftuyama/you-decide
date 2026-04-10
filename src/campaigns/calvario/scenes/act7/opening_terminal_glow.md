@@ -4,6 +4,7 @@ title: Brilho terminal
 chapter: 7
 ambientTheme: ash_sky
 artKey: ashen_horizon
+highlight: true
 choices:
   - text: "Caminhar até onde o céu deixa de fingir cor"
     next: act7/apocalypse_fork

@@ -83,6 +83,17 @@ function mergeFx(
   });
 }
 
+/** Alinhado a `resolveCombatLogFx` — buffs via `info` + `spellId` (Foco, Muralha…). */
+export function isBuffInfoEntry(e: CombatLogEntry, data: GameData): boolean {
+  if (e.kind !== 'info' || !e.spellId) return false;
+  const sp = data.spells[e.spellId];
+  return sp?.spellKind === 'buff_attack_roll' || sp?.spellKind === 'buff_armor_class';
+}
+
+export function logSliceHasBuffCast(entries: CombatLogEntry[], data: GameData): boolean {
+  return entries.some((e) => isBuffInfoEntry(e, data));
+}
+
 /**
  * Derives overlay classes from new combat log lines (same slice as sounds).
  * Later entries for the same enemy extend / override visuals for that render.
@@ -164,11 +175,8 @@ export function resolveCombatLogFx(
       continue;
     }
 
-    if (e.kind === 'info' && e.spellId) {
-      const sp = data.spells[e.spellId];
-      if (sp?.spellKind === 'buff_attack_roll' || sp?.spellKind === 'buff_armor_class') {
-        columnPulse = 'buff';
-      }
+    if (isBuffInfoEntry(e, data)) {
+      columnPulse = 'buff';
     }
   }
 

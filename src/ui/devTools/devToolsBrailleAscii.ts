@@ -2,7 +2,7 @@ import {
   brailleAsciiFromImageSource,
   type BrailleAsciiOptions,
   type BrailleDithererName,
-} from '../dev/brailleAsciiFromImage.ts';
+} from '../../dev/brailleAsciiFromImage.ts';
 
 /** Vite dev server only — see `vite.config.ts`. */
 const DEV_IMAGE_PROXY = '/__dev/image-proxy';

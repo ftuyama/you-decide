@@ -1,13 +1,13 @@
-import './css/styles.css';
+import '../css/styles.css';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
-import { getRegisteredCampaignIds, loadCampaignContent } from '../campaigns/registry.ts';
-import { parseSceneMarkdown, type LoadedScene } from '../engine/sceneRuntime.ts';
-import type { Choice } from '../engine/schema.ts';
-import { sceneActId, sortedSceneActsFromNodes, type SceneGraphNode } from '../engine/sceneGraph.ts';
-import type { ItemDef, EnemyDef } from '../engine/schema.ts';
-import { resolveSceneArtFromFrontmatter } from './gameAppStory.ts';
-import { GameAudio, AMBIENT_THEMES, type AmbientTheme } from './sound/index.ts';
+import { getRegisteredCampaignIds, loadCampaignContent } from '../../campaigns/registry.ts';
+import { parseSceneMarkdown, type LoadedScene } from '../../engine/sceneRuntime.ts';
+import type { Choice } from '../../engine/schema.ts';
+import { sceneActId, sortedSceneActsFromNodes, type SceneGraphNode } from '../../engine/sceneGraph.ts';
+import type { ItemDef, EnemyDef } from '../../engine/schema.ts';
+import { resolveSceneArtFromFrontmatter } from '../gameAppStory.ts';
+import { GameAudio, AMBIENT_THEMES, type AmbientTheme } from '../sound/index.ts';
 import {
   buildGameHref,
   buildScenesGraphHref,
@@ -18,7 +18,7 @@ import {
   resolveDevToolsAsciiSortFromLocation,
   DEV_TOOLS_TABS,
   type DevToolsTab,
-} from './campaignUrl.ts';
+} from '../campaignUrl.ts';
 import { mountBejamasAsciiPanel } from './devToolsBejamasAscii.ts';
 import { mountBrailleAsciiPanel } from './devToolsBrailleAscii.ts';
 import { mountAsciiBrowserPanel } from './devToolsAsciiBrowser.ts';

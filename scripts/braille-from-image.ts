@@ -1,7 +1,7 @@
 /**
  * CLI: imagem → Braille Unicode (mesmo pipeline que `src/dev/brailleAsciiFromImage.ts`).
  * Uso: npx tsx scripts/braille-from-image.ts <ficheiro> [-w 160] [-o out.txt] [--no-invert] [--threshold 127] [--dither atkinson]
- * Defaults alinhados a `devToolsBrailleAscii.ts` (Conversão).
+ * Defaults alinhados a `src/ui/devTools/devToolsBrailleAscii.ts` (Conversão).
  */
 import { readFileSync, writeFileSync } from 'fs';
 import sharp from 'sharp';

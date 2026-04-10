@@ -238,6 +238,8 @@ button.combat-flee-btn:hover {
     .combat-fx-melee-slash--crit,
     .combat-fx-spell-ember,
     .combat-fx-spell-ember--crit,
+    .combat-fx-spell-silver,
+    .combat-fx-spell-silver--crit,
     .combat-fx-spell-arcane,
     .combat-fx-spell-arcane--crit
   ) {
@@ -772,6 +774,41 @@ button.combat-flee-btn:hover {
   animation: combatActionsPotionGlow 0.78s ease-out forwards;
 }
 
+.combat-actions-panel--fx-buff::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 5px;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(
+    200deg,
+    transparent 0%,
+    transparent 35%,
+    rgba(130, 160, 235, 0.2) 48%,
+    rgba(200, 210, 255, 0.32) 55%,
+    rgba(120, 140, 210, 0.14) 65%,
+    transparent 82%
+  );
+  animation: combatActionsBuffGlow 0.72s ease-out forwards;
+  mix-blend-mode: screen;
+}
+
+@keyframes combatActionsBuffGlow {
+  0% {
+    opacity: 0;
+    filter: blur(3px);
+  }
+  30% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+
 @keyframes combatActionsHealSpellGlow {
   0% {
     opacity: 0;
@@ -802,7 +839,8 @@ button.combat-flee-btn:hover {
 }
 
 .combat-actions-panel--fx-heal-spell > *,
-.combat-actions-panel--fx-potion > * {
+.combat-actions-panel--fx-potion > *,
+.combat-actions-panel--fx-buff > * {
   position: relative;
   z-index: 1;
 }

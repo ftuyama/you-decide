@@ -11,7 +11,7 @@ export type AmbientTheme =
   | 'ancient_macabre'
   | 'ash_sky';
 
-/** Lista canónica (alinhada ao switch em `GameAudio` e ao YAML `ambientTheme`). */
+/** Lista canónica (alinhada ao switch em `gameAudio/GameAmbientPlayer` e ao YAML `ambientTheme`). */
 export const AMBIENT_THEMES: readonly AmbientTheme[] = [
   'explore',
   'combat',

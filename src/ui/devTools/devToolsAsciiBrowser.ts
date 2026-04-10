@@ -3,8 +3,8 @@ import {
   resolveDevToolsAsciiPathFromLocation,
   type DevToolsAsciiSort,
   resolveDevToolsAsciiSortFromLocation,
-} from './campaignUrl.ts';
-import type { AsciiSceneFileMeta } from './asciiSceneFileMeta.ts';
+} from '../campaignUrl.ts';
+import type { AsciiSceneFileMeta } from '../asciiSceneFileMeta.ts';
 import manifest from 'virtual:ascii-scene-dev-manifest';
 
 function formatMtimePt(ms: number): string {

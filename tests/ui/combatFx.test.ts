@@ -5,6 +5,8 @@ import { emptyGameData } from '../../src/engine/gameData.ts';
 import { createPlayerCharacter } from '../../src/engine/state.ts';
 import {
   extractLethalGhosts,
+  isBuffInfoEntry,
+  logSliceHasBuffCast,
   resolveCombatLogFx,
 } from '../../src/ui/combatFx.ts';
 
@@ -214,6 +216,37 @@ describe('resolveCombatLogFx', () => {
     ];
     const r = resolveCombatLogFx(entries, [knight], data);
     expect(r.columnPulse).toBe('buff');
+  });
+});
+
+describe('logSliceHasBuffCast', () => {
+  const data = minimalData();
+
+  it('is true when slice has info with buff spellId', () => {
+    const entries: CombatLogEntry[] = [
+      { kind: 'info', message: 'Foco.', spellId: 'warriors_focus' },
+    ];
+    expect(logSliceHasBuffCast(entries, data)).toBe(true);
+  });
+
+  it('is false for non-buff spell info', () => {
+    const entries: CombatLogEntry[] = [
+      { kind: 'info', message: 'Magia.', spellId: 'ember_spark' },
+    ];
+    expect(logSliceHasBuffCast(entries, data)).toBe(false);
+  });
+
+  it('is false for empty slice', () => {
+    expect(logSliceHasBuffCast([], data)).toBe(false);
+  });
+
+  it('flags warriors_focus for martial buff sound routing', () => {
+    const entries: CombatLogEntry[] = [
+      { kind: 'info', message: 'Foco.', spellId: 'warriors_focus' },
+    ];
+    expect(entries.some((e) => isBuffInfoEntry(e, data) && e.spellId === 'warriors_focus')).toBe(
+      true
+    );
   });
 });
 

@@ -119,6 +119,13 @@ button.hamburger:hover {
   padding: 0.5rem;
 }
 
+/** Agrupa os cartões de slot (substituídos em `syncAppChrome`); mantém o mesmo espaçamento que antes. */
+.menu-save-slots {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
 .menu-item {
   font: inherit;
   cursor: pointer;

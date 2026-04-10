@@ -1,7 +1,7 @@
 import type { GameState } from '../engine/schema.ts';
 import type { ContentRegistry } from '../content/registry.ts';
 import { buildGameSidebar } from './gameAppSidebar.ts';
-import { SAVE_SLOT_COUNT, buildMenuSaveSlot } from './gameAppSaveSlots.ts';
+import { buildMenuSaveSlot, saveSlotLimit } from './gameAppSaveSlots.ts';
 
 /** Layout persistente: cabeçalho, menu lateral, sidebar do jogador e área principal (`main.story-shell`). */
 export type MountAppChromeOptions = {
@@ -62,7 +62,27 @@ export type AppChromeRefs = {
   fullscreenCb: HTMLInputElement;
   devSaveExtrasEl: HTMLElement;
   devSettingsExtrasEl: HTMLElement;
+  /** Só os cartões de slot (actualizado em `syncAppChrome` após gravar/importar). */
+  saveSlotsWrap: HTMLElement;
 };
+
+function fillMenuSaveSlots(
+  wrap: HTMLElement,
+  campaignId: string,
+  devMode: boolean,
+  onSaveSlot: (slot: number) => void,
+  onLoadSlot: (slot: number) => void
+): void {
+  wrap.replaceChildren();
+  for (let s = 1; s <= saveSlotLimit(devMode); s++) {
+    wrap.appendChild(
+      buildMenuSaveSlot(s, campaignId, {
+        onSave: onSaveSlot,
+        onLoad: onLoadSlot,
+      })
+    );
+  }
+}
 
 function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
   const frame = document.createElement('div');
@@ -256,14 +276,10 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
   devSettingsExtrasEl.appendChild(graphBtn);
 
   const saveSection = createMenuSection('Partida');
-  for (let s = 1; s <= SAVE_SLOT_COUNT; s++) {
-    saveSection.appendChild(
-      buildMenuSaveSlot(s, opts.campaignId, {
-        onSave: (slot) => opts.onSaveSlot(slot),
-        onLoad: (slot) => opts.onLoadSlot(slot),
-      })
-    );
-  }
+  const saveSlotsWrap = document.createElement('div');
+  saveSlotsWrap.className = 'menu-save-slots';
+  fillMenuSaveSlots(saveSlotsWrap, opts.campaignId, opts.devMode, opts.onSaveSlot, opts.onLoadSlot);
+  saveSection.appendChild(saveSlotsWrap);
   saveSection.appendChild(devSaveExtrasEl);
   saveSection.appendChild(exportBtn);
 
@@ -330,6 +346,7 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
     fullscreenCb,
     devSaveExtrasEl,
     devSettingsExtrasEl,
+    saveSlotsWrap,
   };
 }
 
@@ -375,4 +392,6 @@ export function syncAppChrome(refs: AppChromeRefs, opts: MountAppChromeOptions):
   refs.mainEl.classList.remove('main--combat');
   refs.mainEl.replaceChildren();
   opts.fillMain(refs.mainEl);
+
+  fillMenuSaveSlots(refs.saveSlotsWrap, opts.campaignId, opts.devMode, opts.onSaveSlot, opts.onLoadSlot);
 }

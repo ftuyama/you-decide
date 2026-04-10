@@ -16,7 +16,7 @@ import { migrateLegacyKnownSpells } from '../engine/spellsKnown.ts';
 import { GameAudio, type AmbientTheme } from './sound/index.ts';
 import { buildDevToolsHref, buildScenesGraphHref } from './campaignUrl.ts';
 import {
-  SAVE_SLOT_COUNT,
+  saveSlotLimit,
   migrateLegacySaveIfNeeded as migrateLegacySaveSlot,
   saveStateToSlot,
   readRawSlot as readSaveSlotRaw,
@@ -542,14 +542,14 @@ export class GameApp {
 
   private saveToSlot(slot: number): void {
     this.unlockAudio();
-    saveStateToSlot(this.campaignId, slot, this.state);
+    saveStateToSlot(this.campaignId, slot, this.state, this.devMode);
     this.closeMenu();
     this.render();
   }
 
   private loadFromSlot(slot: number): void {
     this.unlockAudio();
-    if (slot < 1 || slot > SAVE_SLOT_COUNT) return;
+    if (slot < 1 || slot > saveSlotLimit(this.devMode)) return;
     try {
       const raw = readSaveSlotRaw(this.campaignId, slot);
       if (!raw?.trim()) {

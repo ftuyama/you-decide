@@ -8,6 +8,7 @@ import {
   useCombatConsumable,
 } from '../engine/combat.ts';
 import type { Character, CombatLogEntry, GameState, Stance } from '../engine/schema.ts';
+import type { GameData } from '../engine/gameData.ts';
 import type { ContentRegistry } from '../content/registry.ts';
 import type { EventBus } from '../engine/eventBus.ts';
 import { formatDiceAscii } from './diceAscii.ts';
@@ -23,6 +24,8 @@ import type { GameAudio } from './sound/index.ts';
 import {
   extractLethalGhosts,
   getMeleeFxStyleForCharacter,
+  isBuffInfoEntry,
+  logSliceHasBuffCast,
   resolveCombatLogFx,
   type CombatLogFxResult,
 } from './combatFx.ts';
@@ -53,16 +56,14 @@ export function playCombatLogSound(
     audio.playStressSting();
     return;
   }
-  if (entry.kind === 'armor_break') {
-    audio.playHit();
-  }
 }
 
 /** Sons de impacto alinhados aos FX visuais (corte, fogo, arcano…). */
 function playCombatFxImpactSounds(
   entries: CombatLogEntry[],
   party: Character[],
-  audio: GameAudio
+  audio: GameAudio,
+  data: GameData
 ): void {
   const hasPotionHeal = entries.some(
     (e) => e.kind === 'heal' && e.itemId != null && e.spellId == null
@@ -76,6 +77,23 @@ function playCombatFxImpactSounds(
     audio.playPotionDrink();
   } else if (entries.some((e) => e.kind === 'info' && e.itemId != null)) {
     audio.playPotionDrink();
+  }
+
+  if (logSliceHasBuffCast(entries, data)) {
+    const warriorsFocus = entries.some(
+      (e) => isBuffInfoEntry(e, data) && e.spellId === 'warriors_focus'
+    );
+    if (warriorsFocus) {
+      audio.playWarriorsFocus();
+    } else {
+      audio.playBuffCast();
+    }
+  }
+
+  for (const e of entries) {
+    if (e.kind === 'armor_break') {
+      audio.playArmorShatter();
+    }
   }
 
   let lastPartyAttacker: Character | undefined;
@@ -109,6 +127,10 @@ function playCombatFxImpactSounds(
     if (e.damageKind === 'crit') {
       audio.playCritImpact();
     }
+  }
+
+  if (entries.some((e) => e.kind === 'damage' && e.lethal)) {
+    audio.playLethalStrike();
   }
 }
 
@@ -388,7 +410,7 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     for (const entry of newLogEntries) {
       playCombatLogSound(entry, leadName, ctx.audio);
     }
-    playCombatFxImpactSounds(newLogEntries, ctx.state.party, ctx.audio);
+    playCombatFxImpactSounds(newLogEntries, ctx.state.party, ctx.audio, ctx.registry.data);
     const v = { encounterId: encId, index: c.log.length };
     ctx.combatLog.setSoundCursor(v);
   }
@@ -496,6 +518,8 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     actionsPanel.classList.add('combat-actions-panel--fx-heal-spell');
   } else if (combatFx.columnPulse === 'heal_potion') {
     actionsPanel.classList.add('combat-actions-panel--fx-potion');
+  } else if (combatFx.columnPulse === 'buff') {
+    actionsPanel.classList.add('combat-actions-panel--fx-buff');
   }
   const actionsHdr = document.createElement('div');
   actionsHdr.className = 'combat-actions-panel-hdr';

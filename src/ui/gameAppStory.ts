@@ -300,6 +300,8 @@ export type StoryOverlayState = {
   setStatusHighlightQueue: (q: Extract<GameEvent, { type: 'statusHighlight' }>[]) => void;
   itemAcquireQueue: string[];
   setItemAcquireQueue: (q: string[]) => void;
+  diaryEntryQueue: string[];
+  setDiaryEntryQueue: (q: string[]) => void;
 };
 
 export type StoryRenderContext = {
@@ -408,6 +410,41 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
       ctx.render();
     });
     wrap.appendChild(btn);
+    inner.appendChild(wrap);
+  }
+
+  if (ctx.overlay.diaryEntryQueue.length > 0) {
+    const wrap = document.createElement('div');
+    wrap.className = 'diary-entry-banner';
+    const kicker = document.createElement('div');
+    kicker.className = 'diary-entry-kicker';
+    kicker.textContent = 'Cronista';
+    wrap.appendChild(kicker);
+    const subKicker = document.createElement('div');
+    subKicker.className = 'diary-entry-subkicker';
+    subKicker.textContent =
+      ctx.overlay.diaryEntryQueue.length > 1
+        ? 'Novas linhas gravadas no diário'
+        : 'Nova linha gravada no diário';
+    wrap.appendChild(subKicker);
+    for (const passage of ctx.overlay.diaryEntryQueue) {
+      const p = document.createElement('p');
+      p.className = 'diary-entry-body';
+      p.textContent = passage;
+      wrap.appendChild(p);
+    }
+    const btnD = document.createElement('button');
+    btnD.type = 'button';
+    btnD.className = 'diary-entry-dismiss';
+    btnD.dataset.quickNavContinue = '';
+    btnD.title = 'Barra de espaço';
+    btnD.textContent = ctx.quickNavMode ? '[Espaço] — Continuar' : 'Continuar';
+    btnD.addEventListener('click', () => {
+      ctx.overlay.setDiaryEntryQueue([]);
+      ctx.audio.playUiClick();
+      ctx.render();
+    });
+    wrap.appendChild(btnD);
     inner.appendChild(wrap);
   }
 

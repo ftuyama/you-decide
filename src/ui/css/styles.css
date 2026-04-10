@@ -932,6 +932,69 @@ button.hamburger:hover {
   border-color: #7a8a72;
 }
 
+/** Entrada de diário (`addDiary`) — tom de memorial / escriba */
+.diary-entry-banner {
+  margin: 0 0 1rem;
+  padding: 0.85rem 1rem 1rem;
+  background: linear-gradient(160deg, #1e1a16 0%, #12100c 55%, #0c0a08 100%);
+  border: 1px solid rgba(120, 100, 72, 0.45);
+  border-radius: 3px;
+  box-shadow: 0 0 20px rgba(40, 32, 20, 0.45), inset 0 1px 0 rgba(200, 180, 140, 0.06);
+}
+
+.diary-entry-kicker {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #c4a574;
+  margin: 0 0 0.35rem;
+}
+
+.diary-entry-subkicker {
+  font-size: 0.72rem;
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: #9a8a72;
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid rgba(120, 100, 72, 0.25);
+}
+
+.diary-entry-body {
+  font-family: 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  font-style: italic;
+  color: #e8dcc8;
+  margin: 0.5rem 0 0;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.diary-entry-body + .diary-entry-body {
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed rgba(120, 100, 72, 0.2);
+}
+
+.diary-entry-dismiss {
+  display: block;
+  margin: 0.95rem 0 0;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  color: #e8dcc8;
+  background: #2a241c;
+  border: 1px solid #6a5a42;
+  border-radius: 2px;
+}
+
+.diary-entry-dismiss:hover {
+  background: #352e22;
+  border-color: #7a6a52;
+}
+
 .item-acquire-banner {
   margin: 0 0 1rem;
   padding: 0.75rem 0.85rem 0.85rem;

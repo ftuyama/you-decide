@@ -11,6 +11,8 @@ export type GameEvent =
   /** Passagem de tempo ao entrar num acampamento (dia narrativo). */
   | { type: 'time.dayAdvanced'; day: number }
   | { type: 'item.acquired'; itemId: string }
+  /** Entrada nova no diário do jogador (`addDiary`) — texto já com templates resolvidos. */
+  | { type: 'diary.entryAdded'; text: string }
   | { type: 'camp.rest' }
   | {
       type: 'statusHighlight';

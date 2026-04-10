@@ -80,6 +80,8 @@ export class GameApp {
   private statusHighlightQueue: Extract<GameEvent, { type: 'statusHighlight' }>[] = [];
   /** Itens recém-adquiridos (grantItem) — mostra banner até o jogador fechar */
   private itemAcquireQueue: string[] = [];
+  /** Entradas novas de diário (`addDiary`) — banner até fechar */
+  private diaryEntryQueue: string[] = [];
   /** Milagre de fé após quase-morte em combate — banner até fechar */
   private faithMiraclePending = false;
   /** Só reproduz efeitos de som para entradas novas do log de combate */
@@ -174,6 +176,10 @@ export class GameApp {
         this.itemAcquireQueue.push(ev.itemId);
         this.unlockAudio();
         this.audio.playItemAcquire();
+      }
+      if (ev.type === 'diary.entryAdded') {
+        this.diaryEntryQueue.push(ev.text);
+        this.unlockAudio();
       }
       if (ev.type === 'camp.rest') {
         this.unlockAudio();
@@ -686,6 +692,10 @@ export class GameApp {
         itemAcquireQueue: this.itemAcquireQueue,
         setItemAcquireQueue: (q) => {
           this.itemAcquireQueue = q;
+        },
+        diaryEntryQueue: this.diaryEntryQueue,
+        setDiaryEntryQueue: (q) => {
+          this.diaryEntryQueue = q;
         },
       },
       audio: {

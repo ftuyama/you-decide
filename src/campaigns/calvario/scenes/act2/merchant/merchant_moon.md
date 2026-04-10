@@ -76,11 +76,15 @@ choices:
     preview: "Teste de sorte · aposta amaldiçoada"
   - text: "Deixar o Terceiro Sino nomear o preço"
     next: act2/hub_catacomb
-    condition: { rep: { faction: culto, gte: 1 } }
+    condition:
+      all:
+        - { rep: { faction: culto, gte: 1 } }
+        - { noFlag: act2_merchant_moon_cult_price_done }
     effects:
+      - { op: setFlag, key: act2_merchant_moon_cult_price_done, value: true }
       - { op: addResource, resource: corruption, delta: 1 }
       - { op: addDiary, text: "Uma risada seca sob o tecido — o culto gosta de quem já ouve o mesmo eco." }
-    preview: "+1 corrupção, diário"
+    preview: "+1 corrupção, diário (uma vez)"
 onEnter: []
 ---
 Um capuz **sem rosto** estende um **mapa** com margens roídas. Os dedos por baixo do tecido são **demasiado longos** para serem só humanos.

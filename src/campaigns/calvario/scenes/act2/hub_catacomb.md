@@ -51,6 +51,7 @@ choices:
       all:
         - { level: { gte: 4 } }
         - { dayMod: { mod: 5, eq: 0 } }
+        - { noFlag: act2_circle_ritual_tribute_done }
     preview: "O Círculo cobra presença; a corrupção anota."
   - text: "Acampamento da Vigília"
     next: act2/camp/vigilia_camp

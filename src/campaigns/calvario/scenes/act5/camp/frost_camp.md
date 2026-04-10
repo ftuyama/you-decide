@@ -41,24 +41,30 @@ choices:
   - text: "Manusear equipamento no acampamento"
     next: act5/camp/manage_equip
   - text: "Partilhar uma prece com devotos do Terceiro Sino"
-    condition: { rep: { faction: culto, gte: 2 } }
+    condition:
+      all:
+        - { rep: { faction: culto, gte: 2 } }
+        - { noFlag: frost_camp_cult_prayer_done }
     next: act5/camp/frost_camp
     effects:
+      - { op: setFlag, key: frost_camp_cult_prayer_done, value: true }
       - { op: addResource, resource: faith, delta: 1 }
       - { op: addResource, resource: corruption, delta: 1 }
       - { op: addDiary, text: "As brasas desenharam um sino invisível — ninguém tocou, mas todos ouviram." }
-    preview: "+1 fé, +1 corrupção"
+    preview: "+1 fé, +1 corrupção (uma vez)"
   - text: "Pedir escolta de pensamento à Vigília (contra o Culto)"
     condition:
       all:
         - { rep: { faction: vigilia, gte: 2 } }
         - { rep: { faction: culto, gte: 0 } }
+        - { noFlag: frost_camp_vigilia_escort_done }
     next: act5/camp/frost_camp
     effects:
+      - { op: setFlag, key: frost_camp_vigilia_escort_done, value: true }
       - { op: addRep, faction: culto, delta: -1, directGain: true }
       - { op: addRep, faction: vigilia, delta: 1 }
       - { op: addDiary, text: "Um capeador desenhou uma linha na neve entre mim e o rumor do sino." }
-    preview: "Culto cai; Vigília sobe (lento)"
+    preview: "Culto cai; Vigília sobe (lento) (uma vez)"
   - text: "Consagrar neve derretida como água benta (clérigo)"
     condition:
       all:

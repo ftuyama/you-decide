@@ -6,18 +6,24 @@ ambientTheme: explore
 choices:
   - text: "Participar"
     next: act2/hub_catacomb
+    condition: { noFlag: act2_circle_ritual_tribute_done }
     preview: "Aceitar o cinza — ou hesitar e recuar."
     timedMs: 12000
     fallbackNext: act2/circle_ritual/circle_ritual_refuse_mind
     effects:
+      - { op: setFlag, key: act2_circle_ritual_tribute_done, value: true }
       - { op: addResource, resource: corruption, delta: 1 }
       - { op: addRep, faction: circulo, delta: 1 }
       - { op: advanceDay }
   - text: "Cantar o refrão como devoto do Círculo"
     next: act2/hub_catacomb
-    condition: { rep: { faction: circulo, gte: 2 } }
+    condition:
+      all:
+        - { rep: { faction: circulo, gte: 2 } }
+        - { noFlag: act2_circle_ritual_tribute_done }
     preview: "Mais cinza, mais eco — o dia avança."
     effects:
+      - { op: setFlag, key: act2_circle_ritual_tribute_done, value: true }
       - { op: addResource, resource: corruption, delta: 1 }
       - { op: addRep, faction: circulo, delta: 1 }
       - { op: grantTemporaryBuff, attr: mind, delta: 1, remainingScenes: 2 }

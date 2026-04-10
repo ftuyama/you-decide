@@ -6,7 +6,9 @@ ambientTheme: explore
 choices:
   - text: "Continuar a observar o trono"
     next: act4/throne/throne_observe
+    condition: { noFlag: throne_observe_drip_gold_done }
     effects:
+      - { op: setFlag, key: throne_observe_drip_gold_done, value: true }
       - { op: addResource, resource: gold, delta: 1 }
       - { op: addDiary, text: "A gota solidificou-se entre os dedos — pequena moeda de gelo e sorte." }
   - text: "Voltar ao momento da decisão"

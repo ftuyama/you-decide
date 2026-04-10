@@ -1,4 +1,4 @@
-import type { Effect, GameState } from './schema.ts';
+import type { Effect, FactionId, GameState } from './schema.ts';
 import { GameStateSchema } from './schema.ts';
 import type { EventBus } from './eventBus.ts';
 import { beginEncounter } from './combat/encounter.ts';
@@ -92,6 +92,114 @@ function resourceGainSubtitle(resource: keyof typeof RESOURCE_LABEL): string {
   }
 }
 
+const FACTION_NAME_PT: Record<FactionId, string> = {
+  vigilia: 'Vigília',
+  circulo: 'Círculo',
+  culto: 'Culto',
+};
+
+const REPUTATION_TONE_UP_PT: Record<FactionId, readonly string[]> = {
+  vigilia: [
+    'Ecoa nos corredores da ordem: o teu nome ganha um selo menos sombrio nos arquivos da Vigília.',
+    'Oficiais murmuram com outra cadência — patrulha e juramento passam a contar contigo, ainda que com ferro na voz.',
+    'Um escrivão inclina a pena: onde antes só havia desconfiança medida, agora há lugar para um voto de cautela favorável.',
+    'A lanterna da Vigília inclina-se um palmo na tua direção; não é abraço, é reconhecimento de quem serve sem ruído.',
+  ],
+  circulo: [
+    'O cinzento inclina-se: nos arquivos do Círculo, o teu símbolo ganha um traço que não apaga com o primeiro sopro.',
+    'Troca-se sorte por assinatura — o Círculo anota o feito como quem fecha metade de um pacto ainda aberto.',
+    'Rituais frágeis aprendem o teu nome; quem empresta destino cobra, mas hoje o saldo pende a teu favor.',
+    'Uma linha nova no livro cinzento: não é bênção, é contrato — e o mundo leu a cláusula com mais brandura.',
+  ],
+  culto: [
+    'O Terceiro Sino parece mais perto sem haver torre: o Culto carimba o teu passo com interesse que não é benigno, mas é teu.',
+    'Devotos sussurram versículos onde antes calavam; a corrupção, quando te nomeia, faz-o quase como elegia.',
+    'Marca-se o pergaminho com cinza e vela: o Culto guarda o teu feito como quem guarda ferramenta para noite melhor.',
+    'Eco que não devia existir reconhece-te; quem ouve o sino sem badalação sabe que o Culto te contou entre os seus.',
+  ],
+};
+
+const REPUTATION_TONE_DOWN_PT: Record<FactionId, readonly string[]> = {
+  vigilia: [
+    'Raspa-se o registo: a Vigília anota desconfiança onde antes só havia silêncio disciplinado.',
+    'Patrulhas trocam olhar quando passes — juramento virou suspeita, e o mundo nota o peso novo na couraça.',
+    'Um oficial fecha o dossiê com gesto seco: honra tem gosto de cinza, e hoje o teu nome soube a ferro.',
+    'Ordem não perdoa rumor: nos corredores, o teu nome desce de tom; quem serve nota quando deixa de ser ferramenta confiável.',
+  ],
+  circulo: [
+    'O ritual recua: o Círculo descreve o teu nome com traço mais frio, como quem adia uma dívida que não esquece.',
+    'Símbolos que brilhavam hesitam; o cinzento fecha sem ti, e o empréstimo de sorte cobra juros em silêncio.',
+    'Raspa-se margem no livro de contas — o Círculo não grita, apenas deixa de inclinar a balança a teu favor.',
+    'Quem troca destino por sinal aprende o preço: hoje o Círculo leu o teu feito com olhos de credor impaciente.',
+  ],
+  culto: [
+    'Alguém no Culto apaga uma linha que te favorecia; ouve-se o sino sem torre, e o som não te chama.',
+    'Devotos desviam o olhar onde antes bendiziam sombras; a corrupção ainda te conhece, mas já não te acolhe com o mesmo riso.',
+    'Marca-se o pergaminho com salitre e cinza: o Terceiro Sino lembra o teu nome para advertência, não para culto.',
+    'Onde havia interesse sombrio, agora há recuo ritual: o Culto guarda o teu feito como quem guarda faca embrulhada.',
+  ],
+};
+
+function pickReputationToneLine(lines: readonly string[], prev: number, next: number, faction: FactionId): string {
+  if (lines.length === 0) return '';
+  let h = 0;
+  for (let i = 0; i < faction.length; i++) {
+    h = (h * 31 + faction.charCodeAt(i)!) >>> 0;
+  }
+  const idx = (h + prev * 17 + next * 13) % lines.length;
+  return lines[idx]!;
+}
+
+function reputationTonePt(faction: FactionId, prev: number, next: number): string {
+  if (next > prev) {
+    return pickReputationToneLine(REPUTATION_TONE_UP_PT[faction], prev, next, faction);
+  }
+  if (next < prev) {
+    return pickReputationToneLine(REPUTATION_TONE_DOWN_PT[faction], prev, next, faction);
+  }
+  return '';
+}
+
+function emitReputationUi(
+  bus: EventBus,
+  faction: FactionId,
+  prev: number,
+  next: number,
+  kind: 'standing' | 'slowLedger' | 'cappedDirect'
+): void {
+  const name = FACTION_NAME_PT[faction];
+  if (kind === 'slowLedger') {
+    bus.emit({
+      type: 'statusHighlight',
+      variant: 'neutral',
+      title: `${name} — rumor em aberto`,
+      subtitle:
+        'Um gesto ficou assinado nas margens do teu registo; falta outro feito para que o número mude nos arquivos da facção.',
+    });
+    return;
+  }
+  if (kind === 'cappedDirect') {
+    bus.emit({
+      type: 'statusHighlight',
+      variant: 'neutral',
+      title: `${name} — margens esgotadas`,
+      subtitle:
+        'Os escribas já não têm onde subir ou descer este nome: o tom mantém-se, por ora, inamovível.',
+    });
+    return;
+  }
+  const improved = next > prev;
+  const variant: 'good' | 'bad' | 'neutral' = improved ? 'good' : next < prev ? 'bad' : 'neutral';
+  const delta = next - prev;
+  const deltaStr = delta === 0 ? '' : ` (${delta > 0 ? '+' : ''}${delta})`;
+  bus.emit({
+    type: 'statusHighlight',
+    variant,
+    title: `${name} — reputação ${deltaStr ? (improved ? 'sobe' : 'cai') : 'ajusta-se'}${deltaStr}`,
+    subtitle: `${reputationTonePt(faction, prev, next)} Valor: ${prev} → ${next}.`,
+  });
+}
+
 /** Validação Zod completa só em dev; em build de produção confia nos ramos de `applyOne` (save/load valida à parte). */
 function finalizeAppliedState(s: GameState): GameState {
   if (import.meta.env.DEV) {
@@ -160,6 +268,14 @@ function applyOne(
 
       bus.emit({ type: 'reputation.changed', faction, value: rep });
 
+      if (rep !== prev) {
+        emitReputationUi(bus, faction, prev, rep, 'standing');
+      } else if (e.delta > 0 && e.directGain) {
+        emitReputationUi(bus, faction, prev, rep, 'cappedDirect');
+      } else if (e.delta > 0 && !e.directGain) {
+        emitReputationUi(bus, faction, prev, rep, 'slowLedger');
+      }
+
       const isDirectPositiveGain = e.delta > 0 && e.directGain === true;
       if (isDirectPositiveGain) {
         return {
@@ -174,12 +290,18 @@ function applyOne(
         factionGainPending: { ...fgp, [faction]: pending },
       };
     }
-    case 'setRep':
-      bus.emit({ type: 'reputation.changed', faction: e.faction, value: e.value });
+    case 'setRep': {
+      const prev = state.reputation[e.faction] ?? 0;
+      const next = clampReputation(e.value);
+      bus.emit({ type: 'reputation.changed', faction: e.faction, value: next });
+      if (next !== prev) {
+        emitReputationUi(bus, e.faction, prev, next, 'standing');
+      }
       return {
         ...state,
-        reputation: { ...state.reputation, [e.faction]: clampReputation(e.value) },
+        reputation: { ...state.reputation, [e.faction]: next },
       };
+    }
     case 'addResource': {
       const r = { ...state.resources };
       let actual = 0;
@@ -301,8 +423,11 @@ function applyOne(
     }
     case 'goto':
       return { ...state, sceneId: e.sceneId, mode: 'story' };
-    case 'addDiary':
-      return { ...state, diary: [...state.diary, injectText(e.text, state)] };
+    case 'addDiary': {
+      const line = injectText(e.text, state);
+      bus.emit({ type: 'diary.entryAdded', text: line });
+      return { ...state, diary: [...state.diary, line] };
+    }
     case 'startCombat': {
       const enc = ctx.data.encounters[e.encounterId];
       if (!enc) {

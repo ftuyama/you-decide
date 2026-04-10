@@ -54,12 +54,14 @@ choices:
       all:
         - { rep: { faction: vigilia, gte: 1 } }
         - { rep: { faction: culto, gte: 0 } }
+        - { noFlag: vigilia_camp_denounce_cult_done }
     next: act2/camp/vigilia_camp
     effects:
+      - { op: setFlag, key: vigilia_camp_denounce_cult_done, value: true }
       - { op: addRep, faction: culto, delta: -1, directGain: true }
       - { op: addRep, faction: vigilia, delta: 1 }
       - { op: addDiary, text: "Falei alto demais sobre o Terceiro Sino — o oficial anotou como vitória pequena." }
-    preview: "Troca de reputação · Vigília lenta, Culto imediato"
+    preview: "Troca de reputação · Vigília lenta, Culto imediato (uma vez)"
   - text: "Continuar"
     next: act2/hub_catacomb
     effects:

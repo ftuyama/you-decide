@@ -7,7 +7,7 @@ import {
   SACRIFICE_MIN_CORRUPTION,
   useCombatConsumable,
 } from '../engine/combat.ts';
-import type { CombatLogEntry, GameState, Stance } from '../engine/schema.ts';
+import type { Character, CombatLogEntry, GameState, Stance } from '../engine/schema.ts';
 import type { ContentRegistry } from '../content/registry.ts';
 import type { EventBus } from '../engine/eventBus.ts';
 import { formatDiceAscii } from './diceAscii.ts';
@@ -20,7 +20,12 @@ import {
   type CombatLogDisplayItem,
 } from './gameAppUtils.ts';
 import type { GameAudio } from './sound/index.ts';
-import { extractLethalGhosts, resolveCombatLogFx, type CombatLogFxResult } from './combatFx.ts';
+import {
+  extractLethalGhosts,
+  getMeleeFxStyleForCharacter,
+  resolveCombatLogFx,
+  type CombatLogFxResult,
+} from './combatFx.ts';
 
 /** Atalhos no combate: 1–9, depois letras (ordem QWERTY). */
 const COMBAT_QUICK_KEYS_AFTER_9 = 'qwertyuiopasdfghjklzxcvbnm';
@@ -50,6 +55,60 @@ export function playCombatLogSound(
   }
   if (entry.kind === 'armor_break') {
     audio.playHit();
+  }
+}
+
+/** Sons de impacto alinhados aos FX visuais (corte, fogo, arcano…). */
+function playCombatFxImpactSounds(
+  entries: CombatLogEntry[],
+  party: Character[],
+  audio: GameAudio
+): void {
+  const hasPotionHeal = entries.some(
+    (e) => e.kind === 'heal' && e.itemId != null && e.spellId == null
+  );
+  for (const e of entries) {
+    if (e.kind === 'heal' && e.spellId) {
+      audio.playSpellHeal();
+    }
+  }
+  if (hasPotionHeal) {
+    audio.playPotionDrink();
+  } else if (entries.some((e) => e.kind === 'info' && e.itemId != null)) {
+    audio.playPotionDrink();
+  }
+
+  let lastPartyAttacker: Character | undefined;
+  for (const e of entries) {
+    if (e.kind === 'attack') {
+      const actorMember = party.find((p) => p.name === e.actor);
+      if (actorMember) lastPartyAttacker = actorMember;
+    }
+    if (e.kind !== 'damage' || e.enemyIndex == null) continue;
+    if (e.spellId) {
+      if (e.spellId === 'ember_spark') {
+        audio.playSpellFire();
+      } else if (e.spellId === 'silver_bolt') {
+        audio.playSpellIceSpark();
+      } else {
+        audio.playSpellArcaneBurst();
+      }
+      if (e.damageKind === 'crit') {
+        audio.playCritImpact();
+      }
+      continue;
+    }
+    const style = getMeleeFxStyleForCharacter(lastPartyAttacker ?? party[0]);
+    if (style === 'slash') {
+      audio.playSwordSlash();
+    } else if (style === 'blunt') {
+      audio.playBluntImpact();
+    } else {
+      audio.playStaffWhoosh();
+    }
+    if (e.damageKind === 'crit') {
+      audio.playCritImpact();
+    }
   }
 }
 
@@ -329,6 +388,7 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     for (const entry of newLogEntries) {
       playCombatLogSound(entry, leadName, ctx.audio);
     }
+    playCombatFxImpactSounds(newLogEntries, ctx.state.party, ctx.audio);
     const v = { encounterId: encId, index: c.log.length };
     ctx.combatLog.setSoundCursor(v);
   }
@@ -354,8 +414,10 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
   if (combatLastResolvedDamageWasCrit(c.log)) {
     left.classList.add('combat-enemies-column--crit-damage');
   }
-  if (combatFx.columnPulse === 'heal') {
-    left.classList.add('combat-enemies-column--pulse-heal');
+  if (combatFx.columnPulse === 'heal_spell') {
+    left.classList.add('combat-enemies-column--pulse-heal-spell');
+  } else if (combatFx.columnPulse === 'heal_potion') {
+    left.classList.add('combat-enemies-column--pulse-potion');
   } else if (combatFx.columnPulse === 'buff') {
     left.classList.add('combat-enemies-column--pulse-buff');
   }
@@ -430,6 +492,11 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
 
   const actionsPanel = document.createElement('div');
   actionsPanel.className = 'combat-actions-panel';
+  if (combatFx.columnPulse === 'heal_spell') {
+    actionsPanel.classList.add('combat-actions-panel--fx-heal-spell');
+  } else if (combatFx.columnPulse === 'heal_potion') {
+    actionsPanel.classList.add('combat-actions-panel--fx-potion');
+  }
   const actionsHdr = document.createElement('div');
   actionsHdr.className = 'combat-actions-panel-hdr';
   actionsHdr.textContent = 'Ações';

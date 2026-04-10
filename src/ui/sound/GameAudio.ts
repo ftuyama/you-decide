@@ -177,6 +177,283 @@ export class GameAudio {
     this.playTone(95, 0.12, 0.12, 'sawtooth');
   }
 
+  /** Corte de lâmina (ataque físico estilo espada/adaga). */
+  playSwordSlash(): void {
+    const ctx = this.ensureContext();
+    const t0 = ctx.currentTime;
+    const g = this.gain(0.1);
+    if (g <= 0) return;
+    const whoosh = ctx.createOscillator();
+    const gWhoosh = ctx.createGain();
+    whoosh.type = 'sawtooth';
+    whoosh.frequency.setValueAtTime(380, t0);
+    whoosh.frequency.exponentialRampToValueAtTime(2200, t0 + 0.028);
+    whoosh.frequency.exponentialRampToValueAtTime(520, t0 + 0.09);
+    gWhoosh.gain.setValueAtTime(g * 0.55, t0);
+    gWhoosh.gain.exponentialRampToValueAtTime(0.01, t0 + 0.11);
+    whoosh.connect(gWhoosh);
+    gWhoosh.connect(ctx.destination);
+    whoosh.start(t0);
+    whoosh.stop(t0 + 0.12);
+    const ring = ctx.createOscillator();
+    const gRing = ctx.createGain();
+    ring.type = 'square';
+    ring.frequency.setValueAtTime(2100, t0 + 0.015);
+    ring.frequency.exponentialRampToValueAtTime(900, t0 + 0.055);
+    gRing.gain.setValueAtTime(g * 0.22, t0 + 0.015);
+    gRing.gain.exponentialRampToValueAtTime(0.01, t0 + 0.08);
+    ring.connect(gRing);
+    gRing.connect(ctx.destination);
+    ring.start(t0 + 0.015);
+    ring.stop(t0 + 0.09);
+  }
+
+  /** Impacto contundente (maça). */
+  playBluntImpact(): void {
+    const ctx = this.ensureContext();
+    const t0 = ctx.currentTime;
+    const g = this.gain(0.1);
+    if (g <= 0) return;
+    const thud = ctx.createOscillator();
+    const gThud = ctx.createGain();
+    thud.type = 'sine';
+    thud.frequency.setValueAtTime(140, t0);
+    thud.frequency.exponentialRampToValueAtTime(55, t0 + 0.14);
+    gThud.gain.setValueAtTime(g * 0.85, t0);
+    gThud.gain.exponentialRampToValueAtTime(0.01, t0 + 0.18);
+    thud.connect(gThud);
+    gThud.connect(ctx.destination);
+    thud.start(t0);
+    thud.stop(t0 + 0.2);
+    const crack = ctx.createOscillator();
+    const gCrack = ctx.createGain();
+    crack.type = 'triangle';
+    crack.frequency.setValueAtTime(320, t0 + 0.02);
+    crack.frequency.exponentialRampToValueAtTime(120, t0 + 0.06);
+    gCrack.gain.setValueAtTime(g * 0.28, t0 + 0.02);
+    gCrack.gain.exponentialRampToValueAtTime(0.01, t0 + 0.09);
+    crack.connect(gCrack);
+    gCrack.connect(ctx.destination);
+    crack.start(t0 + 0.02);
+    crack.stop(t0 + 0.1);
+  }
+
+  /** Golpe com cajado (whoosh leve + toque mágico). */
+  playStaffWhoosh(): void {
+    const ctx = this.ensureContext();
+    const t0 = ctx.currentTime;
+    const g = this.gain(0.085);
+    if (g <= 0) return;
+    const air = ctx.createOscillator();
+    const gAir = ctx.createGain();
+    air.type = 'sine';
+    air.frequency.setValueAtTime(480, t0);
+    air.frequency.exponentialRampToValueAtTime(1400, t0 + 0.04);
+    air.frequency.exponentialRampToValueAtTime(620, t0 + 0.1);
+    gAir.gain.setValueAtTime(g * 0.5, t0);
+    gAir.gain.exponentialRampToValueAtTime(0.01, t0 + 0.12);
+    air.connect(gAir);
+    gAir.connect(ctx.destination);
+    air.start(t0);
+    air.stop(t0 + 0.13);
+    const chime = ctx.createOscillator();
+    const gChime = ctx.createGain();
+    chime.type = 'triangle';
+    chime.frequency.value = 990;
+    gChime.gain.setValueAtTime(0.001, t0 + 0.04);
+    gChime.gain.exponentialRampToValueAtTime(g * 0.35, t0 + 0.055);
+    gChime.gain.exponentialRampToValueAtTime(0.01, t0 + 0.14);
+    chime.connect(gChime);
+    gChime.connect(ctx.destination);
+    chime.start(t0 + 0.04);
+    chime.stop(t0 + 0.15);
+  }
+
+  /** Magia de fogo / brasa. */
+  playSpellFire(): void {
+    const ctx = this.ensureContext();
+    const t0 = ctx.currentTime;
+    const g = this.gain(0.095);
+    if (g <= 0) return;
+    const rush = ctx.createOscillator();
+    const gRush = ctx.createGain();
+    rush.type = 'sawtooth';
+    rush.frequency.setValueAtTime(90, t0);
+    rush.frequency.exponentialRampToValueAtTime(380, t0 + 0.05);
+    gRush.gain.setValueAtTime(g * 0.45, t0);
+    gRush.gain.exponentialRampToValueAtTime(0.01, t0 + 0.12);
+    rush.connect(gRush);
+    gRush.connect(ctx.destination);
+    rush.start(t0);
+    rush.stop(t0 + 0.13);
+    [1800, 2400, 1600].forEach((freq, i) => {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'square';
+      o.frequency.value = freq;
+      gn.gain.setValueAtTime(0.001, t0 + i * 0.022);
+      gn.gain.exponentialRampToValueAtTime(g * 0.12, t0 + i * 0.022 + 0.008);
+      gn.gain.exponentialRampToValueAtTime(0.01, t0 + i * 0.022 + 0.05);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      const st = t0 + i * 0.022;
+      o.start(st);
+      o.stop(st + 0.06);
+    });
+  }
+
+  /** Rajada arcana genérica (raio, dano mágico). */
+  playSpellArcaneBurst(): void {
+    const ctx = this.ensureContext();
+    const t0 = ctx.currentTime;
+    const g = this.gain(0.09);
+    if (g <= 0) return;
+    const body = ctx.createOscillator();
+    const gBody = ctx.createGain();
+    body.type = 'triangle';
+    body.frequency.setValueAtTime(440, t0);
+    body.frequency.exponentialRampToValueAtTime(1320, t0 + 0.04);
+    body.frequency.exponentialRampToValueAtTime(660, t0 + 0.11);
+    gBody.gain.setValueAtTime(g * 0.55, t0);
+    gBody.gain.exponentialRampToValueAtTime(0.01, t0 + 0.14);
+    body.connect(gBody);
+    gBody.connect(ctx.destination);
+    body.start(t0);
+    body.stop(t0 + 0.15);
+    const sparkle = ctx.createOscillator();
+    const gSp = ctx.createGain();
+    sparkle.type = 'sine';
+    sparkle.frequency.setValueAtTime(2400, t0 + 0.02);
+    sparkle.frequency.exponentialRampToValueAtTime(880, t0 + 0.08);
+    gSp.gain.setValueAtTime(g * 0.2, t0 + 0.02);
+    gSp.gain.exponentialRampToValueAtTime(0.01, t0 + 0.1);
+    sparkle.connect(gSp);
+    gSp.connect(ctx.destination);
+    sparkle.start(t0 + 0.02);
+    sparkle.stop(t0 + 0.11);
+  }
+
+  /** Relâmpago / gelo prateado (tom mais “cristalino”). */
+  playSpellIceSpark(): void {
+    const ctx = this.ensureContext();
+    const t0 = ctx.currentTime;
+    const g = this.gain(0.088);
+    if (g <= 0) return;
+    [2640, 1980, 3520].forEach((freq, i) => {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = freq;
+      gn.gain.setValueAtTime(0.001, t0 + i * 0.018);
+      gn.gain.exponentialRampToValueAtTime(g * 0.22, t0 + i * 0.018 + 0.006);
+      gn.gain.exponentialRampToValueAtTime(0.01, t0 + i * 0.018 + 0.07);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      const st = t0 + i * 0.018;
+      o.start(st);
+      o.stop(st + 0.08);
+    });
+  }
+
+  /** Reforço sonoro em crítico (golpe ou magia). */
+  playCritImpact(): void {
+    const ctx = this.ensureContext();
+    const t0 = ctx.currentTime;
+    const g = this.gain(0.08);
+    if (g <= 0) return;
+    const o = ctx.createOscillator();
+    const gn = ctx.createGain();
+    o.type = 'square';
+    o.frequency.setValueAtTime(180, t0);
+    o.frequency.exponentialRampToValueAtTime(45, t0 + 0.08);
+    gn.gain.setValueAtTime(g * 0.6, t0);
+    gn.gain.exponentialRampToValueAtTime(0.01, t0 + 0.1);
+    o.connect(gn);
+    gn.connect(ctx.destination);
+    o.start(t0);
+    o.stop(t0 + 0.11);
+    const ping = ctx.createOscillator();
+    const gPing = ctx.createGain();
+    ping.type = 'triangle';
+    ping.frequency.value = 660;
+    gPing.gain.setValueAtTime(0.001, t0 + 0.02);
+    gPing.gain.exponentialRampToValueAtTime(this.gain(0.05), t0 + 0.028);
+    gPing.gain.exponentialRampToValueAtTime(0.01, t0 + 0.09);
+    ping.connect(gPing);
+    gPing.connect(ctx.destination);
+    ping.start(t0 + 0.02);
+    ping.stop(t0 + 0.1);
+  }
+
+  /** Magia de cura no líder (tom suave ascendente + brilho). */
+  playSpellHeal(): void {
+    const ctx = this.ensureContext();
+    const t0 = ctx.currentTime;
+    const g = this.gain(0.1);
+    if (g <= 0) return;
+    const notes = [
+      { f: 392, t: 0, dur: 0.1 },
+      { f: 523.25, t: 0.07, dur: 0.12 },
+      { f: 659.25, t: 0.16, dur: 0.14 },
+      { f: 783.99, t: 0.28, dur: 0.18 },
+    ];
+    for (const { f, t, dur } of notes) {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = f;
+      gn.gain.setValueAtTime(0.001, t0 + t);
+      gn.gain.exponentialRampToValueAtTime(g * 0.55, t0 + t + 0.025);
+      gn.gain.exponentialRampToValueAtTime(0.01, t0 + t + dur);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(t0 + t);
+      o.stop(t0 + t + dur + 0.02);
+    }
+    const hum = ctx.createOscillator();
+    const gHum = ctx.createGain();
+    hum.type = 'triangle';
+    hum.frequency.setValueAtTime(130.81, t0);
+    hum.frequency.exponentialRampToValueAtTime(196, t0 + 0.35);
+    gHum.gain.setValueAtTime(g * 0.18, t0);
+    gHum.gain.exponentialRampToValueAtTime(0.01, t0 + 0.45);
+    hum.connect(gHum);
+    gHum.connect(ctx.destination);
+    hum.start(t0);
+    hum.stop(t0 + 0.48);
+  }
+
+  /** Poção consumida (gole / frasco). */
+  playPotionDrink(): void {
+    const ctx = this.ensureContext();
+    const t0 = ctx.currentTime;
+    const g = this.gain(0.095);
+    if (g <= 0) return;
+    const glug = ctx.createOscillator();
+    const gGlug = ctx.createGain();
+    glug.type = 'sawtooth';
+    glug.frequency.setValueAtTime(200, t0);
+    glug.frequency.exponentialRampToValueAtTime(95, t0 + 0.14);
+    gGlug.gain.setValueAtTime(g * 0.42, t0);
+    gGlug.gain.exponentialRampToValueAtTime(0.01, t0 + 0.16);
+    glug.connect(gGlug);
+    gGlug.connect(ctx.destination);
+    glug.start(t0);
+    glug.stop(t0 + 0.18);
+    const bubble = ctx.createOscillator();
+    const gBub = ctx.createGain();
+    bubble.type = 'sine';
+    bubble.frequency.setValueAtTime(880, t0 + 0.04);
+    bubble.frequency.exponentialRampToValueAtTime(420, t0 + 0.1);
+    gBub.gain.setValueAtTime(g * 0.22, t0 + 0.04);
+    gBub.gain.exponentialRampToValueAtTime(0.01, t0 + 0.12);
+    bubble.connect(gBub);
+    gBub.connect(ctx.destination);
+    bubble.start(t0 + 0.04);
+    bubble.stop(t0 + 0.14);
+    this.playTone(120, 0.06, 0.04, 'sine');
+  }
+
   /** Erro / falha leve (ataque falha, sorte má) */
   playMiss(): void {
     this.playTone(220, 0.08, 0.05, 'triangle');

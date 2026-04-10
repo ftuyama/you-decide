@@ -47,9 +47,6 @@ choices:
     preview: "Remédios e preços em ouro ou em promessa."
   - text: "Vagar entre as colunas — o vazio escolhe o próximo passo"
     next: act6/encounters/fractured_void_router
-    condition:
-      all:
-        - { flag: act6_reality_done }
     preview: "Só depois da primeira prova: o vazio empurra-te ao acaso."
     timedMs: 14000
     fallbackNext: act6/camp/void_camp

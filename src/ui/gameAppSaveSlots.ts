@@ -1,7 +1,7 @@
 import { deserializeState, serializeState } from '../engine/state.ts';
 import type { GameState } from '../engine/schema.ts';
 
-export const SAVE_SLOT_COUNT = 3;
+export const SAVE_SLOT_COUNT = 4;
 
 export function slotStorageKey(campaignId: string, slot: number): string {
   return `${campaignId}_save_v1_s${slot}`;

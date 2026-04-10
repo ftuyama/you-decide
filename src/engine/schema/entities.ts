@@ -209,6 +209,8 @@ export const CombatLogEntrySchema = z.object({
   lethal: z.boolean().optional(),
   /** Magia associada à linha de log (lançamento, cura, buff) */
   spellId: z.string().optional(),
+  /** Item consumido (poção em combate — FX / som) */
+  itemId: z.string().optional(),
 });
 
 export type CombatLogEntry = z.infer<typeof CombatLogEntrySchema>;

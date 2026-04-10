@@ -56,6 +56,7 @@ export class GameApp {
   private readonly sidebarKey: string;
   private readonly fontKey: string;
   private readonly timedChoiceKey: string;
+  private readonly sceneArtHighlightKey: string;
   private readonly devModeKey: string;
   private registry: ContentRegistry;
   private bus = new EventBus();
@@ -71,6 +72,8 @@ export class GameApp {
   private devMode = false;
   /** Escolhas com `timedMs` + barra / auto-navegação. */
   private timedChoiceMode = false;
+  /** Overlay em ecrã inteiro da arte na primeira visita (`highlight: true`). */
+  private sceneArtHighlightEnabled = true;
   private readonly choiceHotkeyHandler: (e: KeyboardEvent) => void;
   /** Secções colapsáveis (recursos, inventário, facções, personagem…) — persistido em sessionStorage */
   private sidebarSections: Record<string, boolean> = {};
@@ -105,11 +108,13 @@ export class GameApp {
     this.sidebarKey = `${campaignId}_sidebar_sections_v1`;
     this.fontKey = `${campaignId}_font_step_v1`;
     this.timedChoiceKey = `${campaignId}_timed_choice_v1`;
+    this.sceneArtHighlightKey = `${campaignId}_scene_art_highlight_v1`;
     this.devModeKey = `${campaignId}_dev_mode`;
     this.registry = new ContentRegistry(campaignId);
     this.audio = new GameAudio(campaignId);
     this.fontStep = this.loadFontStep();
     this.timedChoiceMode = this.loadTimedChoiceMode();
+    this.sceneArtHighlightEnabled = this.loadSceneArtHighlightEnabled();
     this.devMode = this.loadDevMode();
     this.choiceHotkeyHandler = (e: KeyboardEvent): void => {
       const el = e.target;
@@ -264,6 +269,22 @@ export class GameApp {
   private saveTimedChoiceMode(): void {
     try {
       localStorage.setItem(this.timedChoiceKey, this.timedChoiceMode ? '1' : '0');
+    } catch {
+      /* noop */
+    }
+  }
+
+  private loadSceneArtHighlightEnabled(): boolean {
+    try {
+      return localStorage.getItem(this.sceneArtHighlightKey) !== '0';
+    } catch {
+      return true;
+    }
+  }
+
+  private saveSceneArtHighlightEnabled(): void {
+    try {
+      localStorage.setItem(this.sceneArtHighlightKey, this.sceneArtHighlightEnabled ? '1' : '0');
     } catch {
       /* noop */
     }
@@ -671,6 +692,13 @@ export class GameApp {
     if (s.sceneArtHighlightShown[scene.id]) return null;
     const artText = resolveSceneArt(this.registry, scene);
     if (!artText) return null;
+    if (!this.sceneArtHighlightEnabled) {
+      this.state = {
+        ...this.state,
+        sceneArtHighlightShown: { ...this.state.sceneArtHighlightShown, [scene.id]: true },
+      };
+      return null;
+    }
     const gen = this.sceneArtHighlightGen;
     const sid = scene.id;
     return {
@@ -692,6 +720,7 @@ export class GameApp {
   }
 
   private buildStoryRenderContext(scene: LoadedScene): StoryRenderContext {
+    const sceneArtHighlight = this.buildSceneArtHighlightPayload(scene);
     return {
       campaignId: this.campaignId,
       devMode: this.devMode,
@@ -699,7 +728,7 @@ export class GameApp {
       state: this.state,
       registry: this.registry,
       scene,
-      sceneArtHighlight: this.buildSceneArtHighlightPayload(scene),
+      sceneArtHighlight,
       overlay: {
         pendingStoryDiceRoll: this.pendingStoryDiceRoll,
         storyDiceHost: this.storyDiceHostBinding(),
@@ -780,6 +809,7 @@ export class GameApp {
       campaignId: this.campaignId,
       devMode: this.devMode,
       timedChoiceEnabled: this.timedChoiceMode,
+      sceneArtHighlightEnabled: this.sceneArtHighlightEnabled,
       state: this.state,
       registry: this.registry,
       sidebarSections: this.sidebarSections,
@@ -802,6 +832,12 @@ export class GameApp {
       onTimedChoiceChange: (v: boolean) => {
         this.timedChoiceMode = v;
         this.saveTimedChoiceMode();
+        this.closeMenu();
+        this.render();
+      },
+      onSceneArtHighlightChange: (v: boolean) => {
+        this.sceneArtHighlightEnabled = v;
+        this.saveSceneArtHighlightEnabled();
         this.closeMenu();
         this.render();
       },

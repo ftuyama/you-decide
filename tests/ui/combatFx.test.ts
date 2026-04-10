@@ -188,7 +188,20 @@ describe('resolveCombatLogFx', () => {
       },
     ];
     const r = resolveCombatLogFx(entries, [knight], data);
-    expect(r.columnPulse).toBe('heal');
+    expect(r.columnPulse).toBe('heal_spell');
+  });
+
+  it('sets potion pulse from info with itemId (ex.: mana)', () => {
+    const entries: CombatLogEntry[] = [
+      {
+        kind: 'info',
+        message: 'Usa poção.',
+        actor: 'Aldo',
+        itemId: 'some_potion',
+      },
+    ];
+    const r = resolveCombatLogFx(entries, [knight], data);
+    expect(r.columnPulse).toBe('heal_potion');
   });
 
   it('sets buff column pulse from info with buff spellId', () => {

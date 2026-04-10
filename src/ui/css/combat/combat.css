@@ -44,6 +44,7 @@ main.main--combat {
 
 /** Postura, magias, itens e fugir — grelha visível (mesmo padrão que --ui-grid-*) */
 .combat-actions-panel {
+  position: relative;
   margin-top: 0.85rem;
   padding: 0.6rem 0.65rem 0.65rem;
   border: 1px solid var(--combat-actions-border);
@@ -231,6 +232,18 @@ button.combat-flee-btn:hover {
   border-radius: 2px;
 }
 
+/** Golpes corpo a corpo / raios: pseudo-elementos podem ultrapassar ligeiramente o recorte */
+.enemy-fx-layer:is(
+ .combat-fx-melee-slash,
+    .combat-fx-melee-slash--crit,
+    .combat-fx-spell-ember,
+    .combat-fx-spell-ember--crit,
+    .combat-fx-spell-arcane,
+    .combat-fx-spell-arcane--crit
+  ) {
+  overflow: visible;
+}
+
 .enemy-sprite {
   position: relative;
   z-index: 1;
@@ -272,26 +285,24 @@ button.combat-flee-btn:hover {
   }
 }
 
-/** Golpes corpo a corpo — variações por arma / classe */
-@keyframes combatFxSlash {
+/**
+ * Corte de espada: traço diagonal brilhante que atravessa o sprite (lê-se como “slash”).
+ */
+@keyframes combatFxSlashBladeSweep {
   0% {
     opacity: 0;
-    background: linear-gradient(
-      115deg,
-      transparent 40%,
-      rgba(220, 200, 160, 0.45) 48%,
-      rgba(255, 245, 220, 0.65) 50%,
-      rgba(220, 200, 160, 0.45) 52%,
-      transparent 60%
-    );
-    transform: translateX(-18%) skewX(-8deg);
+    transform: translate(-28%, 22%) rotate(-38deg) scale(0.75);
   }
-  35% {
+  14% {
     opacity: 1;
+  }
+  48% {
+    opacity: 1;
+    transform: translate(8%, -12%) rotate(-6deg) scale(1.05);
   }
   100% {
     opacity: 0;
-    transform: translateX(18%) skewX(-8deg);
+    transform: translate(22%, -28%) rotate(12deg) scale(1.02);
   }
 }
 
@@ -347,14 +358,41 @@ button.combat-flee-btn:hover {
   }
 }
 
+.combat-fx-melee-slash::before,
+.combat-fx-melee-slash--crit::before {
+  content: '';
+  position: absolute;
+  left: -25%;
+  top: -25%;
+  width: 150%;
+  height: 150%;
+  background: linear-gradient(
+    102deg,
+    transparent 0%,
+    transparent 41%,
+    rgba(255, 248, 220, 0.12) 46.5%,
+    rgba(255, 255, 255, 1) 49.4%,
+    rgba(255, 235, 190, 0.92) 50.2%,
+    rgba(200, 210, 235, 0.45) 52%,
+    transparent 57%
+  );
+  filter: drop-shadow(0 0 10px rgba(255, 245, 210, 0.95)) drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));
+  animation: combatFxSlashBladeSweep 0.44s cubic-bezier(0.2, 0.85, 0.35, 1) forwards;
+  pointer-events: none;
+}
+
+.combat-fx-melee-slash--crit::before {
+  filter:
+    drop-shadow(0 0 14px rgba(255, 230, 120, 1)) drop-shadow(0 0 6px rgba(255, 255, 255, 0.95));
+  animation-duration: 0.48s;
+}
+
 .combat-fx-melee-slash {
-  animation: combatFxSlash 0.38s ease-out forwards;
+  animation: none;
 }
 
 .combat-fx-melee-slash--crit {
-  animation:
-    combatFxSlash 0.38s ease-out forwards,
-    combatFxCritExtra 0.48s ease-out forwards;
+  animation: combatFxCritExtra 0.52s ease-out forwards;
 }
 
 .combat-fx-melee-blunt {
@@ -380,31 +418,91 @@ button.combat-flee-btn:hover {
 @keyframes combatFxSpellArcane {
   0% {
     opacity: 0;
-    background: radial-gradient(circle at 50% 50%, rgba(160, 120, 220, 0.55), transparent 65%);
-    transform: scale(0.65);
+    background:
+      radial-gradient(circle at 50% 50%, rgba(220, 200, 255, 0.35) 0%, transparent 45%),
+      radial-gradient(circle at 50% 50%, rgba(140, 90, 200, 0.65), transparent 58%);
+    transform: scale(0.55);
+    box-shadow: inset 0 0 0 0 rgba(180, 140, 255, 0);
   }
-  45% {
+  38% {
     opacity: 1;
-    transform: scale(1.05);
+    background:
+      radial-gradient(circle at 45% 45%, rgba(255, 250, 255, 0.5) 0%, transparent 25%),
+      radial-gradient(circle at 52% 52%, rgba(160, 110, 230, 0.75), transparent 62%);
+    transform: scale(1.02);
+    box-shadow:
+      inset 0 0 28px rgba(190, 160, 255, 0.45),
+      0 0 24px rgba(130, 80, 200, 0.35);
   }
   100% {
     opacity: 0;
-    transform: scale(1.15);
+    transform: scale(1.18);
+    box-shadow: inset 0 0 0 0 transparent;
   }
 }
 
 @keyframes combatFxSpellEmber {
   0% {
     opacity: 0;
-    background: radial-gradient(circle at 40% 55%, rgba(255, 120, 60, 0.55), transparent 62%);
+    background:
+      radial-gradient(circle at 45% 60%, rgba(255, 255, 200, 0.9) 0%, transparent 8%),
+      radial-gradient(ellipse 70% 55% at 42% 55%, rgba(255, 200, 80, 0.75), transparent 62%),
+      radial-gradient(circle at 55% 40%, rgba(255, 90, 40, 0.45), transparent 55%);
+    transform: scale(0.55);
+    filter: brightness(1);
   }
-  50% {
+  22% {
     opacity: 1;
-    background: radial-gradient(circle at 50% 45%, rgba(255, 160, 80, 0.5), transparent 68%);
+    filter: brightness(1.25);
+  }
+  45% {
+    opacity: 1;
+    background:
+      radial-gradient(circle at 48% 48%, rgba(255, 255, 240, 1) 0%, transparent 12%),
+      radial-gradient(ellipse 85% 70% at 50% 48%, rgba(255, 160, 60, 0.85), transparent 68%),
+      radial-gradient(circle at 38% 62%, rgba(200, 60, 30, 0.55), transparent 50%);
+    transform: scale(1.08);
+    filter: brightness(1.35);
+  }
+  72% {
+    opacity: 0.85;
+    filter: brightness(1.1);
   }
   100% {
     opacity: 0;
+    transform: scale(1.2);
+    filter: brightness(0.85);
   }
+}
+
+@keyframes combatFxSpellEmberSparks {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  15%,
+  35%,
+  55% {
+    opacity: 1;
+  }
+  25%,
+  45% {
+    opacity: 0.35;
+  }
+}
+
+.combat-fx-spell-ember::after,
+.combat-fx-spell-ember--crit::after {
+  content: '';
+  position: absolute;
+  inset: -15%;
+  background:
+    radial-gradient(circle at 20% 70%, rgba(255, 220, 100, 0.7) 0%, transparent 3%),
+    radial-gradient(circle at 78% 35%, rgba(255, 180, 60, 0.65) 0%, transparent 3%),
+    radial-gradient(circle at 60% 75%, rgba(255, 140, 40, 0.55) 0%, transparent 4%);
+  animation: combatFxSpellEmberSparks 0.42s ease-out forwards;
+  pointer-events: none;
+  mix-blend-mode: screen;
 }
 
 @keyframes combatFxSpellSilver {
@@ -421,23 +519,23 @@ button.combat-flee-btn:hover {
 }
 
 .combat-fx-spell-arcane {
-  animation: combatFxSpellArcane 0.45s ease-out forwards;
+  animation: combatFxSpellArcane 0.5s ease-out forwards;
 }
 
 .combat-fx-spell-arcane--crit {
   animation:
-    combatFxSpellArcane 0.45s ease-out forwards,
-    combatFxCritExtra 0.48s ease-out forwards;
+    combatFxSpellArcane 0.5s ease-out forwards,
+    combatFxCritExtra 0.5s ease-out forwards;
 }
 
 .combat-fx-spell-ember {
-  animation: combatFxSpellEmber 0.44s ease-out forwards;
+  animation: combatFxSpellEmber 0.52s ease-out forwards;
 }
 
 .combat-fx-spell-ember--crit {
   animation:
-    combatFxSpellEmber 0.44s ease-out forwards,
-    combatFxCritExtra 0.48s ease-out forwards;
+    combatFxSpellEmber 0.55s ease-out forwards,
+    combatFxCritExtra 0.5s ease-out forwards;
 }
 
 .combat-fx-spell-silver {
@@ -524,21 +622,106 @@ button.combat-flee-btn:hover {
   animation: combatFxDeath 0.75s ease-out forwards;
 }
 
-.combat-enemies-column--pulse-heal {
-  animation: combatColPulseHeal 0.65s ease-out;
+/** Cura por magia — brilho verde-dourado mais visível */
+.combat-enemies-column--pulse-heal-spell {
+  position: relative;
+  animation: combatColPulseHealSpell 0.85s ease-out;
+}
+
+.combat-enemies-column--pulse-heal-spell::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 90% 70% at 50% 100%,
+    rgba(120, 220, 160, 0.35),
+    rgba(200, 240, 200, 0.12) 45%,
+    transparent 70%
+  );
+  animation: combatColHealSpellShimmer 0.85s ease-out forwards;
+  mix-blend-mode: screen;
+}
+
+/** Poção — tom âmbar / verde-água */
+.combat-enemies-column--pulse-potion {
+  position: relative;
+  animation: combatColPulsePotion 0.75s ease-out;
+}
+
+.combat-enemies-column--pulse-potion::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 85%,
+    rgba(180, 220, 140, 0.4),
+    rgba(100, 160, 120, 0.15) 50%,
+    transparent 72%
+  );
+  animation: combatColPotionRipple 0.75s ease-out forwards;
+  mix-blend-mode: soft-light;
 }
 
 .combat-enemies-column--pulse-buff {
   animation: combatColPulseBuff 0.65s ease-out;
 }
 
-@keyframes combatColPulseHeal {
+@keyframes combatColPulseHealSpell {
+  0%,
+  100% {
+    box-shadow: inset 0 0 0 0 transparent;
+    border-color: var(--border);
+  }
+  35%,
+  55% {
+    box-shadow:
+      inset 0 0 36px rgba(90, 200, 140, 0.28),
+      inset 0 -8px 24px rgba(220, 240, 200, 0.12);
+    border-color: color-mix(in srgb, var(--border) 40%, rgba(140, 220, 160, 0.65));
+  }
+}
+
+@keyframes combatColHealSpellShimmer {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scaleY(0.85);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-12%) scaleY(1.05);
+  }
+}
+
+@keyframes combatColPulsePotion {
   0%,
   100% {
     box-shadow: inset 0 0 0 0 transparent;
   }
+  45% {
+    box-shadow:
+      inset 0 0 26px rgba(160, 200, 120, 0.22),
+      inset 0 4px 18px rgba(80, 140, 100, 0.15);
+  }
+}
+
+@keyframes combatColPotionRipple {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
   40% {
-    box-shadow: inset 0 0 28px rgba(100, 180, 130, 0.18);
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.06);
   }
 }
 
@@ -550,6 +733,78 @@ button.combat-flee-btn:hover {
   40% {
     box-shadow: inset 0 0 28px rgba(120, 150, 220, 0.2);
   }
+}
+
+/** Painel de ações: luz sobe (cura mágica) ou brilho de poção */
+.combat-actions-panel--fx-heal-spell::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 5px;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(
+    185deg,
+    transparent 0%,
+    transparent 38%,
+    rgba(140, 230, 180, 0.22) 52%,
+    rgba(240, 255, 245, 0.35) 58%,
+    rgba(120, 200, 150, 0.12) 68%,
+    transparent 85%
+  );
+  animation: combatActionsHealSpellGlow 0.9s ease-out forwards;
+  mix-blend-mode: screen;
+}
+
+.combat-actions-panel--fx-potion::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 5px;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    ellipse 100% 55% at 50% 100%,
+    rgba(160, 210, 130, 0.45),
+    rgba(90, 140, 100, 0.2) 55%,
+    transparent 75%
+  );
+  animation: combatActionsPotionGlow 0.78s ease-out forwards;
+}
+
+@keyframes combatActionsHealSpellGlow {
+  0% {
+    opacity: 0;
+    filter: blur(4px);
+  }
+  25% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    filter: blur(2px);
+  }
+}
+
+@keyframes combatActionsPotionGlow {
+  0% {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.02);
+  }
+}
+
+.combat-actions-panel--fx-heal-spell > *,
+.combat-actions-panel--fx-potion > * {
+  position: relative;
+  z-index: 1;
 }
 
 /** Fala de combate do inimigo — logo abaixo da sprite, estilo citação */

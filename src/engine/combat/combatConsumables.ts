@@ -50,6 +50,7 @@ export function useCombatConsumable(
     kind: 'info',
     message: `${lead.name} usa ${def.name}.`,
     actor: lead.name,
+    itemId,
   });
   if (def.restoreHp && def.restoreHp > 0) {
     const delta = newLead.hp - lead.hp;
@@ -60,6 +61,7 @@ export function useCombatConsumable(
         final: delta,
         actor: lead.name,
         target: lead.name,
+        itemId,
       });
     } else {
       log.push({ kind: 'info', message: 'Nada a curar — HP já cheio.' });

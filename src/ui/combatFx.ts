@@ -28,17 +28,23 @@ export type ResolvedEnemyFx = {
   spriteCritShake: boolean;
 };
 
-export type CombatColumnPulse = 'heal' | 'buff' | null;
+/** Pulso na coluna de inimigos + painel de ações (cura, poção, buff). */
+export type CombatColumnPulse = 'heal_spell' | 'heal_potion' | 'buff' | null;
 
 export type CombatLogFxResult = {
   byEnemyIndex: Map<number, ResolvedEnemyFx>;
   columnPulse: CombatColumnPulse;
 };
 
-function meleeStyleForCharacter(ch: Character | undefined): 'slash' | 'blunt' | 'staff' {
+/** Estilo de FX corpo-a-corpo (arma + classe) — UI e sons. */
+export function getMeleeFxStyleForCharacter(ch: Character | undefined): 'slash' | 'blunt' | 'staff' {
   if (!ch) return 'slash';
   const w = ch.weaponId ? WEAPON_MELEE_STYLE[ch.weaponId] : undefined;
   return w ?? CLASS_FALLBACK[ch.class];
+}
+
+function meleeStyleForCharacter(ch: Character | undefined): 'slash' | 'blunt' | 'staff' {
+  return getMeleeFxStyleForCharacter(ch);
 }
 
 function meleeLayerClass(style: 'slash' | 'blunt' | 'staff', crit: boolean): string {
@@ -140,7 +146,21 @@ export function resolveCombatLogFx(
     }
 
     if (e.kind === 'heal' && e.spellId) {
-      columnPulse = 'heal';
+      columnPulse = 'heal_spell';
+      continue;
+    }
+
+    if (e.kind === 'heal' && e.itemId && !e.spellId) {
+      if (columnPulse !== 'heal_spell') {
+        columnPulse = 'heal_potion';
+      }
+      continue;
+    }
+
+    if (e.kind === 'info' && e.itemId) {
+      if (columnPulse !== 'heal_spell' && columnPulse !== 'heal_potion') {
+        columnPulse = 'heal_potion';
+      }
       continue;
     }
 

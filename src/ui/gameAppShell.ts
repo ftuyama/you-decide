@@ -12,6 +12,8 @@ export type MountAppChromeOptions = {
   campaignId: string;
   devMode: boolean;
   timedChoiceEnabled: boolean;
+  /** Overlay em ecrã inteiro da arte ASCII na primeira visita (`highlight: true` na cena). */
+  sceneArtHighlightEnabled: boolean;
   state: GameState;
   registry: ContentRegistry;
   sidebarSections: Record<string, boolean>;
@@ -21,6 +23,7 @@ export type MountAppChromeOptions = {
   setVolume: (n: number) => void;
   onDevModeChange: (v: boolean) => void;
   onTimedChoiceChange: (v: boolean) => void;
+  onSceneArtHighlightChange: (v: boolean) => void;
   onCycleFont: () => void;
   fullscreenSupported: boolean;
   getFullscreenActive: () => boolean;
@@ -54,6 +57,7 @@ export type AppChromeRefs = {
   volumeValue: HTMLElement;
   devCb: HTMLInputElement;
   timedChoiceCb: HTMLInputElement;
+  sceneArtHighlightCb: HTMLInputElement;
   fontBtn: HTMLButtonElement;
   fullscreenCb: HTMLInputElement;
   devSaveExtrasEl: HTMLElement;
@@ -193,6 +197,19 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
   fullscreenRow.appendChild(fullscreenCb);
   fullscreenRow.appendChild(document.createTextNode(' Ecrã inteiro'));
 
+  const sceneArtHighlightRow = document.createElement('label');
+  sceneArtHighlightRow.className = 'menu-item menu-sound';
+  const sceneArtHighlightCb = document.createElement('input');
+  sceneArtHighlightCb.type = 'checkbox';
+  sceneArtHighlightCb.checked = opts.sceneArtHighlightEnabled;
+  sceneArtHighlightCb.addEventListener('change', () => {
+    opts.onSceneArtHighlightChange(sceneArtHighlightCb.checked);
+  });
+  sceneArtHighlightRow.appendChild(sceneArtHighlightCb);
+  sceneArtHighlightRow.appendChild(
+    document.createTextNode(' Destaque da arte da cena na primeira visita')
+  );
+
   const exportBtn = document.createElement('button');
   exportBtn.type = 'button';
   exportBtn.className = 'menu-item';
@@ -254,6 +271,7 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
   settingsSection.appendChild(volumeRow);
   settingsSection.appendChild(fontBtn);
   settingsSection.appendChild(fullscreenRow);
+  settingsSection.appendChild(sceneArtHighlightRow);
   settingsSection.appendChild(timedChoiceRow);
 
   if (opts.showDevModeToggle || opts.showGraphInSettings) {
@@ -307,6 +325,7 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
     volumeValue,
     devCb,
     timedChoiceCb,
+    sceneArtHighlightCb,
     fontBtn,
     fullscreenCb,
     devSaveExtrasEl,
@@ -336,6 +355,7 @@ export function syncAppChrome(refs: AppChromeRefs, opts: MountAppChromeOptions):
 
   refs.devCb.checked = opts.devMode;
   refs.timedChoiceCb.checked = opts.timedChoiceEnabled;
+  refs.sceneArtHighlightCb.checked = opts.sceneArtHighlightEnabled;
   refs.fontBtn.textContent = `Tamanho do texto (${100 + opts.fontStep * 10}%)`;
   refs.fullscreenCb.checked = opts.getFullscreenActive();
 

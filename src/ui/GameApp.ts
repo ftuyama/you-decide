@@ -30,6 +30,7 @@ import {
 } from './gameAppStory.ts';
 import { formatCampaignHeaderTitle } from './campaignHeaderTitle.ts';
 import { mountAppChrome, syncAppChrome, type AppChromeRefs } from './gameAppShell.ts';
+import { openCreditsModal } from './gameAppSidebar.ts';
 import './css/styles.css';
 import gameVersionRaw from '../../VERSION?raw';
 
@@ -368,9 +369,11 @@ export class GameApp {
 
   private showCredits(): void {
     this.unlockAudio();
-    alert(
-      `${this.registry.data.campaign.name}\nYou Decide · v${GAME_VERSION}\n\nMotor: TypeScript, Vite.\nTexto narrativo em Markdown.\n\nObrigado por jogar.`
-    );
+    openCreditsModal({
+      campaignName: this.registry.data.campaign.name,
+      gameVersion: GAME_VERSION,
+      playUiClick: () => this.audio.playUiClick(),
+    });
     this.closeMenu();
   }
 

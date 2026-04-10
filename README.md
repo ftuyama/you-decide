@@ -122,3 +122,7 @@ Se quiseres contribuir com texto, correções ou ideias, abre um *issue* ou envi
 *“Sob a cidade, só há escadas.”*
 
 </div>
+
+If you enjoyed this experience, consider donating a small tip to support new ideas:
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R6R21XLX02)

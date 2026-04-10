@@ -1,6 +1,6 @@
 import type { GameState } from '../engine/schema.ts';
 import type { ContentRegistry } from '../content/registry.ts';
-import { buildGameSidebar } from './gameAppSidebar.ts';
+import { buildGameSidebar, KOFI_SUPPORT_URL } from './gameAppSidebar.ts';
 import { buildMenuSaveSlot, saveSlotLimit } from './gameAppSaveSlots.ts';
 
 /** Layout persistente: cabeçalho, menu lateral, sidebar do jogador e área principal (`main.story-shell`). */
@@ -300,6 +300,15 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
 
   const aboutSection = createMenuSection('Sobre');
   aboutSection.appendChild(creditsBtn);
+
+  const kofiLink = document.createElement('a');
+  kofiLink.href = KOFI_SUPPORT_URL;
+  kofiLink.target = '_blank';
+  kofiLink.rel = 'noopener noreferrer';
+  kofiLink.className = 'menu-item menu-item--kofi';
+  kofiLink.textContent = 'Apoiar no Ko-fi';
+  kofiLink.title = 'Abre a página de apoio no Ko-fi (novo separador)';
+  aboutSection.appendChild(kofiLink);
 
   const footer = document.createElement('div');
   footer.className = 'menu-drawer-footer';

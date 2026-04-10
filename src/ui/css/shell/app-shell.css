@@ -141,6 +141,23 @@ button.hamburger:hover {
   border-color: var(--accent);
 }
 
+a.menu-item {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  box-sizing: border-box;
+}
+
+/** Ko-fi — logo abaixo de «Créditos» */
+.menu-item--kofi {
+  border-color: color-mix(in srgb, #72a4f2 42%, var(--border));
+  background: color-mix(in srgb, var(--surface-raised) 88%, #72a4f2 14%);
+}
+
+.menu-item--kofi:hover {
+  border-color: color-mix(in srgb, #72a4f2 55%, var(--accent));
+}
+
 /** Dois botões no drawer (dev + grafo): largura total e espaço entre eles. */
 .menu-dev-settings-extras {
   display: flex;

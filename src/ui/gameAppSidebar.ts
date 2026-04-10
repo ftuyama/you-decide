@@ -265,6 +265,104 @@ function openDiaryModal({ diary: entries, marks, registry }: DiaryModalOpenParam
   requestAnimationFrame(() => dismiss.focus());
 }
 
+/** Página de apoio (menu Sobre → Apoiar no Ko-fi). */
+export const KOFI_SUPPORT_URL = 'https://ko-fi.com/lelouchiee';
+
+export type OpenCreditsModalOpts = {
+  campaignName: string;
+  gameVersion: string;
+  playUiClick?: () => void;
+};
+
+/** Modal de créditos (menu Sobre) — partilha overlay com diário/ficha. */
+export function openCreditsModal({
+  campaignName,
+  gameVersion,
+  playUiClick,
+}: OpenCreditsModalOpts): void {
+  closeOverlayModal();
+  playUiClick?.();
+
+  const { layer, scroll, dismiss, wireClose } = createSheetModalShell({
+    layerClass: 'sheet-modal-layer credits-modal-layer',
+    titleId: 'credits-modal-title',
+    kicker: 'You Decide',
+    title: 'Créditos',
+    sub: `${campaignName} · v${gameVersion}`,
+    backdropAriaLabel: 'Fechar créditos',
+  });
+
+  const kofiHint = document.createElement('div');
+  kofiHint.className = 'credits-modal-kofi-hint';
+  const kofiP = document.createElement('p');
+  kofiP.textContent =
+    'Se quiseres apoiar o projeto, usa «Apoiar no Ko-fi» no menu Sobre, abaixo de Créditos.';
+  kofiHint.appendChild(kofiP);
+
+  const secAbout = document.createElement('section');
+  secAbout.className = 'diary-modal-section';
+  const hAbout = document.createElement('h3');
+  hAbout.className = 'diary-modal-section-title';
+  hAbout.textContent = 'Sobre o projeto';
+  const aboutBody = document.createElement('div');
+  aboutBody.className = 'diary-modal-section-body credits-modal-about';
+
+  const p1 = document.createElement('p');
+  p1.textContent =
+    'You Decide é um motor de narrativa interativa: escolhas moldam a história, com estado persistente, combate por turnos e progressão.';
+
+  const p2 = document.createElement('p');
+  p2.appendChild(
+    document.createTextNode(
+      'A campanha atual — '
+    )
+  );
+  const strongCamp = document.createElement('strong');
+  strongCamp.textContent = campaignName;
+  p2.appendChild(strongCamp);
+  p2.appendChild(
+    document.createTextNode(
+      ' — é escrita em Markdown com frontmatter; o motor é TypeScript; o build, Vite.'
+    )
+  );
+
+  aboutBody.appendChild(p1);
+  aboutBody.appendChild(p2);
+  secAbout.appendChild(hAbout);
+  secAbout.appendChild(aboutBody);
+
+  const secThanks = document.createElement('section');
+  secThanks.className = 'diary-modal-section';
+  const hThanks = document.createElement('h3');
+  hThanks.className = 'diary-modal-section-title';
+  hThanks.textContent = 'Obrigado';
+  const pThanks = document.createElement('p');
+  pThanks.className = 'diary-modal-section-body credits-modal-thanks';
+  pThanks.textContent = 'Obrigado por jogar — e boa sorte nas profundezas.';
+  secThanks.appendChild(hThanks);
+  secThanks.appendChild(pThanks);
+
+  scroll.appendChild(kofiHint);
+  scroll.appendChild(secAbout);
+  scroll.appendChild(secThanks);
+
+  document.body.appendChild(layer);
+  overlayModalLayer = layer;
+
+  const shut = (): void => {
+    playUiClick?.();
+    closeOverlayModal();
+  };
+  wireClose(shut);
+
+  overlayModalOnKey = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') shut();
+  };
+  window.addEventListener('keydown', overlayModalOnKey);
+
+  requestAnimationFrame(() => dismiss.focus());
+}
+
 function formatItemEquipmentStatParts(it: ItemDef): string[] {
   const parts: string[] = [];
   if (it.damage !== 0) {

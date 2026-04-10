@@ -357,3 +357,40 @@
   width: 100%;
   text-align: center;
 }
+
+/* Créditos (menu Sobre) — nota sobre o widget Ko-fi flutuante */
+.credits-modal-layer .sheet-modal-panel {
+  width: min(32rem, 100%);
+}
+
+.credits-modal-kofi-hint {
+  margin: 0 0 0.85rem;
+  padding: 0.65rem 0.75rem;
+  background: color-mix(in srgb, var(--surface-inset) 90%, var(--accent) 10%);
+  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--border));
+  border-radius: 3px;
+}
+
+.credits-modal-kofi-hint p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--fg);
+}
+
+.credits-modal-about p {
+  margin: 0 0 0.55rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.credits-modal-about p:last-child {
+  margin-bottom: 0;
+}
+
+.credits-modal-thanks {
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--muted);
+  line-height: 1.45;
+}

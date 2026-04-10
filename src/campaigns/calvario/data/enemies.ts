@@ -43,7 +43,7 @@ export const enemies: Record<string, EnemyDef> = {
     attackStrategy: 'random',
     lootDrops: [
       { chance: 0.05, itemId: 'iron_dagger' },
-      { chance: 0.05, resource: 'gold', amount: 1 },
+      { chance: 0.1, resource: 'gold', amount: 1 },
       { chance: 0.025, resource: 'gold', amount: 1 },
     ],
     combatLines: [
@@ -68,8 +68,8 @@ export const enemies: Record<string, EnemyDef> = {
     sprite: E.act2_cultist.sprite,
     attackStrategy: 'random',
     lootDrops: [
+      { chance: 0.1, resource: 'gold', amount: 1 },
       { chance: 0.05, resource: 'gold', amount: 1 },
-      { chance: 0.025, resource: 'gold', amount: 1 },
     ],
     combatLines: [
       'O sussurro já te escolheu.',
@@ -95,6 +95,7 @@ export const enemies: Record<string, EnemyDef> = {
     lootDrops: [
       { chance: 0.1, resource: 'gold', amount: 1 },
       { chance: 0.05, resource: 'gold', amount: 1 },
+      { chance: 0.025, resource: 'gold', amount: 1 },
     ],
     combatLines: [
       'A geada não perdoa — ela só lembra.',
@@ -303,8 +304,9 @@ export const enemies: Record<string, EnemyDef> = {
     sprite: E.act5_ice_dragon_p1.sprite,
     attackStrategy: 'focus_leader',
     lootDrops: [
-      { chance: 1, resource: 'gold', amount: 5 },
+      { chance: 1, resource: 'gold', amount: 4 },
       { chance: 0.5, resource: 'gold', amount: 2 },
+      { chance: 0.25, resource: 'gold', amount: 1 },
       { chance: 0.5, resource: 'supply', amount: 1 }
     ],
     combatLines: [
@@ -330,8 +332,9 @@ export const enemies: Record<string, EnemyDef> = {
     sprite: E.act5_ice_dragon_p2.sprite,
     attackStrategy: 'focus_leader',
     lootDrops: [
-      { chance: 1, resource: 'gold', amount: 5 },
+      { chance: 1, resource: 'gold', amount: 4 },
       { chance: 0.5, resource: 'gold', amount: 2 },
+      { chance: 0.25, resource: 'gold', amount: 2 },
       { chance: 0.5, resource: 'supply', amount: 1 }
     ],
     combatLines: [
@@ -368,6 +371,7 @@ export const enemies: Record<string, EnemyDef> = {
     lootDrops: [
       { chance: 0.8, resource: 'gold', amount: 4 },
       { chance: 0.4, resource: 'gold', amount: 2 },
+      { chance: 0.1, itemId: 'potion_hp' },
     ],
   },
   act6_veil_herald: {

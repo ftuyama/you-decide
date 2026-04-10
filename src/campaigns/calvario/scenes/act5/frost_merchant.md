@@ -46,7 +46,7 @@ choices:
       - { op: addResource, resource: gold, delta: -4 }
       - { op: grantItem, itemId: potion_stress }
       - { op: setFlag, key: act5_merch_stress_1, value: true }
-  - text: "Comprar Suprimento (5 ouro) (x1)"
+  - text: "Comprar Suprimento (5 ouro) (x2)"
     next: act5/frost_merchant
     condition:
       all:
@@ -61,13 +61,39 @@ choices:
     condition:
       all:
         - { resource: { gold: { gte: 5 } } }
-        - { level: { gte: 21 } }
         - { flag: act5_merch_supply_1 }
         - { noFlag: act5_merch_supply_2 }
     effects:
       - { op: addResource, resource: gold, delta: -5 }
       - { op: addResource, resource: supply, delta: 1 }
       - { op: setFlag, key: act5_merch_supply_2, value: true }
+  - text: "Comprar Suprimento (10 ouro) (x1)"
+    next: act5/frost_merchant
+    condition:
+      all:
+        - { resource: { gold: { gte: 10 } } }
+        - { level: { gte: 21 } }
+        - { flag: act5_merch_supply_1 }
+        - { flag: act5_merch_supply_2 }
+        - { noFlag: act5_merch_supply_3 }
+    effects:
+      - { op: addResource, resource: gold, delta: -10 }
+      - { op: addResource, resource: supply, delta: 1 }
+      - { op: setFlag, key: act5_merch_supply_3, value: true }
+  - text: "Comprar Último Suprimento (15 ouro) (x1)"
+    next: act5/frost_merchant
+    condition:
+      all:
+        - { resource: { gold: { gte: 15 } } }
+        - { level: { gte: 25 } }
+        - { flag: act5_merch_supply_1 }
+        - { flag: act5_merch_supply_2 }
+        - { flag: act5_merch_supply_3 }
+        - { noFlag: act5_merch_supply_4 }
+    effects:
+      - { op: addResource, resource: gold, delta: -15 }
+      - { op: addResource, resource: supply, delta: 1 }
+      - { op: setFlag, key: act5_merch_supply_4, value: true }
   - text: "Afastar-me da tenda"
     next: act5/frost_hub
 onEnter: []

@@ -46,7 +46,7 @@ choices:
       - { op: addResource, resource: gold, delta: -6 }
       - { op: grantItem, itemId: potion_stress }
       - { op: setFlag, key: act6_merch_stress_1, value: true }
-  - text: "Comprar Suprimento (5 ouro) (x1)"
+  - text: "Comprar Suprimento (5 ouro) (x2)"
     next: act6/fractured_merchant
     condition:
       all:
@@ -61,13 +61,25 @@ choices:
     condition:
       all:
         - { resource: { gold: { gte: 5 } } }
-        - { level: { gte: 31 } }
         - { flag: act6_merch_supply_1 }
         - { noFlag: act6_merch_supply_2 }
     effects:
       - { op: addResource, resource: gold, delta: -5 }
       - { op: addResource, resource: supply, delta: 1 }
       - { op: setFlag, key: act6_merch_supply_2, value: true }
+  - text: "Comprar Suprimento (10 ouro) (x1)"
+    next: act6/fractured_merchant
+    condition:
+      all:
+        - { resource: { gold: { gte: 10 } } }
+        - { level: { gte: 31 } }
+        - { flag: act6_merch_supply_1 }
+        - { flag: act6_merch_supply_2 }
+        - { noFlag: act6_merch_supply_3 }
+    effects:
+      - { op: addResource, resource: gold, delta: -10 }
+      - { op: addResource, resource: supply, delta: 1 }
+      - { op: setFlag, key: act6_merch_supply_3, value: true }
   - text: "Afastar-me da banca"
     next: act6/hub_fractured_nave
 onEnter: []

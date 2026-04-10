@@ -29,12 +29,24 @@ choices:
     condition:
       all:
         - { resource: { gold: { gte: 5 } } }
-        - { level: { gte: 11 } }
+        - { level: { gte: 3 } }
         - { noFlag: act2_merch_moon_supply_1 }
     effects:
       - { op: addResource, resource: gold, delta: -5 }
       - { op: addResource, resource: supply, delta: 1 }
       - { op: setFlag, key: act2_merch_moon_supply_1, value: true }
+    preview: "Descansar também é parte da batalha"
+  - text: "Comprar Suprimento (−5 ouro)"
+    next: act2/hub_catacomb
+    condition:
+      all:
+        - { resource: { gold: { gte: 5 } } }
+        - { level: { gte: 11 } }
+        - { noFlag: act2_merch_moon_supply_2 }
+    effects:
+      - { op: addResource, resource: gold, delta: -5 }
+      - { op: addResource, resource: supply, delta: 1 }
+      - { op: setFlag, key: act2_merch_moon_supply_2, value: true }
     preview: "Recurso · estoque único"
   - text: "Comprar Resto de Suprimento (−10 ouro)"
     next: act2/hub_catacomb
@@ -42,11 +54,11 @@ choices:
       all:
         - { resource: { gold: { gte: 10 } } }
         - { level: { gte: 20 } }
-        - { noFlag: act2_merch_moon_supply_2 }
+        - { noFlag: act2_merch_moon_supply_3 }
     effects:
       - { op: addResource, resource: gold, delta: -10 }
       - { op: addResource, resource: supply, delta: 1 }
-      - { op: setFlag, key: act2_merch_moon_supply_2, value: true }
+      - { op: setFlag, key: act2_merch_moon_supply_3, value: true }
     preview: "Um verdadeiro achado"
   - text: "Recusar educadamente"
     next: act2/hub_catacomb

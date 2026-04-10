@@ -158,6 +158,11 @@ export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
     delta: z.number().int(),
   }),
   z.object({
+    op: z.literal('multiplyLeadHp'),
+    /** Multiplica PV atuais e máximos do líder (ex.: 0,5 = metade, permanente até ganhos de nível). */
+    factor: z.number().gt(0).max(1),
+  }),
+  z.object({
     op: z.literal('grantTemporaryBuff'),
     attr: z.enum(['str', 'agi', 'mind', 'luck']),
     delta: z.number().int(),
@@ -206,6 +211,7 @@ export type Effect =
   | { op: 'addMana'; amount: number }
   | { op: 'setPath'; path: string | null }
   | { op: 'adjustLeadStat'; attr: 'str' | 'agi' | 'mind' | 'luck'; delta: number }
+  | { op: 'multiplyLeadHp'; factor: number }
   | {
       op: 'grantTemporaryBuff';
       attr: 'str' | 'agi' | 'mind' | 'luck';

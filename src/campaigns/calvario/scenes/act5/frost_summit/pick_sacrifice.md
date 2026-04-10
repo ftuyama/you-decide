@@ -23,6 +23,9 @@ choices:
     next: act5/frost_summit/ritual_blood
   - text: "Não consigo — voltar ao umbral"
     next: act5/frost_summit/temple_gate
+    preview: "Oferecer seu próprio corpo (Perdes metade do PV máximo para sempre)"
+    effects:
+      - { op: multiplyLeadHp, factor: 0.5 }
 onEnter:
   - { op: addDiary, text: "O altar não pede nome. Pede presença. E eu escolhi quem ia ficar ausente." }
 ---

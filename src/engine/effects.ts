@@ -452,6 +452,26 @@ function applyOne(
         party: state.party.map((p, i) => (i === 0 ? { ...p, [attr]: nextVal } : p)),
       };
     }
+    case 'multiplyLeadHp': {
+      const lead = state.party[0];
+      if (!lead) return state;
+      const f = e.factor;
+      const newMaxHp = Math.max(1, Math.floor(lead.maxHp * f));
+      const newHp = Math.min(newMaxHp, Math.max(1, Math.floor(lead.hp * f)));
+      const lostMax = lead.maxHp - newMaxHp;
+      bus.emit({
+        type: 'statusHighlight',
+        variant: 'bad',
+        title: lostMax > 0 ? `−${lostMax} PV máx.` : `PV máx. ${newMaxHp}`,
+        subtitle: 'O altar cobra quem recua — carne e teto de vida',
+      });
+      return {
+        ...state,
+        party: state.party.map((p, i) =>
+          i === 0 ? { ...p, maxHp: newMaxHp, hp: newHp } : p,
+        ),
+      };
+    }
     case 'grantTemporaryBuff': {
       const id = `buff_${ctx.sceneId}_${state.rngSeed}_${e.attr}_${state.activeBuffs.length}`;
       const label = ATTR_LABEL[e.attr as LeadStatAttr];

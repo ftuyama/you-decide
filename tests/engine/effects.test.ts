@@ -66,6 +66,24 @@ describe('applyEffects', () => {
     expect(next.factionGainPending.vigilia).toBe(0);
   });
 
+  it('multiplyLeadHp reduz PV máx. e atuais pelo fator', () => {
+    let s = createInitialState(testCampaign, 1);
+    s = { ...s, party: [createPlayerCharacter('H', 'knight')] };
+    const bus = new EventBus();
+    const data = emptyGameData(testCampaign, {
+      defaultHeroName: () => 'H',
+      getHeroClassLabel: () => '—',
+      getPathUnlockBonus: () => null,
+    });
+    const next = applyEffects(s, [{ op: 'multiplyLeadHp', factor: 0.5 }], {
+      sceneId: 'test/scene',
+      data,
+      bus,
+    });
+    expect(next.party[0]!.maxHp).toBe(9);
+    expect(next.party[0]!.hp).toBe(9);
+  });
+
   it('addRep sem directGain exige dois ganhos para +1 reputação', () => {
     let s = createInitialState(testCampaign, 1);
     s = { ...s, party: [createPlayerCharacter('H', 'knight')] };

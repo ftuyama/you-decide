@@ -86,17 +86,30 @@ export const ACT3_DEPTH_MELODY: number[] = [
   293.66, // D4
 ];
 
-/** Ritual no cume: trítonos lentos, motivo descendente — macabro, sem conforto tonal. */
+/** Ritual no cume: registro fundo, semitonações e trítono (F3) como ferida — lento, opressivo. */
 export const ANCIENT_MACABRE_MELODY: number[] = [
-  155.56, // D#3
   146.83, // D3
   130.81, // C3
-  123.47, // B2
   116.54, // A#2
   103.83, // G#2
-  116.54, // A#2
-  130.81, // C3
+  92.5, // F#2
+  87.31, // F2 — cova
+  92.5,
+  103.83,
+  116.54,
+  123.47, // B2 — aperto
+  116.54,
+  130.81,
   155.56, // D#3
+  174.61, // F3 (trítono sobre o baixo) — sting
+  155.56,
+  146.83,
+  130.81,
+  116.54,
+  103.83,
+  116.54,
+  130.81,
+  146.83,
 ];
 
 /** Cinzas do céu (ato final): linha irregular, trítonos e descidas — apocalipse sem consolo maior. */

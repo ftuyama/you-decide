@@ -18,6 +18,15 @@ function formatMtimePt(ms: number): string {
   }
 }
 
+/** Alinha a `scripts/check-pending-ascii-art.mjs`: em falta, só espaços, ou só PLACEHOLDER. */
+function isEmptyAsciiSceneArt(sceneArt: Record<string, string>, key: string): boolean {
+  const text = sceneArt[key];
+  if (text === undefined) return true;
+  const t = text.trim();
+  if (t === '') return true;
+  return t.toUpperCase() === 'PLACEHOLDER';
+}
+
 function sortFiles(
   items: readonly AsciiSceneFileMeta[],
   sort: DevToolsAsciiSort
@@ -90,6 +99,26 @@ export function mountAsciiBrowserPanel(
   searchLab.appendChild(searchInp);
   searchRow.appendChild(searchLab);
 
+  const emptyRow = document.createElement('div');
+  emptyRow.className = 'dev-tools-filter-row';
+  const emptyLab = document.createElement('label');
+  emptyLab.className = 'dev-tools-filter';
+  emptyLab.textContent = 'Mostrar ';
+  const emptySel = document.createElement('select');
+  emptySel.className = 'dev-tools-select';
+  const emptyOpts: { value: 'all' | 'empty'; label: string }[] = [
+    { value: 'all', label: 'Todos' },
+    { value: 'empty', label: 'Só vazios ou PLACEHOLDER' },
+  ];
+  for (const o of emptyOpts) {
+    const opt = document.createElement('option');
+    opt.value = o.value;
+    opt.textContent = o.label;
+    emptySel.appendChild(opt);
+  }
+  emptyLab.appendChild(emptySel);
+  emptyRow.appendChild(emptyLab);
+
   const listEl = document.createElement('ul');
   listEl.className = 'dev-tools-scene-list';
 
@@ -101,6 +130,7 @@ export function mountAsciiBrowserPanel(
   sidebar.appendChild(note);
   sidebar.appendChild(sortRow);
   sidebar.appendChild(searchRow);
+  sidebar.appendChild(emptyRow);
   sidebar.appendChild(listEl);
 
   const detail = document.createElement('div');
@@ -115,13 +145,17 @@ export function mountAsciiBrowserPanel(
 
   function filteredSorted(): AsciiSceneFileMeta[] {
     const q = searchInp.value.trim().toLowerCase();
-    const base = q
+    const emptyOnly = emptySel.value === 'empty';
+    let base = q
       ? rawMeta.filter(
           (m) =>
             m.key.toLowerCase().includes(q) ||
             m.path.toLowerCase().includes(q)
         )
       : [...rawMeta];
+    if (emptyOnly) {
+      base = base.filter((m) => isEmptyAsciiSceneArt(sceneArt, m.key));
+    }
     return sortFiles(base, currentSort());
   }
 
@@ -223,6 +257,25 @@ export function mountAsciiBrowserPanel(
     const visible = filteredSorted();
     if (selectedPath && !visible.some((m) => m.path === selectedPath)) {
       selectedPath = visible[0]?.path ?? '';
+    }
+    const meta = rawMeta.find((m) => m.path === selectedPath);
+    if (meta) showDetail(meta);
+    else detail.innerHTML = '';
+  });
+
+  emptySel.addEventListener('change', () => {
+    renderList();
+    const visible = filteredSorted();
+    if (selectedPath && !visible.some((m) => m.path === selectedPath)) {
+      selectedPath = visible[0]?.path ?? '';
+      window.history.pushState(
+        {},
+        '',
+        buildDevToolsHref(campaignId, 'ascii-browser', {
+          asciiPath: selectedPath || null,
+          asciiSort: currentSort(),
+        })
+      );
     }
     const meta = rawMeta.find((m) => m.path === selectedPath);
     if (meta) showDetail(meta);

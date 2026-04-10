@@ -3,7 +3,6 @@ id: act7/stitch_failure
 title: Fio partido
 chapter: 7
 ambientTheme: ash_sky
-artKey: stitch_torn
 choices:
   - text: "Cuspir o sabor de metal e seguir de joelhos se for preciso"
     next: act7/wasteland_antechamber

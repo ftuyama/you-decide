@@ -37,6 +37,13 @@
   align-items: center;
   gap: 0.35rem;
   font-size: 0.9rem;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.dev-tools-campaign .dev-tools-select {
+  flex: 1 1 8rem;
+  min-width: 0;
 }
 
 .dev-tools-select {
@@ -46,6 +53,15 @@
   border: 1px solid var(--border);
   background: var(--panel);
   color: var(--text);
+  box-sizing: border-box;
+  max-width: 100%;
+  /* Evita min-intrínseco do <select> (largura da opção mais longa) a vazar colunas flex/grid */
+  min-width: 0;
+}
+
+.dev-tools-filter .dev-tools-select {
+  flex: 1 1 0;
+  min-width: 0;
 }
 
 .dev-tools-back {
@@ -239,10 +255,13 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  min-width: 0;
 }
 
 .dev-tools-filter-row {
   flex-shrink: 0;
+  min-width: 0;
+  width: 100%;
 }
 
 .dev-tools-filter {
@@ -250,6 +269,8 @@
   align-items: center;
   gap: 0.35rem;
   font-size: 0.85rem;
+  min-width: 0;
+  width: 100%;
 }
 
 .dev-tools-search {

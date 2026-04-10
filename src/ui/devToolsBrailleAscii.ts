@@ -287,8 +287,7 @@ export function mountBrailleAsciiPanel(parent: HTMLElement): void {
   preWrap.className = 'dev-tools-braille-pre-wrap';
   const emptyHint = document.createElement('div');
   emptyHint.className = 'dev-tools-braille-empty';
-  emptyHint.textContent =
-    'Nenhuma imagem carregada. Acima: 1 — ficheiro, 2 — colar, 3 — URL (em dev).';
+  emptyHint.textContent = 'Nenhuma imagem carregada';
   const pre = document.createElement('pre');
   pre.className = 'dev-tools-braille-pre';
   pre.classList.add('dev-tools-braille-pre--hidden');

@@ -3,7 +3,7 @@ id: act7/cinder_tithe_fail
 title: Cinza que morde
 chapter: 7
 ambientTheme: ash_sky
-artKey: cinder_burn
+artKey: cinder_heap
 choices:
   - text: "Sair do monte com as mãos a arder e a boca fechada"
     next: act7/before_final_horizon

@@ -12,5 +12,6 @@ export {
   applyPlayerStance,
   executePlayerTurn,
   fleeCombat,
+  fleeDifficultyTn,
   playerAttack,
 } from './combat/turn.ts';

@@ -549,12 +549,18 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
 
   const flee = document.createElement('button');
   flee.className = 'combat-flee-btn';
+  const canFlee = c.phase === 'choose_stance' && lead != null && lead.hp > 0;
+  flee.disabled = !canFlee;
   decorateCombatQuickNav(flee, (key, quickLabel) => {
-    flee.textContent = quickLabel && key != null ? `${key} - Tentar fugir` : 'Tentar fugir';
+    const base = 'Tentar fugir (2d6 + Agilidade)';
+    flee.textContent = quickLabel && key != null ? `${key} - ${base}` : base;
   });
   flee.addEventListener('click', () => {
+    if (!canFlee) return;
     ctx.lifecycle.unlockAudio();
-    ctx.lifecycle.commitState(ctx.lifecycle.stabilize(fleeCombat(ctx.state, ctx.bus)));
+    ctx.lifecycle.commitState(
+      ctx.lifecycle.stabilize(fleeCombat(ctx.state, ctx.registry.data, ctx.bus))
+    );
   });
   actionsPanel.appendChild(flee);
 

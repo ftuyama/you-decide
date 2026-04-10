@@ -655,18 +655,73 @@ export function executePlayerTurn(
   return playerAttack(s, idx, data, useSpecial, bus);
 }
 
-export function fleeCombat(state: GameState, bus?: EventBus): GameState {
+/** TN de fuga: maior `fleeRate` ⇒ encontro “mais fácil de fugir” (TN mais baixo). Faixa 7–12. */
+export function fleeDifficultyTn(fleeRate: number): number {
+  const r = Math.max(0, Math.min(1, fleeRate));
+  return 7 + Math.round(5 * (1 - r));
+}
+
+export function fleeCombat(state: GameState, data: GameData, bus?: EventBus): GameState {
   const c = state.combat;
-  if (!c) return state;
-  bus?.emit({ type: 'combat.end', victory: false });
-  const stateAfterStress = reducePartyStressAfterCombat(state);
-  return tickActiveBuffs({
-    ...stateAfterStress,
-    lastCombatXpGain: null,
-    lastCombatLevelUps: null,
-    lastCombatLootLines: null,
-    mode: 'story',
-    combat: null,
-    sceneId: c.onFlee ?? c.returnScene,
-  });
+  if (!c || c.phase !== 'choose_stance') return state;
+  const lead = state.party[0];
+  if (!lead || lead.hp <= 0) return state;
+
+  const fleeRate = c.fleeRate ?? 0.5;
+  const tn = fleeDifficultyTn(fleeRate);
+  const agi = effectiveLeadAttr(state, lead, 'agi');
+  const mod = statMod(agi);
+  const rng = mulberry32(state.rngSeed + c.round * 503 + 91);
+  const [d1, d2] = roll2d6(rng);
+  const total = d1 + d2 + mod;
+  const success = total >= tn;
+
+  const log: CombatLogEntry[] = [
+    ...c.log,
+    {
+      kind: 'info',
+      message: success
+        ? `${lead.name} escapa! (${total} vs TN ${tn}, Agilidade ${fmtSignedMod(mod)})`
+        : `${lead.name} não consegue fugir. (${total} vs TN ${tn}, Agilidade ${fmtSignedMod(mod)})`,
+      dice: [d1, d2],
+      modifier: mod,
+      final: total,
+      vsDefense: tn,
+    },
+  ];
+
+  let rngSeed = (state.rngSeed + 31) >>> 0;
+
+  if (success) {
+    bus?.emit({ type: 'combat.end', victory: false });
+    const stateAfterStress = reducePartyStressAfterCombat(state);
+    return tickActiveBuffs({
+      ...stateAfterStress,
+      rngSeed,
+      lastCombatXpGain: null,
+      lastCombatLevelUps: null,
+      lastCombatLootLines: null,
+      mode: 'story',
+      combat: null,
+      sceneId: c.onFlee ?? c.returnScene,
+    });
+  }
+
+  return advanceToEnemyTurn(
+    { ...state, rngSeed },
+    {
+      ...c,
+      log,
+      phase: 'enemy',
+      pendingStance: undefined,
+      pendingSacrificeDamage: 0,
+      pendingSacrificeCost: 0,
+    },
+    data,
+    bus
+  );
+}
+
+function fmtSignedMod(n: number): string {
+  return n >= 0 ? `+${n}` : `${n}`;
 }

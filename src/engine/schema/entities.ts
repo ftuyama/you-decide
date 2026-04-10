@@ -60,6 +60,8 @@ export const EncounterSchema = z.object({
   enemies: z.array(z.string()),
   playerAdvantage: z.boolean().optional(),
   enemyAdvantage: z.boolean().optional(),
+  /** Probabilidade base de fuga (0–1); maior = TN mais baixo no teste 2d6 + mod(AGI). */
+  fleeRate: z.number().min(0).max(1).optional(),
   /** XP extra do encontro (soma ao XP base dos inimigos); ex.: bónus por grupo grande */
   xpReward: z.number().int().min(0).optional(),
 });
@@ -227,6 +229,8 @@ export const CombatStateSchema = z.object({
   buffArmorClass: z.number().int().min(0).default(0),
   playerAdvantage: z.boolean().optional(),
   enemyAdvantage: z.boolean().optional(),
+  /** Cópia do encontro; se omitido (save antigo), usa 0,5 na resolução de fuga. */
+  fleeRate: z.number().min(0).max(1).optional(),
   log: z.array(CombatLogEntrySchema),
   /** Próxima cena após vitória/fuga/derrota */
   returnScene: z.string(),

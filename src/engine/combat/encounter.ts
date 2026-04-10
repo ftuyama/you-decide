@@ -55,6 +55,7 @@ export function beginEncounter(
     log,
     playerAdvantage: enc.playerAdvantage,
     enemyAdvantage: enc.enemyAdvantage,
+    fleeRate: enc.fleeRate,
     pendingSacrificeDamage: 0,
     pendingSacrificeCost: 0,
     buffAttackRoll: 0,

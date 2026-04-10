@@ -1,288 +1,452 @@
 {
   "rats_cellar": {
     "id": "rats_cellar",
-    "enemies": ["rat_swarm"],
+    "enemies": [
+      "rat_swarm"
+    ],
     "playerAdvantage": false,
-    "enemyAdvantage": false
+    "enemyAdvantage": false,
+    "fleeRate": 0.8
   },
   "skeleton_hall": {
     "id": "skeleton_hall",
-    "enemies": ["skeleton"],
+    "enemies": [
+      "skeleton"
+    ],
     "playerAdvantage": false,
-    "enemyAdvantage": false
+    "enemyAdvantage": false,
+    "fleeRate": 0.8
   },
   "rats_cellar_pair": {
     "id": "rats_cellar_pair",
-    "enemies": ["rat_swarm", "rat_swarm"],
+    "enemies": [
+      "rat_swarm",
+      "rat_swarm"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": false,
-    "xpReward": 3
+    "xpReward": 3,
+    "fleeRate": 0.75
   },
   "cellar_mixed": {
     "id": "cellar_mixed",
-    "enemies": ["rat_swarm", "skeleton"],
+    "enemies": [
+      "rat_swarm",
+      "skeleton"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": false,
-    "xpReward": 3
+    "xpReward": 3,
+    "fleeRate": 0.75
   },
   "cultist_patrol": {
     "id": "cultist_patrol",
-    "enemies": ["cultist"],
+    "enemies": [
+      "cultist"
+    ],
     "playerAdvantage": true,
-    "enemyAdvantage": false
+    "enemyAdvantage": false,
+    "fleeRate": 0.88
   },
   "act2_rare_bone_sentinel": {
     "id": "act2_rare_bone_sentinel",
-    "enemies": ["skeleton", "skeleton", "skeleton"],
+    "enemies": [
+      "skeleton",
+      "skeleton",
+      "skeleton"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 10
+    "xpReward": 10,
+    "fleeRate": 0.51
   },
   "act2_rare_lone_swarm": {
     "id": "act2_rare_lone_swarm",
-    "enemies": ["rat_swarm", "rat_swarm", "rat_swarm", "rat_swarm", "rat_swarm"],
+    "enemies": [
+      "rat_swarm",
+      "rat_swarm",
+      "rat_swarm",
+      "rat_swarm",
+      "rat_swarm"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 10
+    "xpReward": 10,
+    "fleeRate": 0.4
   },
   "cult_ambush": {
     "id": "cult_ambush",
-    "enemies": ["cultist", "cultist"],
+    "enemies": [
+      "cultist",
+      "cultist"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 3
+    "xpReward": 3,
+    "fleeRate": 0.64
   },
   "stone_guard_fight": {
     "id": "stone_guard_fight",
-    "enemies": ["stone_guard"],
+    "enemies": [
+      "stone_guard"
+    ],
     "playerAdvantage": false,
-    "enemyAdvantage": false
+    "enemyAdvantage": false,
+    "fleeRate": 0.61
   },
   "boss_morvayn_1": {
     "id": "boss_morvayn_1",
-    "enemies": ["morvayn_p1"],
+    "enemies": [
+      "morvayn_p1"
+    ],
     "playerAdvantage": false,
-    "enemyAdvantage": false
+    "enemyAdvantage": false,
+    "fleeRate": 0.61
   },
   "boss_morvayn_1_disadv": {
     "id": "boss_morvayn_1_disadv",
-    "enemies": ["morvayn_p1"],
+    "enemies": [
+      "morvayn_p1"
+    ],
     "playerAdvantage": false,
-    "enemyAdvantage": true
+    "enemyAdvantage": true,
+    "fleeRate": 0.5
   },
   "boss_morvayn_2": {
     "id": "boss_morvayn_2",
-    "enemies": ["morvayn_p2"],
+    "enemies": [
+      "morvayn_p2"
+    ],
     "playerAdvantage": true,
-    "enemyAdvantage": false
+    "enemyAdvantage": false,
+    "fleeRate": 0.69
   },
   "boss_morvayn_2_disadv": {
     "id": "boss_morvayn_2_disadv",
-    "enemies": ["morvayn_p2"],
+    "enemies": [
+      "morvayn_p2"
+    ],
     "playerAdvantage": false,
-    "enemyAdvantage": true
+    "enemyAdvantage": true,
+    "fleeRate": 0.5
   },
   "vigil_hunter_fight": {
     "id": "vigil_hunter_fight",
-    "enemies": ["vigil_hunter"],
+    "enemies": [
+      "vigil_hunter"
+    ],
     "playerAdvantage": false,
-    "enemyAdvantage": false
+    "enemyAdvantage": false,
+    "fleeRate": 0.8
   },
   "boss_fallen_angel_trial": {
     "id": "boss_fallen_angel_trial",
-    "enemies": ["fallen_angel"],
+    "enemies": [
+      "fallen_angel"
+    ],
     "playerAdvantage": false,
-    "enemyAdvantage": true
+    "enemyAdvantage": true,
+    "fleeRate": 0.5
   },
   "frost_whelps": {
     "id": "frost_whelps",
-    "enemies": ["frost_whelp", "frost_whelp"],
+    "enemies": [
+      "frost_whelp",
+      "frost_whelp"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": false,
-    "xpReward": 3
+    "xpReward": 3,
+    "fleeRate": 0.75
   },
   "frost_whelp_solo": {
     "id": "frost_whelp_solo",
-    "enemies": ["frost_whelp"],
+    "enemies": [
+      "frost_whelp"
+    ],
     "playerAdvantage": false,
-    "enemyAdvantage": false
+    "enemyAdvantage": false,
+    "fleeRate": 0.8
   },
   "frost_hunt_party": {
     "id": "frost_hunt_party",
-    "enemies": ["frost_whelp", "frost_whelp", "frost_cultist"],
+    "enemies": [
+      "frost_whelp",
+      "frost_whelp",
+      "frost_cultist"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 8
+    "xpReward": 8,
+    "fleeRate": 0.51
   },
   "frost_tomas_rescue": {
     "id": "frost_tomas_rescue",
-    "enemies": ["frost_whelp", "frost_cultist", "frost_cultist"],
+    "enemies": [
+      "frost_whelp",
+      "frost_cultist",
+      "frost_cultist"
+    ],
     "playerAdvantage": true,
     "enemyAdvantage": false,
-    "xpReward": 8
+    "xpReward": 8,
+    "fleeRate": 0.7
   },
   "frost_tomas_rescue_ambush": {
     "id": "frost_tomas_rescue_ambush",
-    "enemies": ["frost_whelp", "frost_cultist", "frost_cultist"],
+    "enemies": [
+      "frost_whelp",
+      "frost_cultist",
+      "frost_cultist"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 8
+    "xpReward": 8,
+    "fleeRate": 0.51
   },
   "frost_howl_horde": {
     "id": "frost_howl_horde",
-    "enemies": ["frost_whelp", "frost_whelp", "frost_whelp", "frost_reaver"],
+    "enemies": [
+      "frost_whelp",
+      "frost_whelp",
+      "frost_whelp",
+      "frost_reaver"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 10
+    "xpReward": 10,
+    "fleeRate": 0.45
   },
   "boss_ice_dragon_1": {
     "id": "boss_ice_dragon_1",
-    "enemies": ["ice_dragon_p1"],
+    "enemies": [
+      "ice_dragon_p1"
+    ],
     "playerAdvantage": false,
-    "enemyAdvantage": false
+    "enemyAdvantage": false,
+    "fleeRate": 0.61
   },
   "boss_ice_dragon_2": {
     "id": "boss_ice_dragon_2",
-    "enemies": ["ice_dragon_p2"],
+    "enemies": [
+      "ice_dragon_p2"
+    ],
     "playerAdvantage": true,
-    "enemyAdvantage": false
+    "enemyAdvantage": false,
+    "fleeRate": 0.69
   },
   "summit_ascent_1": {
     "id": "summit_ascent_1",
-    "enemies": ["frost_reaver", "frost_whelp"],
+    "enemies": [
+      "frost_reaver",
+      "frost_whelp"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 4
+    "xpReward": 4,
+    "fleeRate": 0.61
   },
   "summit_ascent_2": {
     "id": "summit_ascent_2",
-    "enemies": ["frost_reaver", "frost_cultist"],
+    "enemies": [
+      "frost_reaver",
+      "frost_cultist"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 5
+    "xpReward": 5,
+    "fleeRate": 0.61
   },
   "summit_ascent_3": {
     "id": "summit_ascent_3",
-    "enemies": ["frost_whelp", "frost_whelp", "frost_reaver", "frost_cultist"],
+    "enemies": [
+      "frost_whelp",
+      "frost_whelp",
+      "frost_reaver",
+      "frost_cultist"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 12
+    "xpReward": 12,
+    "fleeRate": 0.42
   },
   "summit_fallen_god": {
     "id": "summit_fallen_god",
-    "enemies": ["summit_fallen_god"],
+    "enemies": [
+      "summit_fallen_god"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 25
+    "xpReward": 25,
+    "fleeRate": 0.35
   },
   "act6_veil_herald": {
     "id": "act6_veil_herald",
-    "enemies": ["act6_veil_herald"],
+    "enemies": [
+      "act6_veil_herald"
+    ],
     "playerAdvantage": false,
-    "enemyAdvantage": true
+    "enemyAdvantage": true,
+    "fleeRate": 0.5
   },
   "act6_echo_chorus": {
     "id": "act6_echo_chorus",
-    "enemies": ["act6_echo_chorus"],
+    "enemies": [
+      "act6_echo_chorus"
+    ],
     "playerAdvantage": false,
-    "enemyAdvantage": true
+    "enemyAdvantage": true,
+    "fleeRate": 0.5
   },
   "act6_penitent_blade": {
     "id": "act6_penitent_blade",
-    "enemies": ["act6_penitent_blade"],
+    "enemies": [
+      "act6_penitent_blade"
+    ],
     "playerAdvantage": false,
-    "enemyAdvantage": false
+    "enemyAdvantage": false,
+    "fleeRate": 0.61
   },
   "act6_shadow_self": {
     "id": "act6_shadow_self",
-    "enemies": ["act6_shadow_self"],
+    "enemies": [
+      "act6_shadow_self"
+    ],
     "playerAdvantage": false,
-    "enemyAdvantage": true
+    "enemyAdvantage": true,
+    "fleeRate": 0.5
   },
   "act6_will_horde": {
     "id": "act6_will_horde",
-    "enemies": ["act6_penitent_blade", "act6_shade_fragment"],
+    "enemies": [
+      "act6_penitent_blade",
+      "act6_shade_fragment"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 8
+    "xpReward": 8,
+    "fleeRate": 0.58
   },
   "act6_wild_fragment_solo": {
     "id": "act6_wild_fragment_solo",
-    "enemies": ["act6_wild_splinter"],
+    "enemies": [
+      "act6_wild_splinter"
+    ],
     "playerAdvantage": false,
-    "enemyAdvantage": false
+    "enemyAdvantage": false,
+    "fleeRate": 0.8
   },
   "act6_wild_fragments_pair": {
     "id": "act6_wild_fragments_pair",
-    "enemies": ["act6_wild_splinter", "act6_wild_splinter"],
+    "enemies": [
+      "act6_wild_splinter",
+      "act6_wild_splinter"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": false,
-    "xpReward": 3
+    "xpReward": 3,
+    "fleeRate": 0.75
   },
   "act6_wild_triple_fragments": {
     "id": "act6_wild_triple_fragments",
-    "enemies": ["act6_wild_splinter", "act6_wild_splinter", "act6_wild_splinter"],
+    "enemies": [
+      "act6_wild_splinter",
+      "act6_wild_splinter",
+      "act6_wild_splinter"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 8
+    "xpReward": 8,
+    "fleeRate": 0.51
   },
   "act6_wild_veil_fragment": {
     "id": "act6_wild_veil_fragment",
-    "enemies": ["act6_wild_veil_scribe", "act6_wild_splinter"],
+    "enemies": [
+      "act6_wild_veil_scribe",
+      "act6_wild_splinter"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 5
+    "xpReward": 5,
+    "fleeRate": 0.61
   },
   "act6_wild_echo_fragment": {
     "id": "act6_wild_echo_fragment",
-    "enemies": ["act6_wild_murmur_host", "act6_wild_splinter"],
+    "enemies": [
+      "act6_wild_murmur_host",
+      "act6_wild_splinter"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 5
+    "xpReward": 5,
+    "fleeRate": 0.61
   },
   "act6_wild_scribe_solo": {
     "id": "act6_wild_scribe_solo",
-    "enemies": ["act6_wild_veil_scribe"],
+    "enemies": [
+      "act6_wild_veil_scribe"
+    ],
     "playerAdvantage": false,
-    "enemyAdvantage": false
+    "enemyAdvantage": false,
+    "fleeRate": 0.8
   },
   "act6_wild_murmur_solo": {
     "id": "act6_wild_murmur_solo",
-    "enemies": ["act6_wild_murmur_host"],
+    "enemies": [
+      "act6_wild_murmur_host"
+    ],
     "playerAdvantage": false,
-    "enemyAdvantage": false
+    "enemyAdvantage": false,
+    "fleeRate": 0.8
   },
   "act6_wild_chain_solo": {
     "id": "act6_wild_chain_solo",
-    "enemies": ["act6_wild_chain_penitent"],
+    "enemies": [
+      "act6_wild_chain_penitent"
+    ],
     "playerAdvantage": false,
-    "enemyAdvantage": false
+    "enemyAdvantage": false,
+    "fleeRate": 0.8
   },
   "act6_wild_regent_solo": {
     "id": "act6_wild_regent_solo",
-    "enemies": ["act6_wild_glass_regent"],
+    "enemies": [
+      "act6_wild_glass_regent"
+    ],
     "playerAdvantage": false,
-    "enemyAdvantage": true
+    "enemyAdvantage": true,
+    "fleeRate": 0.5
   },
   "act6_wild_stain_horde": {
     "id": "act6_wild_stain_horde",
-    "enemies": ["act6_wild_stain_preacher", "act6_wild_splinter"],
+    "enemies": [
+      "act6_wild_stain_preacher",
+      "act6_wild_splinter"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 8
+    "xpReward": 8,
+    "fleeRate": 0.58
   },
   "faction_circle_initiate": {
     "id": "faction_circle_initiate",
-    "enemies": ["skeleton"],
+    "enemies": [
+      "skeleton"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": false,
-    "xpReward": 2
+    "xpReward": 2,
+    "fleeRate": 0.8
   },
   "act7_hollow_procession": {
     "id": "act7_hollow_procession",
-    "enemies": ["cultist", "skeleton"],
+    "enemies": [
+      "cultist",
+      "skeleton"
+    ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "xpReward": 6
+    "xpReward": 6,
+    "fleeRate": 0.61
   }
 }

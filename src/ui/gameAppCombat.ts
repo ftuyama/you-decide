@@ -300,7 +300,6 @@ export type CombatRenderContext = {
   registry: ContentRegistry;
   bus: EventBus;
   audio: GameAudio;
-  quickNavMode: boolean;
   combatLog: {
     soundCursor: { encounterId: string; index: number };
     setSoundCursor: (v: { encounterId: string; index: number }) => void;
@@ -385,7 +384,7 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
   let combatQuickNavIndex = 0;
   const decorateCombatQuickNav = (
     btn: HTMLButtonElement,
-    setLabel: (key: string | null, quickLabel: boolean) => void
+    setLabel: (key: string | null) => void
   ): void => {
     const key = combatQuickKeyAt(combatQuickNavIndex);
     combatQuickNavIndex += 1;
@@ -393,7 +392,7 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
       btn.dataset.quickNavCombat = key;
       btn.title = `Tecla ${key}`;
     }
-    setLabel(key, ctx.quickNavMode);
+    setLabel(key);
   };
 
   if (c.phase === 'choose_stance' && lead) {
@@ -414,8 +413,8 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     for (const st of stances) {
       const btn = document.createElement('button');
       btn.className = 'stance';
-      decorateCombatQuickNav(btn, (key, quickLabel) => {
-        btn.textContent = quickLabel && key != null ? `${key} - ${labels[st]}` : labels[st];
+      decorateCombatQuickNav(btn, (key) => {
+        btn.textContent = key != null ? `${key} - ${labels[st]}` : labels[st];
       });
       btn.addEventListener('click', () => {
         ctx.lifecycle.unlockAudio();
@@ -431,11 +430,11 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     if (canSacrificeChoice) {
       const sacrifice = document.createElement('button');
       sacrifice.className = 'stance special';
-      decorateCombatQuickNav(sacrifice, (key, quickLabel) => {
+      decorateCombatQuickNav(sacrifice, (key) => {
         const corr = ctx.state.resources.corruption;
         const base = 'Selo do Vazio';
         sacrifice.title = `Corrupção: ${corr}`;
-        sacrifice.textContent = quickLabel && key != null ? `${key} - ${base}` : base;
+        sacrifice.textContent = key != null ? `${key} - ${base}` : base;
       });
       sacrifice.disabled = lead.hp <= 1;
       sacrifice.addEventListener('click', () => {
@@ -452,9 +451,9 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     }
     const sp = document.createElement('button');
     sp.className = 'stance special';
-    decorateCombatQuickNav(sp, (key, quickLabel) => {
+    decorateCombatQuickNav(sp, (key) => {
       const base = lead.specialUsedThisCombat ? 'Especial já usado' : 'Golpe especial';
-      sp.textContent = quickLabel && key != null ? `${key} - ${base}` : base;
+      sp.textContent = key != null ? `${key} - ${base}` : base;
     });
     sp.disabled = lead.specialUsedThisCombat;
     sp.addEventListener('click', () => {
@@ -488,9 +487,9 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
         const btn = document.createElement('button');
         btn.className = 'combat-spell';
         btn.type = 'button';
-        decorateCombatQuickNav(btn, (key, quickLabel) => {
+        decorateCombatQuickNav(btn, (key) => {
           const name =
-            quickLabel && key != null
+            key != null
               ? `${key} - ${spellDef.name} (${spellDef.manaCost})`
               : `${spellDef.name} (${spellDef.manaCost})`;
           btn.innerHTML = `<span class="spell-emoji" aria-hidden="true">${spellEmoji(spellId, spellDef)}</span><span>${escHtml(name)}</span>`;
@@ -528,9 +527,9 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
         const btn = document.createElement('button');
         btn.className = 'combat-potion';
         btn.type = 'button';
-        decorateCombatQuickNav(btn, (key, quickLabel) => {
+        decorateCombatQuickNav(btn, (key) => {
           const base = count > 1 ? `${def.name} (${count})` : def.name;
-          btn.textContent = quickLabel && key != null ? `${key} - ${base}` : base;
+          btn.textContent = key != null ? `${key} - ${base}` : base;
         });
         const ok = canUseCombatConsumable(ctx.state, itemId, ctx.registry.data);
         btn.disabled = !ok;
@@ -552,9 +551,9 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
   flee.className = 'combat-flee-btn';
   const canFlee = c.phase === 'choose_stance' && lead != null && lead.hp > 0;
   flee.disabled = !canFlee;
-  decorateCombatQuickNav(flee, (key, quickLabel) => {
+  decorateCombatQuickNav(flee, (key) => {
     const base = 'Tentar fugir (2d6 + Agilidade)';
-    flee.textContent = quickLabel && key != null ? `${key} - ${base}` : base;
+    flee.textContent = key != null ? `${key} - ${base}` : base;
   });
   flee.addEventListener('click', () => {
     if (!canFlee) return;

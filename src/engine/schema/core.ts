@@ -32,6 +32,8 @@ export const ConditionSchema: z.ZodType<Condition> = z.lazy(() =>
     z.object({ noFlag: z.string() }),
     z.object({ mark: z.string() }),
     z.object({ noMark: z.string() }),
+    z.object({ leadStoryPassive: z.string() }),
+    z.object({ noLeadStoryPassive: z.string() }),
     z.object({ hasItem: z.string() }),
     z.object({ noItem: z.string() }),
     z.object({
@@ -76,6 +78,8 @@ export type Condition =
   | { noFlag: string }
   | { mark: string }
   | { noMark: string }
+  | { leadStoryPassive: string }
+  | { noLeadStoryPassive: string }
   | { hasItem: string }
   | { noItem: string }
   | {
@@ -102,6 +106,7 @@ export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
   z.object({ op: z.literal('toggleFlag'), key: z.string() }),
   z.object({ op: z.literal('addMark'), mark: z.string() }),
   z.object({ op: z.literal('removeMark'), mark: z.string() }),
+  z.object({ op: z.literal('grantLeadStoryPassive'), id: z.string() }),
   z.object({
     op: z.literal('addRep'),
     faction: FactionIdSchema,
@@ -182,6 +187,7 @@ export type Effect =
   | { op: 'toggleFlag'; key: string }
   | { op: 'addMark'; mark: string }
   | { op: 'removeMark'; mark: string }
+  | { op: 'grantLeadStoryPassive'; id: string }
   | { op: 'addRep'; faction: FactionId; delta: number; directGain?: boolean }
   | { op: 'setRep'; faction: FactionId; value: number }
   | { op: 'addResource'; resource: 'supply' | 'faith' | 'corruption' | 'gold'; delta: number }

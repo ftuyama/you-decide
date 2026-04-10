@@ -292,6 +292,8 @@ export const GameStateSchema = z.object({
     .default({ vigilia: 0, circulo: 0, culto: 0 }),
   flags: z.record(z.string(), z.boolean()),
   marks: z.array(z.string()),
+  /** Passivos de história do líder (ids em `GameData.leadStoryPassives`), ex. bênção do monge. */
+  leadStoryPassives: z.array(z.string()).default([]),
   resources: z.object({
     supply: z.number().int().min(0).max(10).default(5),
     faith: z.number().int().min(0).max(5).default(3),

@@ -47,7 +47,7 @@ choices:
     condition:
       all:
         - { noFlag: monk_cave_banished }
-        - { noMark: monk_inner_peace }
+        - { noFlag: frost_monk_blessing_done }
         - { level: { gte: 22 } }
         - { day: { lte: 10 } }
     preview: "Gruta e provas do monge; paz ou banimento."

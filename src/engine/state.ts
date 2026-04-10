@@ -30,6 +30,7 @@ export function createInitialState(campaign: CampaignIndex, seed?: number): Game
     factionGainPending: { vigilia: 0, circulo: 0, culto: 0 },
     flags: {},
     marks: [],
+    leadStoryPassives: [],
     resources: { supply: 5, faith: 3, corruption: 0, gold: 8 },
     extraLifeReady: false,
     combat: null,
@@ -187,11 +188,35 @@ export function deserializeState(json: string): GameState {
     culto: fgp?.culto === 1 ? 1 : 0,
   };
 
+  let marks = Array.isArray((o as GameState).marks) ? [...(o as GameState).marks] : [];
+  let leadStoryPassives = Array.isArray((o as GameState).leadStoryPassives)
+    ? [...(o as GameState).leadStoryPassives]
+    : [];
+  if (marks.includes('monk_inner_peace') && !leadStoryPassives.includes('monk_inner_peace')) {
+    leadStoryPassives.push('monk_inner_peace');
+  }
+  if (leadStoryPassives.includes('monk_inner_peace') && !marks.includes('monk_inner_peace')) {
+    marks.push('monk_inner_peace');
+  }
+
+  const rawFlags = (o as GameState).flags;
+  const flags: GameState['flags'] =
+    rawFlags && typeof rawFlags === 'object' ? { ...rawFlags } : {};
+  if (
+    (marks.includes('monk_inner_peace') || leadStoryPassives.includes('monk_inner_peace')) &&
+    !flags.frost_monk_blessing_done
+  ) {
+    flags.frost_monk_blessing_done = true;
+  }
+
   const merged: GameState = {
     ...(o as GameState),
     campaignId,
     factionGainPending,
     resources,
+    marks,
+    leadStoryPassives,
+    flags,
     extraLifeReady: extraLifeReadyFromFaith(resources.faith),
     level: typeof (o as GameState).level === 'number' ? (o as GameState).level : 1,
     xp: typeof (o as GameState).xp === 'number' ? (o as GameState).xp : 0,

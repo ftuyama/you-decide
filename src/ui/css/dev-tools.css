@@ -75,7 +75,36 @@
 }
 
 .dev-tools-back--secondary {
-  opacity: 0.9;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.38rem 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-emphasis, var(--fg));
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--panel, var(--surface-raised)) 75%, var(--accent) 12%) 0%,
+    var(--panel, var(--surface-raised)) 60%
+  );
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-left-width: 3px;
+  border-left-color: var(--accent);
+  border-radius: 4px;
+  text-decoration: none;
+  opacity: 1;
+}
+
+.dev-tools-back--secondary:hover {
+  text-decoration: none;
+  border-color: var(--accent);
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--panel, var(--surface-raised)) 60%, var(--accent) 18%) 0%,
+    var(--panel, var(--surface-raised)) 55%
+  );
+  box-shadow: 0 0 0 1px var(--glow);
 }
 
 .dev-tools-stats {

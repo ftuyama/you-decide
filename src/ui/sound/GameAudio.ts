@@ -18,10 +18,8 @@ import type { AmbientTheme } from './types.ts';
  * Temas: exploração, combate (batida), acampamento, chefe.
  */
 export class GameAudio {
-  private readonly storageMuteKey: string;
   private readonly storageVolumeKey: string;
   private ctx: AudioContext | null = null;
-  private muted = false;
   /** 0–1, aplicado a todos os ganhos (música ambiente + efeitos). */
   private volume = 1;
   private bgCleanup: (() => void) | null = null;
@@ -30,13 +28,7 @@ export class GameAudio {
   private currentTheme: AmbientTheme | null = null;
 
   constructor(campaignId: string) {
-    this.storageMuteKey = `${campaignId}_sound_muted`;
     this.storageVolumeKey = `${campaignId}_sound_volume`;
-    try {
-      this.muted = localStorage.getItem(this.storageMuteKey) === '1';
-    } catch {
-      /* noop */
-    }
     try {
       const raw = localStorage.getItem(this.storageVolumeKey);
       if (raw != null) {
@@ -48,10 +40,6 @@ export class GameAudio {
     } catch {
       /* noop */
     }
-  }
-
-  isMuted(): boolean {
-    return this.muted;
   }
 
   /** Volume linear 0–1 (persistido em `localStorage`). */
@@ -69,16 +57,6 @@ export class GameAudio {
     }
   }
 
-  setMuted(m: boolean): void {
-    this.muted = m;
-    try {
-      localStorage.setItem(this.storageMuteKey, m ? '1' : '0');
-    } catch {
-      /* noop */
-    }
-    if (m) this.stopAmbient();
-  }
-
   ensureContext(): AudioContext {
     if (!this.ctx) {
       this.ctx = new AudioContext();
@@ -90,10 +68,8 @@ export class GameAudio {
   }
 
   startAmbientWhenReady(): void {
-    if (this.muted) return;
     const ctx = this.ensureContext();
     const run = (): void => {
-      if (this.muted) return;
       if (!this.currentTheme) {
         this.setAmbientTheme('explore');
       }
@@ -107,7 +83,6 @@ export class GameAudio {
 
   /** Troca a música de fundo (idempotente se já for o mesmo tema). */
   setAmbientTheme(theme: AmbientTheme): void {
-    if (this.muted) return;
     if (this.currentTheme === theme && this.bgCleanup) return;
     this.stopAmbientInternal();
     this.currentTheme = theme;
@@ -153,7 +128,7 @@ export class GameAudio {
   }
 
   private gain(base: number): number {
-    return this.muted ? 0 : base * this.volume;
+    return base * this.volume;
   }
 
   private stopAmbientInternal(): void {
@@ -484,7 +459,7 @@ export class GameAudio {
    * Ato 3 (profundezas): drones mais graves, pulso um pouco mais rápido, melodia com tensão frígia.
    */
   private playAmbientAct3Depths(): void {
-    if (this.muted || this.bgCleanup) return;
+    if (this.bgCleanup) return;
     const ctx = this.ensureContext();
 
     const master = ctx.createGain();
@@ -524,7 +499,7 @@ export class GameAudio {
 
     let t = 0;
     this.bgPulseTimer = setInterval(() => {
-      if (this.muted || !this.ctx) return;
+      if (!this.ctx) return;
       t += 0.042;
       const breathe = 0.273 + Math.sin(t) * 0.141 + Math.sin(t * 0.41) * 0.113;
       try {
@@ -536,7 +511,7 @@ export class GameAudio {
 
     let melodyStep = 0;
     this.bgRhythmTimer = setInterval(() => {
-      if (this.muted || !this.ctx) return;
+      if (!this.ctx) return;
       const note = ACT3_DEPTH_MELODY[melodyStep % ACT3_DEPTH_MELODY.length];
       melodyStep++;
       const when = this.ctx.currentTime + 0.02;
@@ -573,7 +548,7 @@ export class GameAudio {
    * Exploração: pad em lá menor com pulsação lenta + piano discreto.
    */
   private playAmbientExplore(): void {
-    if (this.muted || this.bgCleanup) return;
+    if (this.bgCleanup) return;
     const ctx = this.ensureContext();
 
     const master = ctx.createGain();
@@ -612,7 +587,7 @@ export class GameAudio {
 
     let t = 0;
     this.bgPulseTimer = setInterval(() => {
-      if (this.muted || !this.ctx) return;
+      if (!this.ctx) return;
       t += 0.035;
       const breathe = 0.11 + Math.sin(t) * 0.032 + Math.sin(t * 0.37) * 0.014;
       try {
@@ -624,7 +599,7 @@ export class GameAudio {
 
     let melodyStep = 0;
     this.bgRhythmTimer = setInterval(() => {
-      if (this.muted || !this.ctx) return;
+      if (!this.ctx) return;
       const note = EXPLORE_PIANO_MELODY[melodyStep % EXPLORE_PIANO_MELODY.length];
       melodyStep++;
       const when = this.ctx.currentTime + 0.02;
@@ -660,7 +635,7 @@ export class GameAudio {
    * Combate: ~120 BPM, kick + snare + hi-hat + baixo pulsante.
    */
   private playAmbientCombat(): void {
-    if (this.muted || this.bgCleanup) return;
+    if (this.bgCleanup) return;
     const ctx = this.ensureContext();
     const master = ctx.createGain();
     master.gain.value = this.gain(0.22);
@@ -678,7 +653,7 @@ export class GameAudio {
     let step = 0;
     const eighth = 125;
     this.bgRhythmTimer = setInterval(() => {
-      if (this.muted || !this.ctx) return;
+      if (!this.ctx) return;
       const tNow = ctx.currentTime;
       const s = step % 8;
       if (s === 0 || s === 4) {
@@ -715,7 +690,7 @@ export class GameAudio {
    * Acampamento: cama harmónica quente + melodia lenta e contemplativa.
    */
   private playAmbientCamp(): void {
-    if (this.muted || this.bgCleanup) return;
+    if (this.bgCleanup) return;
     const ctx = this.ensureContext();
     const master = ctx.createGain();
     master.gain.value = this.gain(0.42);
@@ -746,7 +721,7 @@ export class GameAudio {
 
     let t = 0;
     this.bgPulseTimer = setInterval(() => {
-      if (this.muted || !this.ctx) return;
+      if (!this.ctx) return;
       t += 0.02;
       const breathe = 0.1 + Math.sin(t * 0.4) * 0.04;
       try {
@@ -758,7 +733,7 @@ export class GameAudio {
 
     let melodyStep = 0;
     this.bgRhythmTimer = setInterval(() => {
-      if (this.muted || !this.ctx) return;
+      if (!this.ctx) return;
       const note = CAMP_MELODY[melodyStep % CAMP_MELODY.length];
       melodyStep++;
       const when = this.ctx.currentTime + 0.02;
@@ -796,7 +771,7 @@ export class GameAudio {
    * Boss: batida mais agressiva + baixo contínuo + lead heroico.
    */
   private playAmbientBoss(): void {
-    if (this.muted || this.bgCleanup) return;
+    if (this.bgCleanup) return;
     const ctx = this.ensureContext();
     const master = ctx.createGain();
     master.gain.value = this.gain(0.15);
@@ -828,7 +803,7 @@ export class GameAudio {
     let step = 0;
     const eighth = 125;
     this.bgRhythmTimer = setInterval(() => {
-      if (this.muted || !this.ctx) return;
+      if (!this.ctx) return;
       const tNow = ctx.currentTime;
       const s = step % 16;
 
@@ -878,7 +853,7 @@ export class GameAudio {
    * Ato 5: camada fria e espaçada, com lead cristalino.
    */
   private playAmbientAct5Ice(): void {
-    if (this.muted || this.bgCleanup) return;
+    if (this.bgCleanup) return;
     const ctx = this.ensureContext();
     const master = ctx.createGain();
     master.gain.value = this.gain(0.2);
@@ -912,7 +887,7 @@ export class GameAudio {
 
     let t = 0;
     this.bgPulseTimer = setInterval(() => {
-      if (this.muted || !this.ctx) return;
+      if (!this.ctx) return;
       t += 0.03;
       const freezeBreathe = 0.18 + Math.sin(t * 0.55) * 0.122 + Math.sin(t * 0.13) * 0.01;
       try {
@@ -924,7 +899,7 @@ export class GameAudio {
 
     let melodyStep = 0;
     this.bgRhythmTimer = setInterval(() => {
-      if (this.muted || !this.ctx) return;
+      if (!this.ctx) return;
       const note = ACT5_ICE_MELODY[melodyStep % ACT5_ICE_MELODY.length];
       melodyStep++;
       const when = this.ctx.currentTime + 0.03;
@@ -961,7 +936,7 @@ export class GameAudio {
    * Montanhas (gruta / monge): drones baixos + motivo lento, mais suspenso que o gelo aberto.
    */
   private playAmbientFrostMystery(): void {
-    if (this.muted || this.bgCleanup) return;
+    if (this.bgCleanup) return;
     const ctx = this.ensureContext();
     const master = ctx.createGain();
     master.gain.value = this.gain(0.17);
@@ -995,7 +970,7 @@ export class GameAudio {
 
     let t = 0;
     this.bgPulseTimer = setInterval(() => {
-      if (this.muted || !this.ctx) return;
+      if (!this.ctx) return;
       t += 0.025;
       const breathe = 0.14 + Math.sin(t * 0.4) * 0.08 + Math.sin(t * 0.09) * 0.02;
       try {
@@ -1007,7 +982,7 @@ export class GameAudio {
 
     let melodyStep = 0;
     this.bgRhythmTimer = setInterval(() => {
-      if (this.muted || !this.ctx) return;
+      if (!this.ctx) return;
       const note = FROST_MYSTERY_MELODY[melodyStep % FROST_MYSTERY_MELODY.length];
       melodyStep++;
       const when = this.ctx.currentTime + 0.04;
@@ -1044,7 +1019,7 @@ export class GameAudio {
    * Mercador: motivo de alaúde medieval com pulsação de mercado.
    */
   private playAmbientMerchant(): void {
-    if (this.muted || this.bgCleanup) return;
+    if (this.bgCleanup) return;
     const ctx = this.ensureContext();
     const master = ctx.createGain();
     master.gain.value = this.gain(0.11);
@@ -1066,7 +1041,7 @@ export class GameAudio {
 
     let step = 0;
     this.bgRhythmTimer = setInterval(() => {
-      if (this.muted || !this.ctx) return;
+      if (!this.ctx) return;
       const tNow = ctx.currentTime + 0.01;
       const s = step % 8;
       const note = MERCHANT_LUTE_MELODY[step % MERCHANT_LUTE_MELODY.length];
@@ -1081,7 +1056,7 @@ export class GameAudio {
     }, 310);
 
     this.bgPulseTimer = setInterval(() => {
-      if (this.muted || !this.ctx) return;
+      if (!this.ctx) return;
       try {
         const pulse = step % 4 === 0 ? 0.06 : 0.04;
         droneGain.gain.setTargetAtTime(this.gain(pulse), this.ctx.currentTime, 0.2);
@@ -1119,7 +1094,7 @@ export class GameAudio {
    * Templo antigo / ritual: sub-graves, batimento lento entre parciais, plucks rasgados + batida cardíaca esparsa.
    */
   private playAmbientAncientMacabre(): void {
-    if (this.muted || this.bgCleanup) return;
+    if (this.bgCleanup) return;
     const ctx = this.ensureContext();
     const master = ctx.createGain();
     master.gain.value = this.gain(0.24);
@@ -1158,7 +1133,7 @@ export class GameAudio {
 
     let t = 0;
     this.bgPulseTimer = setInterval(() => {
-      if (this.muted || !this.ctx) return;
+      if (!this.ctx) return;
       t += 0.028;
       const breathe =
         0.2 +
@@ -1174,7 +1149,7 @@ export class GameAudio {
 
     let melodyStep = 0;
     this.bgRhythmTimer = setInterval(() => {
-      if (this.muted || !this.ctx) return;
+      if (!this.ctx) return;
       const step = melodyStep++;
       const note = ANCIENT_MACABRE_MELODY[step % ANCIENT_MACABRE_MELODY.length]!;
       const when = this.ctx.currentTime + 0.02;
@@ -1217,7 +1192,7 @@ export class GameAudio {
    * Cinzas do céu: drones desalinhados + melodia lenta com trítonos — “fim visível”.
    */
   private playAmbientAshSky(): void {
-    if (this.muted || this.bgCleanup) return;
+    if (this.bgCleanup) return;
     const ctx = this.ensureContext();
     const master = ctx.createGain();
     master.gain.value = this.gain(0.2);
@@ -1254,7 +1229,7 @@ export class GameAudio {
 
     let t = 0;
     this.bgPulseTimer = setInterval(() => {
-      if (this.muted || !this.ctx) return;
+      if (!this.ctx) return;
       t += 0.034;
       const breathe = 0.17 + Math.sin(t * 0.31) * 0.11 + Math.sin(t * 0.09) * 0.05;
       try {
@@ -1266,7 +1241,7 @@ export class GameAudio {
 
     let melodyStep = 0;
     this.bgRhythmTimer = setInterval(() => {
-      if (this.muted || !this.ctx) return;
+      if (!this.ctx) return;
       const note = ASH_SKY_MELODY[melodyStep % ASH_SKY_MELODY.length];
       melodyStep++;
       const when = this.ctx.currentTime + 0.02;
@@ -1305,7 +1280,7 @@ export class GameAudio {
    * A melodia usa oitava acima — graves puros somam pouco em altifalantes pequenos.
    */
   private playAmbientVoid(): void {
-    if (this.muted || this.bgCleanup) return;
+    if (this.bgCleanup) return;
     const ctx = this.ensureContext();
     const voidDroneMul = 1.7;
     const voidMelodyMul = 1.4;
@@ -1349,7 +1324,7 @@ export class GameAudio {
 
     let t = 0;
     this.bgPulseTimer = setInterval(() => {
-      if (this.muted || !this.ctx) return;
+      if (!this.ctx) return;
       t += 0.026;
       try {
         const breathe =
@@ -1367,7 +1342,7 @@ export class GameAudio {
 
     let melodyStep = 0;
     this.bgRhythmTimer = setInterval(() => {
-      if (this.muted || !this.ctx) return;
+      if (!this.ctx) return;
       const note = VOID_DRONE_MELODY[melodyStep % VOID_DRONE_MELODY.length]!;
       melodyStep++;
       const when = this.ctx.currentTime + 0.02;

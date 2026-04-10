@@ -36,15 +36,9 @@ function humanizeMarkId(mark: string): string {
     .join(' ');
 }
 
-/** Títulos amigáveis para marcas de campanha (fallback: humanizeMarkId). */
-const MARK_TITLE_PT: Partial<Record<string, string>> = {
-  monk_inner_peace: 'Paz interior (monge da neve)',
-  wound_mire_leg: 'Mordida do poço',
-  title_fallen_god: 'Título: Deus caído',
-};
-
-function titleForMark(mark: string): string {
-  return MARK_TITLE_PT[mark] ?? humanizeMarkId(mark);
+/** Título de marca para UI: registo da campanha, depois humanização do id. */
+export function displayTitleForMark(mark: string, data: GameData): string {
+  return data.journeyMarks[mark]?.name ?? humanizeMarkId(mark);
 }
 
 const RESOURCE_LABEL: Record<'gold' | 'supply' | 'faith' | 'corruption', string> = {
@@ -238,17 +232,30 @@ function applyOne(
     case 'addMark': {
       if (state.marks.includes(e.mark)) return state;
       const isBad =
-        /wound|curse|maled|bleed|fract|broken|rot|po[cç]o|mire|hex/i.test(e.mark);
+        /wound|curse|maled|bleed|fract|broken|rot|po[cç]o|mire|hex|scarred|spoiled|snare|burned|taint|torn|jarred/i.test(
+          e.mark
+        );
       bus.emit({
         type: 'statusHighlight',
         variant: isBad ? 'bad' : 'neutral',
-        title: titleForMark(e.mark),
+        title: displayTitleForMark(e.mark, ctx.data),
         subtitle: 'Nova marca no personagem',
       });
       return { ...state, marks: [...state.marks, e.mark] };
     }
     case 'removeMark':
       return { ...state, marks: state.marks.filter((m) => m !== e.mark) };
+    case 'grantLeadStoryPassive': {
+      if (state.leadStoryPassives.includes(e.id)) return state;
+      const def = ctx.data.leadStoryPassives[e.id];
+      bus.emit({
+        type: 'statusHighlight',
+        variant: 'neutral',
+        title: def?.name ?? humanizeMarkId(e.id),
+        subtitle: 'Novo passivo de história',
+      });
+      return { ...state, leadStoryPassives: [...state.leadStoryPassives, e.id] };
+    }
     case 'addRep': {
       const faction = e.faction;
       const prev = state.reputation[faction] ?? 0;

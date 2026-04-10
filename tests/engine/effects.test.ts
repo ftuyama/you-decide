@@ -124,4 +124,23 @@ describe('applyEffects', () => {
     expect(next.reputation.vigilia).toBe(0);
     expect(next.factionGainPending.vigilia).toBe(0);
   });
+
+  it('grantLeadStoryPassive dedup e grava id', () => {
+    let s = createInitialState(testCampaign, 1);
+    s = { ...s, party: [createPlayerCharacter('H', 'knight')] };
+    const bus = new EventBus();
+    const data = {
+      ...emptyGameData(testCampaign, {
+        defaultHeroName: () => 'H',
+        getHeroClassLabel: () => '—',
+        getPathUnlockBonus: () => null,
+      }),
+      leadStoryPassives: { test_passive: { name: 'T', description: 'D' } },
+    };
+    const ctx = { sceneId: 'test/scene', data, bus };
+    const a = applyEffects(s, [{ op: 'grantLeadStoryPassive', id: 'test_passive' }], ctx);
+    expect(a.leadStoryPassives).toEqual(['test_passive']);
+    const b = applyEffects(a, [{ op: 'grantLeadStoryPassive', id: 'test_passive' }], ctx);
+    expect(b.leadStoryPassives).toEqual(['test_passive']);
+  });
 });

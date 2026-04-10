@@ -23,6 +23,8 @@ export function evaluateCondition(cond: Condition | undefined, state: GameState)
   if ('noFlag' in cond) return !state.flags[cond.noFlag];
   if ('mark' in cond) return state.marks.includes(cond.mark);
   if ('noMark' in cond) return !state.marks.includes(cond.noMark);
+  if ('leadStoryPassive' in cond) return state.leadStoryPassives.includes(cond.leadStoryPassive);
+  if ('noLeadStoryPassive' in cond) return !state.leadStoryPassives.includes(cond.noLeadStoryPassive);
   if ('hasItem' in cond) return leadOwnsItem(state, cond.hasItem);
   if ('noItem' in cond) return !leadOwnsItem(state, cond.noItem);
   if ('resource' in cond) {

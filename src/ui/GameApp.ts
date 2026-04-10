@@ -54,7 +54,6 @@ export class GameApp {
   private readonly legacySaveKey: string;
   private readonly sidebarKey: string;
   private readonly fontKey: string;
-  private readonly quickNavKey: string;
   private readonly timedChoiceKey: string;
   private readonly devModeKey: string;
   private registry: ContentRegistry;
@@ -67,14 +66,12 @@ export class GameApp {
   private menuOpen = false;
   /** 0 = 100%, 1 = 110%, 2 = 120% */
   private fontStep = 0;
-  /** Memórias (cenas visitadas), caminho do ficheiro da cena, etc. */
+  /** Modo dev (ferramentas de autor). */
   private devMode = false;
-  /** Modo de navegação rápida: mostra números clicáveis antes das escolhas. */
-  private quickNavMode = false;
   /** Escolhas com `timedMs` + barra / auto-navegação. */
   private timedChoiceMode = false;
   private readonly choiceHotkeyHandler: (e: KeyboardEvent) => void;
-  /** Secções colapsáveis (recursos, faccoes, diario) — persistido em sessionStorage */
+  /** Secções colapsáveis (recursos, inventário, facções, personagem…) — persistido em sessionStorage */
   private sidebarSections: Record<string, boolean> = {};
   /** Buffs/debuffs/marcas — mostra banner até o jogador fechar */
   private statusHighlightQueue: Extract<GameEvent, { type: 'statusHighlight' }>[] = [];
@@ -100,13 +97,11 @@ export class GameApp {
     this.legacySaveKey = `${campaignId}_save_v1`;
     this.sidebarKey = `${campaignId}_sidebar_sections_v1`;
     this.fontKey = `${campaignId}_font_step_v1`;
-    this.quickNavKey = `${campaignId}_quick_nav_mode_v1`;
     this.timedChoiceKey = `${campaignId}_timed_choice_v1`;
     this.devModeKey = `${campaignId}_dev_mode`;
     this.registry = new ContentRegistry(campaignId);
     this.audio = new GameAudio(campaignId);
     this.fontStep = this.loadFontStep();
-    this.quickNavMode = this.loadQuickNavMode();
     this.timedChoiceMode = this.loadTimedChoiceMode();
     this.devMode = this.loadDevMode();
     this.choiceHotkeyHandler = (e: KeyboardEvent): void => {
@@ -251,22 +246,6 @@ export class GameApp {
     }
   }
 
-  private loadQuickNavMode(): boolean {
-    try {
-      return localStorage.getItem(this.quickNavKey) === '1';
-    } catch {
-      return false;
-    }
-  }
-
-  private saveQuickNavMode(): void {
-    try {
-      localStorage.setItem(this.quickNavKey, this.quickNavMode ? '1' : '0');
-    } catch {
-      /* noop */
-    }
-  }
-
   private loadTimedChoiceMode(): boolean {
     try {
       return localStorage.getItem(this.timedChoiceKey) === '1';
@@ -405,7 +384,6 @@ export class GameApp {
   }
 
   private syncAmbientTheme(): void {
-    if (this.audio.isMuted()) return;
     this.audio.setAmbientTheme(this.resolveAmbientTheme());
   }
 
@@ -644,7 +622,6 @@ export class GameApp {
 
   private storyDiceHostBinding(): StoryDiceBannerHost {
     return {
-      quickNavMode: this.quickNavMode,
       clearDiceRollTimers: () => this.clearDiceRollTimers(),
       setDiceRollIntervalTimer: (t) => {
         this.diceRollIntervalTimer = t;
@@ -673,7 +650,6 @@ export class GameApp {
     return {
       campaignId: this.campaignId,
       devMode: this.devMode,
-      quickNavMode: this.quickNavMode,
       timedChoiceEnabled: this.timedChoiceMode,
       state: this.state,
       registry: this.registry,
@@ -754,12 +730,10 @@ export class GameApp {
       fontStep: this.fontStep,
       campaignId: this.campaignId,
       devMode: this.devMode,
-      quickNavMode: this.quickNavMode,
       timedChoiceEnabled: this.timedChoiceMode,
       state: this.state,
       registry: this.registry,
       sidebarSections: this.sidebarSections,
-      audio: this.audio,
       onMenuHamburgerClick: (hBtn: HTMLButtonElement) => {
         this.toggleMenu();
         hBtn.setAttribute('aria-expanded', this.menuOpen ? 'true' : 'false');
@@ -768,25 +742,11 @@ export class GameApp {
         this.closeMenu();
         hBtn.setAttribute('aria-expanded', 'false');
       },
-      onSoundMuteChange: (muted: boolean) => {
-        this.audio.setMuted(muted);
-        if (!muted) {
-          this.unlockAudio();
-        } else {
-          this.audio.stopAmbient();
-        }
-      },
       getVolume: () => this.audio.getVolume(),
       setVolume: (n: number) => this.audio.setVolume(n),
       onDevModeChange: (v: boolean) => {
         this.devMode = v;
         this.saveDevMode();
-        this.closeMenu();
-        this.render();
-      },
-      onQuickNavChange: (v: boolean) => {
-        this.quickNavMode = v;
-        this.saveQuickNavMode();
         this.closeMenu();
         this.render();
       },
@@ -824,6 +784,7 @@ export class GameApp {
         this.sidebarSections[key] = open;
         this.saveSidebarSections();
       },
+      playUiClick: () => this.audio.playUiClick(),
       fillMain: (main: HTMLElement) => {
         if (this.state.mode === 'combat') {
           main.classList.add('main--combat');
@@ -832,7 +793,6 @@ export class GameApp {
             registry: this.registry,
             bus: this.bus,
             audio: this.audio,
-            quickNavMode: this.quickNavMode,
             combatLog: {
               soundCursor: this.combatLogSoundCursor,
               setSoundCursor: (v) => {

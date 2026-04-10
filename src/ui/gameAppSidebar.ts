@@ -9,10 +9,12 @@ import {
 import { getEffectiveLuck } from '../engine/luck.ts';
 import { MAX_LEVEL, xpToNextLevel } from '../engine/progression.ts';
 import type { ContentRegistry } from '../content/registry.ts';
+import { displayTitleForMark } from '../engine/effects.ts';
 import {
   escHtml,
   hpBarMarkup,
   manaBarMarkup,
+  markBadgeIconSvg,
   passiveSidebarIconSvg,
   spellEmoji,
   spellSidebarMechanicsLinePt,
@@ -25,9 +27,209 @@ type SidebarBuilderParams = {
   state: GameState;
   registry: ContentRegistry;
   sidebarSections: Record<string, boolean>;
-  devMode: boolean;
   onSectionToggle: (key: string, open: boolean) => void;
+  playUiClick?: () => void;
 };
+
+let diaryModalLayer: HTMLDivElement | null = null;
+let diaryModalOnKey: ((e: KeyboardEvent) => void) | null = null;
+
+function closeDiaryModal(): void {
+  if (diaryModalOnKey) {
+    window.removeEventListener('keydown', diaryModalOnKey);
+    diaryModalOnKey = null;
+  }
+  if (diaryModalLayer) {
+    diaryModalLayer.remove();
+    diaryModalLayer = null;
+  }
+}
+
+type DiaryModalOpenParams = {
+  diary: string[];
+  marks: string[];
+  registry: ContentRegistry;
+};
+
+function openDiaryModal({ diary: entries, marks, registry }: DiaryModalOpenParams, playUiClick?: () => void): void {
+  closeDiaryModal();
+  playUiClick?.();
+
+  const layer = document.createElement('div');
+  layer.className = 'diary-modal-layer';
+  layer.setAttribute('role', 'dialog');
+  layer.setAttribute('aria-modal', 'true');
+  layer.setAttribute('aria-labelledby', 'diary-modal-title');
+
+  const backdrop = document.createElement('button');
+  backdrop.type = 'button';
+  backdrop.className = 'diary-modal-backdrop';
+  backdrop.setAttribute('aria-label', 'Fechar diário');
+
+  const panel = document.createElement('div');
+  panel.className = 'diary-modal-panel';
+
+  const header = document.createElement('div');
+  header.className = 'diary-modal-header';
+
+  const kicker = document.createElement('div');
+  kicker.className = 'diary-entry-kicker';
+  kicker.textContent = 'Cronista';
+
+  const title = document.createElement('h2');
+  title.id = 'diary-modal-title';
+  title.className = 'diary-modal-title';
+  title.textContent = 'Diário de campanha';
+
+  const sub = document.createElement('div');
+  sub.className = 'diary-entry-subkicker';
+  const subParts: string[] = [];
+  if (entries.length === 1) subParts.push('1 entrada registrada');
+  else if (entries.length > 1) subParts.push(`${entries.length} entradas registradas`);
+  if (marks.length === 1) subParts.push('1 marca');
+  else if (marks.length > 1) subParts.push(`${marks.length} marcas`);
+  sub.textContent = subParts.join(' · ');
+
+  header.appendChild(kicker);
+  header.appendChild(title);
+  header.appendChild(sub);
+
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.className = 'diary-modal-close';
+  closeBtn.setAttribute('aria-label', 'Fechar');
+  closeBtn.innerHTML = '&times;';
+  header.appendChild(closeBtn);
+
+  const scroll = document.createElement('div');
+  scroll.className = 'diary-modal-scroll';
+
+  const secMarks = document.createElement('section');
+  secMarks.className = 'diary-modal-section diary-modal-section--badges';
+  const hMarks = document.createElement('h3');
+  hMarks.className = 'diary-modal-section-title';
+  hMarks.textContent = 'Conquistas';
+  const marksBody = document.createElement('div');
+  if (marks.length === 0) {
+    marksBody.className = 'diary-modal-section-body';
+    const empty = document.createElement('p');
+    empty.className = 'diary-modal-empty';
+    empty.textContent = 'Nenhuma marca ainda.';
+    marksBody.appendChild(empty);
+  } else {
+    marksBody.className = 'diary-modal-section-body diary-modal-badges-grid';
+    for (const mark of marks) {
+      const def = registry.data.journeyMarks[mark];
+      const displayTitle = def?.name ?? displayTitleForMark(mark, registry.data);
+      const displayDesc = def?.description ?? '';
+
+      const badge = document.createElement('article');
+      badge.className = 'diary-mark-badge';
+      badge.setAttribute('aria-label', displayTitle);
+
+      const rim = document.createElement('div');
+      rim.className = 'diary-mark-badge-rim';
+
+      const iconCell = document.createElement('div');
+      iconCell.className = 'diary-mark-badge-icon';
+      iconCell.innerHTML = iconWrap(markBadgeIconSvg(mark), 'ui-icon-wrap diary-mark-badge-icon-wrap');
+      iconCell.setAttribute('aria-hidden', 'true');
+
+      const textBlock = document.createElement('div');
+      textBlock.className = 'diary-mark-badge-text';
+
+      const titleEl = document.createElement('p');
+      titleEl.className = 'diary-mark-badge-title';
+      titleEl.textContent = displayTitle;
+
+      textBlock.appendChild(titleEl);
+      if (displayDesc) {
+        const descEl = document.createElement('p');
+        descEl.className = 'diary-mark-badge-desc';
+        descEl.textContent = displayDesc;
+        textBlock.appendChild(descEl);
+      }
+
+      rim.appendChild(iconCell);
+      rim.appendChild(textBlock);
+      badge.appendChild(rim);
+      marksBody.appendChild(badge);
+    }
+  }
+  secMarks.appendChild(hMarks);
+  secMarks.appendChild(marksBody);
+
+  const secDiary = document.createElement('section');
+  secDiary.className = 'diary-modal-section';
+  const hDiary = document.createElement('h3');
+  hDiary.className = 'diary-modal-section-title';
+  hDiary.textContent = 'Linhas do diário';
+  const diaryBody = document.createElement('div');
+  diaryBody.className = 'diary-modal-section-body';
+  if (entries.length === 0) {
+    const empty = document.createElement('p');
+    empty.className = 'diary-modal-empty';
+    empty.textContent = 'Nenhuma entrada ainda.';
+    diaryBody.appendChild(empty);
+  } else {
+    const padW = entries.length >= 10 ? 2 : 1;
+    for (let i = 0; i < entries.length; i++) {
+      const block = document.createElement('div');
+      block.className = 'diary-modal-entry';
+      const num = document.createElement('span');
+      num.className = 'diary-modal-entry-num';
+      num.setAttribute('aria-hidden', 'true');
+      num.textContent = String(i + 1).padStart(padW, '0');
+      const bodyWrap = document.createElement('div');
+      bodyWrap.className = 'diary-modal-entry-body-wrap';
+      const p = document.createElement('p');
+      p.className = 'diary-entry-body';
+      p.textContent = entries[i]!;
+      bodyWrap.appendChild(p);
+      block.appendChild(num);
+      block.appendChild(bodyWrap);
+      diaryBody.appendChild(block);
+    }
+  }
+  secDiary.appendChild(hDiary);
+  secDiary.appendChild(diaryBody);
+
+  scroll.appendChild(secMarks);
+  scroll.appendChild(secDiary);
+
+  const footer = document.createElement('div');
+  footer.className = 'diary-modal-footer';
+  const dismiss = document.createElement('button');
+  dismiss.type = 'button';
+  dismiss.className = 'diary-entry-dismiss';
+  dismiss.textContent = 'Fechar';
+  footer.appendChild(dismiss);
+
+  panel.appendChild(header);
+  panel.appendChild(scroll);
+  panel.appendChild(footer);
+
+  layer.appendChild(backdrop);
+  layer.appendChild(panel);
+  document.body.appendChild(layer);
+  diaryModalLayer = layer;
+
+  const shut = () => {
+    playUiClick?.();
+    closeDiaryModal();
+  };
+  backdrop.addEventListener('click', shut);
+  closeBtn.addEventListener('click', shut);
+  dismiss.addEventListener('click', shut);
+  panel.addEventListener('click', (e) => e.stopPropagation());
+
+  diaryModalOnKey = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') shut();
+  };
+  window.addEventListener('keydown', diaryModalOnKey);
+
+  requestAnimationFrame(() => dismiss.focus());
+}
 
 function formatItemEquipmentStatsHtml(it: ItemDef): string {
   const parts: string[] = [];
@@ -249,8 +451,8 @@ export function buildGameSidebar({
   state,
   registry,
   sidebarSections,
-  devMode,
   onSectionToggle,
+  playUiClick,
 }: SidebarBuilderParams): HTMLElement {
   const hud = document.createElement('div');
   hud.className = 'sidebar-inner';
@@ -262,12 +464,10 @@ export function buildGameSidebar({
   const openRec = sidebarSections['recursos'] ? ' open' : '';
   const openInv = sidebarSections['inventario'] ? ' open' : '';
   const openFac = sidebarSections['faccoes'] ? ' open' : '';
-  const openDiary = sidebarSections['diario'] ? ' open' : '';
   const openLore = sidebarSections['personagem_lore'] ? ' open' : '';
   const openSpells = sidebarSections['personagem_spells'] ? ' open' : '';
   const openEquip = sidebarSections['personagem_equip'] ? ' open' : '';
   const openPassive = sidebarSections['personagem_passivos'] ? ' open' : '';
-  const openMem = sidebarSections['memorias'] ? ' open' : '';
 
   const personagemBlock = (() => {
     if (!p) {
@@ -298,18 +498,18 @@ export function buildGameSidebar({
       p.weaponId === PASSIVE_UNLOCK_ITEM_ID ||
       p.armorId === PASSIVE_UNLOCK_ITEM_ID ||
       p.relicId === PASSIVE_UNLOCK_ITEM_ID;
-    const markPassiveBlocks: string[] = [];
-    for (const mark of state.marks) {
-      const def = registry.data.passivesByMark[mark];
+    const storyPassiveBlocks: string[] = [];
+    for (const pid of state.leadStoryPassives) {
+      const def = registry.data.leadStoryPassives[pid];
       if (def) {
-        const ic = passiveSidebarIconSvg(mark);
-        markPassiveBlocks.push(
+        const ic = passiveSidebarIconSvg(pid);
+        storyPassiveBlocks.push(
           `<p class="sidebar-passive-line sidebar-line--with-icon">${iconWrap(ic, 'ui-icon-wrap ui-icon-wrap--sm')}<span><strong>${escHtml(def.name)}</strong></span></p>
             <p class="sidebar-line sidebar-muted">${escHtml(def.description)}</p>`
         );
       }
     }
-    const showPassivesSection = passiveUnlocked || markPassiveBlocks.length > 0;
+    const showPassivesSection = passiveUnlocked || storyPassiveBlocks.length > 0;
     const passiveDef = registry.data.passives[cid];
     const classPassiveBlock = passiveUnlocked
       ? `<p class="sidebar-passive-line sidebar-line--with-icon">${iconWrap(passiveSidebarIconSvg(passiveDef?.id ?? ''), 'ui-icon-wrap ui-icon-wrap--sm')}<span><strong>${escHtml(passiveDef?.name ?? 'Passivo de classe')}</strong></span></p>
@@ -336,8 +536,8 @@ export function buildGameSidebar({
           <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.tier, 'Passivos')}</summary>
           <div class="sidebar-collapse-body sidebar-lore-body">
             ${classPassiveBlock}
-            ${passiveUnlocked && markPassiveBlocks.length > 0 ? '<hr class="sidebar-passive-divider" />' : ''}
-            ${markPassiveBlocks.join('')}
+            ${passiveUnlocked && storyPassiveBlocks.length > 0 ? '<hr class="sidebar-passive-divider" />' : ''}
+            ${storyPassiveBlocks.join('')}
           </div>
         </details>` : ''}
         ${(() => {
@@ -415,38 +615,27 @@ export function buildGameSidebar({
       </details>
     `;
 
-  const visitedIds = Object.keys(state.visitedScenes)
-    .filter((k) => state.visitedScenes[k])
-    .sort();
-  if (devMode && visitedIds.length > 0) {
-    const max = 48;
-    const shown = visitedIds.slice(0, max);
-    const rest = visitedIds.length - shown.length;
-    const memHtml = shown.map((id) => `<div class="sidebar-line"><code>${escHtml(id)}</code></div>`).join('');
-    const more = rest > 0 ? `<div class="sidebar-line sidebar-muted">… e mais ${rest} cena(s)</div>` : '';
-    const mem = document.createElement('details');
-    mem.className = 'sidebar-collapse';
-    if (openMem) mem.setAttribute('open', '');
-    mem.dataset.section = 'memorias';
-    mem.innerHTML = `
-        <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.memories, 'Memórias (cenas visitadas)')}</summary>
-        <div class="sidebar-collapse-body memories-list">${memHtml}${more}</div>
-      `;
-    hud.appendChild(mem);
-  }
-
-  if (state.diary.length) {
-    const diary = document.createElement('details');
-    diary.className = 'sidebar-collapse';
-    if (openDiary) diary.setAttribute('open', '');
-    diary.dataset.section = 'diario';
-    diary.innerHTML = `
-        <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.diary, 'Diário')}</summary>
-        <div class="sidebar-collapse-body diary-box">
-          ${state.diary.map((x) => `<p>“${x}”</p>`).join('')}
-        </div>
-      `;
-    hud.appendChild(diary);
+  if (state.diary.length || state.marks.length) {
+    const diaryCard = document.createElement('div');
+    diaryCard.className = 'sidebar-collapse diary-sidebar-card';
+    const metaParts: string[] = [];
+    if (state.diary.length) {
+      metaParts.push(state.diary.length === 1 ? '1 entrada' : `${state.diary.length} entradas`);
+    }
+    if (state.marks.length) {
+      metaParts.push(state.marks.length === 1 ? '1 marca' : `${state.marks.length} marcas`);
+    }
+    const countLabel = metaParts.join(' · ');
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'sidebar-collapse-trigger diary-sidebar-open-btn';
+    btn.setAttribute('aria-haspopup', 'dialog');
+    btn.innerHTML = `${collapseTriggerStart(icons.diary, 'Diário')}<span class="diary-sidebar-open-meta">${escHtml(countLabel)}<span class="diary-sidebar-open-hint" aria-hidden="true">›</span></span>`;
+    btn.addEventListener('click', () =>
+      openDiaryModal({ diary: state.diary, marks: state.marks, registry }, playUiClick)
+    );
+    diaryCard.appendChild(btn);
+    hud.appendChild(diaryCard);
   }
 
   wireSidebarDetails(hud, sidebarSections, onSectionToggle);

@@ -9,7 +9,9 @@ choices:
     next: act5/frost_hub
 onEnter:
   - { op: adjustLeadStat, attr: luck, delta: 1 }
+  - { op: grantLeadStoryPassive, id: monk_inner_peace }
   - { op: addMark, mark: monk_inner_peace }
+  - { op: setFlag, key: frost_monk_blessing_done, value: true }
   - {
       op: addDiary,
       text: "Na gruta acima da tempestade, um monge sem rosto deu-me uma bênção estranha: não promessa, não milagre — só a certeza de que a sorte também pode ser disciplina. Ganhei a passiva Paz interior: +1 SOR, para sempre.",

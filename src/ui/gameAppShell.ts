@@ -1,6 +1,5 @@
 import type { GameState } from '../engine/schema.ts';
 import type { ContentRegistry } from '../content/registry.ts';
-import type { GameAudio } from './sound/index.ts';
 import { buildGameSidebar } from './gameAppSidebar.ts';
 import { SAVE_SLOT_COUNT, buildMenuSaveSlot } from './gameAppSaveSlots.ts';
 
@@ -12,19 +11,15 @@ export type MountAppChromeOptions = {
   fontStep: number;
   campaignId: string;
   devMode: boolean;
-  quickNavMode: boolean;
   timedChoiceEnabled: boolean;
   state: GameState;
   registry: ContentRegistry;
   sidebarSections: Record<string, boolean>;
-  audio: GameAudio;
   onMenuHamburgerClick: (hBtn: HTMLButtonElement) => void;
   onMenuBackdropClick: (hBtn: HTMLButtonElement) => void;
-  onSoundMuteChange: (muted: boolean) => void;
   getVolume: () => number;
   setVolume: (n: number) => void;
   onDevModeChange: (v: boolean) => void;
-  onQuickNavChange: (v: boolean) => void;
   onTimedChoiceChange: (v: boolean) => void;
   onCycleFont: () => void;
   fullscreenSupported: boolean;
@@ -42,6 +37,8 @@ export type MountAppChromeOptions = {
   onSaveSlot: (slot: number) => void;
   onLoadSlot: (slot: number) => void;
   onSidebarSectionToggle: (key: string, open: boolean) => void;
+  /** Som de clique na UI (ex.: abrir/fechar diário). */
+  playUiClick?: () => void;
   /** Preenche o `<main class="story-shell">` (combate ou narrativa). */
   fillMain: (main: HTMLElement) => void;
 };
@@ -53,11 +50,9 @@ export type AppChromeRefs = {
   sidebarEl: HTMLElement;
   mainEl: HTMLElement;
   hamburgerBtn: HTMLButtonElement;
-  soundCb: HTMLInputElement;
   volumeRange: HTMLInputElement;
   volumeValue: HTMLElement;
   devCb: HTMLInputElement;
-  quickNavCb: HTMLInputElement;
   timedChoiceCb: HTMLInputElement;
   fontBtn: HTMLButtonElement;
   fullscreenCb: HTMLInputElement;
@@ -110,17 +105,6 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
     return body;
   };
 
-  const soundRow = document.createElement('label');
-  soundRow.className = 'menu-item menu-sound';
-  const soundCb = document.createElement('input');
-  soundCb.type = 'checkbox';
-  soundCb.checked = !opts.audio.isMuted();
-  soundCb.addEventListener('change', () => {
-    opts.onSoundMuteChange(!soundCb.checked);
-  });
-  soundRow.appendChild(soundCb);
-  soundRow.appendChild(document.createTextNode(' Som ligado'));
-
   const volumeRow = document.createElement('div');
   volumeRow.className = 'menu-item menu-volume';
   const volumeLabelRow = document.createElement('div');
@@ -163,17 +147,6 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
   });
   devRow.appendChild(devCb);
   devRow.appendChild(document.createTextNode(' Modo desenvolvedor'));
-
-  const quickNavRow = document.createElement('label');
-  quickNavRow.className = 'menu-item menu-sound menu-dev';
-  const quickNavCb = document.createElement('input');
-  quickNavCb.type = 'checkbox';
-  quickNavCb.checked = opts.quickNavMode;
-  quickNavCb.addEventListener('change', () => {
-    opts.onQuickNavChange(quickNavCb.checked);
-  });
-  quickNavRow.appendChild(quickNavCb);
-  quickNavRow.appendChild(document.createTextNode(' Navegação rápida (números clicáveis)'));
 
   const timedChoiceRow = document.createElement('label');
   timedChoiceRow.className = 'menu-item menu-sound menu-dev';
@@ -278,16 +251,18 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
   saveSection.appendChild(exportBtn);
 
   const settingsSection = createMenuSection('Configurações');
-  settingsSection.appendChild(soundRow);
   settingsSection.appendChild(volumeRow);
   settingsSection.appendChild(fontBtn);
   settingsSection.appendChild(fullscreenRow);
-  settingsSection.appendChild(quickNavRow);
   settingsSection.appendChild(timedChoiceRow);
-  if (opts.showDevModeToggle) {
-    settingsSection.appendChild(devRow);
+
+  if (opts.showDevModeToggle || opts.showGraphInSettings) {
+    const devSection = createMenuSection('Desenvolvimento');
+    if (opts.showDevModeToggle) {
+      devSection.appendChild(devRow);
+    }
+    devSection.appendChild(devSettingsExtrasEl);
   }
-  settingsSection.appendChild(devSettingsExtrasEl);
 
   const aboutSection = createMenuSection('Sobre');
   aboutSection.appendChild(creditsBtn);
@@ -309,8 +284,8 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
       state: opts.state,
       registry: opts.registry,
       sidebarSections: opts.sidebarSections,
-      devMode: opts.devMode,
       onSectionToggle: opts.onSidebarSectionToggle,
+      playUiClick: opts.playUiClick,
     })
   );
 
@@ -328,11 +303,9 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
     sidebarEl,
     mainEl,
     hamburgerBtn: hBtn,
-    soundCb,
     volumeRange,
     volumeValue,
     devCb,
-    quickNavCb,
     timedChoiceCb,
     fontBtn,
     fullscreenCb,
@@ -356,14 +329,12 @@ export function syncAppChrome(refs: AppChromeRefs, opts: MountAppChromeOptions):
   refs.devSaveExtrasEl.hidden = !opts.showImportInPartida;
   refs.devSettingsExtrasEl.hidden = !opts.showGraphInSettings;
 
-  refs.soundCb.checked = !opts.audio.isMuted();
   const pct = Math.round(opts.getVolume() * 100);
   refs.volumeRange.value = String(pct);
   refs.volumeValue.textContent = `${pct}%`;
   refs.volumeRange.setAttribute('aria-valuetext', `${pct}%`);
 
   refs.devCb.checked = opts.devMode;
-  refs.quickNavCb.checked = opts.quickNavMode;
   refs.timedChoiceCb.checked = opts.timedChoiceEnabled;
   refs.fontBtn.textContent = `Tamanho do texto (${100 + opts.fontStep * 10}%)`;
   refs.fullscreenCb.checked = opts.getFullscreenActive();
@@ -376,8 +347,8 @@ export function syncAppChrome(refs: AppChromeRefs, opts: MountAppChromeOptions):
       state: opts.state,
       registry: opts.registry,
       sidebarSections: opts.sidebarSections,
-      devMode: opts.devMode,
       onSectionToggle: opts.onSidebarSectionToggle,
+      playUiClick: opts.playUiClick,
     })
   );
 

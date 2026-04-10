@@ -43,19 +43,6 @@ body {
   font-size: var(--app-font-pct);
 }
 
-.memories-list {
-  font-size: 0.82em;
-  line-height: 1.45;
-  max-height: 14rem;
-  overflow-y: auto;
-  color: var(--muted);
-}
-
-.memories-list code {
-  color: var(--fg);
-  font-size: 0.95em;
-}
-
 .app-top {
   display: flex;
   align-items: center;
@@ -183,6 +170,19 @@ button.hamburger:hover {
 
 .menu-item:hover {
   border-color: var(--accent);
+}
+
+/** Dois botões no drawer (dev + grafo): largura total e espaço entre eles. */
+.menu-dev-settings-extras {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+  align-items: stretch;
+}
+
+.menu-dev-settings-extras .menu-item {
+  width: 100%;
 }
 
 .menu-save-slot {
@@ -995,6 +995,369 @@ button.hamburger:hover {
   border-color: #7a6a52;
 }
 
+/** Diário na sidebar — abre modal (não colapsável) */
+.diary-sidebar-card .diary-sidebar-open-btn {
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: 0.35rem;
+  column-gap: 0.45rem;
+}
+
+.diary-sidebar-card .diary-sidebar-open-btn::after {
+  content: none;
+}
+
+.diary-sidebar-open-btn .sidebar-collapse-trigger-start {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.diary-sidebar-open-btn .diary-sidebar-open-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-basis: 100%;
+  justify-content: flex-end;
+  margin-left: 0;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  color: var(--muted);
+}
+
+.diary-sidebar-open-hint {
+  font-size: 0.85rem;
+  color: var(--accent);
+  opacity: 0.85;
+}
+
+/** Modal do diário — mesmo tom memorial que novas entradas */
+.diary-modal-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.diary-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  background: var(--backdrop-scrim);
+}
+
+.diary-modal-panel {
+  position: relative;
+  z-index: 1;
+  width: min(36rem, 100%);
+  max-height: min(82vh, 40rem);
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0.95rem 1.05rem 1.05rem;
+  background:
+    radial-gradient(ellipse 85% 45% at 50% -15%, rgba(196, 165, 116, 0.09) 0%, transparent 55%),
+    linear-gradient(160deg, #1e1a16 0%, #12100c 55%, #0c0a08 100%);
+  border: 1px solid rgba(140, 118, 88, 0.5);
+  border-radius: 4px;
+  box-shadow:
+    0 0 24px rgba(40, 32, 20, 0.5),
+    0 0 48px rgba(196, 165, 116, 0.06),
+    inset 0 1px 0 rgba(200, 180, 140, 0.08),
+    0 14px 44px rgba(0, 0, 0, 0.58);
+}
+
+.diary-modal-header {
+  position: relative;
+  flex-shrink: 0;
+  padding-right: 2rem;
+  margin-bottom: 0.15rem;
+}
+
+.diary-modal-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #d4c4a8;
+  margin: 0.25rem 0 0;
+}
+
+.diary-modal-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  line-height: 1;
+  font-size: 1.35rem;
+  cursor: pointer;
+  color: #c4a574;
+  background: transparent;
+  border: 1px solid rgba(120, 100, 72, 0.35);
+  border-radius: 2px;
+}
+
+.diary-modal-close:hover {
+  color: #e8dcc8;
+  background: rgba(80, 64, 48, 0.35);
+  border-color: rgba(160, 140, 100, 0.5);
+}
+
+.diary-modal-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0.35rem 0 0;
+  padding: 0.35rem 0.15rem 0.5rem;
+  border-top: 1px solid rgba(120, 100, 72, 0.2);
+}
+
+.diary-modal-section {
+  margin: 0;
+  padding: 0;
+}
+
+.diary-modal-section + .diary-modal-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed rgba(120, 100, 72, 0.28);
+}
+
+.diary-modal-section-title {
+  margin: 0 0 0.5rem;
+  padding: 0;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #b89868;
+}
+
+.diary-modal-section-body {
+  margin: 0;
+  padding: 0;
+}
+
+.diary-modal-empty {
+  margin: 0;
+  font-size: 0.78rem;
+  font-style: italic;
+  color: #7a6e5c;
+}
+
+/** Conquistas — grelha de medalhas */
+.diary-modal-badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10.75rem, 1fr));
+  gap: 0.85rem;
+  padding: 0.15rem 0.05rem;
+}
+
+.diary-mark-badge {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: linear-gradient(
+    145deg,
+    rgba(200, 175, 130, 0.42) 0%,
+    rgba(90, 72, 52, 0.65) 38%,
+    rgba(45, 38, 28, 0.92) 100%
+  );
+  border-radius: 10px;
+  box-shadow:
+    0 3px 14px rgba(0, 0, 0, 0.45),
+    0 0 0 1px rgba(30, 24, 18, 0.85),
+    inset 0 1px 0 rgba(255, 235, 200, 0.22);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.diary-mark-badge::before {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: 8px;
+  border: 1px dashed rgba(196, 165, 116, 0.22);
+  pointer-events: none;
+}
+
+.diary-mark-badge:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.5),
+    0 0 28px rgba(196, 165, 116, 0.12),
+    0 0 0 1px rgba(30, 24, 18, 0.85),
+    inset 0 1px 0 rgba(255, 235, 200, 0.28);
+}
+
+.diary-mark-badge-rim {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0.72rem 0.55rem 0.78rem;
+  border-radius: 8px;
+  background:
+    radial-gradient(ellipse 100% 80% at 50% 0%, rgba(80, 68, 52, 0.35) 0%, transparent 55%),
+    linear-gradient(168deg, #1a1612 0%, #0f0d0a 55%, #0a0908 100%);
+  border: 1px solid rgba(100, 86, 64, 0.55);
+  box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.35);
+  min-height: 7.5rem;
+}
+
+.diary-mark-badge-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 0.55rem;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 28%, rgba(220, 200, 160, 0.2) 0%, transparent 45%),
+    linear-gradient(165deg, #2a241c 0%, #14110e 100%);
+  border: 2px solid rgba(180, 155, 110, 0.45);
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.45),
+    0 0 12px rgba(196, 165, 116, 0.08);
+}
+
+.diary-mark-badge-icon-wrap {
+  width: 1.65rem !important;
+  height: 1.65rem !important;
+}
+
+.diary-mark-badge-icon-wrap svg {
+  width: 1.65rem !important;
+  height: 1.65rem !important;
+  opacity: 0.92;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+}
+
+.diary-mark-badge-text {
+  width: 100%;
+  min-width: 0;
+}
+
+.diary-mark-badge-title {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.35;
+  text-transform: uppercase;
+  color: #e8d8b8;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.65);
+}
+
+.diary-mark-badge-desc {
+  margin: 0.4rem 0 0;
+  font-size: 0.66rem;
+  line-height: 1.45;
+  font-style: italic;
+  color: #9a8a72;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.diary-modal-entry {
+  display: flex;
+  gap: 0.95rem;
+  align-items: flex-start;
+}
+
+.diary-modal-entry-num {
+  position: relative;
+  flex-shrink: 0;
+  width: 2.5rem;
+  min-height: 2.6rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 0.08rem 0.55rem 0 0;
+  box-sizing: border-box;
+  font-family: 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  background: linear-gradient(
+    168deg,
+    #fff8e8 0%,
+    #e8d4a8 22%,
+    #c4a06a 52%,
+    #8a7048 78%,
+    #5c4830 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.65)) drop-shadow(0 0 14px rgba(196, 165, 116, 0.12));
+}
+
+.diary-modal-entry-num::after {
+  content: '';
+  position: absolute;
+  top: 0.15rem;
+  right: 0;
+  bottom: 0.15rem;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(196, 165, 116, 0.25) 12%,
+    rgba(212, 184, 140, 0.55) 50%,
+    rgba(196, 165, 116, 0.25) 88%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.diary-modal-entry-body-wrap {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.diary-modal-entry + .diary-modal-entry {
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed rgba(120, 100, 72, 0.2);
+}
+
+.diary-modal-entry .diary-entry-body {
+  margin-top: 0;
+}
+
+.diary-modal-footer {
+  flex-shrink: 0;
+  margin-top: 0.65rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(120, 100, 72, 0.2);
+}
+
+.diary-modal-footer .diary-entry-dismiss {
+  margin-top: 0;
+  width: 100%;
+  text-align: center;
+}
+
 .item-acquire-banner {
   margin: 0 0 1rem;
   padding: 0.75rem 0.85rem 0.85rem;
@@ -1433,11 +1796,6 @@ button.hamburger:hover {
   font-size: 0.68rem;
   line-height: 1.4;
   color: var(--sidebar-equip-stats);
-}
-
-.player-sidebar .diary-box p {
-  margin: 0.35rem 0;
-  font-size: 0.72rem;
 }
 
 .story-shell {
@@ -2425,14 +2783,6 @@ button.combat-potion:disabled {
 
 .map-hint.sidebar-line--with-icon .ui-icon-wrap {
   margin-top: 0;
-}
-
-.diary-box {
-  font-size: 0.78rem;
-  color: var(--muted);
-  max-height: 5rem;
-  overflow-y: auto;
-  margin-top: 0.5rem;
 }
 
 .timed-bar {

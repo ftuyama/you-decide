@@ -63,7 +63,7 @@ export function spellEmoji(spellId: string, spellDef: SpellDef): string {
   return byId[spellId] ?? byKind[spellDef.spellKind] ?? '✦';
 }
 
-/** SVG inline para passivo de classe (`passives[class].id`) ou chave em `passivesByMark` (marca). */
+/** SVG para passivo de classe ou id em `leadStoryPassives`. Marcas no diário: `markBadgeIconSvg`. */
 export function passiveSidebarIconSvg(passiveKey: string): string {
   const byId: Partial<Record<string, IconId>> = {
     knight_crit_edge: 'weapon',
@@ -72,6 +72,58 @@ export function passiveSidebarIconSvg(passiveKey: string): string {
     monk_inner_peace: 'faith',
   };
   const id = byId[passiveKey] ?? 'tier';
+  return icons[id];
+}
+
+/** Ícone para badges de marca no diário (ids em `journeyMarks`). */
+export function markBadgeIconSvg(markId: string): string {
+  const byMark: Partial<Record<string, IconId>> = {
+    act1_surface_whisper_intel: 'scroll',
+    act1_surface_whisper_taint: 'corruption',
+    act3_cult_flight: 'map',
+    act3_well_truth: 'scroll',
+    act3_well_snare: 'corruption',
+    act3_rune_tuned: 'scroll',
+    act3_rune_jarred: 'corruption',
+    act6_memory_kept: 'memories',
+    act6_memory_spoiled: 'memories',
+    act6_shadow_faced: 'memories',
+    act6_veil_aligned: 'scroll',
+    act6_veil_broken: 'scroll',
+    act6_void_pact_mark: 'corruption',
+    act6_will_direct: 'weapon',
+    act6_will_measured: 'weapon',
+    act6_will_scattered: 'weapon',
+    act7_bell_ate_promise: 'corruption',
+    act7_bell_paid_faith: 'faith',
+    act7_broke_hollow_line: 'weapon',
+    act7_cinder_burned: 'corruption',
+    act7_cinder_favored: 'relic',
+    act7_ember_witness: 'relic',
+    act7_heard_ash_sermon: 'scroll',
+    act7_last_train_rider: 'map',
+    act7_paid_sky_in_faith: 'faith',
+    act7_sealed_in_ember: 'relic',
+    act7_sky_stitch_torn: 'corruption',
+    act7_sky_stitch_true: 'faith',
+    act7_walked_bare: 'person',
+    calvario_sealed: 'faith',
+    fled_rats: 'map',
+    mira_camp_shadows: 'person',
+    mira_cruzeiro_confidencia: 'person',
+    mira_frost_pact: 'person',
+    mira_void_endtalk: 'person',
+    monk_inner_peace: 'faith',
+    morvayn_slain: 'weapon',
+    pact_bound: 'corruption',
+    soul_scarred_by_seal: 'corruption',
+    title_fallen_god: 'relic',
+    tomas_camp_oath: 'person',
+    tomas_void_duty: 'person',
+    vetrnax_slain: 'weapon',
+    wound_mire_leg: 'corruption',
+  };
+  const id = byMark[markId] ?? 'tier';
   return icons[id];
 }
 

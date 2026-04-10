@@ -8,5 +8,6 @@ choices:
     next: act3/encounters/cult_ambush_scene
 onEnter:
   - { op: setFlag, key: false_map, value: true }
+  - { op: addMark, mark: act3_well_snare }
 ---
 Acreditas no reflexo. Algo na próxima sala **prepara-te** uma surpresa.

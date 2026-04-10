@@ -8,5 +8,6 @@ choices:
     next: act3/hub_depths
 onEnter:
   - { op: setFlag, key: well_truth, value: true }
+  - { op: addMark, mark: act3_well_truth }
 ---
 Vês o **truque**: espelho deslocado. O caminho real abre à esquerda.

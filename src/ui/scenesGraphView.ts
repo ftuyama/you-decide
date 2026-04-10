@@ -194,6 +194,9 @@ export function mountScenesGraphView(root: HTMLElement, campaignId: string): voi
   title.className = 'scenes-graph-title';
   title.textContent = 'Grafo de cenas';
 
+  const filters = document.createElement('div');
+  filters.className = 'scenes-graph-filters';
+
   const campaignWrap = document.createElement('label');
   campaignWrap.className = 'scenes-graph-campaign';
   campaignWrap.textContent = 'Campanha ';
@@ -243,6 +246,9 @@ export function mountScenesGraphView(root: HTMLElement, campaignId: string): voi
   });
   actWrap.appendChild(actSelect);
 
+  filters.appendChild(campaignWrap);
+  filters.appendChild(actWrap);
+
   const back = document.createElement('a');
   back.className = 'scenes-graph-back';
   back.href = buildGameHref(campaignId);
@@ -256,8 +262,7 @@ export function mountScenesGraphView(root: HTMLElement, campaignId: string): voi
   stats.textContent = `${drawNodes.length} cenas · ${drawEdges.length} arestas · ${actLabel} · camadas 0–${maxCamada} · entrada: ${entrySceneId}`;
 
   toolbar.appendChild(title);
-  toolbar.appendChild(campaignWrap);
-  toolbar.appendChild(actWrap);
+  toolbar.appendChild(filters);
   toolbar.appendChild(back);
   toolbar.appendChild(stats);
 
@@ -274,10 +279,25 @@ export function mountScenesGraphView(root: HTMLElement, campaignId: string): voi
   }
   const ctx = canvasCtx;
 
-  const hint = document.createElement('div');
-  hint.className = 'scenes-graph-hint';
-  hint.textContent =
-    'Linha do tempo: esquerda = entrada da campanha, direita = mais longe em passos (BFS). Setas = direção da cena. Tracejado = volta ou ramo lateral. Roda: zoom · arrastar: mover';
+  const hintBar = document.createElement('div');
+  hintBar.className = 'scenes-graph-hint-bar';
+  const legend = document.createElement('div');
+  legend.className = 'scenes-graph-legend';
+  const legendItem = (cls: string, text: string): HTMLSpanElement => {
+    const s = document.createElement('span');
+    s.className = `scenes-graph-legend-item ${cls}`;
+    s.textContent = text;
+    return s;
+  };
+  legend.appendChild(legendItem('scenes-graph-legend--fwd', 'À frente'));
+  legend.appendChild(legendItem('scenes-graph-legend--same', 'Mesma camada'));
+  legend.appendChild(legendItem('scenes-graph-legend--back', 'Volta'));
+  const hintText = document.createElement('p');
+  hintText.className = 'scenes-graph-hint-text';
+  hintText.textContent =
+    'Linha do tempo: esquerda = entrada, direita = mais longe (BFS). Roda: zoom · arrastar: mover o mapa';
+  hintBar.appendChild(legend);
+  hintBar.appendChild(hintText);
 
   let scale = 1;
   let offsetX = 0;
@@ -343,8 +363,11 @@ export function mountScenesGraphView(root: HTMLElement, campaignId: string): voi
     canvas.height = Math.max(1, Math.floor(r.height * dpr));
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, r.width, r.height);
-    ctx.fillStyle = '#0e0f12';
-    ctx.fillRect(0, 0, r.width, r.height);
+
+    const rootEl = document.documentElement;
+    const themeFg = getComputedStyle(rootEl).getPropertyValue('--fg').trim() || '#c9b89a';
+    const themeEmphasis =
+      getComputedStyle(rootEl).getPropertyValue('--text-emphasis').trim() || '#e0d4b8';
 
     ctx.save();
     ctx.translate(offsetX, offsetY);
@@ -407,7 +430,7 @@ export function mountScenesGraphView(root: HTMLElement, campaignId: string): voi
       ctx.beginPath();
       ctx.fillStyle = chapterHue(n.chapter);
       if (n.isEntry) {
-        ctx.strokeStyle = '#e8d49a';
+        ctx.strokeStyle = themeEmphasis;
         ctx.lineWidth = 2.5 / scale;
         ctx.arc(p.x, p.y, nodeRadius + 2.2 / scale, 0, Math.PI * 2);
         ctx.stroke();
@@ -428,7 +451,7 @@ export function mountScenesGraphView(root: HTMLElement, campaignId: string): voi
       ctx.font = `${fontPx}px IBM Plex Mono, ui-monospace, monospace`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'top';
-      ctx.fillStyle = 'rgba(200, 205, 215, 0.92)';
+      ctx.fillStyle = themeFg;
       let ty = p.y + nodeRadius + 3 / scale;
       for (const line of linesForNodeLabel(n)) {
         ctx.fillText(line, p.x, ty);
@@ -440,7 +463,8 @@ export function mountScenesGraphView(root: HTMLElement, campaignId: string): voi
 
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.fillStyle = 'rgba(180, 190, 210, 0.55)';
+    const axisFg = getComputedStyle(rootEl).getPropertyValue('--text-section').trim() || '#9a9588';
+    ctx.fillStyle = axisFg;
     ctx.font = '11px IBM Plex Mono, ui-monospace, monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'bottom';
@@ -548,7 +572,7 @@ export function mountScenesGraphView(root: HTMLElement, campaignId: string): voi
   ro.observe(canvasWrap);
 
   shell.appendChild(toolbar);
-  shell.appendChild(hint);
+  shell.appendChild(hintBar);
   canvasWrap.appendChild(canvas);
   shell.appendChild(canvasWrap);
   root.appendChild(shell);

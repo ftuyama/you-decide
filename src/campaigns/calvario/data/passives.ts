@@ -1,3 +1,4 @@
+import type { LeadStoryPassiveDef } from '../../../engine/gameData.ts';
 import type { ClassId } from '../../../engine/schema.ts';
 
 export type ClassPassiveDef = {
@@ -6,6 +7,7 @@ export type ClassPassiveDef = {
   description: string;
 };
 
+/** Passivos de classe do líder (combate). Marcas da história: `journeyMarks.ts`. */
 export const passives: Record<ClassId, ClassPassiveDef> = {
   knight: {
     id: 'knight_crit_edge',
@@ -24,10 +26,13 @@ export const passives: Record<ClassId, ClassPassiveDef> = {
   },
 };
 
-/** Bênção da gruta do monge — alinhado à marca `monk_inner_peace` e ao +1 SOR em `triumph`. */
-export const passivesByMark = {
+/**
+ * Passivos de história do líder (`state.leadStoryPassives`).
+ * Concedidos com `grantLeadStoryPassive` nas cenas — não usam `state.marks`.
+ */
+export const leadStoryPassives: Record<string, LeadStoryPassiveDef> = {
   monk_inner_peace: {
     name: 'Paz interior',
-    description: '+1 SOR permanente (bênção do monge da neve).',
+    description: '+1 SOR permanente — bênção do monge da neve: sorte como disciplina, não como truque.',
   },
-} as const;
+};

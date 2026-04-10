@@ -390,7 +390,6 @@ function mountMusicPanel(
     playBtn.className = 'dev-tools-btn';
     playBtn.textContent = 'Ouvir';
     playBtn.addEventListener('click', () => {
-      audio.setMuted(false);
       audio.ensureContext();
       audio.setAmbientTheme(theme);
     });

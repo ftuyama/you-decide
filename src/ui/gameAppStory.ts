@@ -174,7 +174,6 @@ export function appendCampEquipmentPanel(
 }
 
 export type StoryDiceBannerHost = {
-  quickNavMode: boolean;
   clearDiceRollTimers(): void;
   setDiceRollIntervalTimer(t: ReturnType<typeof setInterval> | null): void;
   setDiceRollEnterHandler(h: ((e: KeyboardEvent) => void) | null): void;
@@ -233,7 +232,7 @@ export function appendStoryDiceRollBanner(
   btn.className = 'story-dice-banner-dismiss';
   btn.dataset.quickNavContinue = '';
   btn.title = 'Barra de espaço';
-  btn.textContent = host.quickNavMode ? '[Espaço] — Continuar' : 'Continuar';
+  btn.textContent = '[Espaço] — Continuar';
   btn.disabled = true;
   panel.appendChild(btn);
 
@@ -307,7 +306,6 @@ export type StoryOverlayState = {
 export type StoryRenderContext = {
   campaignId: string;
   devMode: boolean;
-  quickNavMode: boolean;
   /** Se true, escolhas com `timedMs` + `fallbackNext` disparam barra e auto-navegação. */
   timedChoiceEnabled: boolean;
   /** Grava `timedChoiceDeadline` ao agendar (para sobreviver a `render()` sem reiniciar o relógio). */
@@ -361,7 +359,7 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     btnM.className = 'faith-miracle-dismiss';
     btnM.dataset.quickNavContinue = '';
     btnM.title = 'Barra de espaço';
-    btnM.textContent = ctx.quickNavMode ? '[Espaço] — Continuar' : 'Continuar';
+    btnM.textContent = '[Espaço] — Continuar';
     btnM.addEventListener('click', () => {
       ctx.overlay.setFaithMiraclePending(false);
       ctx.audio.playUiClick();
@@ -403,7 +401,7 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     btn.className = 'status-highlight-dismiss';
     btn.dataset.quickNavContinue = '';
     btn.title = 'Barra de espaço';
-    btn.textContent = ctx.quickNavMode ? '[Espaço] — Continuar' : 'Continuar';
+    btn.textContent = '[Espaço] — Continuar';
     btn.addEventListener('click', () => {
       ctx.overlay.setStatusHighlightQueue([]);
       ctx.audio.playUiClick();
@@ -438,7 +436,7 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     btnD.className = 'diary-entry-dismiss';
     btnD.dataset.quickNavContinue = '';
     btnD.title = 'Barra de espaço';
-    btnD.textContent = ctx.quickNavMode ? '[Espaço] — Continuar' : 'Continuar';
+    btnD.textContent = '[Espaço] — Continuar';
     btnD.addEventListener('click', () => {
       ctx.overlay.setDiaryEntryQueue([]);
       ctx.audio.playUiClick();
@@ -479,7 +477,7 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     btn.className = 'item-acquire-dismiss';
     btn.dataset.quickNavContinue = '';
     btn.title = 'Barra de espaço';
-    btn.textContent = ctx.quickNavMode ? '[Espaço] — Continuar' : 'Continuar';
+    btn.textContent = '[Espaço] — Continuar';
     btn.addEventListener('click', () => {
       ctx.overlay.setItemAcquireQueue([]);
       ctx.audio.playUiClick();
@@ -607,7 +605,7 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     const b = document.createElement('button');
     b.className = 'choice';
     const base = `Rolar teste: ${ctx.scene.frontmatter.skillCheck.label ?? ctx.scene.frontmatter.skillCheck.attr} (2d6)`;
-    b.textContent = ctx.quickNavMode ? `${storyNavIndex} - ${base}` : base;
+    b.textContent = `${storyNavIndex} - ${base}`;
     if (storyNavIndex < 10) b.title = `Tecla ${storyNavIndex}`;
     b.addEventListener('click', () => ctx.navigation.onSkillRoll(ctx.scene));
     row.appendChild(b);
@@ -625,7 +623,7 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
       dc.label ??
       `${dc.attrs[0].toUpperCase()} + ${dc.attrs[1].toUpperCase()} · ${dc.rounds} lançamentos`;
     const base = `Rolar prova tríplice: ${lbl} (2d6 + dois mods vs TN ${dc.tn})`;
-    b.textContent = ctx.quickNavMode ? `${storyNavIndex} - ${base}` : base;
+    b.textContent = `${storyNavIndex} - ${base}`;
     if (storyNavIndex < 10) b.title = `Tecla ${storyNavIndex}`;
     b.addEventListener('click', () => ctx.navigation.onDualAttrSkillRoll(ctx.scene));
     row.appendChild(b);
@@ -642,7 +640,7 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     const curse =
       lc.luckPenalty && lc.luckPenalty > 0 ? ` · maldição −${lc.luckPenalty}` : '';
     const base = `Rolar sorte: ${lc.label ?? '2d6 + mod(SOR)'} vs TN ${lc.tn}${curse}`;
-    b.textContent = ctx.quickNavMode ? `${storyNavIndex} - ${base}` : base;
+    b.textContent = `${storyNavIndex} - ${base}`;
     if (storyNavIndex < 10) b.title = `Tecla ${storyNavIndex}`;
     b.addEventListener('click', () => ctx.navigation.onLuckRoll(ctx.scene));
     row.appendChild(b);
@@ -660,7 +658,7 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     btn.className = 'choice';
     const navNum = storyNavIndex + i + 1;
     if (navNum < 10) btn.title = `Tecla ${navNum}`;
-    const labelText = ctx.quickNavMode ? `${navNum} - ${ch.text}` : ch.text;
+    const labelText = `${navNum} - ${ch.text}`;
     btn.appendChild(document.createTextNode(labelText));
     if (ch.preview) {
       const span = document.createElement('span');

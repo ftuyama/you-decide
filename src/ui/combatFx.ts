@@ -31,10 +31,27 @@ export type ResolvedEnemyFx = {
 /** Pulso na coluna de inimigos + painel de ações (cura, poção, buff). */
 export type CombatColumnPulse = 'heal_spell' | 'heal_potion' | 'buff' | null;
 
+/** Flash breve na coluna de inimigos (ex.: Centelha / fogo na cena). */
+export type CombatColumnFlash = 'ember' | null;
+
+/** Partículas de poção (cor) — derivado do `itemId` no log. */
+export type CombatPotionParticles = 'hp' | 'mana' | 'stress' | null;
+
 export type CombatLogFxResult = {
   byEnemyIndex: Map<number, ResolvedEnemyFx>;
   columnPulse: CombatColumnPulse;
+  columnFlash: CombatColumnFlash;
+  potionParticles: CombatPotionParticles;
 };
+
+function potionParticlesFromItemId(itemId: string, data: GameData): CombatPotionParticles {
+  const def = data.items[itemId];
+  if (!def || def.slot !== 'consumable') return null;
+  if (def.restoreHp != null && def.restoreHp > 0) return 'hp';
+  if (def.restoreMana != null && def.restoreMana > 0) return 'mana';
+  if (def.stressRelief != null && def.stressRelief > 0) return 'stress';
+  return null;
+}
 
 /** Estilo de FX corpo-a-corpo (arma + classe) — UI e sons. */
 export function getMeleeFxStyleForCharacter(ch: Character | undefined): 'slash' | 'blunt' | 'staff' {
@@ -105,6 +122,8 @@ export function resolveCombatLogFx(
 ): CombatLogFxResult {
   const byEnemyIndex = new Map<number, ResolvedEnemyFx>();
   let columnPulse: CombatColumnPulse = null;
+  let columnFlash: CombatColumnFlash = null;
+  let potionParticles: CombatPotionParticles = null;
 
   let lastPartyAttacker: Character | undefined;
 
@@ -144,6 +163,9 @@ export function resolveCombatLogFx(
       if (e.spellId) {
         const sp = data.spells[e.spellId];
         layers.push(spellDamageLayerClass(sp, e.spellId, isCrit));
+        if (e.spellId === 'ember_spark') {
+          columnFlash = 'ember';
+        }
       } else {
         const attacker = lastPartyAttacker ?? party[0];
         layers.push(meleeLayerClass(meleeStyleForCharacter(attacker), isCrit));
@@ -165,6 +187,7 @@ export function resolveCombatLogFx(
       if (columnPulse !== 'heal_spell') {
         columnPulse = 'heal_potion';
       }
+      potionParticles = potionParticlesFromItemId(e.itemId, data) ?? potionParticles;
       continue;
     }
 
@@ -172,6 +195,7 @@ export function resolveCombatLogFx(
       if (columnPulse !== 'heal_spell' && columnPulse !== 'heal_potion') {
         columnPulse = 'heal_potion';
       }
+      potionParticles = potionParticlesFromItemId(e.itemId, data) ?? potionParticles;
       continue;
     }
 
@@ -180,7 +204,7 @@ export function resolveCombatLogFx(
     }
   }
 
-  return { byEnemyIndex, columnPulse };
+  return { byEnemyIndex, columnPulse, columnFlash, potionParticles };
 }
 
 export type LethalGhostDef = {

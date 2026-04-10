@@ -74,30 +74,42 @@ export class GameSfxPlayer {
   playBluntImpact(): void {
     const ctx = this.host.ensureContext();
     const t0 = ctx.currentTime;
-    const g = this.host.gain(0.1);
+    const g = this.host.gain(0.115);
     if (g <= 0) return;
+    const click = ctx.createOscillator();
+    const gClick = ctx.createGain();
+    click.type = 'square';
+    click.frequency.setValueAtTime(2400, t0);
+    click.frequency.exponentialRampToValueAtTime(480, t0 + 0.022);
+    gClick.gain.setValueAtTime(g * 0.14, t0);
+    gClick.gain.exponentialRampToValueAtTime(0.01, t0 + 0.035);
+    click.connect(gClick);
+    gClick.connect(ctx.destination);
+    click.start(t0);
+    click.stop(t0 + 0.04);
     const thud = ctx.createOscillator();
     const gThud = ctx.createGain();
     thud.type = 'sine';
-    thud.frequency.setValueAtTime(140, t0);
-    thud.frequency.exponentialRampToValueAtTime(55, t0 + 0.14);
-    gThud.gain.setValueAtTime(g * 0.85, t0);
-    gThud.gain.exponentialRampToValueAtTime(0.01, t0 + 0.18);
+    thud.frequency.setValueAtTime(155, t0 + 0.008);
+    thud.frequency.exponentialRampToValueAtTime(48, t0 + 0.15);
+    gThud.gain.setValueAtTime(0.001, t0);
+    gThud.gain.setValueAtTime(g * 0.92, t0 + 0.008);
+    gThud.gain.exponentialRampToValueAtTime(0.01, t0 + 0.2);
     thud.connect(gThud);
     gThud.connect(ctx.destination);
     thud.start(t0);
-    thud.stop(t0 + 0.2);
+    thud.stop(t0 + 0.22);
     const crack = ctx.createOscillator();
     const gCrack = ctx.createGain();
     crack.type = 'triangle';
-    crack.frequency.setValueAtTime(320, t0 + 0.02);
-    crack.frequency.exponentialRampToValueAtTime(120, t0 + 0.06);
-    gCrack.gain.setValueAtTime(g * 0.28, t0 + 0.02);
-    gCrack.gain.exponentialRampToValueAtTime(0.01, t0 + 0.09);
+    crack.frequency.setValueAtTime(340, t0 + 0.024);
+    crack.frequency.exponentialRampToValueAtTime(110, t0 + 0.065);
+    gCrack.gain.setValueAtTime(g * 0.32, t0 + 0.024);
+    gCrack.gain.exponentialRampToValueAtTime(0.01, t0 + 0.095);
     crack.connect(gCrack);
     gCrack.connect(ctx.destination);
-    crack.start(t0 + 0.02);
-    crack.stop(t0 + 0.1);
+    crack.start(t0 + 0.024);
+    crack.stop(t0 + 0.11);
   }
 
   /** Golpe com cajado (whoosh leve + toque mágico). */
@@ -285,35 +297,52 @@ export class GameSfxPlayer {
     hum.stop(t0 + 0.48);
   }
 
-  /** Poção consumida (gole / frasco). */
+  /** Poção consumida — sequência “glub glub” (goles). */
   playPotionDrink(): void {
     const ctx = this.host.ensureContext();
     const t0 = ctx.currentTime;
-    const g = this.host.gain(0.095);
+    const g = this.host.gain(0.4);
     if (g <= 0) return;
-    const glug = ctx.createOscillator();
-    const gGlug = ctx.createGain();
-    glug.type = 'sawtooth';
-    glug.frequency.setValueAtTime(200, t0);
-    glug.frequency.exponentialRampToValueAtTime(95, t0 + 0.14);
-    gGlug.gain.setValueAtTime(g * 0.42, t0);
-    gGlug.gain.exponentialRampToValueAtTime(0.01, t0 + 0.16);
-    glug.connect(gGlug);
-    gGlug.connect(ctx.destination);
-    glug.start(t0);
-    glug.stop(t0 + 0.18);
-    const bubble = ctx.createOscillator();
-    const gBub = ctx.createGain();
-    bubble.type = 'sine';
-    bubble.frequency.setValueAtTime(880, t0 + 0.04);
-    bubble.frequency.exponentialRampToValueAtTime(420, t0 + 0.1);
-    gBub.gain.setValueAtTime(g * 0.22, t0 + 0.04);
-    gBub.gain.exponentialRampToValueAtTime(0.01, t0 + 0.12);
-    bubble.connect(gBub);
-    gBub.connect(ctx.destination);
-    bubble.start(t0 + 0.04);
-    bubble.stop(t0 + 0.14);
-    this.playTone(120, 0.06, 0.04, 'sine');
+    const glugSteps = [0, 0.09, 0.19, 0.3];
+    for (let i = 0; i < glugSteps.length; i++) {
+      const st = t0 + glugSteps[i]!;
+      const body = ctx.createOscillator();
+      const gBody = ctx.createGain();
+      body.type = 'triangle';
+      body.frequency.setValueAtTime(165 + i * 12, st);
+      body.frequency.exponentialRampToValueAtTime(72, st + 0.055);
+      gBody.gain.setValueAtTime(0.001, st);
+      gBody.gain.linearRampToValueAtTime(g * (0.38 - i * 0.05), st + 0.012);
+      gBody.gain.exponentialRampToValueAtTime(0.01, st + 0.072);
+      body.connect(gBody);
+      gBody.connect(ctx.destination);
+      body.start(st);
+      body.stop(st + 0.08);
+      const lip = ctx.createOscillator();
+      const gLip = ctx.createGain();
+      lip.type = 'sine';
+      lip.frequency.setValueAtTime(520 + i * 40, st + 0.008);
+      lip.frequency.exponentialRampToValueAtTime(240, st + 0.04);
+      gLip.gain.setValueAtTime(0.001, st + 0.008);
+      gLip.gain.linearRampToValueAtTime(g * 0.16, st + 0.018);
+      gLip.gain.exponentialRampToValueAtTime(0.01, st + 0.055);
+      lip.connect(gLip);
+      gLip.connect(ctx.destination);
+      lip.start(st + 0.008);
+      lip.stop(st + 0.06);
+    }
+    const swallow = ctx.createOscillator();
+    const gSw = ctx.createGain();
+    swallow.type = 'sine';
+    swallow.frequency.setValueAtTime(195, t0 + 0.38);
+    swallow.frequency.exponentialRampToValueAtTime(110, t0 + 0.48);
+    gSw.gain.setValueAtTime(0.001, t0 + 0.38);
+    gSw.gain.linearRampToValueAtTime(g * 0.22, t0 + 0.395);
+    gSw.gain.exponentialRampToValueAtTime(0.01, t0 + 0.52);
+    swallow.connect(gSw);
+    gSw.connect(ctx.destination);
+    swallow.start(t0 + 0.38);
+    swallow.stop(t0 + 0.54);
   }
 
   /** Buff de combate (Foco, Muralha, etc.) — sino curto e discreto. */

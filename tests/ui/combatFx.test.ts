@@ -50,6 +50,66 @@ const minimalData = (): GameData => {
       dice: 1,
       base: 0,
     },
+    arcane_bolt: {
+      id: 'arcane_bolt',
+      name: 'Arcano',
+      manaCost: 1,
+      minLevel: 1,
+      classId: 'mage',
+      spellKind: 'damage',
+      dice: 1,
+      base: 0,
+    },
+  };
+  d.items = {
+    ...d.items,
+    potion_hp: {
+      id: 'potion_hp',
+      name: 'Poção Rubra',
+      slot: 'consumable',
+      bonusStr: 0,
+      bonusAgi: 0,
+      bonusMind: 0,
+      armor: 0,
+      damage: 0,
+      bonusLuck: 0,
+      restoreHp: 8,
+    },
+    potion_mana: {
+      id: 'potion_mana',
+      name: 'Tônico Azul',
+      slot: 'consumable',
+      bonusStr: 0,
+      bonusAgi: 0,
+      bonusMind: 0,
+      armor: 0,
+      damage: 0,
+      bonusLuck: 0,
+      restoreMana: 6,
+    },
+    potion_stress: {
+      id: 'potion_stress',
+      name: 'Infusão Serena',
+      slot: 'consumable',
+      bonusStr: 0,
+      bonusAgi: 0,
+      bonusMind: 0,
+      armor: 0,
+      damage: 0,
+      bonusLuck: 0,
+      stressRelief: 1,
+    },
+    some_potion: {
+      id: 'some_potion',
+      name: 'Mistério',
+      slot: 'consumable',
+      bonusStr: 0,
+      bonusAgi: 0,
+      bonusMind: 0,
+      armor: 0,
+      damage: 0,
+      bonusLuck: 0,
+    },
   };
   return d;
 };
@@ -176,6 +236,23 @@ describe('resolveCombatLogFx', () => {
     ];
     const r = resolveCombatLogFx(entries, [mage], data);
     expect(r.byEnemyIndex.get(0)?.layerClasses).toContain('combat-fx-spell-ember');
+    expect(r.columnFlash).toBe('ember');
+  });
+
+  it('does not set column flash for non-ember spell damage', () => {
+    const entries: CombatLogEntry[] = [
+      {
+        kind: 'damage',
+        message: 'Arcano.',
+        target: 'Goblin',
+        enemyIndex: 0,
+        damageKind: 'normal',
+        spellId: 'arcane_bolt',
+        final: 3,
+      },
+    ];
+    const r = resolveCombatLogFx(entries, [mage], data);
+    expect(r.columnFlash).toBeNull();
   });
 
   it('sets heal column pulse from heal with spellId', () => {
@@ -204,6 +281,47 @@ describe('resolveCombatLogFx', () => {
     ];
     const r = resolveCombatLogFx(entries, [knight], data);
     expect(r.columnPulse).toBe('heal_potion');
+    expect(r.potionParticles).toBeNull();
+  });
+
+  it('classifies potion particles for HP mana stress from itemId', () => {
+    expect(
+      resolveCombatLogFx(
+        [{ kind: 'info', message: 'x', actor: 'Aldo', itemId: 'potion_hp' }],
+        [knight],
+        data
+      ).potionParticles
+    ).toBe('hp');
+    expect(
+      resolveCombatLogFx(
+        [{ kind: 'info', message: 'x', actor: 'Aldo', itemId: 'potion_mana' }],
+        [knight],
+        data
+      ).potionParticles
+    ).toBe('mana');
+    expect(
+      resolveCombatLogFx(
+        [{ kind: 'info', message: 'x', actor: 'Aldo', itemId: 'potion_stress' }],
+        [knight],
+        data
+      ).potionParticles
+    ).toBe('stress');
+  });
+
+  it('sets potion particles from heal entry with itemId', () => {
+    const entries: CombatLogEntry[] = [
+      {
+        kind: 'heal',
+        message: 'Cura.',
+        actor: 'Aldo',
+        target: 'Aldo',
+        itemId: 'potion_hp',
+        final: 3,
+      },
+    ];
+    const r = resolveCombatLogFx(entries, [knight], data);
+    expect(r.columnPulse).toBe('heal_potion');
+    expect(r.potionParticles).toBe('hp');
   });
 
   it('sets buff column pulse from info with buff spellId', () => {

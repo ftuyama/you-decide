@@ -418,7 +418,7 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
   const combatFx: CombatLogFxResult =
     newLogEntries.length > 0
       ? resolveCombatLogFx(newLogEntries, ctx.state.party, ctx.registry.data)
-      : { byEnemyIndex: new Map(), columnPulse: null };
+      : { byEnemyIndex: new Map(), columnPulse: null, columnFlash: null, potionParticles: null };
   const lethalGhosts =
     newLogEntries.length > 0
       ? extractLethalGhosts(newLogEntries, c, ctx.registry.data)
@@ -436,10 +436,20 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
   if (combatLastResolvedDamageWasCrit(c.log)) {
     left.classList.add('combat-enemies-column--crit-damage');
   }
+  if (combatFx.columnFlash === 'ember') {
+    left.classList.add('combat-enemies-column--flash-ember');
+  }
   if (combatFx.columnPulse === 'heal_spell') {
     left.classList.add('combat-enemies-column--pulse-heal-spell');
   } else if (combatFx.columnPulse === 'heal_potion') {
     left.classList.add('combat-enemies-column--pulse-potion');
+    if (combatFx.potionParticles === 'hp') {
+      left.classList.add('combat-enemies-column--potion-fx-hp');
+    } else if (combatFx.potionParticles === 'mana') {
+      left.classList.add('combat-enemies-column--potion-fx-mana');
+    } else if (combatFx.potionParticles === 'stress') {
+      left.classList.add('combat-enemies-column--potion-fx-stress');
+    }
   } else if (combatFx.columnPulse === 'buff') {
     left.classList.add('combat-enemies-column--pulse-buff');
   }
@@ -518,6 +528,13 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     actionsPanel.classList.add('combat-actions-panel--fx-heal-spell');
   } else if (combatFx.columnPulse === 'heal_potion') {
     actionsPanel.classList.add('combat-actions-panel--fx-potion');
+    if (combatFx.potionParticles === 'hp') {
+      actionsPanel.classList.add('combat-actions-panel--potion-fx-hp');
+    } else if (combatFx.potionParticles === 'mana') {
+      actionsPanel.classList.add('combat-actions-panel--potion-fx-mana');
+    } else if (combatFx.potionParticles === 'stress') {
+      actionsPanel.classList.add('combat-actions-panel--potion-fx-stress');
+    }
   } else if (combatFx.columnPulse === 'buff') {
     actionsPanel.classList.add('combat-actions-panel--fx-buff');
   }

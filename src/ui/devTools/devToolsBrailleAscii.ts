@@ -19,6 +19,39 @@ function parseDitherer(value: string): BrailleDithererName {
   return 'floydSteinberg';
 }
 
+function getFullscreenElement(): Element | null {
+  const d = document as Document & { webkitFullscreenElement?: Element | null };
+  return document.fullscreenElement ?? d.webkitFullscreenElement ?? null;
+}
+
+function requestElementFullscreen(el: HTMLElement): Promise<void> {
+  const w = el as HTMLElement & {
+    webkitRequestFullscreen?: () => void;
+    mozRequestFullScreen?: () => void;
+  };
+  if (el.requestFullscreen) return el.requestFullscreen();
+  if (w.webkitRequestFullscreen) {
+    w.webkitRequestFullscreen();
+    return Promise.resolve();
+  }
+  if (w.mozRequestFullScreen) {
+    w.mozRequestFullScreen();
+    return Promise.resolve();
+  }
+  return Promise.reject(new Error('Fullscreen não disponível'));
+}
+
+function exitDocumentFullscreen(): Promise<void> {
+  const d = document as Document & { webkitExitFullscreen?: () => void };
+  if (!getFullscreenElement()) return Promise.resolve();
+  if (document.exitFullscreen) return document.exitFullscreen();
+  if (d.webkitExitFullscreen) {
+    d.webkitExitFullscreen();
+    return Promise.resolve();
+  }
+  return Promise.resolve();
+}
+
 export function mountBrailleAsciiPanel(parent: HTMLElement): void {
   let currentSource: CanvasImageSource | null = null;
   let lastAscii = '';
@@ -273,8 +306,15 @@ export function mountBrailleAsciiPanel(parent: HTMLElement): void {
   copyImgBtn.className = 'dev-tools-btn dev-tools-btn--secondary';
   copyImgBtn.textContent = 'Copiar imagem';
   copyImgBtn.title = 'Copia a imagem atual (PNG) para a área de transferência';
+  const fullscreenBtn = document.createElement('button');
+  fullscreenBtn.type = 'button';
+  fullscreenBtn.className = 'dev-tools-btn dev-tools-btn--secondary';
+  fullscreenBtn.textContent = 'Ecrã inteiro';
+  fullscreenBtn.title = 'Mostra o resultado em ecrã inteiro (Esc para sair)';
+  fullscreenBtn.disabled = true;
   copyRow.appendChild(copyBtn);
   copyRow.appendChild(copyImgBtn);
+  copyRow.appendChild(fullscreenBtn);
   outHead.appendChild(outTitle);
   outHead.appendChild(meta);
   outHead.appendChild(copyRow);
@@ -307,6 +347,17 @@ export function mountBrailleAsciiPanel(parent: HTMLElement): void {
 
   pre.style.fontSize = `${fontRange.value}px`;
 
+  function syncFullscreenButton(): void {
+    const hasOut = Boolean(lastAscii);
+    fullscreenBtn.disabled = !hasOut;
+    const fsEl = getFullscreenElement();
+    const inFs = fsEl === preWrap;
+    fullscreenBtn.textContent = inFs ? 'Sair do ecrã inteiro' : 'Ecrã inteiro';
+    fullscreenBtn.title = inFs
+      ? 'Sai do modo ecrã inteiro (ou pressiona Esc)'
+      : 'Mostra o resultado em ecrã inteiro (Esc para sair)';
+  }
+
   function setOutputShell(hasImage: boolean): void {
     emptyHint.classList.toggle('dev-tools-braille-empty--gone', hasImage);
     pre.classList.toggle('dev-tools-braille-pre--hidden', !hasImage);
@@ -324,11 +375,15 @@ export function mountBrailleAsciiPanel(parent: HTMLElement): void {
 
   function render(): void {
     if (!currentSource) {
+      if (getFullscreenElement() === preWrap) {
+        void exitDocumentFullscreen();
+      }
       pre.textContent = '';
       lastAscii = '';
       meta.textContent = '';
       status.textContent = '';
       setOutputShell(false);
+      syncFullscreenButton();
       return;
     }
     setOutputShell(true);
@@ -345,6 +400,7 @@ export function mountBrailleAsciiPanel(parent: HTMLElement): void {
       pre.textContent = '';
       lastAscii = '';
     }
+    syncFullscreenButton();
   }
 
   function setSourceFromBitmap(bmp: ImageBitmap): void {
@@ -516,6 +572,21 @@ export function mountBrailleAsciiPanel(parent: HTMLElement): void {
         msg.includes('ClipboardItem') || msg.includes('write')
           ? 'Cópia de imagem não suportada neste browser.'
           : `Erro: ${msg}`;
+    }
+  });
+
+  document.addEventListener('fullscreenchange', syncFullscreenButton);
+  document.addEventListener('webkitfullscreenchange', syncFullscreenButton);
+
+  fullscreenBtn.addEventListener('click', () => {
+    if (!lastAscii) return;
+    if (getFullscreenElement() === preWrap) {
+      void exitDocumentFullscreen();
+    } else {
+      void requestElementFullscreen(preWrap).catch((e) => {
+        const msg = e instanceof Error ? e.message : String(e);
+        status.textContent = msg;
+      });
     }
   });
 }

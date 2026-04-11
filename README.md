@@ -2,7 +2,7 @@
 
 **Um jogo de texto onde cada clique pesa como uma lâmina.**
 
-[Jogar online](#jogar-online-github-pages) · [Como jogar](#como-jogar) · [O que te espera](#o-que-te-espera-lá-embaixo) · [Dicas](#dicas-de-sobrevivência)
+[Como jogar](#como-jogar) · [Capturas](#capturas-de-ecrã) · [O que te espera](#o-que-te-espera-lá-embaixo) · [Dicas](#dicas-de-sobrevivência)
 
 </div>
 
@@ -51,40 +51,35 @@ Seja por honra, ganância ou desespero, o primeiro passo é sempre o mesmo: **de
 
 ---
 
-## Jogar online (GitHub Pages)
+## Como jogar
 
-O projeto está preparado para **GitHub Pages** (URLs relativas na build; não dependes do nome do repositório para os assets).
+Corre **no navegador** — não precisas de instalar nada. Usa a página oficial:
 
-1. No GitHub: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-2. Faz push para `main` (ou `master`). O workflow [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) corre `npm ci`, `npm run build` e publica a pasta `dist`.
-3. O jogo fica disponível em `https://<teu-utilizador>.github.io/<nome-do-repo>/` (ex.: `https://ftuyama.github.io/you-decide/`).
+<div align="center">
 
-Se o repositório tiver outro nome, o mesmo URL relativo continua a funcionar — não é preciso alterar o `base` do Vite.
+[![Jogar agora — Calvário Subterrâneo](https://img.shields.io/badge/Jogar%20agora-Calvário%20Subterr%C3%A2neo-5c3d6e?style=for-the-badge)](https://ftuyama.github.io/you-decide/)
+
+**[https://ftuyama.github.io/you-decide/](https://ftuyama.github.io/you-decide/)**
+
+</div>
 
 ---
 
-## Como jogar
+## Capturas de ecrã
 
-1. **Clone** este repositório (ou baixe o ZIP).
-2. Na pasta do projeto, instale as dependências:
+Interface do **Calvário Subterrâneo**: narrativa com ASCII, combate por turnos e exploração.
 
-   ```bash
-   npm install
-   ```
+**Narrativa e escolhas** — *Umbral do Vazio*
 
-3. Inicie o jogo no navegador:
+![Cena de narrativa com arte ASCII, barra lateral do herói e opções de escolha](screenshots/Screenshot%202026-04-10%20at%2020.53.35.png)
 
-   ```bash
-   npm run dev
-   ```
+**Combate** — *turnos, ações e log de batalha*
 
-4. Abra o endereço que o Vite mostrar (em geral `http://localhost:5173`) e **jogue no teclado e no rato** — lê com calma; o texto é o cenário.
+![Combate por turnos com inimigo, ações e log de batalha](screenshots/Screenshot%202026-04-10%20at%2020.54.11.png)
 
-Para gerar uma build estática e pré-visualizar:
+**Exploração** — *catacumbas e acampamento*
 
-```bash
-npm run build && npm run preview
-```
+![Acampamento com arte ASCII, progresso e dica de jogo](screenshots/Screenshot%202026-04-10%20at%2020.54.24.png)
 
 ---
 
@@ -109,20 +104,12 @@ npm run build && npm run preview
 
 ---
 
-## Sobre o projeto
-
-**You Decide** é um motor de narrativa interativa em **TypeScript** + **Vite**: cenas em Markdown com frontmatter, motor de estado e UI web. A campanha principal é **Calvário Subterrâneo**.
-
-Se quiseres contribuir com texto, correções ou ideias, abre um *issue* ou envia um *pull request*.
-
----
-
 <div align="center">
 
 *“Sob a cidade, só há escadas.”*
 
 </div>
 
-If you enjoyed this experience, consider donating a small tip to support new ideas:
+Se você apreciou essa experiência, considere doar um pequeno incentivo:
 
 [![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R6R21XLX02)

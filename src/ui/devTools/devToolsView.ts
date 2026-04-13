@@ -273,6 +273,7 @@ function aggregateAmbientCounts(scenes: Map<string, LoadedScene>): Map<AmbientTh
 type DevToolsVisualThemeId = 'default' | 'snow' | 'void' | 'ash';
 
 const DEV_TOOLS_VISUAL_THEMES: readonly DevToolsVisualThemeId[] = ['default', 'snow', 'void', 'ash'];
+const DEV_TOOLS_VISUAL_THEME_STORAGE_KEY = 'you-decide.devTools.visualTheme';
 
 function inferVisualThemeForScene(id: string, chapter: number | undefined): DevToolsVisualThemeId {
   if (chapter === 6 || id.startsWith('act6/')) return 'void';
@@ -296,6 +297,31 @@ function applyDevToolsVisualTheme(theme: DevToolsVisualThemeId): void {
     document.documentElement.removeAttribute('data-theme');
   } else {
     document.documentElement.setAttribute('data-theme', theme);
+  }
+}
+
+function readStoredDevToolsVisualTheme(): DevToolsVisualThemeId {
+  try {
+    const raw = window.localStorage.getItem(DEV_TOOLS_VISUAL_THEME_STORAGE_KEY);
+    if (
+      raw === 'default' ||
+      raw === 'snow' ||
+      raw === 'void' ||
+      raw === 'ash'
+    ) {
+      return raw;
+    }
+  } catch {
+    /* ignore storage errors */
+  }
+  return 'default';
+}
+
+function persistDevToolsVisualTheme(theme: DevToolsVisualThemeId): void {
+  try {
+    window.localStorage.setItem(DEV_TOOLS_VISUAL_THEME_STORAGE_KEY, theme);
+  } catch {
+    /* ignore storage errors */
   }
 }
 
@@ -334,6 +360,7 @@ function mountVisualPanel(
     previewBtn.textContent = 'Aplicar';
     previewBtn.addEventListener('click', () => {
       applyDevToolsVisualTheme(theme);
+      persistDevToolsVisualTheme(theme);
     });
     td3.appendChild(previewBtn);
     tr.appendChild(td1);
@@ -351,6 +378,7 @@ function mountVisualPanel(
   restoreBtn.textContent = 'Restaurar tema padrão';
   restoreBtn.addEventListener('click', () => {
     applyDevToolsVisualTheme('default');
+    persistDevToolsVisualTheme('default');
   });
   restore.appendChild(restoreBtn);
 
@@ -649,6 +677,7 @@ function mountScenesPanel(
 export function mountDevToolsView(root: HTMLElement, campaignId: string): void {
   root.innerHTML = '';
   root.className = 'dev-tools-root app--dev-tools';
+  applyDevToolsVisualTheme(readStoredDevToolsVisualTheme());
 
   const tab = resolveDevToolsTabFromLocation();
   const sceneParam = resolveDevToolsSceneIdFromLocation();

@@ -32,6 +32,14 @@ type SidebarBuilderParams = {
   playUiClick?: () => void;
 };
 
+type SidebarDisclosure = {
+  visitedCount: number;
+  unlockInventory: boolean;
+  unlockFactions: boolean;
+  unlockCompanions: boolean;
+  nextHint: string | null;
+};
+
 let overlayModalLayer: HTMLDivElement | null = null;
 let overlayModalOnKey: ((e: KeyboardEvent) => void) | null = null;
 
@@ -287,7 +295,7 @@ export function openCreditsModal({
   const { layer, scroll, dismiss, wireClose } = createSheetModalShell({
     layerClass: 'sheet-modal-layer credits-modal-layer',
     titleId: 'credits-modal-title',
-    kicker: 'You Decide',
+    kicker: 'Silent Dungeon',
     title: 'Créditos',
     sub: `${campaignName} · v${gameVersion}`,
     backdropAriaLabel: 'Fechar créditos',
@@ -310,7 +318,7 @@ export function openCreditsModal({
 
   const p1 = document.createElement('p');
   p1.textContent =
-    'You Decide é um motor de narrativa interativa: escolhas moldam a história, com estado persistente, combate por turnos e progressão.';
+    'Silent Dungeon é um motor de narrativa interativa: escolhas moldam a história, com estado persistente, combate por turnos e progressão.';
 
   const p2 = document.createElement('p');
   p2.appendChild(
@@ -702,13 +710,31 @@ function statHint(label: string): string {
     SOR: 'Sorte: afeta bônus de sorte e alguns testes.',
     CRIT: 'Chance de crítico em ataques físicos.',
     XP: 'Experiência acumulada para subir de nível.',
-    Dia: 'Dia narrativo: avança quando sais de um acampamento principal (fogueira).',
+    Dia: 'Dia narrativo',
   };
   return hints[label] ?? label;
 }
 
 function hintedLabel(label: string): string {
   return `<span class="sidebar-hint-label" title="${escHtml(statHint(label))}">${escHtml(label)}</span>`;
+}
+
+function buildSidebarDisclosure(state: GameState): SidebarDisclosure {
+  const visitedCount = Object.keys(state.visitedScenes).length;
+  const repTouched =
+    state.reputation.vigilia !== 0 || state.reputation.circulo !== 0 || state.reputation.culto !== 0;
+  const unlockInventory = state.chapter >= 2 || visitedCount >= 6 || state.day >= 4;
+  const unlockFactions = state.chapter >= 2 || visitedCount >= 10 || repTouched;
+  const unlockCompanions = state.chapter >= 2 || visitedCount >= 8 || state.party.length > 2;
+  let nextHint: string | null = null;
+  if (!unlockInventory) {
+    nextHint = null;
+  } else if (!unlockCompanions && state.party.length > 1) {
+    nextHint = 'Detalhes de companheiros destravam no capítulo 2 ou após 8 cenas visitadas.';
+  } else if (!unlockFactions) {
+    nextHint = 'Painel de facções destrava no capítulo 2, ao visitar 10 cenas ou ao alterar reputação.';
+  }
+  return { visitedCount, unlockInventory, unlockFactions, unlockCompanions, nextHint };
 }
 
 function formatStatAttrsLineHtml(
@@ -921,16 +947,17 @@ export function buildGameSidebar({
   const gold = r.gold ?? 0;
   const p = state.party[0];
   const rep = state.reputation;
+  const disclosure = buildSidebarDisclosure(state);
 
   const openRec = sidebarSections['recursos'] ? ' open' : '';
-  const openInv = sidebarSections['inventario'] ? ' open' : '';
-  const openFac = sidebarSections['faccoes'] ? ' open' : '';
+  const openInv = disclosure.unlockInventory && sidebarSections['inventario'] ? ' open' : '';
+  const openFac = disclosure.unlockFactions && sidebarSections['faccoes'] ? ' open' : '';
   const hasCompanionsInParty = state.party.length > 1;
   const hasInventory = state.inventory.length > 0;
 
   const personagemBlock = (() => {
     if (!p) {
-      return `<div class="sidebar-line">Escolha uma classe na narrativa.</div>
+      return `<div class="sidebar-line sidebar-muted">Escolha uma classe na narrativa.</div>
         <div class="sidebar-line">Nível <strong>${state.level}</strong> · XP <strong>${state.xp}</strong></div>`;
     }
     const cid = p.class as ClassId;
@@ -979,6 +1006,22 @@ export function buildGameSidebar({
           <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.progress)}<span>Capítulo <strong>${state.chapter}</strong></span></div>
           <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.memories)}<span>${hintedLabel('Dia')} <strong>${state.day}</strong></span></div>
           <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.tier)}<span>Tier <strong>${state.narrativeTier}</strong></span></div>
+          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.memories)}<span>Ecos herdados <strong>${state.legacy.echoes}</strong></span></div>
+          ${
+            state.legacy.lastRunEchoGain > 0
+              ? `<div class="sidebar-line sidebar-resource-hint">Último reinício: +${state.legacy.lastRunEchoGain} ecos.</div>`
+              : ''
+          }
+          ${
+            state.legacy.titles.length > 0
+              ? `<div class="sidebar-line sidebar-resource-hint">Título recente: <strong>${escHtml(state.legacy.titles[state.legacy.titles.length - 1]!)}</strong>.</div>`
+              : ''
+          }
+          ${
+            state.legacy.lastRunSummary.trim().length > 0
+              ? `<div class="sidebar-line sidebar-resource-hint">${escHtml(state.legacy.lastRunSummary)}</div>`
+              : ''
+          }
         </div>
       </div>
       <div class="sidebar-static">
@@ -988,13 +1031,23 @@ export function buildGameSidebar({
         </div>
       </div>
       ${
-        hasCompanionsInParty
+        hasCompanionsInParty && disclosure.unlockCompanions
           ? `<div class="sidebar-static">
         <div class="sidebar-static-title sidebar-static-title--with-icon">${iconWrap(icons.companions)}<span>Companheiros</span></div>
         <div class="sidebar-static-body sidebar-stats">
           ${companionsSectionMarkup(state, registry)}
         </div>
       </div>`
+          : ''
+      }
+      ${
+        hasCompanionsInParty && !disclosure.unlockCompanions
+          ? `<div class="sidebar-line sidebar-muted sidebar-disclosure-hint">Companheiros recrutados: <strong>${state.party.length - 1}</strong> (detalhes avançados bloqueados no início da jornada).</div>`
+          : ''
+      }
+      ${
+        disclosure.nextHint
+          ? `<div class="sidebar-line sidebar-muted sidebar-disclosure-hint">${escHtml(disclosure.nextHint)}</div>`
           : ''
       }
       <details class="sidebar-collapse"${openRec} data-section="recursos">
@@ -1008,7 +1061,7 @@ export function buildGameSidebar({
         </div>
       </details>
       ${
-        hasInventory
+        hasInventory && disclosure.unlockInventory
           ? `<details class="sidebar-collapse"${openInv} data-section="inventario">
         <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.inventory, 'Inventário')}</summary>
         <div class="sidebar-collapse-body sidebar-inventory">
@@ -1017,7 +1070,9 @@ export function buildGameSidebar({
       </details>`
           : ''
       }
-      <details class="sidebar-collapse"${openFac} data-section="faccoes">
+      ${
+        disclosure.unlockFactions
+          ? `<details class="sidebar-collapse"${openFac} data-section="faccoes">
         <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.factions, 'Facções')}</summary>
         <div class="sidebar-collapse-body sidebar-faccoes">
           ${repBarMarkup('Vigília', rep.vigilia, 'vigilia')}
@@ -1027,7 +1082,14 @@ export function buildGameSidebar({
           ${repBarMarkup('Culto', rep.culto, 'culto')}
           ${factionLoreBlurb('culto')}
         </div>
-      </details>
+      </details>`
+          : ''
+      }
+      ${
+        hasInventory && !disclosure.unlockInventory
+          ? `<div class="sidebar-line sidebar-muted sidebar-disclosure-hint">Inventário já contém itens, mas os detalhes ficam disponíveis após mais exploração.</div>`
+          : ''
+      }
     `;
 
   if (state.diary.length || state.marks.length) {

@@ -6,7 +6,7 @@
 #
 # Upload manual (ZIP):
 #   npm run release:itch
-#   → cria release/you-decide-itch.zip — envia em itch.io → Edit game → Uploads
+#   → cria release/silent-dungeon-itch.zip — envia em itch.io → Edit game → Uploads
 #
 # Upload com butler (só o que mudou; patches para a app itch):
 #   1. Instala: https://itch.io/docs/butler/
@@ -22,7 +22,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
-ZIP_BASENAME="${ZIP_BASENAME:-you-decide-itch.zip}"
+ZIP_BASENAME="${ZIP_BASENAME:-silent-dungeon-itch.zip}"
 RELEASE_DIR="${RELEASE_DIR:-$ROOT/release}"
 BUTLER_CHANNEL="${BUTLER_CHANNEL:-html}"
 

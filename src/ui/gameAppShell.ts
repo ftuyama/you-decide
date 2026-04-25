@@ -266,7 +266,7 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
 
   const versionLabel = document.createElement('div');
   versionLabel.className = 'menu-version';
-  versionLabel.textContent = `You Decide v${opts.gameVersion}`;
+  versionLabel.textContent = `Silent Dungeon v${opts.gameVersion}`;
 
   const devSaveExtrasEl = document.createElement('div');
   devSaveExtrasEl.className = 'menu-dev-save-extras';

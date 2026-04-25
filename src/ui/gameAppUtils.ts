@@ -286,7 +286,7 @@ export function hpBarMarkup(
   if (max <= 0) return `<div class="${trackCls} empty"></div>`;
   const pct = Math.min(100, Math.max(0, Math.round((cur / max) * 100)));
   const label = fill === 'hp' ? 'HP' : 'XP';
-  return `<div class="${trackCls}" title="${label} ${cur} / ${max}">
+  return `<div class="${trackCls}" role="img" aria-label="${label} ${cur} de ${max}">
       <div class="${fillCls}" style="width:${pct}%"></div>
     </div>`;
 }
@@ -294,7 +294,7 @@ export function hpBarMarkup(
 export function manaBarMarkup(cur: number, max: number): string {
   if (max <= 0) return '';
   const pct = Math.min(100, Math.max(0, Math.round((cur / max) * 100)));
-  return `<div class="mana-bar-track" title="Mana ${cur} / ${max}">
+  return `<div class="mana-bar-track" role="img" aria-label="Mana ${cur} de ${max}">
       <div class="mana-bar-fill" style="width:${pct}%"></div>
     </div>`;
 }
@@ -302,7 +302,7 @@ export function manaBarMarkup(cur: number, max: number): string {
 export function stressBarMarkup(cur: number): string {
   const max = 4;
   const pct = Math.min(100, Math.max(0, Math.round((cur / max) * 100)));
-  return `<div class="stress-bar-track" title="Stress ${cur} / ${max}">
+  return `<div class="stress-bar-track" role="img" aria-label="Stress ${cur} de ${max}">
       <div class="stress-bar-fill" style="width:${pct}%"></div>
     </div>`;
 }

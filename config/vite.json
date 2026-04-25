@@ -1,0 +1,20 @@
+{
+  "all": {
+    "sourceCodeDir": "src",
+    "watchAdditionalPaths": []
+  },
+  "development": {
+    "autoBuild": true,
+    "publicOutputDir": "dist",
+    "port": 5173
+  },
+  "test": {
+    "autoBuild": true,
+    "publicOutputDir": "dist-test",
+    "port": 5174
+  },
+  "production": {
+    "autoBuild": false,
+    "publicOutputDir": "dist"
+  }
+}

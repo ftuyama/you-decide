@@ -2,7 +2,7 @@
  * Braille image → text conversion, adapted from Braille-ASCII-Art (MIT).
  *
  * Copyright (c) 2018 Lachlan Arthur
- * Copyright (c) You Decide contributors — TypeScript port and integration
+ * Copyright (c) Silent Dungeon contributors — TypeScript port and integration
  *
  * SPDX-License-Identifier: MIT
  * @see https://github.com/LachlanArthur/Braille-ASCII-Art

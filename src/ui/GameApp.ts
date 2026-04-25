@@ -61,6 +61,7 @@ export class GameApp {
   private readonly devModeKey: string;
   private readonly onboardingPrimerKey: string;
   private readonly returnRewardDateKey: string;
+  private readonly legacyBriefingKey: string;
   private registry: ContentRegistry;
   private bus = new EventBus();
   private audio: GameAudio;
@@ -121,6 +122,7 @@ export class GameApp {
     this.devModeKey = `${campaignId}_dev_mode`;
     this.onboardingPrimerKey = `${campaignId}_onboarding_primer_v1`;
     this.returnRewardDateKey = `${campaignId}_return_reward_date_v1`;
+    this.legacyBriefingKey = `${campaignId}_legacy_briefing_v1`;
     this.registry = new ContentRegistry(campaignId);
     this.audio = new GameAudio(campaignId);
     this.fontStep = this.loadFontStep();
@@ -230,6 +232,7 @@ export class GameApp {
     this.state = createInitialState(this.registry.data.campaign);
     this.state = this.stabilize(this.state);
     this.applyReturnRewardIfNeeded();
+    this.applyLegacyBriefingIfNeeded();
     this.sidebarSections = this.loadSidebarSections();
     this.migrateLegacySaveIfNeeded();
     window.addEventListener('keydown', (e) => {
@@ -387,6 +390,39 @@ export class GameApp {
     return 'Meta da sessão: concluir 1 ramificação nova e registrar 1 novo marco de jornada.';
   }
 
+  private applyLegacyBriefingIfNeeded(): void {
+    const legacy = this.state.legacy;
+    if (legacy.echoes <= 0) return;
+    const stamp = `${legacy.echoes}:${legacy.lastRunSummary}:${legacy.titles.join('|')}`;
+    try {
+      if (localStorage.getItem(this.legacyBriefingKey) === stamp) return;
+      const topTitle = legacy.titles[legacy.titles.length - 1];
+      if (topTitle) {
+        this.statusHighlightQueue.push({
+          type: 'statusHighlight',
+          variant: 'neutral',
+          title: `Legado ativo — ${topTitle}`,
+          subtitle:
+            legacy.lastRunEchoGain > 0
+              ? `+${legacy.lastRunEchoGain} ecos preservados entre runs.`
+              : 'Ecos preservados entre runs.',
+        });
+      }
+      if (legacy.lastRunSummary.trim().length > 0) {
+        this.state = this.stabilize(
+          applyEffects(
+            this.state,
+            [{ op: 'addDiary', text: `Legado: ${legacy.lastRunSummary}` }],
+            this.ctx()
+          )
+        );
+      }
+      localStorage.setItem(this.legacyBriefingKey, stamp);
+    } catch {
+      /* noop */
+    }
+  }
+
   private saveDevMode(): void {
     try {
       localStorage.setItem(this.devModeKey, this.devMode ? '1' : '0');
@@ -492,6 +528,30 @@ export class GameApp {
     } catch {
       /* noop */
     }
+  }
+
+  private canOpenSidebarSection(key: string): boolean {
+    const visitedCount = Object.keys(this.state.visitedScenes).length;
+    if (key === 'inventario') {
+      return this.state.chapter >= 2 || visitedCount >= 6 || this.state.day >= 4;
+    }
+    if (key === 'faccoes') {
+      const rep = this.state.reputation;
+      const repTouched = rep.vigilia !== 0 || rep.circulo !== 0 || rep.culto !== 0;
+      return this.state.chapter >= 2 || visitedCount >= 10 || repTouched;
+    }
+    return true;
+  }
+
+  private syncSidebarDisclosureSections(): void {
+    let changed = false;
+    for (const key of Object.keys(this.sidebarSections)) {
+      if (this.sidebarSections[key] === true && !this.canOpenSidebarSection(key)) {
+        this.sidebarSections[key] = false;
+        changed = true;
+      }
+    }
+    if (changed) this.saveSidebarSections();
   }
 
   private unlockAudio(): void {
@@ -925,6 +985,7 @@ export class GameApp {
       this.timedTimer = null;
     }
     this.clearDiceRollTimers();
+    this.syncSidebarDisclosureSections();
     if (this.state.mode !== 'combat') {
       this.combatLogSoundCursor = { encounterId: '', index: 0 };
       this.combatLogFxCursor = { encounterId: '', index: 0 };
@@ -997,6 +1058,9 @@ export class GameApp {
       onSaveSlot: (slot: number) => this.saveToSlot(slot),
       onLoadSlot: (slot: number) => this.loadFromSlot(slot),
       onSidebarSectionToggle: (key: string, open: boolean) => {
+        if (open && !this.canOpenSidebarSection(key)) {
+          return;
+        }
         this.sidebarSections[key] = open;
         this.saveSidebarSections();
       },

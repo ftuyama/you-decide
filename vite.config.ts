@@ -6,8 +6,10 @@ import { asciiSceneDevManifestPlugin } from './scripts/vite-ascii-scene-manifest
 function readPexelsApiKey(viteEnv: Record<string, string>): string | undefined {
   const k =
     viteEnv.PEXELS_API_KEY ??
+    viteEnv.SILENT_DUNGEON_PEXELS_KEY ??
     viteEnv.YOU_DECIDE_PEXELS_KEY ??
     process.env.PEXELS_API_KEY ??
+    process.env.SILENT_DUNGEON_PEXELS_KEY ??
     process.env.YOU_DECIDE_PEXELS_KEY;
   return k && k.trim() ? k.trim() : undefined;
 }
@@ -17,7 +19,7 @@ function readPexelsApiKey(viteEnv: Record<string, string>): string | undefined {
  * `https://<user>.github.io/<repo>/` sem depender do nome do repositório.
  *
  * Dev-only: busca de imagens Pexels (`/__dev/image-search`) usa
- * `PEXELS_API_KEY` ou `YOU_DECIDE_PEXELS_KEY` em `.env.local`.
+ * `PEXELS_API_KEY`, `SILENT_DUNGEON_PEXELS_KEY` ou `YOU_DECIDE_PEXELS_KEY` em `.env.local`.
  * https://www.pexels.com/api/
  */
 export default defineConfig(({ mode }) => {
@@ -69,7 +71,7 @@ export default defineConfig(({ mode }) => {
               const r = await fetch(pexelsUrl, {
                 headers: {
                   Authorization: apiKey,
-                  'User-Agent': 'you-decide-dev-image-search/1',
+                  'User-Agent': 'silent-dungeon-dev-image-search/1',
                 },
               });
               const text = await r.text();
@@ -121,7 +123,7 @@ export default defineConfig(({ mode }) => {
           }
           try {
             const r = await fetch(parsedUrl, {
-              headers: { 'User-Agent': 'you-decide-dev-image-proxy/1' },
+              headers: { 'User-Agent': 'silent-dungeon-dev-image-proxy/1' },
             });
             if (!r.ok) {
               res.statusCode = r.status;

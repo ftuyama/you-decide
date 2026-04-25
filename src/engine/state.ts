@@ -30,6 +30,7 @@ export function createInitialState(campaign: CampaignIndex, seed?: number): Game
     factionGainPending: { vigilia: 0, circulo: 0, culto: 0 },
     flags: {},
     marks: [],
+    legacy: { echoes: 0, titles: [], lastRunSummary: '', lastRunEchoGain: 0 },
     leadStoryPassives: [],
     resources: { supply: 5, faith: 3, corruption: 0, gold: 8 },
     extraLifeReady: false,
@@ -203,6 +204,21 @@ export function deserializeState(json: string): GameState {
   const rawFlags = (o as GameState).flags;
   const flags: GameState['flags'] =
     rawFlags && typeof rawFlags === 'object' ? { ...rawFlags } : {};
+  const rawLegacy = (o as Partial<GameState>).legacy;
+  const legacy: GameState['legacy'] = {
+    echoes:
+      typeof rawLegacy?.echoes === 'number' && Number.isFinite(rawLegacy.echoes)
+        ? Math.max(0, Math.floor(rawLegacy.echoes))
+        : 0,
+    titles: Array.isArray(rawLegacy?.titles)
+      ? rawLegacy.titles.filter((x): x is string => typeof x === 'string' && x.trim().length > 0)
+      : [],
+    lastRunSummary: typeof rawLegacy?.lastRunSummary === 'string' ? rawLegacy.lastRunSummary : '',
+    lastRunEchoGain:
+      typeof rawLegacy?.lastRunEchoGain === 'number' && Number.isFinite(rawLegacy.lastRunEchoGain)
+        ? Math.max(0, Math.floor(rawLegacy.lastRunEchoGain))
+        : 0,
+  };
   if (
     (marks.includes('monk_inner_peace') || leadStoryPassives.includes('monk_inner_peace')) &&
     !flags.frost_monk_blessing_done
@@ -224,6 +240,7 @@ export function deserializeState(json: string): GameState {
     marks,
     leadStoryPassives,
     flags,
+    legacy,
     sceneArtHighlightShown,
     extraLifeReady: extraLifeReadyFromFaith(resources.faith),
     level: typeof (o as GameState).level === 'number' ? (o as GameState).level : 1,

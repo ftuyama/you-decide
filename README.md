@@ -57,9 +57,9 @@ Corre **no navegador** — não precisas de instalar nada. Usa a página oficial
 
 <div align="center">
 
-[![Jogar agora — A Masmorra do Silêncio](https://img.shields.io/badge/Jogar%20agora-A%20Masmorra%20do%20Sil%C3%AAncio-5c3d6e?style=for-the-badge)](https://ftuyama.github.io/you-decide/)
+[![Jogar agora — A Masmorra do Silêncio](https://img.shields.io/badge/Jogar%20agora-A%20Masmorra%20do%20Sil%C3%AAncio-5c3d6e?style=for-the-badge)](https://ftuyama.github.io/silent-dungeon/)
 
-**[https://ftuyama.github.io/you-decide/](https://ftuyama.github.io/you-decide/)**
+**[https://ftuyama.github.io/silent-dungeon/](https://ftuyama.github.io/silent-dungeon/)**
 
 </div>
 

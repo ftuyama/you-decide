@@ -298,6 +298,15 @@ export const GameStateSchema = z.object({
     .default({ vigilia: 0, circulo: 0, culto: 0 }),
   flags: z.record(z.string(), z.boolean()),
   marks: z.array(z.string()),
+  /** Meta-progresso persistente entre runs (não reseta com `resetRun`). */
+  legacy: z
+    .object({
+      echoes: z.number().int().min(0).default(0),
+      titles: z.array(z.string()).default([]),
+      lastRunSummary: z.string().default(''),
+      lastRunEchoGain: z.number().int().min(0).default(0),
+    })
+    .default({ echoes: 0, titles: [], lastRunSummary: '', lastRunEchoGain: 0 }),
   /** Passivos de história do líder (ids em `GameData.leadStoryPassives`), ex. bênção do monge. */
   leadStoryPassives: z.array(z.string()).default([]),
   resources: z.object({

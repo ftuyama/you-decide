@@ -1,6 +1,6 @@
 /**
  * Normaliza a resposta JSON da API de pesquisa Pexels (`GET /v1/search`).
- * Chave de API: definir `PEXELS_API_KEY` ou `YOU_DECIDE_PEXELS_KEY` em `.env.local`
+ * Chave de API: definir `PEXELS_API_KEY` ou `SILENT_DUNGEON_PEXELS_KEY` em `.env.local`
  * (só usada no middleware Vite em dev). Criar chave em https://www.pexels.com/api/
  */
 

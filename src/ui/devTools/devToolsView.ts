@@ -274,7 +274,7 @@ function aggregateAmbientCounts(scenes: Map<string, LoadedScene>): Map<AmbientTh
 type DevToolsVisualThemeId = 'default' | 'snow' | 'void' | 'ash';
 
 const DEV_TOOLS_VISUAL_THEMES: readonly DevToolsVisualThemeId[] = ['default', 'snow', 'void', 'ash'];
-const DEV_TOOLS_VISUAL_THEME_STORAGE_KEY = 'you-decide.devTools.visualTheme';
+const DEV_TOOLS_VISUAL_THEME_STORAGE_KEY = 'silent-dungeon.devTools.visualTheme';
 
 function inferVisualThemeForScene(id: string, chapter: number | undefined): DevToolsVisualThemeId {
   if (chapter === 6 || id.startsWith('act6/')) return 'void';

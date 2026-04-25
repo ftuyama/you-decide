@@ -473,6 +473,10 @@ export class GameApp {
       s = tickActiveBuffs(s);
     }
     this.state = this.stabilize(s);
+    if (this.state.sceneId !== prevScene) {
+      this.diaryEntryQueue = [];
+      this.statusHighlightQueue = [];
+    }
     this.render();
   }
 
@@ -671,6 +675,10 @@ export class GameApp {
           s = tickActiveBuffs(s);
         }
         this.state = this.stabilize(s);
+        if (this.state.sceneId !== prevScene) {
+          this.diaryEntryQueue = [];
+          this.statusHighlightQueue = [];
+        }
         this.audio.playUiClick();
         this.render();
       },

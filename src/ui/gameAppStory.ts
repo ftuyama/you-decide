@@ -768,18 +768,6 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
       }
       wrap.appendChild(block);
     }
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'status-highlight-dismiss';
-    btn.dataset.quickNavContinue = '';
-    btn.title = 'Barra de espaço';
-    btn.textContent = '[Espaço] — Continuar';
-    btn.addEventListener('click', () => {
-      ctx.overlay.setStatusHighlightQueue([]);
-      ctx.audio.playUiClick();
-      ctx.render();
-    });
-    wrap.appendChild(btn);
     inner.appendChild(wrap);
   }
 
@@ -803,18 +791,6 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
       p.textContent = passage;
       wrap.appendChild(p);
     }
-    const btnD = document.createElement('button');
-    btnD.type = 'button';
-    btnD.className = 'diary-entry-dismiss';
-    btnD.dataset.quickNavContinue = '';
-    btnD.title = 'Barra de espaço';
-    btnD.textContent = '[Espaço] — Continuar';
-    btnD.addEventListener('click', () => {
-      ctx.overlay.setDiaryEntryQueue([]);
-      ctx.audio.playUiClick();
-      ctx.render();
-    });
-    wrap.appendChild(btnD);
     inner.appendChild(wrap);
   }
 

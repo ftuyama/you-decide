@@ -21,7 +21,8 @@ choices:
       - { op: addResource, resource: supply, delta: -1 }
   - text: "Inspeccionar os batentes da porta"
     next: act1/dungeon_door
-onEnter: []
+onEnter:
+  - { op: addXp, amount: 6 }
 ---
 A **boca de pedra** range como mandíbula velha. O ar torna-se **denso**, como lã molhada a entrar pelos pulmões — e o **silêncio** da câmara parece **ouvir-te** antes de tu ouvires a ti.
 

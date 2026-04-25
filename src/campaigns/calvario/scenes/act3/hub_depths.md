@@ -49,6 +49,7 @@ choices:
     effects:
       - { op: setChapter, chapter: 2 }
 onEnter:
+  - { op: addXp, amount: 10 }
   - { op: clearAsciiMap }
 ---
 Profundezas **silenciosas**. Morvayn não está longe — e o silêncio dele já foi **política** antes de ser magia: rede no teto, facção no corredor, cadáver no trono como **factura** pendente. Por baixo dele, **buraco** sem nome no mapa.

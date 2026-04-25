@@ -99,7 +99,8 @@ choices:
     effects:
       - { op: setChapter, chapter: 3 }
       - { op: setNarrativeTier, tier: 3 }
-onEnter: []
+onEnter:
+  - { op: addXp, amount: 8 }
 ---
 Velas e **cera** prendem o passo no cruzeiro; *hoje é **dia {{day}}** no subsolo.*
 

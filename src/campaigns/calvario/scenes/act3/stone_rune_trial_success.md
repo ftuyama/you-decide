@@ -6,6 +6,7 @@ ambientTheme: act3
 artKey: rune_resonance
 onEnter:
   - { op: grantTemporaryBuff, attr: mind, delta: 1, remainingScenes: 2 }
+  - { op: addXp, amount: 18 }
   - { op: setFlag, key: stone_rune_trial_done, value: true }
   - { op: addMark, mark: act3_rune_tuned }
   - { op: addDiary, text: "Sintonizei o pulso das runas; por pouco tempo, penso com mais clareza." }

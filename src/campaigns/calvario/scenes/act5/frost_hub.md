@@ -63,7 +63,8 @@ choices:
     showWhenLocked: true
     lockedHint: "O cume exige corpo de veterano (nível 25) e janela curta no calendário da tempestade (até ao dia 10)."
     preview: "Ascensão perigosa ao templo e ao que dorme no cume."
-onEnter: []
+onEnter:
+  - { op: addXp, amount: 14 }
 ---
 **Tendas** rangem como dentes velhos; o fogo mais **ameaça** do que aquece. **Mesmo** silêncio de peso, **palco** maior: neve, marcas **humanas**, **bestiais** e uma terceira sem nome.
 

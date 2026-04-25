@@ -10,6 +10,7 @@ choices:
     next: act5/frost_hub
 onEnter:
   - { op: adjustLeadStat, attr: luck, delta: 1 }
+  - { op: addXp, amount: 24 }
   - { op: grantLeadStoryPassive, id: monk_inner_peace }
   - { op: addMark, mark: monk_inner_peace }
   - { op: setFlag, key: frost_monk_blessing_done, value: true }

@@ -60,6 +60,7 @@ choices:
         - { level: { gte: 30 } }
     preview: "Pacto no vazio; exige corrupção alta e nível."
 onEnter:
+  - { op: addXp, amount: 16 }
   - { op: setNarrativeTier, tier: 4 }
 ---
 Três corredores mentem sobre o que é viver; o **Vazio** abre **um de cada vez** — **sentença**, não mapa, só **versões** em fila.
@@ -67,4 +68,3 @@ Três corredores mentem sobre o que é viver; o **Vazio** abre **um de cada vez*
 No teto, rachaduras **constelam** rostos teus impossíveis. Sair **inteiro** pode ser dizer **incompleto** com etiqueta bonita.
 
 Entre colunas, fogueira que não devia existir e **banca** sem dono fingem negócio com quem já é cliente do vazio.
-

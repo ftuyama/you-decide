@@ -7,7 +7,8 @@ artKey: wasteland_dust
 choices:
   - text: "Deixar o vento decidir o próximo sacrifício"
     next: act7/wasteland_router
-onEnter: []
+onEnter:
+  - { op: addXp, amount: 20 }
 ---
 A estrada **não** volta atrás — só **ramifica** em males menores. Antes do último horizonte, o descampo impõe **um** evento que não pede desculpa: sermão, lâmina ou **sino** sem badalo.
 

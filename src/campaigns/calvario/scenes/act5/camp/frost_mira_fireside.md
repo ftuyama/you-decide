@@ -17,6 +17,8 @@ onEnter: []
 ---
 **Mira** usa o vento em vez de encolher-se; no fogo, o teu rosto **duplica** um instante — truque velho do subsolo.
 
+Ainda **desces** — o teto só **mudou** de forma.
+
 > *"Neve **apaga pegadas**", diz. "Escolhe o que queres esquecer."*
 ---
 

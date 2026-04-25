@@ -65,6 +65,6 @@ choices:
     preview: "Ascensão perigosa ao templo e ao que dorme no cume."
 onEnter: []
 ---
-**Tendas** rangem como dentes velhos; o fogo mais **ameaça** do que aquece. Na neve: marcas **humanas**, **bestiais** e uma terceira sem nome.
+**Tendas** rangem como dentes velhos; o fogo mais **ameaça** do que aquece. **Mesmo** silêncio de peso, **palco** maior: neve, marcas **humanas**, **bestiais** e uma terceira sem nome.
 
 O mapa aqui é **decisão** — rumor, **troca** de calor, ou deixar a neve **escolher**. O desfiladeiro só **cobre**.

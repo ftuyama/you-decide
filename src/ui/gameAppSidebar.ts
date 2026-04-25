@@ -1,4 +1,4 @@
-import type { Character, ClassId, GameState, ItemDef, SpellDef } from '../engine/schema.ts';
+import type { Character, ClassId, GameState, SpellDef } from '../engine/schema.ts';
 import { effectiveLeadAttr } from '../engine/leadStats.ts';
 import { PASSIVE_UNLOCK_ITEM_ID } from '../engine/state.ts';
 import {
@@ -21,6 +21,7 @@ import {
   statBonusParen,
   stressBarMarkup,
 } from './gameAppUtils.ts';
+import { formatItemEquipmentStatParts } from './formatItemEquipment.ts';
 import { collapseTriggerStart, iconWrap, icons } from './icons/index.ts';
 
 type SidebarBuilderParams = {
@@ -361,29 +362,6 @@ export function openCreditsModal({
   window.addEventListener('keydown', overlayModalOnKey);
 
   requestAnimationFrame(() => dismiss.focus());
-}
-
-function formatItemEquipmentStatParts(it: ItemDef): string[] {
-  const parts: string[] = [];
-  if (it.damage !== 0) {
-    parts.push(it.damage > 0 ? `Dano +${it.damage}` : `Dano ${it.damage}`);
-  }
-  if (it.armor !== 0) {
-    parts.push(it.armor > 0 ? `Armadura +${it.armor}` : `Armadura ${it.armor}`);
-  }
-  const attrs: [keyof ItemDef, string][] = [
-    ['bonusStr', 'STR'],
-    ['bonusAgi', 'AGI'],
-    ['bonusMind', 'MEN'],
-    ['bonusLuck', 'SOR'],
-  ];
-  for (const [key, label] of attrs) {
-    const v = it[key];
-    if (typeof v !== 'number' || v === 0) continue;
-    parts.push(`${label} ${v > 0 ? '+' : ''}${v}`);
-  }
-  if (it.cursed) parts.push('Amaldiçoado');
-  return parts;
 }
 
 function isPassiveUnlocked(state: GameState, leader: Character): boolean {
@@ -947,6 +925,8 @@ export function buildGameSidebar({
   const openRec = sidebarSections['recursos'] ? ' open' : '';
   const openInv = sidebarSections['inventario'] ? ' open' : '';
   const openFac = sidebarSections['faccoes'] ? ' open' : '';
+  const hasCompanionsInParty = state.party.length > 1;
+  const hasInventory = state.inventory.length > 0;
 
   const personagemBlock = (() => {
     if (!p) {
@@ -1007,12 +987,16 @@ export function buildGameSidebar({
           ${personagemBlock}
         </div>
       </div>
-      <div class="sidebar-static">
+      ${
+        hasCompanionsInParty
+          ? `<div class="sidebar-static">
         <div class="sidebar-static-title sidebar-static-title--with-icon">${iconWrap(icons.companions)}<span>Companheiros</span></div>
         <div class="sidebar-static-body sidebar-stats">
           ${companionsSectionMarkup(state, registry)}
         </div>
-      </div>
+      </div>`
+          : ''
+      }
       <details class="sidebar-collapse"${openRec} data-section="recursos">
         <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.resources, 'Recursos')}</summary>
         <div class="sidebar-collapse-body">
@@ -1023,12 +1007,16 @@ export function buildGameSidebar({
           <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.corruption)}<span>Corrupção <strong>${r.corruption}</strong></span></div>
         </div>
       </details>
-      <details class="sidebar-collapse"${openInv} data-section="inventario">
+      ${
+        hasInventory
+          ? `<details class="sidebar-collapse"${openInv} data-section="inventario">
         <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.inventory, 'Inventário')}</summary>
         <div class="sidebar-collapse-body sidebar-inventory">
           ${inventoryMarkup(state, registry)}
         </div>
-      </details>
+      </details>`
+          : ''
+      }
       <details class="sidebar-collapse"${openFac} data-section="faccoes">
         <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.factions, 'Facções')}</summary>
         <div class="sidebar-collapse-body sidebar-faccoes">

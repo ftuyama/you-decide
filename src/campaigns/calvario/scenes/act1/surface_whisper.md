@@ -13,6 +13,6 @@ luckCheck:
 choices: []
 onEnter: []
 ---
-Encostas o ouvido à **pedra**: de cima descem **vozes** cortadas — preço de pão, nome de desaparecido, riso de quem vendeu a última **vela** a quem já não precisa de luz.
+Encostas o ouvido à **pedra**: de cima descem **vozes** cortadas — preço de pão, portas cedo fechadas, medo de **olhar** para onde a sombra come em silêncio.
 
 Um fragmento de conversa **pega** na garganta da masmorra como anzol.

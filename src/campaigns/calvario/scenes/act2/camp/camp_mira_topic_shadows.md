@@ -12,7 +12,7 @@ onEnter: []
 
 Uma faísca morde o ar. Ela finalmente sorri de lado:
 
-> *"Tu também deixas coisas. Eu é que não as catalogo."*
+> *"Tu deixas **promessas** no escuro. Eu **sei** o peso quando finges que é leve."*
 ---
 
 {{companionLine}}

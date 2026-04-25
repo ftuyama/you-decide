@@ -179,7 +179,7 @@ button.choice.choice--locked .choice-locked-hint {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 0.65rem;
+  margin-bottom: 0.45rem;
 }
 
 .camp-equip-hdr--with-icon {
@@ -192,68 +192,118 @@ button.choice.choice--locked .choice-locked-hint {
   margin-top: 0;
 }
 
+.camp-equip-intro {
+  margin: 0 0 0.85rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--fg) 78%, transparent);
+}
+
 .camp-equip-member-name {
   font-size: 0.72rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 0.55rem;
+  margin: 0 0 0.2rem;
 }
 
-.camp-equip-member + .camp-equip-member {
-  margin-top: 1rem;
-  padding-top: 0.85rem;
+.camp-equip-member-class {
+  font-size: 0.74rem;
+  line-height: 1.35;
+  color: color-mix(in srgb, var(--fg) 72%, transparent);
+}
+
+.camp-equip-member--flat .camp-equip-member-class {
+  margin-bottom: 0.65rem;
+}
+
+.camp-equip-member-details {
+  margin: 0;
+  padding: 0;
+}
+
+.camp-equip-member-details + .camp-equip-member-details {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.camp-equip-slot {
-  margin-bottom: 0.75rem;
+.camp-equip-member-summary {
+  list-style: none;
+  cursor: pointer;
 }
 
-.camp-equip-slot:last-child {
-  margin-bottom: 0;
+.camp-equip-member-summary::-webkit-details-marker {
+  display: none;
 }
 
-.camp-equip-slot-label {
-  font-size: 0.7rem;
-  color: var(--magic);
-  margin-bottom: 0.2rem;
+.camp-equip-member-body {
+  padding-top: 0.55rem;
 }
 
-.camp-equip-slot-label--with-icon {
+.camp-equip-slot-grid {
+  display: grid;
+  gap: 0.65rem;
+  grid-template-columns: 1fr;
+  align-items: start;
+}
+
+@media (min-width: 34rem) {
+  .camp-equip-slot-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.camp-equip-slot-wrap {
   display: flex;
-  align-items: center;
-  gap: 0.4rem;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 0;
 }
 
-.camp-equip-slot-label--with-icon .ui-icon-wrap {
-  margin-top: 0;
+.camp-equip-panel .character-sheet-slot-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
-.camp-equip-current {
-  font-size: 0.82rem;
-  color: var(--text-emphasis);
+.camp-equip-panel .character-sheet-slot-head {
   margin-bottom: 0.35rem;
 }
 
-.camp-equip-current--empty {
-  color: var(--muted);
-  font-style: italic;
+.camp-equip-panel .character-sheet-slot-name {
+  margin-top: 0;
 }
 
 .camp-equip-hint {
+  margin-top: 0.45rem;
   font-size: 0.75rem;
   color: var(--camp-equip-hint);
 }
 
-.camp-equip-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
+button.camp-equip-candidate.camp-equip-btn--unequip {
+  margin-top: 0.35rem;
 }
 
-.camp-equip-unequip {
-  margin: 0.35rem 0 0.25rem;
+button.camp-equip-candidate.camp-equip-btn--unequip:hover {
+  border-color: var(--camp-equip-unequip-hover);
+  background: var(--surface-hover-alt);
+  color: var(--fg);
+}
+
+.camp-equip-candidate-action--unequip {
+  color: color-mix(in srgb, var(--muted) 88%, var(--fg));
+}
+
+button.camp-equip-candidate.camp-equip-btn--unequip:hover .camp-equip-candidate-action--unequip {
+  color: color-mix(in srgb, var(--fg) 82%, var(--muted));
+}
+
+.camp-equip-candidate-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
 }
 
 button.camp-equip-btn {
@@ -266,6 +316,11 @@ button.camp-equip-btn {
   border: 1px solid var(--border);
   border-radius: 2px;
   transition: border-color 0.15s, background 0.15s;
+}
+
+button.camp-equip-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--accent) 65%, transparent);
+  outline-offset: 2px;
 }
 
 button.camp-equip-btn:hover {
@@ -282,6 +337,48 @@ button.camp-equip-btn--unequip {
 button.camp-equip-btn--unequip:hover {
   border-color: var(--camp-equip-unequip-hover);
   color: var(--fg);
+}
+
+button.camp-equip-candidate {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.45rem 0.6rem;
+  text-align: left;
+}
+
+.camp-equip-candidate-main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 0.12rem;
+}
+
+.camp-equip-candidate-name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-strong);
+  line-height: 1.3;
+}
+
+.camp-equip-candidate-stats {
+  font-size: 0.68rem;
+  line-height: 1.35;
+  color: var(--sidebar-equip-stats);
+}
+
+.camp-equip-candidate-action {
+  flex: 0 0 auto;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--accent) 82%, var(--fg));
 }
 
 /** Dados ASCII: fonte pequena para caber mais no painel */

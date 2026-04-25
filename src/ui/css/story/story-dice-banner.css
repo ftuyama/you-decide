@@ -1,106 +1,670 @@
-/** Rola dados (perícia / sorte) — mesmo sítio que penalidade / item: topo do texto da cena */
-/* Skill check / luck dice UI above scene text */
+/**
+ * Banner de teste (perícia / sorte) — inspiração visual: painéis de rolagem estilo RPG CRPG
+ * (moldura bronze, serifas em títulos, revelação em camadas). Respeita `prefers-reduced-motion`.
+ */
 
 .story-dice-banner {
-  margin: 0 0 1rem;
-  padding: 0.75rem 0.85rem 0.85rem;
-  background: linear-gradient(145deg, #1c1a16 0%, var(--surface-inset) 100%);
-  border-radius: 3px;
-  border: 1px solid rgba(100, 96, 80, 0.45);
-  box-shadow: 0 0 18px rgba(0, 0, 0, 0.35);
+  --sd-radius-outer: 12px;
+  --sd-radius-inner: 10px;
+  --sd-pad-x: 0.9rem;
+  --sd-serif: 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, 'Times New Roman', serif;
+  --sd-gold: #c4a04a;
+  --sd-gold-bright: #e8c86a;
+  --sd-bronze: #6a5538;
+  --sd-bronze-deep: #2a2218;
+  margin: 0 0 1.2rem;
+  padding: 0.55rem 0.65rem 0.65rem;
+  background:
+    linear-gradient(165deg, rgba(55, 48, 32, 0.55) 0%, transparent 42%),
+    linear-gradient(
+      155deg,
+      color-mix(in srgb, var(--surface-raised) 85%, var(--accent)) 0%,
+      var(--surface-inset) 48%,
+      var(--surface-drawer) 100%
+    );
+  border-radius: var(--sd-radius-outer);
+  border: 1px solid color-mix(in srgb, var(--sd-bronze) 65%, var(--border));
+  box-shadow:
+    0 0 0 1px rgba(20, 16, 12, 0.95),
+    0 0 0 2px color-mix(in srgb, var(--sd-gold) 35%, transparent),
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 16px 40px rgba(0, 0, 0, 0.55),
+    0 0 48px rgba(0, 0, 0, 0.35);
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.story-dice-banner--intro {
+  animation: storyDiceBannerRise 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes storyDiceBannerRise {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.96);
+    filter: brightness(0.85);
+  }
+  55% {
+    filter: brightness(1.08);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: brightness(1);
+  }
 }
 
 .story-dice-banner-panel {
-  border-radius: 2px;
-  padding: 0;
-  border: 1px solid #3d5248;
-  background: linear-gradient(165deg, rgba(22, 32, 26, 0.9) 0%, rgba(10, 14, 10, 0.96) 100%);
+  position: relative;
+  z-index: 0;
+  border-radius: var(--sd-radius-inner);
+  padding: 0 0 0.12rem;
+  border: 1px solid color-mix(in srgb, var(--sd-bronze) 45%, var(--border));
+  background:
+    radial-gradient(ellipse 120% 80% at 50% -20%, rgba(200, 170, 100, 0.08), transparent 50%),
+    linear-gradient(
+      168deg,
+      color-mix(in srgb, var(--surface-raised) 94%, transparent) 0%,
+      var(--panel-overlay-strong) 52%,
+      var(--surface-drawer) 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.045),
+    inset 0 -18px 32px rgba(0, 0, 0, 0.28);
+  transition:
+    border-color 0.4s ease,
+    box-shadow 0.4s ease;
+}
+
+.story-dice-banner-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+.story-dice-banner-panel--rolling {
+  border-color: color-mix(in srgb, var(--sd-gold-bright) 38%, var(--border));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 32px var(--glow),
+    0 0 24px color-mix(in srgb, var(--sd-gold) 15%, transparent);
+}
+
+.story-dice-banner-panel--rolling .story-dice-ascii-stage {
+  animation: storyDiceStageEmber 2s ease-in-out infinite;
+}
+
+@keyframes storyDiceStageEmber {
+  0%,
+  100% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      inset 0 -14px 28px rgba(0, 0, 0, 0.38),
+      0 4px 16px rgba(0, 0, 0, 0.45),
+      0 0 0 1px color-mix(in srgb, var(--sd-gold) 18%, transparent);
+  }
+  50% {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -14px 28px rgba(0, 0, 0, 0.32),
+      0 4px 20px rgba(0, 0, 0, 0.5),
+      0 0 28px color-mix(in srgb, var(--sd-gold) 28%, transparent);
+  }
 }
 
 .story-dice-banner-kicker {
-  font-size: 0.65rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #a8c4a0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   margin: 0 0 0.45rem;
-  padding: 0.5rem 0.65rem 0;
+  padding: 0.7rem var(--sd-pad-x) 0.4rem;
+  font-family: var(--sd-serif);
+  font-size: clamp(0.78rem, 2.1vw, 0.92rem);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--sd-gold-bright) 88%, var(--text-emphasis));
+  text-shadow:
+    0 0 14px color-mix(in srgb, var(--sd-gold) 35%, transparent),
+    0 2px 5px rgba(0, 0, 0, 0.92);
+}
+
+.story-dice-banner-kicker::before {
+  content: '';
+  flex-shrink: 0;
+  width: 4px;
+  height: 1.25em;
+  border-radius: 2px;
+  background: linear-gradient(180deg, var(--sd-gold-bright) 0%, var(--accent) 55%, var(--magic) 100%);
+  box-shadow:
+    0 0 12px color-mix(in srgb, var(--sd-gold) 45%, transparent),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+/** Cartão único: dificuldade + dados (ASCII) + bloco revelado (resultado) */
+.story-dice-roll-card {
+  margin: 0 0.55rem 0.55rem;
+  padding: 0;
+  border-radius: var(--sd-radius-inner);
+  border: 1px solid color-mix(in srgb, var(--sd-bronze) 50%, var(--border));
+  background: linear-gradient(
+    168deg,
+    color-mix(in srgb, var(--surface-raised) 88%, transparent) 0%,
+    var(--panel-overlay-strong) 55%,
+    var(--surface-drawer) 100%
+  );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 4px 18px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.story-dice-difficulty {
+  padding: 0.65rem 0.8rem 0.55rem;
+  text-align: center;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, var(--sd-bronze));
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.22) 0%, transparent 100%);
+}
+
+.story-dice-difficulty-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.45rem 0.65rem;
+}
+
+.story-dice-difficulty-label {
+  font-family: var(--sd-serif);
+  font-size: clamp(0.72rem, 2.2vw, 0.86rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--text-section) 75%, var(--sd-gold));
+}
+
+.story-dice-difficulty-value {
+  font-family: var(--sd-serif);
+  font-size: clamp(1.35rem, 6vw, 2.1rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--text-emphasis);
+  text-shadow:
+    0 0 20px color-mix(in srgb, var(--sd-gold) 25%, transparent),
+    0 2px 4px rgba(0, 0, 0, 0.75);
+}
+
+.story-dice-difficulty-sub {
+  margin-top: 0.35rem;
+  font-family: var(--sd-serif);
+  font-size: clamp(0.66rem, 2vw, 0.76rem);
+  font-style: italic;
+  color: var(--muted);
+  line-height: 1.3;
+}
+
+.story-dice-data-region {
+  padding: 0.5rem 0.65rem 0.55rem;
+}
+
+.story-dice-dice-row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.story-dice-mod-slot {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: 0;
+  align-self: center;
+}
+
+.story-dice-mod-slot:empty {
+  display: none;
+}
+
+.story-dice-ascii-stage {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 auto;
+  width: fit-content;
+  max-width: calc(100% - 5.2rem);
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0.85rem 0.65rem 0.9rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 45%, rgba(80, 120, 90, 0.1), transparent 62%),
+    var(--dice-panel-bg);
+  border: 1px solid var(--dice-panel-border);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -12px 24px rgba(0, 0, 0, 0.34);
+}
+
+.story-dice-reveal:not([hidden]) {
+  padding: 0.7rem 0.75rem 0.85rem;
+  border-top: 1px solid color-mix(in srgb, var(--border) 65%, var(--sd-bronze));
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.2) 0%, var(--panel-overlay-28) 100%);
+}
+
+.story-dice-banner .story-dice-ascii-stage .dice-ascii-block {
+  margin: 0;
+  flex: 0 0 auto;
+  color: color-mix(in srgb, var(--combat-log-msg) 88%, var(--sd-gold));
+  border-color: color-mix(in srgb, var(--dice-panel-border) 75%, var(--sd-bronze) 25%);
+  border-style: solid;
+  background: rgba(0, 0, 0, 0.32);
+  transition: filter 0.2s ease;
 }
 
 .story-dice-banner .dice-ascii-block {
-  margin: 0 0.65rem 0.5rem;
-  font-size: 0.38rem;
+  font-size: clamp(0.54rem, 2.6vw, 0.8rem);
   max-width: 100%;
-  overflow-x: auto;
 }
 
 .story-dice-pre--rolling {
-  animation: storyDiceTumble 0.12s ease-in-out infinite;
+  animation: storyDiceTumble 0.16s ease-in-out infinite;
 }
 
 @keyframes storyDiceTumble {
   0%,
   100% {
-    transform: translateY(0) rotate(-0.5deg);
+    transform: translateY(0) rotate(-1.5deg) scale(1);
+    filter: brightness(1);
   }
   50% {
-    transform: translateY(-1px) rotate(0.5deg);
+    transform: translateY(-4px) rotate(1.5deg) scale(1.04);
+    filter: brightness(1.12);
+  }
+}
+
+.story-dice-pre--landed {
+  animation: storyDiceDiceSettle 0.58s cubic-bezier(0.34, 1.45, 0.64, 1) both;
+}
+
+@keyframes storyDiceDiceSettle {
+  0% {
+    transform: scale(1.14) rotate(-2.5deg);
+    filter: brightness(1.4) drop-shadow(0 0 12px color-mix(in srgb, var(--sd-gold) 55%, transparent));
+  }
+  60% {
+    transform: scale(0.97) rotate(0.6deg);
+    filter: brightness(1.05) drop-shadow(0 0 6px color-mix(in srgb, var(--sd-gold) 30%, transparent));
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    filter: brightness(1) drop-shadow(0 0 0 transparent);
   }
 }
 
 .story-dice-result {
   font-size: 0.82rem;
   line-height: 1.45;
-  color: #c4baa8;
-  margin: 0 0.65rem 0.5rem;
-  padding: 0.45rem 0.5rem;
-  border-radius: 2px;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid #2a2824;
+  color: var(--combat-log-msg);
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  border: none;
   white-space: pre-wrap;
 }
 
+.story-dice-result.story-dice-result--rich {
+  white-space: normal;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.story-dice-result--rich.story-dice-result--animate-in {
+  animation: storyDiceResultSurface 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes storyDiceResultSurface {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.story-dice-result-math {
+  text-align: center;
+  font-size: clamp(1.02rem, 3.6vw, 1.4rem);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-emphasis);
+  margin-bottom: 0.38rem;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.story-dice-result-math-eq {
+  font-weight: 600;
+  opacity: 0.5;
+  margin: 0 0.08em;
+}
+
+.story-dice-result-total {
+  display: inline-block;
+  font-weight: 800;
+  font-size: clamp(1.14rem, 4vw, 1.52rem);
+  padding: 0.1em 0.32em;
+  border-radius: 6px;
+  background: linear-gradient(180deg, rgba(40, 38, 32, 0.95) 0%, rgba(12, 10, 8, 0.98) 100%);
+  border: 1px solid color-mix(in srgb, var(--sd-gold) 35%, var(--border));
+  color: var(--sd-gold-bright);
+  vertical-align: baseline;
+  text-shadow: 0 0 12px color-mix(in srgb, var(--sd-gold) 35%, transparent);
+}
+
+.story-dice-mod-card {
+  box-sizing: border-box;
+  width: min(4.85rem, 26vw);
+  height: min(4.85rem, 26vw);
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0.32rem 0.28rem;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--sd-bronze) 48%, var(--border));
+  background: linear-gradient(165deg, var(--panel-overlay-32) 0%, rgba(0, 0, 0, 0.35) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.18rem;
+}
+
+.story-dice-mod-card--compact {
+  gap: 0.12rem;
+  padding: 0.28rem 0.22rem;
+}
+
+.story-dice-mod-card-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.04rem;
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+.story-dice-mod-card--compact .story-dice-mod-card-label {
+  font-size: 0.52rem;
+  letter-spacing: 0.06em;
+}
+
+.story-dice-mod-card--compact .story-dice-mod-card-value {
+  font-size: 0.78rem;
+}
+
+.story-dice-mod-card-label {
+  font-family: var(--sd-serif);
+  font-size: clamp(0.58rem, 1.8vw, 0.68rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-section);
+  line-height: 1.1;
+  text-align: center;
+}
+
+.story-dice-mod-card-value {
+  font-family: var(--sd-serif);
+  font-size: clamp(0.82rem, 2.4vw, 0.98rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--sd-gold-bright);
+  line-height: 1.05;
+  text-align: center;
+}
+
+.story-dice-mod-card-value--curse {
+  color: color-mix(in srgb, var(--danger) 75%, var(--text-emphasis));
+}
+
+.story-dice-mod-card--inline {
+  width: auto;
+  height: auto;
+  min-height: unset;
+  aspect-ratio: unset;
+  margin: 0;
+  padding: 0.4rem 0.55rem;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.story-dice-mod-card-inline {
+  font-family: var(--sd-serif);
+  font-size: clamp(0.86rem, 2.5vw, 1.02rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: var(--sd-gold-bright);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--sd-gold) 28%, transparent);
+}
+
+.story-dice-reveal .story-dice-result-outcome {
+  text-align: center;
+  font-family: var(--sd-serif);
+  font-size: clamp(0.95rem, 2.8vw, 1.08rem);
+  font-weight: 600;
+  font-style: italic;
+  letter-spacing: 0.03em;
+  margin: 0 0 0.55rem;
+  padding: 0 0 0.5rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+}
+
+.story-dice-reveal .story-dice-result-math {
+  margin-top: 0.15rem;
+}
+
+.story-dice-result-outcome--ok {
+  color: color-mix(in srgb, var(--accent) 55%, var(--text-strong));
+}
+
+.story-dice-result-outcome--fail {
+  color: color-mix(in srgb, var(--danger) 50%, var(--muted));
+}
+
+.story-dice-banner-panel--success .story-dice-result-outcome--ok {
+  color: color-mix(in srgb, var(--accent) 62%, #b8dcc0);
+}
+
+.story-dice-banner-panel--fail .story-dice-result-outcome--fail {
+  color: color-mix(in srgb, var(--danger) 58%, #dcc0c0);
+}
+
+.story-dice-result-seal {
+  padding: 0.72rem 0.78rem 0.78rem;
+  margin-top: 0.55rem;
+  border-radius: var(--sd-radius-inner);
+  background: linear-gradient(180deg, var(--panel-overlay-15) 0%, var(--panel-overlay-32) 100%);
+  border: 1px solid color-mix(in srgb, var(--sd-bronze) 35%, var(--border));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.story-dice-result-seal:first-of-type {
+  margin-top: 0.38rem;
+}
+
+.story-dice-result-seal-title {
+  font-family: var(--sd-serif);
+  font-size: clamp(0.72rem, 2.2vw, 0.86rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--text-section) 8%, var(--sd-gold));
+  margin-bottom: 0.42rem;
+  text-align: center;
+}
+
 .story-dice-banner-panel--success {
-  border-color: #3d6b48;
-  box-shadow: 0 0 14px rgba(74, 122, 82, 0.2);
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--sd-bronze));
+  animation: storyDicePanelSuccessThrob 0.85s ease-out 0.08s;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 36px color-mix(in srgb, var(--accent) 32%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+@keyframes storyDicePanelSuccessThrob {
+  0% {
+    transform: scale(1);
+    filter: saturate(1);
+  }
+  35% {
+    transform: scale(1.012);
+    filter: saturate(1.15);
+  }
+  100% {
+    transform: scale(1);
+    filter: saturate(1);
+  }
+}
+
+.story-dice-banner-panel--success .story-dice-roll-card {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--sd-bronze));
 }
 
 .story-dice-banner-panel--success .story-dice-result {
-  border-color: #3d6b48;
-  background: rgba(35, 65, 40, 0.22);
-  color: #b8e8c4;
+  border-color: transparent;
+  background: linear-gradient(
+    168deg,
+    color-mix(in srgb, var(--accent) 12%, var(--panel-overlay-35)) 0%,
+    var(--panel-overlay-28) 100%
+  );
+  color: color-mix(in srgb, var(--combat-log-msg) 68%, #b8e8c4);
 }
 
 .story-dice-banner-panel--fail {
-  border-color: #7a3d3d;
-  box-shadow: 0 0 14px rgba(138, 58, 56, 0.22);
+  border-color: color-mix(in srgb, var(--danger) 48%, var(--sd-bronze));
+  animation: storyDicePanelFailShake 0.5s ease-out 0.06s;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 0 32px color-mix(in srgb, var(--danger) 28%, transparent);
+}
+
+@keyframes storyDicePanelFailShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  18% {
+    transform: translateX(-5px);
+  }
+  36% {
+    transform: translateX(5px);
+  }
+  54% {
+    transform: translateX(-3px);
+  }
+  72% {
+    transform: translateX(3px);
+  }
+}
+
+.story-dice-banner-panel--fail .story-dice-roll-card {
+  border-color: color-mix(in srgb, var(--danger) 40%, var(--sd-bronze));
 }
 
 .story-dice-banner-panel--fail .story-dice-result {
-  border-color: #7a3d3d;
-  background: rgba(55, 28, 28, 0.35);
-  color: #f0b0b0;
+  border-color: transparent;
+  background: linear-gradient(
+    168deg,
+    color-mix(in srgb, var(--danger) 14%, var(--panel-overlay-35)) 0%,
+    var(--panel-overlay-32) 100%
+  );
+  color: color-mix(in srgb, var(--combat-log-msg) 62%, #f0b8b8);
 }
 
 .story-dice-banner-dismiss {
   display: block;
-  width: 100%;
-  margin: 0 0.65rem 0.65rem;
-  padding: 0.4rem 0.9rem;
-  font-size: 0.78rem;
-  cursor: pointer;
-  color: #dfe8d8;
-  background: #2a3028;
-  border: 1px solid #5a6252;
-  border-radius: 2px;
+  width: calc(100% - 1.3rem);
+  max-width: 100%;
+  margin: 0.2rem auto 0.78rem;
+  padding: 0.55rem 1.05rem;
   box-sizing: border-box;
+  font-family: var(--sd-serif);
+  font-size: clamp(0.78rem, 2.2vw, 0.9rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  color: color-mix(in srgb, var(--text-strong) 90%, var(--sd-gold));
+  background: linear-gradient(180deg, #2a2620 0%, #141210 100%);
+  border: 1px solid color-mix(in srgb, var(--sd-gold) 42%, var(--border));
+  border-radius: 8px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 4px 16px rgba(0, 0, 0, 0.42);
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    transform 0.14s ease,
+    color 0.18s ease;
 }
 
 .story-dice-banner-dismiss:hover:not(:disabled) {
-  background: #343a32;
+  background: linear-gradient(180deg, #36322a 0%, #1c1a16 100%);
+  border-color: color-mix(in srgb, var(--sd-gold-bright) 55%, var(--border));
+  color: var(--sd-gold-bright);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.07) inset,
+    0 0 22px color-mix(in srgb, var(--sd-gold) 22%, transparent),
+    0 6px 20px rgba(0, 0, 0, 0.38);
+  transform: translateY(-2px);
+}
+
+.story-dice-banner-dismiss:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .story-dice-banner-dismiss:disabled {
-  opacity: 0.55;
+  opacity: 0.48;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .story-dice-banner--intro,
+  .story-dice-banner-panel--rolling .story-dice-ascii-stage,
+  .story-dice-pre--rolling,
+  .story-dice-pre--landed,
+  .story-dice-result--rich.story-dice-result--animate-in,
+  .story-dice-banner-panel--success,
+  .story-dice-banner-panel--fail {
+    animation: none !important;
+  }
+
+  .story-dice-banner--intro,
+  .story-dice-result--rich.story-dice-result--animate-in {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
 }

@@ -17,7 +17,7 @@ choices:
     next: act2/camp/camp_companion_chat
 onEnter: []
 ---
-**Mira** não se senta como soldado: desliza para o chão, joelhos ao peito, olhos na chama.
+**Mira** não se senta como soldado: desliza para o chão, joelhos ao peito, olhos na chama — e no teu **maxilar**, a cidade ainda **pesa**.
 
 > *"Fala depressa. O fogo **ouve** melhor que a pedra — e eu ouço melhor que os dois."*
 

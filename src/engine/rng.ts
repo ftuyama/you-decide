@@ -16,6 +16,11 @@ export function roll2d6(rng: () => number): [number, number] {
   return [rollD6(rng), rollD6(rng)];
 }
 
+/** Avança a seed usando o próprio PRNG para evitar padrões lineares (+N). */
+export function nextRngSeed(rng: () => number): number {
+  return (rng() * 0x100000000) >>> 0;
+}
+
 /** 2d6 de ataque: 6+6 crítico, 1+1 falha crítica */
 export type AttackRollSpecial = 'crit' | 'fumble' | 'normal';
 

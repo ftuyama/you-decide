@@ -12,14 +12,14 @@ onEnter:
   - { op: setChapter, chapter: 5 }
   - { op: setNarrativeTier, tier: 4 }
   - { op: addResource, resource: supply, delta: -1 }
-  - { op: addDiary, text: "Subi onde o mapa falha. Dizem que nas Cimeiras há um dragão que não pede permissão a ninguém — só ao céu, quando o céu hesita." }
+  - { op: addDiary, text: "Depois do trono: vão de gelo, ar de masmorra, céu mentiroso. Rumor de dragão nas Cimeiras — só o céu hesita." }
 ---
 ## Cimeiras do Vento Cinzento
 
-O mapa é **sombras** sobre neve — *aqui o vento corta quem fala alto*. Eco, ferida ou promessa: a altitude **iguala** até ao rumor de **Vetrnax**, fio de geada antigo como a primeira noite com medo do céu.
+O mapa é **sombras** sobre neve — *aqui o vento corta quem fala alto*. Não voltaste à rua: **mesmo** silêncio, **outro** teto — neve que finge cordilheira. Eco, ferida ou promessa: a altitude **iguala** até ao rumor de **Vetrnax**, fio de geada antigo como a primeira noite com medo do céu.
 
 {{throneOutcomeLine}}
 
 {{factionThroneEcho}}
 
-O desfiladeiro abre **ferida branca**; por trás, o caminho já não te devolve ao trono. Cada respiração paga **juros** ao frio.
+**Bolsa** branca, **eixo** a seguir — o trono ficou atrás. Cada respiração paga **juros** ao frio.

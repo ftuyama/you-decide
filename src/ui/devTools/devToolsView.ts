@@ -21,6 +21,7 @@ import {
 } from '../campaignUrl.ts';
 import { mountBejamasAsciiPanel } from './devToolsBejamasAscii.ts';
 import { mountBrailleAsciiPanel } from './devToolsBrailleAscii.ts';
+import { mountBrailleWebSearchPanel } from './devToolsBrailleWebSearch.ts';
 import { mountAsciiBrowserPanel } from './devToolsAsciiBrowser.ts';
 
 function pathToSceneId(path: string): string {
@@ -766,6 +767,7 @@ export function mountDevToolsView(root: HTMLElement, campaignId: string): void {
       music: 'Música',
       visual: 'Paleta visual',
       enemies: 'Inimigos',
+      'ascii-web': 'Busca Web → Braille',
       ascii: 'Arte ASCII (Braille)',
       'ascii-bejamas': 'Arte ASCII (Bejamas IA)',
       'ascii-browser': 'Navegador ASCII',
@@ -789,6 +791,9 @@ export function mountDevToolsView(root: HTMLElement, campaignId: string): void {
       break;
     case 'visual':
       mountVisualPanel(main, visualCounts);
+      break;
+    case 'ascii-web':
+      mountBrailleWebSearchPanel(main);
       break;
     case 'ascii':
       mountBrailleAsciiPanel(main);

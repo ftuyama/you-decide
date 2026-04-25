@@ -11,4 +11,4 @@ onEnter: []
 ---
 No nicho, **espelho oval** partido: metade do **teu rosto**, metade do **túnel** — tu e o abismo no mesmo corte.
 
-A imagem não responde se **quem sobe** ainda és tu; **fixa** a pergunta no frio.
+O vidro **fixa** *{{playerName}}* a **escolher** a cidade em silêncio — antes que o silêncio escolha por ti.

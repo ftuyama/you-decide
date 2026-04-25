@@ -15,7 +15,7 @@ choices:
     next: act2/camp/camp_companion_chat
 onEnter: []
 ---
-**Tomás** apoia o escudo na terra como quem afirma um limite.
+**Tomás** apoia o escudo na terra como quem afirma um limite; a tua **postura** já lhe contou *porquê* — falta **palavra** que não envergonhe quem fica em cima.
 
 > *"Se vieste por pena, poupa saliva. Se vieste por **palavra**, fala — o fogo não vai interromper por educação."*
 

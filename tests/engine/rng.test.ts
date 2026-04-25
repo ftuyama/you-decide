@@ -3,6 +3,7 @@ import {
   attackRollSpecial2d6,
   attackRollSpecial3d6dl,
   mulberry32,
+  nextRngSeed,
   roll2d6,
   rollD6,
 } from '../../src/engine/rng.ts';
@@ -36,6 +37,12 @@ describe('dice helpers', () => {
     const [d1, d2] = roll2d6(mulberry32(7));
     expect(d1).toBeGreaterThanOrEqual(1);
     expect(d2).toBeGreaterThanOrEqual(1);
+  });
+
+  it('nextRngSeed advances deterministically via PRNG stream', () => {
+    const a = mulberry32(123);
+    const b = mulberry32(123);
+    expect(nextRngSeed(a)).toBe(nextRngSeed(b));
   });
 });
 

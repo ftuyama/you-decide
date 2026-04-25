@@ -13,7 +13,7 @@ choices:
     next: act5/camp/frost_companion_chat
 onEnter: []
 ---
-**Tomás** esfrega as mãos sem drama; o escudo perto, **segunda pele**.
+**Tomás** esfrega as mãos sem drama; o escudo perto, **segunda pele**. **Mesma** ferida, **outro** teto.
 
 > *"Montanha não é inimigo — inimigo é **confundir** cansaço com sinal de Deus."* A sombra no metal lembra: **postura** também é máscara.
 ---

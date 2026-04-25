@@ -7,6 +7,7 @@ import {
 import type { Choice, Effect, GameState, SceneFrontmatter } from '../engine/schema.ts';
 import type { ContentRegistry } from '../content/registry.ts';
 import { formatLevelUpDeltaLine, randomCampCombatHint } from './gameAppUtils.ts';
+import { formatItemEquipmentStatParts } from './formatItemEquipment.ts';
 import { formatDiceAscii } from './diceAscii.ts';
 import { iconWrap, icons } from './icons/index.ts';
 import type { GameEvent } from '../engine/eventBus.ts';
@@ -70,6 +71,7 @@ export function appendCampEquipmentPanel(
   if (!isCampEquipmentScene(state.sceneId) || state.party.length === 0) return;
 
   const items = registry.data.items;
+  const multiParty = state.party.length > 1;
 
   const panel = document.createElement('div');
   panel.className = 'camp-equip-panel';
@@ -78,20 +80,55 @@ export function appendCampEquipmentPanel(
   hdr.innerHTML = `${iconWrap(icons.equipment)}<span>Equipamento no acampamento</span>`;
   panel.appendChild(hdr);
 
+  const intro = document.createElement('p');
+  intro.className = 'camp-equip-intro';
+  intro.textContent =
+    'Retirar devolve a peça ao inventário; equipar usa uma peça que já tens no inventário.';
+  panel.appendChild(intro);
+
   const slotSvg: Record<'weapon' | 'armor' | 'relic', string> = {
     weapon: icons.weapon,
     armor: icons.armor,
     relic: icons.relic,
   };
 
-  for (let partyIndex = 0; partyIndex < state.party.length; partyIndex++) {
-    const member = state.party[partyIndex]!;
-    const memberWrap = document.createElement('div');
-    memberWrap.className = 'camp-equip-member';
+  const appendMemberHead = (target: HTMLElement, member: (typeof state.party)[number]): void => {
     const nameEl = document.createElement('div');
     nameEl.className = 'camp-equip-member-name';
     nameEl.textContent = member.name;
-    memberWrap.appendChild(nameEl);
+    target.appendChild(nameEl);
+    const classEl = document.createElement('div');
+    classEl.className = 'camp-equip-member-class';
+    classEl.textContent = registry.ui.getHeroClassLabel(member.class, member.path);
+    target.appendChild(classEl);
+  };
+
+  for (let partyIndex = 0; partyIndex < state.party.length; partyIndex++) {
+    const member = state.party[partyIndex]!;
+    const slotGridHost = document.createElement('div');
+    slotGridHost.className = 'camp-equip-member-body';
+
+    if (multiParty) {
+      const det = document.createElement('details');
+      det.className = 'camp-equip-member-details';
+      det.open = true;
+      const sum = document.createElement('summary');
+      sum.className = 'camp-equip-member-summary';
+      appendMemberHead(sum, member);
+      det.appendChild(sum);
+      det.appendChild(slotGridHost);
+      panel.appendChild(det);
+    } else {
+      const flat = document.createElement('div');
+      flat.className = 'camp-equip-member camp-equip-member--flat';
+      appendMemberHead(flat, member);
+      flat.appendChild(slotGridHost);
+      panel.appendChild(flat);
+    }
+
+    const slotGrid = document.createElement('div');
+    slotGrid.className = 'camp-equip-slot-grid';
+    slotGridHost.appendChild(slotGrid);
 
     const slotDefs: { key: 'weapon' | 'armor' | 'relic'; label: string; cur: string | null }[] = [
       { key: 'weapon', label: 'Arma', cur: member.weaponId },
@@ -100,31 +137,48 @@ export function appendCampEquipmentPanel(
     ];
 
     for (const { key, label, cur } of slotDefs) {
-      const row = document.createElement('div');
-      row.className = 'camp-equip-slot';
-      const lab = document.createElement('div');
-      lab.className = 'camp-equip-slot-label camp-equip-slot-label--with-icon';
-      lab.innerHTML = `${iconWrap(slotSvg[key])}<span>${label}</span>`;
-      row.appendChild(lab);
+      const candidates = inventoryEquipmentIdsForSlot(state, registry, key);
 
-      const curEl = document.createElement('div');
-      curEl.className = 'camp-equip-current';
+      const slotWrap = document.createElement('div');
+      slotWrap.className = 'camp-equip-slot-wrap';
+
+      const article = document.createElement('article');
+      article.className = cur
+        ? 'character-sheet-slot-card'
+        : 'character-sheet-slot-card character-sheet-slot-card--empty';
+
+      const head = document.createElement('div');
+      head.className = 'character-sheet-slot-head';
+      head.innerHTML = `${iconWrap(slotSvg[key], 'character-sheet-slot-icon-wrap')}<span class="character-sheet-slot-label">${label}</span>`;
+      article.appendChild(head);
+
       if (cur) {
         const def = items[cur];
-        curEl.textContent = def?.name ?? cur;
-      } else {
-        curEl.classList.add('camp-equip-current--empty');
-        curEl.textContent = '— vazio —';
-      }
-      row.appendChild(curEl);
-
-      if (cur) {
-        const unequipWrap = document.createElement('div');
-        unequipWrap.className = 'camp-equip-unequip';
         const unequipBtn = document.createElement('button');
         unequipBtn.type = 'button';
-        unequipBtn.className = 'camp-equip-btn camp-equip-btn--unequip';
-        unequipBtn.textContent = 'Retirar ao inventário';
+        unequipBtn.className = 'camp-equip-btn camp-equip-candidate camp-equip-btn--unequip';
+        unequipBtn.title = 'Retirar ao inventário';
+        unequipBtn.setAttribute('aria-label', 'Retirar ao inventário');
+        const main = document.createElement('span');
+        main.className = 'camp-equip-candidate-main';
+        const nm = document.createElement('span');
+        nm.className = 'camp-equip-candidate-name';
+        nm.textContent = def?.name ?? cur;
+        main.appendChild(nm);
+        if (def) {
+          const statParts = formatItemEquipmentStatParts(def);
+          if (statParts.length > 0) {
+            const st = document.createElement('span');
+            st.className = 'camp-equip-candidate-stats';
+            st.textContent = statParts.join(' · ');
+            main.appendChild(st);
+          }
+        }
+        unequipBtn.appendChild(main);
+        const act = document.createElement('span');
+        act.className = 'camp-equip-candidate-action camp-equip-candidate-action--unequip';
+        act.textContent = 'Retirar';
+        unequipBtn.appendChild(act);
         const pi = partyIndex;
         const sk = key;
         unequipBtn.addEventListener('click', () => {
@@ -133,26 +187,44 @@ export function appendCampEquipmentPanel(
           const eff: Effect = { op: 'unequipSlot', slot: sk, partyIndex: pi };
           cbs.commitEquipEffects([eff]);
         });
-        unequipWrap.appendChild(unequipBtn);
-        row.appendChild(unequipWrap);
+        article.appendChild(unequipBtn);
+      } else {
+        const emptyP = document.createElement('p');
+        emptyP.className = 'character-sheet-slot-empty';
+        emptyP.textContent = 'Nada equipado';
+        article.appendChild(emptyP);
       }
 
-      const candidates = inventoryEquipmentIdsForSlot(state, registry, key);
-      if (candidates.length === 0) {
-        const hint = document.createElement('div');
-        hint.className = 'camp-equip-hint';
-        hint.textContent = 'Sem peças deste tipo no inventário.';
-        row.appendChild(hint);
-      } else {
-        const actions = document.createElement('div');
-        actions.className = 'camp-equip-actions';
+      slotWrap.appendChild(article);
+
+      if (candidates.length > 0) {
+        const list = document.createElement('div');
+        list.className = 'camp-equip-candidate-list';
         for (const itemId of candidates) {
           const def = items[itemId];
           if (!def) continue;
           const btn = document.createElement('button');
           btn.type = 'button';
-          btn.className = 'camp-equip-btn';
-          btn.textContent = `Equipar ${def.name}`;
+          btn.className = 'camp-equip-btn camp-equip-candidate';
+          btn.setAttribute('aria-label', `Equipar ${def.name}`);
+          const main = document.createElement('span');
+          main.className = 'camp-equip-candidate-main';
+          const nm = document.createElement('span');
+          nm.className = 'camp-equip-candidate-name';
+          nm.textContent = def.name;
+          main.appendChild(nm);
+          const statParts = formatItemEquipmentStatParts(def);
+          if (statParts.length > 0) {
+            const st = document.createElement('span');
+            st.className = 'camp-equip-candidate-stats';
+            st.textContent = statParts.join(' · ');
+            main.appendChild(st);
+          }
+          btn.appendChild(main);
+          const act = document.createElement('span');
+          act.className = 'camp-equip-candidate-action';
+          act.textContent = 'Equipar';
+          btn.appendChild(act);
           const pi = partyIndex;
           btn.addEventListener('click', () => {
             cbs.unlockAudio();
@@ -160,14 +232,18 @@ export function appendCampEquipmentPanel(
             const eff: Effect = { op: 'equipItem', itemId, partyIndex: pi };
             cbs.commitEquipEffects([eff]);
           });
-          actions.appendChild(btn);
+          list.appendChild(btn);
         }
-        row.appendChild(actions);
+        slotWrap.appendChild(list);
+      } else if (!cur) {
+        const hint = document.createElement('div');
+        hint.className = 'camp-equip-hint';
+        hint.textContent = 'Sem peças deste tipo no inventário.';
+        article.appendChild(hint);
       }
-      memberWrap.appendChild(row);
-    }
 
-    panel.appendChild(memberWrap);
+      slotGrid.appendChild(slotWrap);
+    }
   }
 
   parent.appendChild(panel);
@@ -182,6 +258,220 @@ export type StoryDiceBannerHost = {
   playCheckSuccess(): void;
   playCheckFail(): void;
 };
+
+const STORY_DICE_ROLL_TICK_MS = 128;
+const STORY_DICE_ROLL_MAX_TICKS = 18;
+
+/** Par de d6 para a animação cosmética: `crypto.getRandomValues` ou xorshift por banner. */
+function storyDiceAnimScratchNext(seedRef: { s: number }): number {
+  let x = seedRef.s;
+  x ^= x << 13;
+  x >>>= 0;
+  x ^= x >>> 17;
+  x ^= x << 5;
+  seedRef.s = x >>> 0;
+  return seedRef.s;
+}
+
+function randomStoryDicePairForAnim(seedRef: { s: number }): [number, number] {
+  const c = globalThis.crypto;
+  if (typeof c?.getRandomValues === 'function') {
+    const buf = new Uint8Array(2);
+    c.getRandomValues(buf);
+    return [(buf[0]! % 6) + 1, (buf[1]! % 6) + 1];
+  }
+  const a = storyDiceAnimScratchNext(seedRef);
+  const b = storyDiceAnimScratchNext(seedRef);
+  return [(a % 6) + 1, (b % 6) + 1];
+}
+
+function storyDiceTargetTn(breakdown: StoryDiceRollBreakdown): number {
+  if (breakdown.kind === 'dualSkill') {
+    return breakdown.rounds[0]?.tn ?? 0;
+  }
+  return breakdown.tn;
+}
+
+function populateStoryDiceDifficulty(el: HTMLElement, breakdown: StoryDiceRollBreakdown): void {
+  el.replaceChildren();
+  const tn = storyDiceTargetTn(breakdown);
+  const row = document.createElement('div');
+  row.className = 'story-dice-difficulty-row';
+  const lab = document.createElement('span');
+  lab.className = 'story-dice-difficulty-label';
+  lab.textContent = 'Dificuldade';
+  const val = document.createElement('span');
+  val.className = 'story-dice-difficulty-value';
+  val.textContent = String(tn);
+  row.append(lab, val);
+  el.appendChild(row);
+  if (breakdown.kind === 'dualSkill') {
+    const sub = document.createElement('div');
+    sub.className = 'story-dice-difficulty-sub';
+    sub.textContent = 'Cada selo precisa alcançar este total.';
+    el.appendChild(sub);
+  }
+}
+
+function formatModSigned(m: number): string {
+  if (m > 0) return `+${m}`;
+  if (m < 0) return `−${Math.abs(m)}`;
+  return '0';
+}
+
+/** Cartão de modificador(es) visível desde o início da rolagem (ao lado dos dados ASCII). */
+function populateStoryDiceModSlot(slot: HTMLElement, breakdown: StoryDiceRollBreakdown): void {
+  slot.replaceChildren();
+  slot.className = 'story-dice-mod-slot';
+
+  if (breakdown.kind === 'skill') {
+    if (breakdown.mod === 0) return;
+    const card = document.createElement('div');
+    card.className = 'story-dice-mod-card story-dice-mod-card--inline';
+    const line = document.createElement('span');
+    line.className = 'story-dice-mod-card-inline';
+    line.textContent = `${breakdown.attr.toUpperCase()}${formatModSigned(breakdown.mod)}`;
+    card.appendChild(line);
+    slot.appendChild(card);
+    return;
+  }
+
+  if (breakdown.kind === 'luck') {
+    if (breakdown.mod === 0 && breakdown.luckPenalty === 0) return;
+    const card = document.createElement('div');
+    card.className = 'story-dice-mod-card story-dice-mod-card--compact';
+    if (breakdown.mod !== 0) {
+      const row = document.createElement('div');
+      row.className = 'story-dice-mod-card-row';
+      const l = document.createElement('span');
+      l.className = 'story-dice-mod-card-label';
+      l.textContent = 'SOR';
+      const v = document.createElement('span');
+      v.className = 'story-dice-mod-card-value';
+      v.textContent = formatModSigned(breakdown.mod);
+      row.append(l, v);
+      card.appendChild(row);
+    }
+    if (breakdown.luckPenalty > 0) {
+      const row = document.createElement('div');
+      row.className = 'story-dice-mod-card-row';
+      const l = document.createElement('span');
+      l.className = 'story-dice-mod-card-label';
+      l.textContent = 'Maldição';
+      const v = document.createElement('span');
+      v.className = 'story-dice-mod-card-value story-dice-mod-card-value--curse';
+      v.textContent = `−${breakdown.luckPenalty}`;
+      row.append(l, v);
+      card.appendChild(row);
+    }
+    slot.appendChild(card);
+    return;
+  }
+
+  const r0 = breakdown.rounds[0];
+  if (!r0) return;
+  const [a1, a2] = breakdown.attrs;
+  if (r0.mod1 === 0 && r0.mod2 === 0) return;
+  const card = document.createElement('div');
+  const dualCompact = r0.mod1 !== 0 && r0.mod2 !== 0;
+  card.className = dualCompact
+    ? 'story-dice-mod-card story-dice-mod-card--compact'
+    : 'story-dice-mod-card';
+  if (r0.mod1 !== 0) {
+    const row = document.createElement('div');
+    row.className = 'story-dice-mod-card-row';
+    const l = document.createElement('span');
+    l.className = 'story-dice-mod-card-label';
+    l.textContent = a1.toUpperCase();
+    const v = document.createElement('span');
+    v.className = 'story-dice-mod-card-value';
+    v.textContent = formatModSigned(r0.mod1);
+    row.append(l, v);
+    card.appendChild(row);
+  }
+  if (r0.mod2 !== 0) {
+    const row = document.createElement('div');
+    row.className = 'story-dice-mod-card-row';
+    const l = document.createElement('span');
+    l.className = 'story-dice-mod-card-label';
+    l.textContent = a2.toUpperCase();
+    const v = document.createElement('span');
+    v.className = 'story-dice-mod-card-value';
+    v.textContent = formatModSigned(r0.mod2);
+    row.append(l, v);
+    card.appendChild(row);
+  }
+  slot.appendChild(card);
+}
+
+/** Modificador após a soma dos dados (ex.: "+ 2" ou "− 1"). */
+function formatModAfterDice(mod: number): string {
+  if (mod >= 0) return `+ ${mod}`;
+  return `− ${Math.abs(mod)}`;
+}
+
+/** Lado esquerdo da equação + total destacado (dados já vistos no ASCII acima). */
+function appendMathWithTotal(parent: HTMLElement, beforeEquals: string, total: number): void {
+  const math = document.createElement('div');
+  math.className = 'story-dice-result-math';
+  math.append(document.createTextNode(beforeEquals));
+  const eq = document.createElement('span');
+  eq.className = 'story-dice-result-math-eq';
+  eq.textContent = '=';
+  const totalEl = document.createElement('span');
+  totalEl.className = 'story-dice-result-total';
+  totalEl.textContent = String(total);
+  math.append(document.createTextNode('\u00a0'), eq, document.createTextNode('\u00a0'), totalEl);
+  parent.appendChild(math);
+}
+
+function appendOutcomeLine(parent: HTMLElement, success: boolean): void {
+  const line = document.createElement('div');
+  line.className = success
+    ? 'story-dice-result-outcome story-dice-result-outcome--ok'
+    : 'story-dice-result-outcome story-dice-result-outcome--fail';
+  line.textContent = success ? 'Passou.' : 'Falhou.';
+  parent.appendChild(line);
+}
+
+function populateStoryDiceRollResult(region: HTMLElement, breakdown: StoryDiceRollBreakdown): void {
+  region.replaceChildren();
+  region.className = 'story-dice-reveal story-dice-result story-dice-result--rich';
+  region.setAttribute('aria-label', breakdown.rollLog);
+
+  if (breakdown.kind === 'skill') {
+    appendOutcomeLine(region, breakdown.success);
+    const lhs = `${breakdown.d1} + ${breakdown.d2} ${formatModAfterDice(breakdown.mod)}`.replace(/\s+/g, ' ').trim();
+    appendMathWithTotal(region, lhs, breakdown.total);
+    return;
+  }
+
+  if (breakdown.kind === 'luck') {
+    appendOutcomeLine(region, breakdown.success);
+    let lhs = `${breakdown.d1} + ${breakdown.d2} ${formatModAfterDice(breakdown.mod)}`.replace(/\s+/g, ' ').trim();
+    if (breakdown.luckPenalty > 0) {
+      lhs += ` − ${breakdown.luckPenalty}`;
+    }
+    appendMathWithTotal(region, lhs, breakdown.total);
+    return;
+  }
+
+  const [a1, a2] = breakdown.attrs;
+  const totalR = breakdown.rounds.length;
+  for (let i = 0; i < totalR; i++) {
+    const r = breakdown.rounds[i]!;
+    const seal = document.createElement('div');
+    seal.className = 'story-dice-result-seal';
+    const st = document.createElement('div');
+    st.className = 'story-dice-result-seal-title';
+    st.textContent = `Selo ${i + 1} de ${totalR}`;
+    seal.appendChild(st);
+    appendOutcomeLine(seal, r.success);
+    const lhs = `${r.d1} + ${r.d2} + ${r.mod1} (${a1.toUpperCase()}) + ${r.mod2} (${a2.toUpperCase()})`;
+    appendMathWithTotal(seal, lhs, r.total);
+    region.appendChild(seal);
+  }
+}
 
 export function appendStoryDiceRollBanner(
   inner: HTMLElement,
@@ -215,17 +505,43 @@ export function appendStoryDiceRollBanner(
         : 'Teste de sorte';
   panel.appendChild(kicker);
 
+  const rollCard = document.createElement('div');
+  rollCard.className = 'story-dice-roll-card';
+
+  const difficultyEl = document.createElement('div');
+  difficultyEl.className = 'story-dice-difficulty';
+  populateStoryDiceDifficulty(difficultyEl, breakdown);
+  rollCard.appendChild(difficultyEl);
+
+  const dataRegion = document.createElement('div');
+  dataRegion.className = 'story-dice-data-region';
+
+  const diceRow = document.createElement('div');
+  diceRow.className = 'story-dice-dice-row';
+
+  const asciiStage = document.createElement('div');
+  asciiStage.className = 'story-dice-ascii-stage';
   const pre = document.createElement('pre');
   pre.className = 'dice-ascii-block story-dice-pre story-dice-pre--rolling';
   pre.textContent = formatDiceAscii([3, 4]);
-  panel.appendChild(pre);
+  asciiStage.appendChild(pre);
+  diceRow.appendChild(asciiStage);
+
+  const modSlot = document.createElement('div');
+  populateStoryDiceModSlot(modSlot, breakdown);
+  diceRow.appendChild(modSlot);
+
+  dataRegion.appendChild(diceRow);
+  rollCard.appendChild(dataRegion);
 
   const resultRegion = document.createElement('div');
-  resultRegion.className = 'story-dice-result';
+  resultRegion.className = 'story-dice-reveal story-dice-result';
   resultRegion.setAttribute('aria-live', 'polite');
   resultRegion.setAttribute('aria-atomic', 'true');
   resultRegion.hidden = true;
-  panel.appendChild(resultRegion);
+  rollCard.appendChild(resultRegion);
+
+  panel.appendChild(rollCard);
 
   const btn = document.createElement('button');
   btn.type = 'button';
@@ -238,12 +554,15 @@ export function appendStoryDiceRollBanner(
 
   wrap.appendChild(panel);
   inner.appendChild(wrap);
+  wrap.classList.add('story-dice-banner--intro');
+  panel.classList.add('story-dice-banner-panel--rolling');
 
   const dismiss = (): void => {
     host.dismissStoryDiceRoll(nextState);
   };
 
   const finishReveal = (): void => {
+    panel.classList.remove('story-dice-banner-panel--rolling');
     const dPair =
       breakdown.kind === 'dualSkill'
         ? (() => {
@@ -253,13 +572,22 @@ export function appendStoryDiceRollBanner(
         : [breakdown.d1, breakdown.d2];
     pre.textContent = formatDiceAscii(dPair);
     pre.classList.remove('story-dice-pre--rolling');
+    pre.classList.add('story-dice-pre--landed');
+    window.setTimeout(() => {
+      pre.classList.remove('story-dice-pre--landed');
+    }, 620);
     panel.classList.add(
       breakdown.success ? 'story-dice-banner-panel--success' : 'story-dice-banner-panel--fail'
     );
     if (breakdown.success) host.playCheckSuccess();
     else host.playCheckFail();
     resultRegion.hidden = false;
-    resultRegion.textContent = breakdown.rollLog;
+    populateStoryDiceRollResult(resultRegion, breakdown);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        resultRegion.classList.add('story-dice-result--animate-in');
+      });
+    });
     btn.disabled = false;
     btn.focus();
 
@@ -273,18 +601,25 @@ export function appendStoryDiceRollBanner(
   };
 
   let ticks = 0;
-  const maxTicks = 10;
+  let animSeed =
+    (Date.now() ^
+      (typeof performance !== 'undefined' ? (performance.now() * 7919) | 0 : 0) ^
+      ((Math.random() * 0xffffffff) | 0) ^
+      0x9e3779b9) >>>
+    0;
+  if (animSeed === 0) animSeed = 0xdeadbeef;
+  const animRng = { s: animSeed };
+
   host.setDiceRollIntervalTimer(
     setInterval(() => {
       ticks += 1;
-      const r1 = Math.floor(Math.random() * 6) + 1;
-      const r2 = Math.floor(Math.random() * 6) + 1;
+      const [r1, r2] = randomStoryDicePairForAnim(animRng);
       pre.textContent = formatDiceAscii([r1, r2]);
-      if (ticks >= maxTicks) {
+      if (ticks >= STORY_DICE_ROLL_MAX_TICKS) {
         host.clearDiceRollTimers();
         finishReveal();
       }
-    }, 80)
+    }, STORY_DICE_ROLL_TICK_MS)
   );
 
   btn.addEventListener('click', () => dismiss());
@@ -637,14 +972,38 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
   const storyQuickKeyHint = (n: number): string =>
     `Pressione ${n} no teclado para ativar esta ação sem clicar`;
 
+  const attrModAbbrev = (attr: 'str' | 'agi' | 'mind'): 'STR' | 'AGI' | 'MEN' =>
+    attr === 'str' ? 'STR' : attr === 'agi' ? 'AGI' : 'MEN';
+
+  /** Título curto + fórmula em `.preview`, como nas escolhas com `preview`. */
+  const setStoryRollChoiceContent = (
+    btn: HTMLButtonElement,
+    navNum: number,
+    titleLine: string,
+    previewLine: string
+  ): void => {
+    btn.appendChild(document.createTextNode(`${navNum} - ${titleLine}`));
+    const span = document.createElement('span');
+    span.className = 'preview';
+    span.textContent = previewLine;
+    btn.appendChild(span);
+  };
+
   if (ctx.scene.frontmatter.skillCheck) {
     storyNavIndex += 1;
     const row = document.createElement('div');
     row.className = 'skill-row';
     const b = document.createElement('button');
     b.className = 'choice';
-    const base = `Rolar teste: ${ctx.scene.frontmatter.skillCheck.label ?? ctx.scene.frontmatter.skillCheck.attr} (2d6)`;
-    b.textContent = `${storyNavIndex} - ${base}`;
+    const sc = ctx.scene.frontmatter.skillCheck;
+    const ab = attrModAbbrev(sc.attr);
+    const trimmedLabel = sc.label?.trim();
+    const title =
+      trimmedLabel !== undefined && trimmedLabel.length > 0
+        ? `Rolar teste: ${trimmedLabel}`
+        : `Rolar teste: ${ab}`;
+    const preview = `2d6 + mod(${ab}) vs TN ${sc.tn}`;
+    setStoryRollChoiceContent(b, storyNavIndex, title, preview);
     if (storyNavIndex < 10) b.title = storyQuickKeyHint(storyNavIndex);
     b.addEventListener('click', () => ctx.navigation.onSkillRoll(ctx.scene));
     row.appendChild(b);
@@ -658,11 +1017,14 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     const b = document.createElement('button');
     b.className = 'choice';
     const dc = ctx.scene.frontmatter.dualAttrSkillCheck;
+    const trimmedDl = dc.label?.trim();
     const lbl =
-      dc.label ??
-      `${dc.attrs[0].toUpperCase()} + ${dc.attrs[1].toUpperCase()} · ${dc.rounds} lançamentos`;
-    const base = `Rolar prova tríplice: ${lbl} (2d6 + dois mods vs TN ${dc.tn})`;
-    b.textContent = `${storyNavIndex} - ${base}`;
+      trimmedDl !== undefined && trimmedDl.length > 0
+        ? trimmedDl
+        : `${dc.attrs[0].toUpperCase()} + ${dc.attrs[1].toUpperCase()} · ${dc.rounds} lançamentos`;
+    const title = `Rolar prova tríplice: ${lbl}`;
+    const preview = `2d6 + dois mods vs TN ${dc.tn}`;
+    setStoryRollChoiceContent(b, storyNavIndex, title, preview);
     if (storyNavIndex < 10) b.title = storyQuickKeyHint(storyNavIndex);
     b.addEventListener('click', () => ctx.navigation.onDualAttrSkillRoll(ctx.scene));
     row.appendChild(b);
@@ -678,8 +1040,11 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     const lc = ctx.scene.frontmatter.luckCheck;
     const curse =
       lc.luckPenalty && lc.luckPenalty > 0 ? ` · maldição −${lc.luckPenalty}` : '';
-    const base = `Rolar sorte: ${lc.label ?? '2d6 + mod(SOR)'} vs TN ${lc.tn}${curse}`;
-    b.textContent = `${storyNavIndex} - ${base}`;
+    const trimmedLl = lc.label?.trim();
+    const title =
+      trimmedLl !== undefined && trimmedLl.length > 0 ? `Rolar sorte: ${trimmedLl}` : 'Rolar sorte:';
+    const preview = `2d6 + mod(SOR) vs TN ${lc.tn}${curse}`;
+    setStoryRollChoiceContent(b, storyNavIndex, title, preview);
     if (storyNavIndex < 10) b.title = storyQuickKeyHint(storyNavIndex);
     b.addEventListener('click', () => ctx.navigation.onLuckRoll(ctx.scene));
     row.appendChild(b);

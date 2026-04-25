@@ -9,6 +9,7 @@ export const DEV_TOOLS_TABS = [
   'music',
   'visual',
   'enemies',
+  'ascii-web',
   'ascii',
   'ascii-bejamas',
   'ascii-browser',

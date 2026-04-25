@@ -10,7 +10,7 @@ function throneOutcomeLine(state: GameState): string {
     return 'O **Terceiro Sino** inscreveu-se na tua pele: a **corrupção** que sobe é o juro do silêncio que pediste em nome da cidade.';
   }
   if (state.marks.includes('morvayn_slain')) {
-    return '**Ferro** fez justiça sem panfleto: Morvayn findou no trono, e carregas a limpeza como quem carrega cadáver — honra suja de quem mata para calar o silêncio.';
+    return '**Ferro** no trono: Morvayn findou — o **eixo** segue; a ferida **afunda** onde o mapa desiste.';
   }
   return '';
 }

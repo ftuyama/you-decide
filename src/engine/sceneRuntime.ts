@@ -13,7 +13,7 @@ import { injectText } from './template.ts';
 import type { EventBus } from './eventBus.ts';
 import type { GameData } from './gameData.ts';
 import { getEffectiveLuck } from './luck.ts';
-import { mulberry32, roll2d6 } from './rng.ts';
+import { mulberry32, nextRngSeed, roll2d6 } from './rng.ts';
 
 export type LoadedScene = {
   id: string;
@@ -194,7 +194,7 @@ export function resolveSkillCheck(
   };
   const newState = tickActiveBuffs({
     ...state,
-    rngSeed: (state.rngSeed + 17) >>> 0,
+    rngSeed: nextRngSeed(rng),
     sceneId: next,
   });
   return { state: newState, breakdown };
@@ -249,7 +249,7 @@ export function resolveDualAttrSkillCheck(
   };
   const newState = tickActiveBuffs({
     ...state,
-    rngSeed: (state.rngSeed + 23 + dc.rounds * 7) >>> 0,
+    rngSeed: nextRngSeed(rng),
     sceneId: next,
   });
   return { state: newState, breakdown };
@@ -287,7 +287,7 @@ export function resolveLuckCheck(
   };
   const newState = tickActiveBuffs({
     ...state,
-    rngSeed: (state.rngSeed + 19) >>> 0,
+    rngSeed: nextRngSeed(rng),
     sceneId: next,
   });
   return { state: newState, breakdown };

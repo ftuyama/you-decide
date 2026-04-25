@@ -17,5 +17,5 @@ onEnter: []
 
 {{factionThroneEcho}}
 
-O mapa empurra-te para a **orla**; nas **Cimeiras**, rumor antigo respira geada — não convite, **dívida** com juros de vento.
+O trono **não** fechou o **eixo**: nas **Cimeiras**, a ferida **abre** bolsa de gelo tão vasta que parece montanha — **câmara** com neve de teto. **Dívida** com juros de vento.
 

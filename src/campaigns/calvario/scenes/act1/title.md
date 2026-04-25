@@ -19,6 +19,6 @@ onEnter: []
 ---
 # A Masmorra do Silêncio
 
-O **pulso verde** sobe pela garganta da cidade; por baixo, a **masmorra** abre boca muda: pedra húmida, ferro velho, cobre com temperatura errada — e um **silêncio** que não é ausência de som, é **peso** que empurra para dentro.
+O **pulso verde** sobe pela garganta da cidade; por baixo, a **masmorra** abre boca muda: pedra húmida, ferro velho, cobre com temperatura errada — e **silêncio** que é **sombra** a alastrar, **peso** que empurra para dentro.
 
-Lá em cima fingem que o **imposto** é só pão; quem desce e não volta entra no preço alheio — *{{playerName}}*, honra ou fome, o primeiro passo é **descer** até onde a voz já não soa como a tua.
+Em cima fingem rotina; alguém tem de **cortar** isso na raiz — *{{playerName}}*, honra ou fome, o primeiro passo é **descer** até onde a voz já não soa como a tua.

@@ -8,6 +8,9 @@ choices:
     next: act4/encounters/fight_morvayn
 onEnter:
   - { op: addMark, mark: soul_scarred_by_seal }
+  - { op: grantTemporaryBuff, attr: str, delta: -1, remainingScenes: 3 }
+  - { op: grantTemporaryBuff, attr: agi, delta: -1, remainingScenes: 3 }
+  - { op: grantTemporaryBuff, attr: mind, delta: -1, remainingScenes: 3 }
 ---
 A paz **falha** por um instante que basta.
 

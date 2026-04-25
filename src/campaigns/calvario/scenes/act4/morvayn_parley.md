@@ -10,7 +10,7 @@ choices:
       - { op: addRep, faction: vigilia, delta: 1, directGain: true }
   - text: "Aceitar servir ao Terceiro Sino"
     next: act4/pact/pact_ascent
-    condition: { rep: { faction: culto, gte: 0 } }
+    condition: { rep: { faction: culto, gte: 2 } }
     showWhenLocked: true
     lockedHint: "O Terceiro Sino só estende a mão a quem o Culto ainda não trata como inimigo declarado."
     preview: "Corrupção e poder sombrio."

@@ -3,9 +3,14 @@ id: act4/pact/pact_ascent
 title: Ascensão do Pacto
 chapter: 4
 ambientTheme: explore
-choices:
-  - text: "Subir à cidade com o eco na nuca"
-    next: act4/pact/pact_whispers
+skillCheck:
+  id: pact_ascent_resonance
+  attr: mind
+  tn: 13
+  successNext: act4/pact/pact_whispers
+  failNext: act4/pact/pact_ascent_fail
+  label: "Conter o Terceiro Sino antes da superfície"
+choices: []
 onEnter:
   - { op: addDiary, text: "Aceitei o Terceiro Sino. Cada degrau para cima soa como um badalar que só eu ouço." }
 ---

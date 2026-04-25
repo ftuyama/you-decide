@@ -12,8 +12,6 @@ choices:
 onEnter:
   - { op: addDiary, text: "Vi-me num caco de espelho: um estranho com o meu nome." }
 ---
-Entre dois degraus, preso na argamassa, um **caco de espelho** sobreviveu ao tempo — borda negra, vidro que não devia reflectir **nada** com tão pouca luz.
+Na argamassa, um **caco de espelho** — borda negra, luz a mentir — devolve *{{playerName}}* **cansado**, boca mais fechada do que lembravas.
 
-Mesmo assim, *{{playerName}}* aparece: **rosto cansado**, sombra sob os olhos, a boca um pouco mais fechada do que lembravas.
-
-Não é heroísmo o que vês. É **decisão gasta**. E por um instante percebes que o medo não está no reflexo — está em **reconhecer** quem desce por opção própria.
+Não é heroísmo: é **decisão gasta**; o medo está em **reconhecer** quem desce por opção própria.

@@ -13,6 +13,8 @@ choices:
       all:
         - { level: { gte: 10 } }
         - { flag: stone_guard_defeated }
+    showWhenLocked: true
+    lockedHint: "Precisas de nível 10 e de já teres posto abaixo o guardião de pedra — só então o trono deixa de ser rumor."
     preview: "Capítulo 4 — confronto com Morvayn; o trono espera."
     timedMs: 15000
     fallbackNext: act3/stone_corridor

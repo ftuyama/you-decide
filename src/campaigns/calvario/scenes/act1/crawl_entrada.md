@@ -11,7 +11,7 @@ choices:
     timedMs: 12000
     fallbackNext: act1/mirror_descent
     effects:
-      - { op: addDiary, text: "Entrei no Calvário." }
+      - { op: addDiary, text: "Entrei na Masmorra do Silêncio." }
   - text: "Um caco de espelho brilha na argamassa — ver o próprio rosto"
     next: act1/mirror_descent
     preview: "Rota do espelho; descida simbólica antes da classe."

@@ -9,6 +9,8 @@ choices:
   - text: "Alimentar a chama com memória (−1 suprimento)"
     next: act6/hub_fractured_nave
     condition: { resource: { supply: { gte: 1 } } }
+    showWhenLocked: true
+    lockedHint: "Precisas de pelo menos 1 suprimento para alimentar a chama."
     effects:
       - { op: campRest }
       - { op: advanceDay }
@@ -38,6 +40,8 @@ choices:
   - text: "Trocar duas palavras com o grupo"
     next: act6/camp/void_companion_chat
     condition: { companionCount: { gte: 1 } }
+    showWhenLocked: true
+    lockedHint: "Sem companheiro, não há grupo com quem trocar palavra."
   - text: "Ver o cinzento engolir mais um dia"
     next: act6/camp/void_camp
     preview: "O dia narrativo avança; não recuperas força."

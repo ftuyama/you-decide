@@ -40,10 +40,8 @@ choices:
 onEnter:
   - { op: setNarrativeTier, tier: 4 }
 ---
-O **Trono de Ossos** ergue-se como onda fossilizada — costelas de gigantes entrelaçadas, **correntes** vivas que range sem vento.
+O **Trono de Ossos** sobe em costelas entrelaçadas; **correntes** rangem sem vento.
 
-**Morvayn** está sentado antes de existir cadeira: primeiro a **sombra**, depois a forma. Sorri **sem lábios** — ou com lábios de outra pessoa.
+**Morvayn** antecede a cadeira — **sombra**, depois sorriso **sem lábios** certos. O pulso verde **bate** com o teu coração; o salão devolve **sussurros** alheios que sabem o teu nome.
 
-O pulso verde **bate** ao ritmo do teu coração, como um **médico** que não cura. O salão **inventa** ecos: cada passo te devolve um **sussurro** que não é teu — e mesmo assim conhece o teu nome.
-
-Cada **ensaio** no salão — olhar, ler, pisar, tocar, oficiar — **gasta-se** como fricção: o osso **lembra** e não repete o mesmo convite. Ainda há tempo para **negociar** com quem vende silêncio em frascos, ou o aço **espera** — frio como estatística.
+Cada **ensaio** no salão **gasta-se** no osso: ainda dá para **negociar** ao mercador ou deixar o aço **esperar**.

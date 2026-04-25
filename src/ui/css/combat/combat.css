@@ -1305,9 +1305,9 @@ button.combat-flee-btn:hover {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--dice-panel-header-color);
-  border-bottom: 1px solid var(--dice-panel-header-border);
-  background: var(--dice-panel-header-bg);
+  color: var(--text-section);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
+  background: color-mix(in srgb, var(--surface-raised) 78%, var(--border));
 }
 
 .combat-log-scroll {
@@ -1349,9 +1349,9 @@ button.combat-flee-btn:hover {
 }
 
 .combat-log-round {
-  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--combat-log-entry-border));
+  border: 1px solid color-mix(in srgb, var(--border) 55%, var(--combat-log-entry-border));
   border-radius: 4px;
-  background: rgba(18, 32, 24, 0.4);
+  background: color-mix(in srgb, var(--surface-inset) 42%, transparent);
   overflow: hidden;
 }
 
@@ -1361,9 +1361,9 @@ button.combat-flee-btn:hover {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.09em;
-  color: color-mix(in srgb, var(--fg) 88%, var(--accent));
-  border-bottom: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
-  background: rgba(25, 45, 32, 0.55);
+  color: var(--text-section);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+  background: color-mix(in srgb, var(--surface-raised) 78%, var(--border));
 }
 
 .combat-log-phase {
@@ -1379,7 +1379,7 @@ button.combat-flee-btn:hover {
   font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0.04em;
-  color: #9ab89a;
+  color: color-mix(in srgb, var(--text-section) 88%, var(--fg));
   display: flex;
   align-items: center;
   gap: 0.35rem;
@@ -1390,8 +1390,18 @@ button.combat-flee-btn:hover {
   width: 0.35rem;
   height: 0.35rem;
   border-radius: 50%;
-  background: var(--accent);
+  background: color-mix(in srgb, var(--muted) 65%, var(--fg));
   opacity: 0.85;
+}
+
+.combat-log-phase--player .combat-log-phase-label {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.combat-log-phase--player .combat-log-phase-label::before {
+  background: var(--accent);
+  opacity: 0.95;
 }
 
 .combat-log-phase--enemy .combat-log-phase-label {
@@ -1446,76 +1456,86 @@ button.combat-flee-btn:hover {
   color: var(--combat-log-msg);
 }
 
-/** Ataque: cores por acerto / erro (verde / vermelho) */
-.combat-log-entry.combat-outcome-hit {
-  border-color: #3d6b48;
-  background: rgba(35, 65, 40, 0.28);
+/** Ataque físico: jogador/companion acerta → verde; erra → sem tinta. Inimigo acerta → vermelho; erra → sem tinta. */
+.combat-log-entry.combat-attack-by-party.combat-outcome-hit {
+  border-color: #52a868;
+  background: rgba(48, 110, 68, 0.22);
 }
 
-.combat-log-entry.combat-outcome-hit .combat-log-msg {
-  color: #b8e8c4;
+.combat-log-entry.combat-attack-by-party.combat-outcome-hit .combat-log-msg {
+  color: #c8f2d4;
 }
 
-.combat-log-entry.combat-outcome-hit .combat-log-meta {
-  color: #9ec9a8;
+.combat-log-entry.combat-attack-by-party.combat-outcome-hit .combat-log-meta {
+  color: #a8dcb8;
 }
 
-.combat-log-entry.combat-outcome-miss {
-  border-color: #7a3d3d;
-  background: rgba(55, 28, 28, 0.35);
+.combat-log-entry.combat-attack-by-enemy.combat-outcome-hit {
+  border-color: #c85858;
+  background: rgba(140, 48, 52, 0.2);
 }
 
-.combat-log-entry.combat-outcome-miss .combat-log-msg {
+.combat-log-entry.combat-attack-by-enemy.combat-outcome-hit .combat-log-msg {
+  color: #ffc8c8;
+}
+
+.combat-log-entry.combat-attack-by-enemy.combat-outcome-hit .combat-log-meta {
+  color: #f0a8a8;
+}
+
+.combat-log-entry.combat-attack-by-party.combat-outcome-miss,
+.combat-log-entry.combat-attack-by-enemy.combat-outcome-miss {
+  border-color: var(--combat-log-entry-border);
+  background: transparent;
+}
+
+.combat-log-entry.combat-attack-by-party.combat-outcome-miss .combat-log-msg,
+.combat-log-entry.combat-attack-by-enemy.combat-outcome-miss .combat-log-msg {
+  color: var(--combat-log-msg);
+}
+
+.combat-log-entry.combat-attack-by-party.combat-outcome-miss .combat-log-meta,
+.combat-log-entry.combat-attack-by-enemy.combat-outcome-miss .combat-log-meta {
+  color: #aab8a8;
+}
+
+/** Dano a inimigo (fonte jogador/companheiro/magia aliada): verde; crítico → amarelo abaixo. */
+.combat-log-entry.combat-log-damage.combat-damage-to-enemy:not(.combat-damage-crit) {
+  border-color: #52a868;
+  background: rgba(48, 110, 68, 0.18);
+}
+
+.combat-log-entry.combat-log-damage.combat-damage-to-enemy:not(.combat-damage-crit) .combat-log-msg {
+  color: #b8ecc8;
+}
+
+/** Dano no grupo (inimigo acerta): vermelho; crítico → amarelo abaixo. */
+.combat-log-entry.combat-log-damage.combat-damage-to-hero:not(.combat-damage-crit) {
+  border-color: #c85858;
+  background: rgba(140, 48, 52, 0.2);
+}
+
+.combat-log-entry.combat-log-damage.combat-damage-to-hero:not(.combat-damage-crit) .combat-log-msg {
+  color: #ffc8c8;
+}
+
+.combat-log-entry.combat-log-damage.combat-damage-to-hero:not(.combat-damage-crit) .combat-log-meta--attack-roll {
   color: #f0b0b0;
 }
 
-.combat-log-entry.combat-outcome-miss .combat-log-meta {
-  color: #d89898;
+/** Crítico (dano físico): amarelo — sobrepõe verde/vermelho de acerto. */
+.combat-log-entry.combat-log-damage.combat-damage-crit {
+  border-color: #c4a028;
+  background: rgba(95, 78, 22, 0.34);
 }
 
-.combat-log-entry.combat-log-damage.combat-damage-to-enemy .combat-log-msg {
-  color: #a8d4b0;
-}
-
-.combat-log-entry.combat-log-damage.combat-damage-to-enemy {
-  border-color: #3a5c42;
-  background: rgba(30, 50, 35, 0.2);
-}
-
-/**
- * Dano no herói (inimigo acerta): verde — leitura de “golpe certeiro”, não panfleto de erro.
- * Crítico: amarelo (mesma família do crítico em dano a inimigo).
- */
-.combat-log-entry.combat-log-damage.combat-damage-to-hero {
-  border-color: #3d6b48;
-  background: rgba(35, 65, 40, 0.28);
-}
-
-.combat-log-entry.combat-log-damage.combat-damage-to-hero .combat-log-msg {
-  color: #b8e8c4;
-}
-
-.combat-log-entry.combat-log-damage.combat-damage-to-hero .combat-log-meta--attack-roll {
-  color: #9ec9a8;
-}
-
-.combat-log-entry.combat-log-damage.combat-damage-to-hero.combat-damage-crit {
-  border-color: #8a7a28;
-  background: rgba(65, 55, 20, 0.35);
-}
-
-.combat-log-entry.combat-log-damage.combat-damage-to-hero.combat-damage-crit .combat-log-msg {
+.combat-log-entry.combat-log-damage.combat-damage-crit .combat-log-msg {
   color: #e6c200;
   font-weight: 600;
 }
 
-.combat-log-entry.combat-log-damage.combat-damage-to-hero.combat-damage-crit .combat-log-meta--attack-roll {
+.combat-log-entry.combat-log-damage.combat-damage-crit .combat-log-meta--attack-roll {
   color: #e0c860;
-  font-weight: 600;
-}
-
-.combat-log-entry.combat-log-damage.combat-damage-crit:not(.combat-damage-to-hero) .combat-log-msg {
-  color: #e6c200;
   font-weight: 600;
 }
 
@@ -1576,12 +1596,17 @@ button.combat-flee-btn:hover {
   font-variant-numeric: tabular-nums;
 }
 
-.combat-log-entry.combat-outcome-hit .combat-log-meta--attack-roll {
-  color: #b8e0c4;
+.combat-log-entry.combat-attack-by-party.combat-outcome-hit .combat-log-meta--attack-roll {
+  color: #b8f0cc;
 }
 
-.combat-log-entry.combat-outcome-miss .combat-log-meta--attack-roll {
-  color: #f0c0c0;
+.combat-log-entry.combat-attack-by-enemy.combat-outcome-hit .combat-log-meta--attack-roll {
+  color: #ffb8b8;
+}
+
+.combat-log-entry.combat-attack-by-party.combat-outcome-miss .combat-log-meta--attack-roll,
+.combat-log-entry.combat-attack-by-enemy.combat-outcome-miss .combat-log-meta--attack-roll {
+  color: #aab8a8;
 }
 
 .combat-log-msg--sub {

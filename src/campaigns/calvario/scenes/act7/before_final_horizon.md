@@ -9,6 +9,8 @@ choices:
   - text: "Oferecer fé como moeda — comprar silêncio ao céu por um instante"
     next: act7/epilogue_apocalypse
     condition: { resource: { faith: { gte: 1 } } }
+    showWhenLocked: true
+    lockedHint: "O céu cobra fé que ainda exista — precisas de pelo menos 1 para abrir este contrato."
     effects:
       - { op: addResource, resource: faith, delta: -2 }
       - { op: addMark, mark: act7_paid_sky_in_faith }

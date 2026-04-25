@@ -9,8 +9,6 @@ choices:
     next: act1/class_gate
 onEnter: []
 ---
-Na curva da pedra, um **espelho de mão** pendurado por uma corrente enferrujada — oferenda ridícula para um sítio sem sol.
+Um **espelho de mão** na corrente enferrujada: ridículo aqui, mas o vidro **treme** e *{{playerName}}* encara *{{playerName}}* sem a água negra a mentir.
 
-Levantas-o: o vidro **treme**; *{{playerName}}* encara *{{playerName}}*, sem a água negra a mentir por ti.
-
-É **só tu**. Sem máscara de osso, sem ripple — e por isso **pior**: não há truque que absolva a escolha que vais fazer daqui a instantes. O reflexo não julga; **mostra**.
+É **só tu** — sem truque que absolva o que vais escolher a seguir.

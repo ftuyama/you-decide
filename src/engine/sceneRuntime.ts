@@ -100,8 +100,30 @@ export function enterScene(
   return s;
 }
 
+/** Linhas de escolha na ordem do YAML: ativas, bloqueadas visíveis (teaser), ou omitidas. */
+export type StoryChoiceRow =
+  | { kind: 'enabled'; choice: Choice }
+  | { kind: 'locked'; choice: Choice; hint: string };
+
+export function buildStoryChoiceRows(choices: Choice[], state: GameState): StoryChoiceRow[] {
+  const rows: StoryChoiceRow[] = [];
+  for (const ch of choices) {
+    if (ch.condition === undefined || evaluateCondition(ch.condition, state)) {
+      rows.push({ kind: 'enabled', choice: ch });
+      continue;
+    }
+    const hint = ch.lockedHint?.trim();
+    if (ch.showWhenLocked && hint) {
+      rows.push({ kind: 'locked', choice: ch, hint });
+    }
+  }
+  return rows;
+}
+
 export function filterChoices(choices: Choice[], state: GameState): Choice[] {
-  return choices.filter((ch) => evaluateCondition(ch.condition, state));
+  return buildStoryChoiceRows(choices, state).flatMap((r) =>
+    r.kind === 'enabled' ? [r.choice] : []
+  );
 }
 
 /** Dados da rolagem 2d6 + mod para a UI (teste de perícia / sorte). */

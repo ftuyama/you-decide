@@ -17,10 +17,8 @@ choices:
     next: act1/title_breath
 onEnter: []
 ---
-# Calvário Subterrâneo
+# A Masmorra do Silêncio
 
-O **pulso verde** não cessa — sobe pela garganta da cidade como vómito de luar envenenado. Sob os fundamentos, o antigo **complexo funerário** abre a boca: pedra húmida, ferro oxidado, e um cheiro a cobre que não deveria ter temperatura.
+O **pulso verde** sobe pela garganta da cidade; por baixo, a **masmorra** abre boca muda: pedra húmida, ferro velho, cobre com temperatura errada — e um **silêncio** que não é ausência de som, é **peso** que empurra para dentro.
 
-Lá em cima, o mercado ainda finge que o **imposto** cobra só o pão; quem desce sem voltar entra no preço dos outros — **nome** raspado de lista, **porta** que não abre à segunda chamada.
-
-*{{playerName}}*, seja por honra, ganância ou desespero, o primeiro passo é sempre o mesmo: **descer**.
+Lá em cima fingem que o **imposto** é só pão; quem desce e não volta entra no preço alheio — *{{playerName}}*, honra ou fome, o primeiro passo é **descer** até onde a voz já não soa como a tua.

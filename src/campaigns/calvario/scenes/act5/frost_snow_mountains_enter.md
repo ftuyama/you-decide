@@ -9,8 +9,6 @@ choices:
     next: act5/encounters/frost_snow_mountains_combat
 onEnter: []
 ---
-Há quem diga que, acima da linha onde a **tempestade** aprende silêncio, uma **gruta** respira como um peito antigo. Não consta em mapas de mercador — só em **sussurro** de patrulheiro e em culpa de quem voltou **meio** de lá.
+Acima da linha onde a **tempestade** cala, dizem que uma **gruta** respira — rastro só em **sussurro** e em quem voltou **meio** de lá.
 
-A neve aqui não é pano; é **pergunta**. Cada passo pergunta se ainda precisas do teu nome.
-
-Se subires, não chames isso **turismo**. Chama **peregrinação** — ou **fuga** disfarçada de coragem.
+A neve **pergunta** se ainda precisas do nome; subir é **peregrinação** ou **fuga** com capa de coragem.

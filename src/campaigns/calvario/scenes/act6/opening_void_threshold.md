@@ -13,11 +13,7 @@ onEnter:
   - { op: setNarrativeTier, tier: 4 }
   - { op: addDiary, text: "No fundo do gelo havia uma porta sem dobradiça. Entrei e o mundo respondeu com a minha voz, mas sem a minha piedade." }
 ---
-O gelo não termina: ele **abre**. Debaixo das Cimeiras, encontras uma nave sem altar, pendurada entre pedra e noite, como se alguém tivesse construído uma catedral para abrigar uma pergunta.
+O gelo **abre** sob as Cimeiras: **nave** sem altar, pendurada entre pedra e noite — catedral para uma pergunta.
 
-Cada passo devolve um eco teu, mas atrasado o suficiente para parecer **outra pessoa** — o mesmo truque do **caco** entre degraus, lá em baixo: estranho com o teu nome, só que agora o nome **responde** sem pedir licença. O ar não cheira a morte nem a incenso. Cheira a **verdade antes de ter nome**.
-
-Uma inscrição corre pelas colunas quebradas:
-
-> *Se o mundo for sonho, quem acorda quando tu cais?*
+Cada eco volta **atrasado**, outra pessoa com o teu nome; o ar cheira a **verdade antes de ter nome**. Nas colunas partidas: *se o mundo for sonho, quem acorda quando cais?*
 

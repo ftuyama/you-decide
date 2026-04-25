@@ -13,9 +13,9 @@ choices:
         onFlee: act5/frost_hub
 onEnter: []
 ---
-Um **estalido** sob a tua **bota** — **demasiado** cedo. O **cultista** **ergue** o rosto; o **whelp** **sibila** como **fio** de geada entre os dentes. Tomás **sente** o **ar** mudar e **puxa** o escudo, **preso**, **inútil** — mas **vivo**.
+**Estalido** debaixo da bota — **cedo** demais. O **cultista** ergue o rosto; o **whelp** **sibila**; **Tomás** puxa o escudo **preso**, ainda **vivo**.
 
-Agora não há **teatro** — só **luta** onde **hesitação** paga **juros** em **carne**.
+Só **luta**; **hesitação** paga **juros** em carne.
 
 ---
 

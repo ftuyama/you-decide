@@ -62,11 +62,9 @@ choices:
 onEnter:
   - { op: setNarrativeTier, tier: 4 }
 ---
-Três corredores respiram à tua frente, cada um com uma mentira diferente sobre o que é viver — mas **só um de cada vez** abre a garganta: o Vazio impõe **ordem** como quem impõe sentença. Não há mapa aqui; só **versões** e a fila que não pede opinião.
+Três corredores mentem sobre o que é viver; o **Vazio** abre **um de cada vez** — **sentença**, não mapa, só **versões** em fila.
 
-No teto, rachaduras formam constelações impossíveis. Uma delas lembra o teu rosto em idade avançada. Outra, o teu rosto sem culpa.
+No teto, rachaduras **constelam** rostos teus impossíveis. Sair **inteiro** pode ser dizer **incompleto** com etiqueta bonita.
 
-Se queres sair inteiro, vais precisar de aceitar que inteiro talvez seja uma forma elegante de dizer **incompleto**.
-
-Entre colunas partidas, alguém **aquece** uma fogueira que não deveria existir — e mais adiante, uma **banca** sem dono expõe remédios como se o vazio fosse cliente **habitué**.
+Entre colunas, fogueira que não devia existir e **banca** sem dono fingem negócio com quem já é cliente do vazio.
 

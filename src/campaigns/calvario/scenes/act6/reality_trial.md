@@ -20,11 +20,7 @@ choices:
     next: act6/encounters/reality_trial_shatter
 onEnter: []
 ---
-Os espelhos não mostram o teu rosto: mostram versões de ti que fizeram escolhas mais fáceis. Numa delas, nunca entraste no Calvário. Noutra, foste amado por todos e lembrado por ninguém.
+Os espelhos mostram **ti** com escolhas mais fáceis — nunca entraste na Masmorra do Silêncio, ou foste amado por todos e esquecido por todos.
 
-No centro do corredor, um arauto de véu metálico inclina a cabeça:
-
-> *"Real não é o que existe. Real é o que insiste."*
-
-Ele abre as mãos e o chão fica líquido por um instante. Só fica de pé quem decide qual dor merece ser chamada de verdade.
+O arauto de véu metálico inclina-se: *real é o que **insiste***; o chão liquefaz-se um instante — só ficas de pé se escolheres qual dor chamas de verdade.
 

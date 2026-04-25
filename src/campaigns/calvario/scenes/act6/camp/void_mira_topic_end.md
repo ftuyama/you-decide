@@ -11,13 +11,9 @@ choices:
       - { op: addDiary, text: "Mira falou do fim como de uma fresta — não de vitória. Guardo isto como quem guarda fósforo: pouco, mas suficiente para ver o próximo passo." }
 onEnter: []
 ---
-> *"Porta fecha. Poço **engole**", murmura ela. "Eu prefiro porta — dói menos no orgulho. Se o fim for buraco, eu desço **primeiro**: já sei o sabor da queda."*
+> *"Porta fecha; poço **engole**",* murmura **Mira**. *"Prefiro porta. Becos eu conheço."*
 
-Um riso curto, sem alegria.
-
-> *"Contigo, talvez seja só mais um beco. Becos eu conheço."*
-
-Se o **Vazio** é espelho que não perdoa, então o beco acabou: daqui para a frente, o que te segue não é sombra — é **decisão** com o teu peso real.
+Riso curto; daqui em diante o **Vazio** não perdoa — segue-te **decisão** com o teu peso real.
 
 ---
 

@@ -10,8 +10,6 @@ choices:
 onEnter:
   - { op: addDiary, text: "O apocalipse não terminou — só ficou mais honesto: cinza com nome, vento com conta, e eu no meio a aprender a respirar sem pedir licença ao céu." }
 ---
-O mundo **continua** a partir sem ti — como sempre continuou — só que agora o teu **eco** não cabe inteiro no peito: parte ficou na **estrada**, parte na **marca** que escolheste, parte no **silêncio** que compraste ou recusaste.
+O mundo **continua** sem ti; o teu **eco** reparte-se entre **estrada**, **marca** e **silêncio** comprado ou recusado.
 
-Não há **morada** estável aqui — há **testemunho**. E testemunho, no fim, é o que sobrevive quando até Deus aprende a **sussurrar**.
-
-*(Podes **salvar** o jogo no menu ou **recomeçar** quando quiseres.)*
+Sobra **testemunho** — o que resta quando até o céu aprende a **sussurrar**. *(Podes **salvar** no menu ou **recomeçar**.)*

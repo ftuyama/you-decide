@@ -15,7 +15,7 @@ onEnter:
   - { op: addResource, resource: faith, delta: -2 }
   - { op: addMark, mark: calvario_sealed }
 ---
-Selas o **Calvário** com preço. Cicatrizes na alma; paz frágil nas pedras.
+Selas a **Masmorra do Silêncio** com preço. Cicatrizes na alma; paz frágil nas pedras.
 
 O selo pede mais do que sangue: pede que a tua mente não rache quando o sino
 rebenta por dentro.

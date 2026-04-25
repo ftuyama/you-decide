@@ -17,7 +17,7 @@ export const DEFAULT_HERO_NAME: Record<ClassId, string> = {
 
 /** Pequena lore por classe (expandível na UI). */
 export const CLASS_LORE_PT: Record<ClassId, string> = {
-  knight: `Galen jurou a espada às muralhas do sul. Desceu ao Calvário por dívida de honra — e porque, nas galerias, ainda há linhas a segurar e portas a fechar.
+  knight: `Galen jurou a espada às muralhas do sul. Desceu à Masmorra do Silêncio por dívida de honra — e porque, nas galerias, ainda há linhas a segurar e portas a fechar.
 
 Quem o vê de armadura gasta pensa em bravura barata; ele sabe que cada camada de ferro é uma promessa que não se desdiz.`,
 
@@ -49,7 +49,7 @@ const PATH_LORE_PT: Partial<Record<string, string>> = {
 
 Quem o chama de caído não sabe o que é levantar outra vez só para não deixar ninguém atrás.`,
 
-  'mage:dark': `A Torre ensinou símbolos seguros; o Calvário ensinou os outros. Ysara escolheu a segunda lição de propósito — não por sede de poder, mas porque certas portas só abrem com sombras honestas.
+  'mage:dark': `A Torre ensinou símbolos seguros; a masmorra ensinou os outros. Ysara escolheu a segunda lição de propósito — não por sede de poder, mas porque certas portas só abrem com sombras honestas.
 
 O caderno tem páginas que ela não mostra ao scriptorium.`,
 

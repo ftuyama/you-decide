@@ -14,10 +14,6 @@ luckCheck:
 onEnter: []
 choices: []
 ---
-O capuz **inclina-se** — não por respeito, por **aposta**.
+O capuz **inclina-se** por **aposta**; sussurras **símbolos** e o ar **aprende** o padrão — alguém invisível **segura** os dados.
 
-Sussurras o **anel fechado** e o **traço que não existe** no mapa. O ar **aprende** o padrão… e alguém que não vês **segura** os dados.
-
-"O Círculo **empresta** sorte", respira a voz. "Quem **erra** o timing paga **outra moeda**."
-
-**Rola sorte** — tens **ligeira desvantagem**: o pacto **morde** −1 no total, como **dívida** já contada.
+*O Círculo empresta sorte; quem erra o timing paga outra moeda.* **Rola sorte** (−1 no total: **dívida** já contada).

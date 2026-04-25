@@ -13,11 +13,9 @@ choices:
     next: act5/camp/frost_companion_chat
 onEnter: []
 ---
-**Tomás** esfrega as mãos devagar, sem drama — trabalho de quem já aprendeu que o frio não negocia. O escudo está perto, sempre, como segunda pele.
+**Tomás** esfrega as mãos sem drama; o escudo perto, **segunda pele**.
 
-> *"A montanha não é inimigo", diz. "Inimigo é **confundir** cansaço com sinal de Deus."*
-
-O escudo devolve uma **sombra** tua mais estreita — como espelho mentiroso, só que útil: lembra que **postura** também é máscara, e máscara cansa menos que ferida aberta.
+> *"Montanha não é inimigo — inimigo é **confundir** cansaço com sinal de Deus."* A sombra no metal lembra: **postura** também é máscara.
 ---
 
 {{companionLine}}

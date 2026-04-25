@@ -18,10 +18,6 @@ onEnter:
       text: "Na gruta acima da tempestade, um monge sem rosto deu-me uma bênção estranha: não promessa, não milagre — só a certeza de que a sorte também pode ser disciplina. Ganhei a passiva Paz interior: +1 SOR, para sempre.",
     }
 ---
-O monge **inclina** a cabeça — não vitória, **encerramento**.
+O monge **inclina** a cabeça — *não leves eu; leva isto: o mundo atira dados, e tu aprendeste a olhar sem pedir truque.*
 
-— *Não leves eu. Leva isto: o mundo vai continuar a atirar dados; tu, pelo menos, **aprendeste** a olhar para eles sem pedir truque.*
-
-Algo **assenta** no peito — não calor, não brilho. Um **passivo** silencioso: uma linha fina de sorte que não pede nome, só **permanece**. O teu **SOR** aumenta em **1**, para sempre.
-
-A gruta não agradece. Só **respira** quando sais.
+Algo **assenta** no peito: **+1 SOR**, para sempre, como **passivo** silencioso. A gruta só **respira** quando sais.

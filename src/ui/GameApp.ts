@@ -65,6 +65,8 @@ export class GameApp {
   private state: GameState;
   private root: HTMLElement;
   private chromeRefs: AppChromeRefs | null = null;
+  /** `mode:sceneId` após último `scrollTop = 0` em `main` — evita reset em re-render da mesma cena. */
+  private lastMainScrollResetKey: string | null = null;
   private timedTimer: ReturnType<typeof setTimeout> | null = null;
   private menuOpen = false;
   /** 0 = 100%, 1 = 110%, 2 = 120% */
@@ -905,6 +907,11 @@ export class GameApp {
           } else {
             renderStoryInto(main, this.buildStoryRenderContext(scene));
           }
+        }
+        const scrollKey = `${this.state.mode}:${this.state.sceneId}`;
+        if (scrollKey !== this.lastMainScrollResetKey) {
+          main.scrollTop = 0;
+          this.lastMainScrollResetKey = scrollKey;
         }
       },
     };

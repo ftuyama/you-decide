@@ -13,6 +13,6 @@ skillCheck:
   label: "Aproximar-te sem que o vento te venda"
 onEnter: []
 ---
-A **neve** mente com carinho — **esconde** o som, mas **não** o rasto. Para chegares antes ao **ritual**, precisas de **perna** e de **juízo**: ou **calas** o passo até o último instante, ou o **cultista** vira a cabeça e o **whelp** de geada **acorda** com fome de **pânico**.
+A **neve** esconde o som, não o **rasto** — **perna** e **juízo**, ou o **cultista** vira a cabeça e o **whelp** acorda com fome de **pânico**.
 
-Tomás **morde** o lábio. Não vê **quem** vens — só **espera** que alguém **digno** mande o escudo **levantar** de novo.
+**Tomás** morde o lábio: não vê quem vens, só **espera** que alguém digno **levante** o escudo outra vez.

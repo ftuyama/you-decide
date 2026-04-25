@@ -13,9 +13,9 @@ choices:
         onFlee: act5/frost_hub
 onEnter: []
 ---
-Alcanças a **clareira** como **sombra** — o **whelp** ainda **fareja** o vento errado; o **cultista** **inclina** a faca para o **pescoço** do escudeiro. **Agora** é o momento em que **silêncio** paga **juros** em sangue.
+Chegas à **clareira** em **sombra** — **whelp** a farejar vento errado; **cultista** com faca no **pescoço** de **Tomás**. **Silêncio** paga **juros** em sangue.
 
-Tomás **fecha** os olhos — não por **medo**, por **contagem**.
+Tomás **fecha** os olhos por **contagem**, não por medo.
 
 ---
 

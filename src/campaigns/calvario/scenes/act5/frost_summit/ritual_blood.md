@@ -14,6 +14,6 @@ dualAttrSkillCheck:
   label: "Três selos — vontade e ferro"
 onEnter: []
 ---
-O sangue **escurece** a neve sem pedir licença. O ar cheira a **ferro** e a **juramento** quebrado. Algo no templo **desperta** — não com bênção, mas com **contrato**.
+Sangue **escurece** a neve; o ar cheira a **ferro** e **juramento** partido — no templo, algo **acorda** por **contrato**, não por bênção.
 
-Para **fechar** a invocação antes que ela te feche a ti, precisas de **mente** que não trema e **força** que não negocie — **três vezes**, **três** portas de dados. Se falhares numa só, o que vem **não vem** como promessa.
+**Três selos** — Mente e Força, três vezes — ou o que vem **não vem** como promessa.

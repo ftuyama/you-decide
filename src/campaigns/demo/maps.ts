@@ -1,4 +1,4 @@
-/** Minimal ASCII map for the demo stub (same shape as Calvário). */
+/** Minimal ASCII map for the demo stub (same shape as a campanha completa). */
 export const MAPS: Record<string, string[]> = {
   demo5: ['#####', '#...#', '#.#.#', '#..!#', '#####'],
 };

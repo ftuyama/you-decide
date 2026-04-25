@@ -7,6 +7,8 @@ choices:
   - text: "Gastar corda e calor — puxar a mula para o salto"
     next: act5/frost_hub
     condition: { resource: { supply: { gte: 1 } } }
+    showWhenLocked: true
+    lockedHint: "Sem suprimento não há corda nem calor de sobra para o acto de salvar — precisas de pelo menos 1."
     effects:
       - { op: addResource, resource: supply, delta: -1 }
       - { op: addResource, resource: faith, delta: 1 }

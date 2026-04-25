@@ -13,10 +13,6 @@ luckCheck:
 choices: []
 onEnter: []
 ---
-Um **riso** muito baixo, quase geada a estalar.
+Um **riso** baixo, geada a estalar: *agora não é ideia — é **queda** e **sorte**.*
 
-— *Agora deixa de ser ideia. Agora é o que te acontece quando não há plano — só **queda** e **sorte**.*
-
-A gruta parece **inclinar-se**. Não há armadilha visível; há a sensação de que o próximo passo pode ser **teu**… ou de alguém que acreditou demais em controlo.
-
-**Rola sorte** — não para impressionar o monge, mas para ver se ainda sabes **confessar** que nem tudo é mérito.
+A gruta **inclina-se**; o próximo passo pode ser teu ou de quem acreditou demais em controlo. **Rola sorte** quando estiveres pronto.

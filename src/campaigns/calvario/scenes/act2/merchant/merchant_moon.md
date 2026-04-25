@@ -67,12 +67,16 @@ choices:
   - text: "Mencionar patrulhas da Vigília (aliados)"
     next: act2/hub_catacomb
     condition: { rep: { faction: vigilia, gte: 2 } }
+    showWhenLocked: true
+    lockedHint: "A Vigília só te dá esse gancho quando a reputação contigo é forte (≥2)."
     effects:
       - { op: addDiary, text: "O mercador hesitou quando falei da Vigília — interesse compra silêncio." }
     preview: "Diário · rumor de respeito"
   - text: "Sussurrar símbolos do Círculo"
     next: act2/merchant/merchant_circle_bet
     condition: { rep: { faction: circulo, gte: 1 } }
+    showWhenLocked: true
+    lockedHint: "O Círculo só ouve sussurros de quem já lhes deve atenção (reputação ≥1)."
     preview: "Teste de sorte · aposta amaldiçoada"
   - text: "Deixar o Terceiro Sino nomear o preço"
     next: act2/hub_catacomb

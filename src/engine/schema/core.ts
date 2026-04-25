@@ -228,18 +228,45 @@ export type Effect =
   | { op: 'advanceDay' }
   | { op: 'resetRun' };
 
-export const ChoiceSchema = z.object({
-  id: z.string().optional(),
-  text: z.string(),
-  next: z.string().optional(),
-  condition: ConditionSchema.optional(),
-  /** Texto de preview de consequência (1 linha) */
-  preview: z.string().optional(),
-  effects: z.array(EffectSchema).default([]),
-  /** Escolha com tempo: ms; se expirar, usa fallbackNext */
-  timedMs: z.number().positive().optional(),
-  fallbackNext: z.string().optional(),
-});
+export const ChoiceSchema = z
+  .object({
+    id: z.string().optional(),
+    text: z.string(),
+    next: z.string().optional(),
+    condition: ConditionSchema.optional(),
+    /** Texto de preview de consequência (1 linha) */
+    preview: z.string().optional(),
+    effects: z.array(EffectSchema).default([]),
+    /** Escolha com tempo: ms; se expirar, usa fallbackNext */
+    timedMs: z.number().positive().optional(),
+    fallbackNext: z.string().optional(),
+    /**
+     * Se a `condition` falhar, a UI ainda mostra a linha desabilitada (teaser).
+     * Exige `condition` e `lockedHint` quando true.
+     */
+    showWhenLocked: z.boolean().optional(),
+    /** Texto curto ao jogador quando a escolha está bloqueada (requisito / gancho). */
+    lockedHint: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.showWhenLocked) {
+      if (data.condition === undefined) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'showWhenLocked exige condition',
+          path: ['condition'],
+        });
+      }
+      const h = data.lockedHint?.trim();
+      if (!h) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'showWhenLocked exige lockedHint não vazio',
+          path: ['lockedHint'],
+        });
+      }
+    }
+  });
 
 export type Choice = z.infer<typeof ChoiceSchema>;
 

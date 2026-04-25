@@ -12,8 +12,8 @@ onEnter:
   - { op: recruit, companionId: squire_tomas }
   - { op: addDiary, text: "Arranquei Tomás da corda e do ritual. O escudo dele ainda treme — mas jurou-se a seguir quem não fugir de primeiro." }
 ---
-A corda cai como serpente morta. Tomás respira como quem rouba o ar ao céu; as mãos tremem, mas agarra o escudo como nome próprio.
+A corda cai; **Tomás** rouba ar ao céu e agarra o escudo como **nome**.
 
-> "Não vim para ti — vim para o que deixas para trás." Engole orgulho. "Se me ordenares levantar, levanto. Se não — caminho ao teu lado até o calvário ter vergonha de nós."
+> *"Não vim por ti — vim pelo que deixas para trás. Ordena levantar, levanto; senão, caminho contigo."*
 
-Não é romance — é contrato entre ferro e silêncio.
+**Contrato** de ferro e silêncio, não romance.

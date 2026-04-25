@@ -13,6 +13,8 @@ choices:
       all:
         - { level: { gte: 18 } }
         - { day: { lte: 10 } }
+    showWhenLocked: true
+    lockedHint: "A neve só mantém o rasto legível com força (nível 18) e cedo no ciclo (até ao dia 10)."
     preview: "Rasto, emboscada ou caça — a neve não julga."
   - text: "Rumor do escudeiro — corda e ritual no gelo"
     next: act5/frost_tomas/intro
@@ -58,9 +60,11 @@ choices:
       all:
         - { level: { gte: 25 } }
         - { day: { lte: 10 } }
+    showWhenLocked: true
+    lockedHint: "O cume exige corpo de veterano (nível 25) e janela curta no calendário da tempestade (até ao dia 10)."
     preview: "Ascensão perigosa ao templo e ao que dorme no cume."
 onEnter: []
 ---
-Uma **lasca** de abrigo contra o vento: tendas que rangem como **dentes** velhos, fogareiro que mais **ameaça** do que aquece. Alguém deixou marcas na neve — **humanas**, **bestiais**, e uma terceira que não gosta de nome.
+**Tendas** rangem como dentes velhos; o fogo mais **ameaça** do que aquece. Na neve: marcas **humanas**, **bestiais** e uma terceira sem nome.
 
-Aqui o mapa é **decisão** — não linha. Podes seguir o rumor, **negociar** o preço do calor, ou deixar a neve **escolher** por ti. O desfiladeiro não julga; só **cobre**.
+O mapa aqui é **decisão** — rumor, **troca** de calor, ou deixar a neve **escolher**. O desfiladeiro só **cobre**.

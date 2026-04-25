@@ -1,5 +1,5 @@
 import {
-  filterChoices,
+  buildStoryChoiceRows,
   renderSceneBody,
   type LoadedScene,
   type StoryDiceRollBreakdown,
@@ -634,6 +634,8 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
   appendCampEquipmentPanel(inner, ctx.state, ctx.registry, ctx.campCallbacks);
 
   let storyNavIndex = 0;
+  const storyQuickKeyHint = (n: number): string =>
+    `Pressione ${n} no teclado para ativar esta ação sem clicar`;
 
   if (ctx.scene.frontmatter.skillCheck) {
     storyNavIndex += 1;
@@ -643,7 +645,7 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     b.className = 'choice';
     const base = `Rolar teste: ${ctx.scene.frontmatter.skillCheck.label ?? ctx.scene.frontmatter.skillCheck.attr} (2d6)`;
     b.textContent = `${storyNavIndex} - ${base}`;
-    if (storyNavIndex < 10) b.title = `Tecla ${storyNavIndex}`;
+    if (storyNavIndex < 10) b.title = storyQuickKeyHint(storyNavIndex);
     b.addEventListener('click', () => ctx.navigation.onSkillRoll(ctx.scene));
     row.appendChild(b);
     inner.appendChild(row);
@@ -661,7 +663,7 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
       `${dc.attrs[0].toUpperCase()} + ${dc.attrs[1].toUpperCase()} · ${dc.rounds} lançamentos`;
     const base = `Rolar prova tríplice: ${lbl} (2d6 + dois mods vs TN ${dc.tn})`;
     b.textContent = `${storyNavIndex} - ${base}`;
-    if (storyNavIndex < 10) b.title = `Tecla ${storyNavIndex}`;
+    if (storyNavIndex < 10) b.title = storyQuickKeyHint(storyNavIndex);
     b.addEventListener('click', () => ctx.navigation.onDualAttrSkillRoll(ctx.scene));
     row.appendChild(b);
     inner.appendChild(row);
@@ -678,23 +680,42 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
       lc.luckPenalty && lc.luckPenalty > 0 ? ` · maldição −${lc.luckPenalty}` : '';
     const base = `Rolar sorte: ${lc.label ?? '2d6 + mod(SOR)'} vs TN ${lc.tn}${curse}`;
     b.textContent = `${storyNavIndex} - ${base}`;
-    if (storyNavIndex < 10) b.title = `Tecla ${storyNavIndex}`;
+    if (storyNavIndex < 10) b.title = storyQuickKeyHint(storyNavIndex);
     b.addEventListener('click', () => ctx.navigation.onLuckRoll(ctx.scene));
     row.appendChild(b);
     inner.appendChild(row);
   }
 
-  const choices = filterChoices(ctx.scene.frontmatter.choices, ctx.state);
+  const choiceRows = buildStoryChoiceRows(ctx.scene.frontmatter.choices, ctx.state);
+  const enabledChoices = choiceRows
+    .filter((r): r is { kind: 'enabled'; choice: Choice } => r.kind === 'enabled')
+    .map((r) => r.choice);
   const chWrap = document.createElement('div');
   chWrap.className = 'choices';
 
-  choices.forEach((ch, i) => {
-    const runChoice = (): void => ctx.navigation.applyChoice(ch);
+  choiceRows.forEach((row, i) => {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'choice';
     const navNum = storyNavIndex + i + 1;
-    if (navNum < 10) btn.title = `Tecla ${navNum}`;
+
+    if (row.kind === 'locked') {
+      btn.disabled = true;
+      btn.classList.add('choice--locked');
+      btn.title = row.hint;
+      const labelText = `${navNum} - ${row.choice.text}`;
+      btn.appendChild(document.createTextNode(labelText));
+      const hintSpan = document.createElement('span');
+      hintSpan.className = 'choice-locked-hint';
+      hintSpan.textContent = row.hint;
+      btn.appendChild(hintSpan);
+      chWrap.appendChild(btn);
+      return;
+    }
+
+    const ch = row.choice;
+    const runChoice = (): void => ctx.navigation.applyChoice(ch);
+    if (navNum < 10) btn.title = storyQuickKeyHint(navNum);
     const labelText = `${navNum} - ${ch.text}`;
     btn.appendChild(document.createTextNode(labelText));
     if (ch.preview) {
@@ -709,8 +730,8 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
   inner.appendChild(chWrap);
 
   const hasTimedChoice =
-    ctx.timedChoiceEnabled && choices.some((c) => c.timedMs && c.fallbackNext);
-  setupTimedChoices(choices, inner, ctx);
+    ctx.timedChoiceEnabled && enabledChoices.some((c) => c.timedMs && c.fallbackNext);
+  setupTimedChoices(enabledChoices, inner, ctx);
   if (!hasTimedChoice) {
     ctx.onTimedChoiceScheduled(null);
   }

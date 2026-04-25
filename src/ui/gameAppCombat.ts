@@ -4,10 +4,19 @@ import {
   executePlayerTurn,
   executeSpellTurn,
   fleeCombat,
+  fleeDifficultyTn,
   SACRIFICE_MIN_CORRUPTION,
   useCombatConsumable,
 } from '../engine/combat.ts';
-import type { Character, CombatLogEntry, GameState, Stance } from '../engine/schema.ts';
+import { getSacrificeValues } from '../engine/combat/constants.ts';
+import type {
+  Character,
+  CombatLogEntry,
+  GameState,
+  ItemDef,
+  SpellDef,
+  Stance,
+} from '../engine/schema.ts';
 import type { GameData } from '../engine/gameData.ts';
 import type { ContentRegistry } from '../content/registry.ts';
 import type { EventBus } from '../engine/eventBus.ts';
@@ -37,6 +46,50 @@ export function combatQuickKeyAt(index: number): string | null {
   if (index < 9) return String(index + 1);
   const j = index - 9;
   return j < COMBAT_QUICK_KEYS_AFTER_9.length ? COMBAT_QUICK_KEYS_AFTER_9[j]! : null;
+}
+
+function combatShortcutTitle(btn: HTMLButtonElement): string {
+  const raw = btn.dataset.quickNavCombat;
+  if (raw == null) return '';
+  const keyDisplay =
+    raw.length === 1 && raw >= 'a' && raw <= 'z' ? raw.toUpperCase() : raw;
+  return `Pressione ${keyDisplay} no teclado para ativar sem clicar.`;
+}
+
+function joinCombatActionHint(description: string, btn: HTMLButtonElement): string {
+  const shortcut = combatShortcutTitle(btn);
+  return shortcut ? `${description} ${shortcut}` : description;
+}
+
+const STANCE_COMBAT_HINT: Record<Stance, string> = {
+  aggressive:
+    'Postura ofensiva: +1 no acerto (2d6+mod) e +1 no dano fixo; não aumenta a CA contra golpes inimigos.',
+  defensive:
+    'Postura guardada: +2 na CA quando os inimigos te atacam; −1 no acerto (2d6+mod).',
+  focus:
+    'Postura técnica: o acerto usa mod de Mente (+1 extra) no lugar do mod de Força; o dano da arma segue o normal.',
+};
+
+function spellCombatHoverText(sp: SpellDef): string {
+  if (sp.spellKind === 'damage') {
+    return `Dano mágico no primeiro inimigo com vida: ${sp.dice}d6+${sp.base}+mod(Mente). Consome o turno.`;
+  }
+  if (sp.spellKind === 'heal_self') {
+    return `Cura em você: ${sp.dice}d6+${sp.base}+mod(Mente), até o HP máximo. Consome o turno.`;
+  }
+  if (sp.spellKind === 'buff_attack_roll') {
+    return 'Suporte: +1 no seu ataque físico até o fim do combate. Consome o turno.';
+  }
+  return 'Suporte: +1 na sua CA até o fim do combate. Consome o turno.';
+}
+
+function consumableCombatHover(def: ItemDef): string {
+  const bits: string[] = [];
+  if (def.restoreHp && def.restoreHp > 0) bits.push(`até +${def.restoreHp} HP`);
+  if (def.restoreMana && def.restoreMana > 0) bits.push(`até +${def.restoreMana} mana`);
+  if (def.stressRelief && def.stressRelief > 0) bits.push(`−${def.stressRelief} Stress`);
+  const summary = bits.length > 0 ? bits.join(', ') : 'efeito do item';
+  return `Usa no líder: ${summary}. Consome o turno.`;
 }
 
 export function playCombatLogSound(
@@ -230,6 +283,20 @@ type CombatLogRenderCtx = {
   combatantNames: readonly string[];
 };
 
+/** Physical attack log row: actor in party → player/companion; otherwise enemy. */
+function combatAttackOriginClass(
+  entry: { actor?: string; target?: string },
+  partyNames: Set<string>
+): 'combat-attack-by-party' | 'combat-attack-by-enemy' {
+  if (entry.actor != null) {
+    return partyNames.has(entry.actor) ? 'combat-attack-by-party' : 'combat-attack-by-enemy';
+  }
+  if (entry.target != null) {
+    return partyNames.has(entry.target) ? 'combat-attack-by-enemy' : 'combat-attack-by-party';
+  }
+  return 'combat-attack-by-party';
+}
+
 function appendCombatLogDisplayItems(
   parent: HTMLElement,
   items: CombatLogDisplayItem[],
@@ -242,6 +309,7 @@ function appendCombatLogDisplayItems(
       const { attack, damage, quaseCritico } = item;
       const wrap = document.createElement('div');
       wrap.className = 'combat-log-entry combat-log-attack combat-outcome-hit combat-log-damage';
+      wrap.classList.add(combatAttackOriginClass(attack, partyNames));
       if (damage.target) {
         wrap.classList.add(
           partyNames.has(damage.target) ? 'combat-damage-to-hero' : 'combat-damage-to-enemy'
@@ -292,6 +360,7 @@ function appendCombatLogDisplayItems(
     wrap.className = `combat-log-entry combat-log-${entry.kind}`;
     if (entry.kind === 'attack' && entry.outcome) {
       wrap.classList.add(entry.outcome === 'hit' ? 'combat-outcome-hit' : 'combat-outcome-miss');
+      wrap.classList.add(combatAttackOriginClass(entry, partyNames));
     }
     if (entry.kind === 'damage' && entry.target) {
       wrap.classList.add(
@@ -551,9 +620,16 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     combatQuickNavIndex += 1;
     if (key != null) {
       btn.dataset.quickNavCombat = key;
-      btn.title = `Tecla ${key}`;
+    } else {
+      delete btn.dataset.quickNavCombat;
     }
     setLabel(key);
+    const shortcut = combatShortcutTitle(btn);
+    if (shortcut) {
+      btn.title = shortcut;
+    } else {
+      btn.removeAttribute('title');
+    }
   };
 
   if (c.phase === 'choose_stance' && lead) {
@@ -577,6 +653,7 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
       decorateCombatQuickNav(btn, (key) => {
         btn.textContent = key != null ? `${key} - ${labels[st]}` : labels[st];
       });
+      btn.title = joinCombatActionHint(STANCE_COMBAT_HINT[st], btn);
       btn.addEventListener('click', () => {
         ctx.lifecycle.unlockAudio();
         ctx.audio.playDice();
@@ -592,11 +669,15 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
       const sacrifice = document.createElement('button');
       sacrifice.className = 'stance special';
       decorateCombatQuickNav(sacrifice, (key) => {
-        const corr = ctx.state.resources.corruption;
         const base = 'Selo do Vazio';
-        sacrifice.title = `Corrupção: ${corr}`;
         sacrifice.textContent = key != null ? `${key} - ${base}` : base;
       });
+      const sacVals = getSacrificeValues(ctx.state);
+      const sacExplain =
+        sacVals != null
+          ? `Selo do Vazio: sacrifica até ${sacVals.hpCost} HP neste ataque por +${sacVals.damageBonus} de dano (postura agressiva). Corrupção ${ctx.state.resources.corruption}.`
+          : `Selo do Vazio. Corrupção ${ctx.state.resources.corruption}.`;
+      sacrifice.title = joinCombatActionHint(sacExplain, sacrifice);
       sacrifice.disabled = lead.hp <= 1;
       sacrifice.addEventListener('click', () => {
         if (lead.hp <= 1) return;
@@ -616,6 +697,10 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
       const base = lead.specialUsedThisCombat ? 'Especial já usado' : 'Golpe especial';
       sp.textContent = key != null ? `${key} - ${base}` : base;
     });
+    const specialExplain = lead.specialUsedThisCombat
+      ? 'Golpe especial já usado neste combate.'
+      : 'Golpe especial (uma vez por combate): +2 no acerto e +1 de Stress; o golpe usa a postura agressiva.';
+    sp.title = joinCombatActionHint(specialExplain, sp);
     sp.disabled = lead.specialUsedThisCombat;
     sp.addEventListener('click', () => {
       if (!lead.specialUsedThisCombat) {
@@ -651,10 +736,11 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
         decorateCombatQuickNav(btn, (key) => {
           const name =
             key != null
-              ? `${key} - ${spellDef.name} (${spellDef.manaCost})`
-              : `${spellDef.name} (${spellDef.manaCost})`;
+              ? `${key} - ${spellDef.name} (${spellDef.manaCost} MP)`
+              : `${spellDef.name} (${spellDef.manaCost} MP)`;
           btn.innerHTML = `<span class="spell-emoji" aria-hidden="true">${spellEmoji(spellId, spellDef)}</span><span>${escHtml(name)}</span>`;
         });
+        btn.title = joinCombatActionHint(spellCombatHoverText(spellDef), btn);
         const castOk = canCastSpell(ctx.state, spellId, ctx.registry.data);
         btn.disabled = !castOk;
         btn.addEventListener('click', () => {
@@ -689,9 +775,10 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
         btn.className = 'combat-potion';
         btn.type = 'button';
         decorateCombatQuickNav(btn, (key) => {
-          const base = count > 1 ? `${def.name} (${count})` : def.name;
+          const base = count > 1 ? `${def.name} (${count} qty)` : def.name;
           btn.textContent = key != null ? `${key} - ${base}` : base;
         });
+        btn.title = joinCombatActionHint(consumableCombatHover(def), btn);
         const ok = canUseCombatConsumable(ctx.state, itemId, ctx.registry.data);
         btn.disabled = !ok;
         btn.addEventListener('click', () => {
@@ -716,6 +803,11 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     const base = 'Tentar fugir (2d6 + Agilidade)';
     flee.textContent = key != null ? `${key} - ${base}` : base;
   });
+  const fleeTn = fleeDifficultyTn(c.fleeRate ?? 0.5);
+  const fleeExplain = canFlee
+    ? `Fuga: 2d6 + mod(Agilidade) ≥ ${fleeTn} para sair. Se falhar, vem a rodada dos inimigos.`
+    : 'Só é possível tentar fugir na fase de escolha de ações, com o líder vivo.';
+  flee.title = joinCombatActionHint(fleeExplain, flee);
   flee.addEventListener('click', () => {
     if (!canFlee) return;
     ctx.lifecycle.unlockAudio();

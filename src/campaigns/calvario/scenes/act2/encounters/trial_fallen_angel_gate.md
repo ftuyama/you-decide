@@ -37,8 +37,6 @@ choices:
     preview: "Combate · vantagem do inimigo"
 onEnter: []
 ---
-Do **cinza** do cruzeiro ergue-se uma **silhueta** que já foi luz demais para um só corpo. Não pede **perdão** — pede **prova**.
+Do **cinza** ergue-se **silhueta** que já foi luz demais para um corpo — não pede perdão, pede **prova**.
 
-"Quem quiser **nome** de queda, de **treva** ou de **penitência**", diz sem boca, "que **vença** o que caiu antes e ainda **corta**."
-
-Não há **atalho**: ou o **ferro**, o **arcano** e a **oração** aguentam o véu, ou **volta** sem título.
+*Quem quiser nome de queda, treva ou penitência que vença o que caiu e ainda corta* — sem **atalho**: ferro, arcano ou oração, ou **volta** sem título.

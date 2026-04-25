@@ -5,15 +5,14 @@
 }
 
 html {
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100%;
   background-color: var(--bg);
 }
 
 body {
   margin: 0;
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100%;
+  overflow: hidden;
   background-color: var(--bg);
   background-image:
     linear-gradient(var(--ui-grid-line) 1px, transparent 1px),
@@ -28,7 +27,25 @@ body {
 #app {
   max-width: 100rem;
   margin: 0 auto;
-  padding: 0.75rem 2rem 5rem;
+  padding: 0.75rem 2rem 1rem;
+  box-sizing: border-box;
+  height: 100%;
+  max-height: 100dvh;
+}
+
+/** Jogo: #app é o viewport lógico; scroll fica em `.story-shell` / `.player-sidebar`. */
+#app:not(.app--dev-tools):not(.app--scenes-graph) {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/** Ferramentas / grafo: scroll no próprio #app (conteúdo pode exceder a altura). */
+#app.app--dev-tools,
+#app.app--scenes-graph {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: none;
 }
 
 #app.app-fullscreen {

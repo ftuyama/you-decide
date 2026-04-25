@@ -14,8 +14,6 @@ choices:
     next: act5/frost_hub
 onEnter: []
 ---
-Alguém **canta** mal — não para o céu, para **o silêncio** entre as rochas. O rumor é **simples**: um **escudeiro** ainda com o escudo preso ao pulso, **amarrado** a um poste de gelo, e dois **cultistas** do frio que medem o tempo com **lâmina** e **oração**.
+Entre as rochas, **Tomás** está **amarrado** ao poste de gelo; dois **cultistas** do frio medem o tempo com **lâmina** e **oração**.
 
-Não é herói de romance — é **Tomás**, filho de ferreiros, a tremer **sem** vergonha. Se o deixares **lá**, o desfiladeiro aprende a **chamar** isso de justiça.
-
-Se **fores**, não chames **destino**; chama **dívida** que o sangue ainda não leu.
+Não é romance — é **dívida**; se o deixares, o desfiladeiro chama isso de justiça.

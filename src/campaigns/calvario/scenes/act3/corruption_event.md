@@ -12,4 +12,4 @@ choices:
     next: act3/hub_depths
 onEnter: []
 ---
-Um **cristal** verde pulsa. O Eco do Calvário responde.
+Um **cristal** verde pulsa. O eco da masmorra responde — um pulso que não pede permissão para falar baixo.

@@ -14,10 +14,6 @@ skillCheck:
 choices: []
 onEnter: []
 ---
-A sombra **dobra-se** como costas velhas. Não vês rosto — vês **hábito**: pano grosso, mãos quietas, o tipo de quietude que não é paz, é **decisão**.
+Sombra sem rosto, só **hábito** quieto — *diz uma verdade que **odeias** saber.*
 
-— *Diz-me uma coisa que sabes ser verdade… e que **odeias** saber.*
-
-Não é teste de eloquência. É ver se consegues **ficar** com a verdade sem a transformar em armadura. A gruta, dizem os que falham, não castiga — **fecha**.
-
-**Rola o teste de perícia** quando estiveres pronto.
+A gruta não castiga quem falha: **fecha**. **Rola o teste de perícia** quando estiveres pronto.

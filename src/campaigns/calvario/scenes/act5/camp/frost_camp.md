@@ -9,6 +9,8 @@ choices:
   - text: "Descansar junto ao fogareiro (−1 suprimento)"
     next: act5/frost_hub
     condition: { resource: { supply: { gte: 1 } } }
+    showWhenLocked: true
+    lockedHint: "Precisas de pelo menos 1 suprimento para pagar o descanso."
     effects:
       - { op: campRest }
       - { op: advanceDay }
@@ -38,6 +40,8 @@ choices:
   - text: "Trocar duas palavras com o grupo"
     next: act5/camp/frost_companion_chat
     condition: { companionCount: { gte: 1 } }
+    showWhenLocked: true
+    lockedHint: "Sem companheiro, não há grupo com quem trocar palavra."
   - text: "Manusear equipamento no acampamento"
     next: act5/camp/manage_equip
   - text: "Partilhar uma prece com devotos do Terceiro Sino"
@@ -99,8 +103,6 @@ choices:
 onEnter:
   - { op: addRep, faction: culto, delta: 1 }
 ---
-Peregrinos e **forasteiros** partilham o que não têm: calor em **pedaços**. O fogo não julga — só **consome**. Entre duas histórias, a verdade é sempre a mesma: **ninguém** sobe inteiro.
+Peregrinos partilham calor em **pedaços**; o fogo **consome** — verdade única: **ninguém** sobe inteiro.
 
-*A tempestade não traz calendário — contas na mesma pedra: **dia {{day}}**.*.
-
-Se o vento parar de sussurrar, desconfia: às vezes o silêncio é só **emboscada** a afinar o arco.
+*Sem calendário na tempestade: **dia {{day}}**.* Se o vento calar, pode ser **emboscada** a afinar o arco.

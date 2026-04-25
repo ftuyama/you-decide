@@ -9,15 +9,9 @@ choices:
     next: act5/camp/frost_companion_chat
 onEnter: []
 ---
-**Mira** e **Tomás** não discutem — **medem** palavras como quem mede distância numa corda.
+**Mira** e **Tomás** **medem** palavras no fogo — ela quer **nome** ao sair; ele endireita o escudo: *ordem é **sítio** onde ninguém cai sozinho.*
 
-> *"Ele quer ordem", diz ela, sem olhar para ele, mas apontando com o queixo. "Eu quero **sair** com nome."*
-
-Tomás não se irrita; só endireita o escudo.
-
-> *"Ordem não é prisão. É **sítio** onde ninguém cai sozinho."*
-
-A neve na beira da tenda parece ouvir e calar-se. Tu ficas entre os dois: não árbitro — **testemunha**.
+Tu não és árbitro — **testemunha**.
 
 ---
 

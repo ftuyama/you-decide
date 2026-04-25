@@ -10,7 +10,7 @@
 
 ## Por baixo da cidade, a pedra não perdoa
 
-O **pulso verde** não cessa — sobe pela garganta da cidade como vómito de luar envenenado. Sob os fundamentos, o antigo **complexo funerário** abre a boca: pedra húmida, ferro oxidado, e um cheiro a cobre que não deveria ter temperatura.
+O **pulso verde** não cessa — sobe pela garganta da cidade como vómito de luar envenenado. Sob os fundamentos, a **Masmorra do Silêncio** abre a boca: pedra húmida, ferro oxidado, cheiro a cobre que não deveria ter temperatura — e um **silêncio** que aprende o teu nome antes de tu o dizeres em voz alta.
 
 Seja por honra, ganância ou desespero, o primeiro passo é sempre o mesmo: **descer**.
 
@@ -57,7 +57,7 @@ Corre **no navegador** — não precisas de instalar nada. Usa a página oficial
 
 <div align="center">
 
-[![Jogar agora — Calvário Subterrâneo](https://img.shields.io/badge/Jogar%20agora-Calvário%20Subterr%C3%A2neo-5c3d6e?style=for-the-badge)](https://ftuyama.github.io/you-decide/)
+[![Jogar agora — A Masmorra do Silêncio](https://img.shields.io/badge/Jogar%20agora-A%20Masmorra%20do%20Sil%C3%AAn%C3%AAnio-5c3d6e?style=for-the-badge)](https://ftuyama.github.io/you-decide/)
 
 **[https://ftuyama.github.io/you-decide/](https://ftuyama.github.io/you-decide/)**
 
@@ -67,7 +67,7 @@ Corre **no navegador** — não precisas de instalar nada. Usa a página oficial
 
 ## Capturas de ecrã
 
-Interface do **Calvário Subterrâneo**: narrativa com ASCII, combate por turnos e exploração.
+Interface de **A Masmorra do Silêncio**: narrativa com ASCII, combate por turnos e exploração.
 
 **Narrativa e escolhas** — *Umbral do Vazio*
 

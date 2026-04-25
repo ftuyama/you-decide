@@ -9,8 +9,6 @@ choices:
     next: act1/title_examine
 onEnter: []
 ---
-Num nicho vazio, alguém deixou um **espelho oval** partido ao meio — o resto foi roubado ou caiu para o escuro.
+No nicho, **espelho oval** partido: metade do **teu rosto**, metade do **túnel** — tu e o abismo no mesmo corte.
 
-O pedaço que ficou mostra **metade do teu rosto** e **metade do túnel**, como se tu e o abismo fossem um só corpo partido.
-
-*{{playerName}}*, perguntas-te em silêncio: **quem sobe**, se voltares? A imagem não responde — só **fixa** a pergunta na retina, húmida de frio.
+A imagem não responde se **quem sobe** ainda és tu; **fixa** a pergunta no frio.

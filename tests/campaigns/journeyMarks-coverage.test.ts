@@ -34,7 +34,7 @@ function extractAddMarkIdsFromScenes(): Set<string> {
   return ids;
 }
 
-describe('journeyMarks coverage (Calvário)', () => {
+describe('journeyMarks coverage (calvario)', () => {
   it('cada addMark nas cenas tem entrada em journeyMarks', () => {
     const used = extractAddMarkIdsFromScenes();
     for (const id of used) {

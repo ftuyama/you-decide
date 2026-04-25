@@ -15,4 +15,4 @@ onEnter: []
 ---
 Encostas o ouvido à **pedra**: de cima descem **vozes** cortadas — preço de pão, nome de desaparecido, riso de quem vendeu a última **vela** a quem já não precisa de luz.
 
-Um fragmento de conversa **pega** na garganta do Calvário como anzol.
+Um fragmento de conversa **pega** na garganta da masmorra como anzol.

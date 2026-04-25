@@ -14,10 +14,6 @@ onEnter:
       text: "Falhei na gruta do monge. O vento empurrou-me para fora como quem tira um objeto errado de uma gaveta — e ouvi a pedra a fechar por dentro. Não há segunda entrada: aquele caminho acabou.",
     }
 ---
-A **pressão** muda — não violência, **recusa**. O ar torna-se **estreito**, como se a própria gruta decidisse que o teu sítio já não era ali.
+A gruta **recusa-te** — ar **estreito**, voz seca: *volta para onde ainda podes mentir com conforto.*
 
-Uma voz, quase **caridade** e quase **corte**:
-
-— *Volta para onde ainda podes mentir com conforto.*
-
-Passos **atrás** — não são teus. São da montanha a **empurrar**. Quando o branco te cospe de volta ao desfiladeiro, compreendes sem teatro: **não há retorno** àquela boca. O rumor morreu; ficou só **neve** a fingir neutralidade.
+A montanha **empurra-te** para fora; **não há retorno** àquela boca — só **neve** que finge neutralidade.

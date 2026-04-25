@@ -13,6 +13,6 @@ onEnter:
   - { op: addRep, faction: vigilia, delta: 1, directGain: true }
   - { op: addDiary, text: "Um pregador sem rosto pediu esmola em nome de um deus que já não tem cidade. Paguei para ele calar antes de eu calar." }
 ---
-Um **pregador** de manto cinzento gesticula para um céu que não existe — só **fenda**. A multidão é **zero** pessoas, mas o gesto é treinado: como se o fim do mundo precisasse de **plateia** para ser oficial.
+**Pregador** cinzento gesticula para **fenda** no sítio do céu — plateia vazia, gesto de fim **oficial**.
 
-Ou ris, ou pagas para o teu riso não virar **culpa**. Hoje, o preço é **moeda** e um bocado de **reputação** com quem ainda finge ordem.
+Ou ris, ou pagas para o riso não virar **culpa** — hoje: **moeda** e reputação com quem finge ordem.

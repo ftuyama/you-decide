@@ -9,6 +9,8 @@ choices:
   - text: "Descansar no acampamento (−1 suprimento)"
     next: act2/hub_catacomb
     condition: { resource: { supply: { gte: 1 } } }
+    showWhenLocked: true
+    lockedHint: "Precisas de pelo menos 1 suprimento para pagar o descanso."
     effects:
       - { op: campRest }
       - { op: advanceDay }
@@ -38,9 +40,13 @@ choices:
   - text: "Trocar duas palavras com o grupo"
     next: act2/camp/camp_companion_chat
     condition: { companionCount: { gte: 1 } }
+    showWhenLocked: true
+    lockedHint: "Sem companheiro, não há grupo com quem trocar palavra."
   - text: "Perguntar ao grupo há quantos dias desceste"
     next: act2/camp/camp_companion_chat
     condition: { all: [{ companionCount: { gte: 1 } }, { day: { gte: 4 } }] }
+    showWhenLocked: true
+    lockedHint: "Precisas de companheiro e de pelo menos quatro dias no subsolo para essa conversa."
     preview: "Contagem em voz alta; o eco não mente."
   - text: "Riscar o dia na terra húmida"
     next: act2/camp/vigilia_camp

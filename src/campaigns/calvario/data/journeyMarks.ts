@@ -151,9 +151,9 @@ export const journeyMarks: Record<string, JourneyMarkDef> = {
       'Recusaste armadura narrativa diante do fim; caminhaste nu de metáforas — exposição que é coragem ou loucura, e talvez as duas.',
   },
   calvario_sealed: {
-    name: 'Calvário selado',
+    name: 'Masmorra selada',
     description:
-      'Carregaste o peso do selo em ti; o subsolo cala porque assumiste o custo em fé e cicatriz, em vez de emprestar o rumor.',
+      'Carregaste o peso do selo em ti; o subsolo cala — silêncio de pedra — porque assumiste o custo em fé e cicatriz, em vez de emprestar o rumor.',
   },
   fled_rats: {
     name: 'Retirada dos ratos',

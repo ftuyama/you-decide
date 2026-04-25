@@ -12,8 +12,6 @@ onEnter: []
 ---
 # Silêncio de pedra
 
-Algo em ti **cede** — não com estrondo, mas com um vazio que não deixa eco.
+Algo em ti **cede** sem estrondo — vazio que não deixa eco.
 
-O Calvário não julga. **Abre** e **fecha** como uma ferida, e o teu nome torna-se mais um sussurro na humidade, sem testemunhas além do teto que não se vê.
-
-Se ainda houver fio a puxar, desce outra vez. O abismo não se enche.
+A **Masmorra do Silêncio** **abre** e **fecha** como ferida; o teu nome vira sussurro na humidade. Se houver fio, desce outra vez: o abismo não se enche — o silêncio, sim, anota.

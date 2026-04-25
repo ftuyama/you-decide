@@ -14,10 +14,6 @@ skillCheck:
 choices: []
 onEnter: []
 ---
-O chão **lamela** sob as botas — não gelo liso, mas placas que **mentem** sobre firmeza.
+Placas sob as botas **mentem** sobre firmeza — *não digas; **faz** um passo sem trair o equilíbrio; quem tropeça **some**.*
 
-— *Última coisa: não me digas o que vais fazer. **Faz** — um passo à frente sem trair o equilíbrio. Quem tropeça aqui não se machuca… **some**.*
-
-Isto não é dança. É **limite**: o corpo a lembrar-te que coragem sem precisão é só **pressa**.
-
-**Rola o teste de perícia** — um movimento honesto, ou a montanha decide por ti.
+Coragem sem precisão é **pressa**. **Rola o teste de perícia** — ou a montanha decide.

@@ -57,7 +57,7 @@ choices:
   - text: "Acampamento da Vigília"
     next: act2/camp/vigilia_camp
     preview: "Fogo, reza e um sopro de suprimento."
-  - text: "Rota aleatória (demo)"
+  - text: "Patrulha do perímetro (combate aleatório)"
     next: act2/encounters/random_router
     preview: "O túnel exige decisão rápida — ou recuas para o acampamento."
     timedMs: 14000
@@ -85,20 +85,22 @@ choices:
       all:
         - { level: { gte: 6 } }
         - { day: { lte: 5 } }
+    showWhenLocked: true
+    lockedHint: "Precisas de nível 6 e de ouvir isto antes do dia 6 — depois o eco cala-se."
     preview: "Voz seca no cruzeiro; registo no diário."
     effects:
       - { op: addDiary, text: "Uma voz presa ao teto: \"Já vais no dia {{day}}.\"" }
   - text: "Descer mais fundo"
     next: act3/descent
     condition: { level: { gte: 5 } }
-    preview: "Capítulo 3 — o Calvário aperta o tom."
+    showWhenLocked: true
+    lockedHint: "Precisas de pelo menos nível 5 para enfrentar o que desce daqui."
+    preview: "Capítulo 3 — a masmorra aperta o silêncio."
     effects:
       - { op: setChapter, chapter: 3 }
       - { op: setNarrativeTier, tier: 3 }
 onEnter: []
 ---
-O cruzeiro **segura** o peso de quem passa. Velas novas e velhas misturam-se; **cera** cola botas ao chão.
+Velas e **cera** prendem o passo no cruzeiro; *hoje é **dia {{day}}** no subsolo.*
 
-*Quem conta o tempo conta **dia {{day}}** — o subsolo come folhas de calendário.*
-
-Toda escolha **paga** algo — às vezes suprimento, às vezes **só um bocado de alma**. Um **eco** de sino sobe das profundezas e morre na garganta da cidade — lá em cima, alguém finge não ouvir.
+Um **eco** de sino sobe das profundezas e morre antes de chegar à cidade — como se o **silêncio** de lá em baixo **comesse** o som e só deixasse passar o necessário para te lembrar que ainda há ouvidos.

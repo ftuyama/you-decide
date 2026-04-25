@@ -7,6 +7,8 @@ choices:
   - text: "Recolher um fragmento preso ao metal (−1 suprimento, +2 ouro)"
     next: act4/throne/throne_gate
     condition: { resource: { supply: { gte: 1 } } }
+    showWhenLocked: true
+    lockedHint: "Precisas de pelo menos 1 suprimento para forçar o fragmento sem te partir ao meio."
     effects:
       - { op: addResource, resource: supply, delta: -1 }
       - { op: addResource, resource: gold, delta: 2 }
@@ -14,6 +16,8 @@ choices:
   - text: "Deixar o gotejar tocar na pele (+1 corrupção, −1 fé)"
     next: act4/throne/throne_gate
     condition: { resource: { faith: { gte: 1 } } }
+    showWhenLocked: true
+    lockedHint: "Sem fé para gastar, o gotejar não encontra moeda em ti — acumula pelo menos 1."
     effects:
       - { op: addResource, resource: corruption, delta: 1 }
       - { op: addResource, resource: faith, delta: -1 }

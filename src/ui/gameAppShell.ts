@@ -112,6 +112,8 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
 
   const drawer = document.createElement('aside');
   drawer.className = 'menu-drawer';
+  drawer.setAttribute('role', 'dialog');
+  drawer.setAttribute('aria-modal', 'true');
   drawer.setAttribute('aria-hidden', 'true');
   const drawerScroll = document.createElement('div');
   drawerScroll.className = 'menu-drawer-scroll';

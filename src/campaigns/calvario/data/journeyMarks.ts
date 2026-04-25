@@ -160,6 +160,11 @@ export const journeyMarks: Record<string, JourneyMarkDef> = {
     description:
       'Escolheste não medir forças com a maré de dentes; sobreviveste a custa de orgulho — quem foge hoje conta a história amanhã.',
   },
+  act2_brazier_scar: {
+    name: 'Cicatriz do braseiro',
+    description:
+      'Rasgaste o selo quente por mantimentos e deixaste fé na cera. Prova de que sobrevivência também cobra devoção.',
+  },
   mira_camp_shadows: {
     name: 'Sombras com a Mira',
     description:

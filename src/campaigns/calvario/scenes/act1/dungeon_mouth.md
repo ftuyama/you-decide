@@ -6,6 +6,14 @@ ambientTheme: explore
 artKey: dungeon_mouth
 highlight: true
 choices:
+  - text: "Braseiro rachado — arrancar o selo (risco/recompensa)"
+    next: act1/encounters/risk_brazier
+    condition: { noFlag: act2_risk_brazier_done }
+    preview: "Pode render recurso raro, mas drena convicção."
+  - text: "Sino cego — prometer sangue ao eco (risco/recompensa)"
+    next: act1/encounters/risk_bell
+    condition: { noFlag: act2_risk_bell_done }
+    preview: "Ganho imediato em poder, com custo visível."
   - text: "Entrar na catacumba"
     next: act2/catacomb_entry
     effects:

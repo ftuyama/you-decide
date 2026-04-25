@@ -660,6 +660,10 @@ export type StoryRenderContext = {
   scene: LoadedScene;
   /** Primeira visita + `highlight` no frontmatter + arte resolvida (overlay por cima de diário, facções, itens, dados, etc.). */
   sceneArtHighlight: SceneArtHighlightPayload | null;
+  /** Meta curta para orientar a sessão atual. */
+  sessionObjective: string | null;
+  /** Bloco de primeiros passos mostrado apenas na primeira sessão. */
+  onboardingPrimer: { onDismiss: () => void } | null;
   overlay: StoryOverlayState;
   audio: {
     unlockAudio: () => void;
@@ -833,6 +837,46 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     });
     wrap.appendChild(btn);
     inner.appendChild(wrap);
+  }
+
+  if (ctx.onboardingPrimer) {
+    const primer = document.createElement('section');
+    primer.className = 'session-primer';
+    const title = document.createElement('div');
+    title.className = 'session-primer-title';
+    title.textContent = 'Primeiros passos';
+    primer.appendChild(title);
+    const list = document.createElement('ul');
+    list.className = 'session-primer-list';
+    const tips = [
+      '[1-9] ativa escolhas sem clicar.',
+      '[Espaço] continua banners e avisos.',
+      'Menu (☰) para salvar/carregar, ajustar texto e áudio.',
+    ];
+    for (const tip of tips) {
+      const li = document.createElement('li');
+      li.textContent = tip;
+      list.appendChild(li);
+    }
+    primer.appendChild(list);
+    const dismiss = document.createElement('button');
+    dismiss.type = 'button';
+    dismiss.className = 'session-primer-dismiss';
+    dismiss.textContent = 'Entendi';
+    dismiss.addEventListener('click', () => {
+      ctx.onboardingPrimer?.onDismiss();
+      ctx.audio.playUiClick();
+      ctx.render();
+    });
+    primer.appendChild(dismiss);
+    inner.appendChild(primer);
+  }
+
+  if (ctx.sessionObjective) {
+    const objective = document.createElement('div');
+    objective.className = 'session-objective';
+    objective.textContent = ctx.sessionObjective;
+    inner.appendChild(objective);
   }
 
   const xpGain = ctx.state.lastCombatXpGain;

@@ -44,6 +44,13 @@ button.hamburger:hover {
   border-color: var(--accent);
 }
 
+button.hamburger:focus-visible,
+.menu-item:focus-visible,
+.menu-save-slot-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
 .menu-backdrop {
   display: none;
   position: fixed;
@@ -110,7 +117,7 @@ button.hamburger:hover {
 .menu-section-title {
   margin: 0;
   padding: 0.45rem 0.55rem;
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-section);
@@ -192,7 +199,7 @@ a.menu-item {
 }
 
 .menu-save-slot-title {
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-section);
@@ -200,7 +207,7 @@ a.menu-item {
 }
 
 .menu-save-slot-meta {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   color: var(--muted);
   line-height: 1.35;
   display: flex;

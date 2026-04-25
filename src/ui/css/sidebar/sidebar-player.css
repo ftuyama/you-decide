@@ -4,7 +4,7 @@
   border: 1px solid var(--border);
   background: var(--sidebar-gradient);
   padding: 0.75rem 0.85rem;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   color: var(--muted);
   min-height: 0;
   align-self: stretch;
@@ -15,7 +15,7 @@
 }
 
 .sidebar-title {
-  font-size: 0.7rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--accent);
@@ -44,7 +44,7 @@
 .sidebar-collapse-trigger {
   list-style: none;
   cursor: pointer;
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-section);
@@ -79,10 +79,15 @@
   background: var(--surface-hover);
 }
 
+.sidebar-collapse-trigger:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
 .sidebar-collapse-body {
   padding: 0.45rem 0.55rem 0.65rem;
   border-top: 1px dashed var(--border);
-  font-size: 0.75rem;
+  font-size: 0.82rem;
   color: var(--fg);
 }
 
@@ -164,7 +169,7 @@
 }
 
 .sidebar-buffs {
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   color: var(--sidebar-buff);
   line-height: 1.35;
 }
@@ -187,7 +192,7 @@
 }
 
 .sidebar-static-title {
-  font-size: 0.68rem;
+  font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-section);
@@ -202,7 +207,7 @@
 
 .sidebar-static-body {
   padding: 0.45rem 0.55rem 0.65rem;
-  font-size: 0.75rem;
+  font-size: 0.82rem;
 }
 
 .hp-bar-track {

@@ -109,6 +109,7 @@ export function markBadgeIconSvg(markId: string): string {
     act7_walked_bare: 'person',
     calvario_sealed: 'faith',
     fled_rats: 'map',
+    act2_brazier_scar: 'supply',
     mira_camp_shadows: 'person',
     mira_cruzeiro_confidencia: 'person',
     mira_frost_pact: 'person',

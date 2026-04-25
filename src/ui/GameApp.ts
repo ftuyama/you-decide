@@ -59,6 +59,8 @@ export class GameApp {
   private readonly timedChoiceKey: string;
   private readonly sceneArtHighlightKey: string;
   private readonly devModeKey: string;
+  private readonly onboardingPrimerKey: string;
+  private readonly returnRewardDateKey: string;
   private registry: ContentRegistry;
   private bus = new EventBus();
   private audio: GameAudio;
@@ -77,6 +79,10 @@ export class GameApp {
   private timedChoiceMode = false;
   /** Overlay em ecrã inteiro da arte na primeira visita (`highlight: true`). */
   private sceneArtHighlightEnabled = true;
+  /** Dica de primeiros passos (mostrada uma vez por campanha). */
+  private onboardingPrimerVisible = false;
+  /** Meta da sessão aparece apenas até a primeira mudança de cena. */
+  private sessionObjectiveVisible = true;
   private readonly choiceHotkeyHandler: (e: KeyboardEvent) => void;
   /** Secções colapsáveis (recursos, inventário, facções, personagem…) — persistido em sessionStorage */
   private sidebarSections: Record<string, boolean> = {};
@@ -113,12 +119,15 @@ export class GameApp {
     this.timedChoiceKey = `${campaignId}_timed_choice_v1`;
     this.sceneArtHighlightKey = `${campaignId}_scene_art_highlight_v1`;
     this.devModeKey = `${campaignId}_dev_mode`;
+    this.onboardingPrimerKey = `${campaignId}_onboarding_primer_v1`;
+    this.returnRewardDateKey = `${campaignId}_return_reward_date_v1`;
     this.registry = new ContentRegistry(campaignId);
     this.audio = new GameAudio(campaignId);
     this.fontStep = this.loadFontStep();
     this.timedChoiceMode = this.loadTimedChoiceMode();
     this.sceneArtHighlightEnabled = this.loadSceneArtHighlightEnabled();
     this.devMode = this.loadDevMode();
+    this.onboardingPrimerVisible = this.loadOnboardingPrimerVisible();
     this.choiceHotkeyHandler = (e: KeyboardEvent): void => {
       const el = e.target;
       if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || el instanceof HTMLSelectElement) {
@@ -187,6 +196,15 @@ export class GameApp {
         this.unlockAudio();
         this.audio.playItemAcquire();
       }
+      if (ev.type === 'xp.gained' && ev.amount > 0 && this.state.mode === 'story') {
+        this.statusHighlightQueue.push({
+          type: 'statusHighlight',
+          variant: 'good',
+          title: `+${ev.amount} XP`,
+          subtitle: 'Experiência recebida',
+        });
+        this.unlockAudio();
+      }
       if (ev.type === 'diary.entryAdded') {
         this.diaryEntryQueue.push(ev.text);
         this.unlockAudio();
@@ -211,6 +229,7 @@ export class GameApp {
     });
     this.state = createInitialState(this.registry.data.campaign);
     this.state = this.stabilize(this.state);
+    this.applyReturnRewardIfNeeded();
     this.sidebarSections = this.loadSidebarSections();
     this.migrateLegacySaveIfNeeded();
     window.addEventListener('keydown', (e) => {
@@ -291,6 +310,81 @@ export class GameApp {
     } catch {
       /* noop */
     }
+  }
+
+  private loadOnboardingPrimerVisible(): boolean {
+    try {
+      return localStorage.getItem(this.onboardingPrimerKey) !== '0';
+    } catch {
+      return true;
+    }
+  }
+
+  private saveOnboardingPrimerVisible(): void {
+    try {
+      localStorage.setItem(this.onboardingPrimerKey, this.onboardingPrimerVisible ? '1' : '0');
+    } catch {
+      /* noop */
+    }
+  }
+
+  private applyReturnRewardIfNeeded(): void {
+    const today = new Date().toISOString().slice(0, 10);
+    try {
+      if (localStorage.getItem(this.returnRewardDateKey) === today) return;
+      this.state = this.stabilize(
+        applyEffects(
+          this.state,
+          [
+            { op: 'addResource', resource: 'supply', delta: 1 },
+            { op: 'addResource', resource: 'gold', delta: 4 },
+          ],
+          this.ctx()
+        )
+      );
+      localStorage.setItem(this.returnRewardDateKey, today);
+      this.statusHighlightQueue.push({
+        type: 'statusHighlight',
+        variant: 'good',
+        title: 'Retorno às catacumbas',
+        subtitle: '+1 suprimento e +4 ouro por voltares hoje.',
+      });
+    } catch {
+      /* noop */
+    }
+  }
+
+  private buildSessionObjective(): string {
+    const { chapter, day, sceneId } = this.state;
+    const supply = this.state.resources.supply;
+    const faith = this.state.resources.faith ?? 0;
+    const corruption = this.state.resources.corruption ?? 0;
+    const gold = this.state.resources.gold ?? 0;
+    if (chapter === 1 && day <= 2) {
+      return 'Meta da sessão: usar atalhos [1-9] e concluir as 2 primeiras escolhas sem pressa.';
+    }
+    if (supply <= 2) {
+      return 'Meta da sessão: recuperar suprimento antes da próxima decisão de risco.';
+    }
+    if (faith >= 5) {
+      return 'Meta da sessão: preservar a fé para um momento crítico.';
+    }
+    if (chapter <= 2) {
+      return 'Meta da sessão: avançar 3 cenas sem cair para 0 de suprimento.';
+    }
+    if (corruption >= 6) {
+      return 'Meta da sessão: concluir 1 decisão de risco sem aumentar corrupção.';
+    }
+    if (faith <= 1) {
+      return 'Meta da sessão: recuperar fé ou evitar combate desnecessário.';
+    }
+    if (chapter >= 4 && chapter <= 5 && gold >= 20) {
+      return 'Meta da sessão: gastar ouro para reforçar o grupo antes do próximo confronto maior.';
+    }
+    if (sceneId.startsWith('act2/camp/') || sceneId.startsWith('act5/camp/')) {
+      return 'Meta da sessão: revisar equipamento e sair do acampamento com vantagem clara.';
+    }
+    return 'Meta da sessão: concluir 1 ramificação nova e registrar 1 novo marco de jornada.';
   }
 
   private saveDevMode(): void {
@@ -464,6 +558,8 @@ export class GameApp {
       this.timedTimer = null;
     }
     const prevScene = this.state.sceneId;
+    const prevDiaryQueueLen = this.diaryEntryQueue.length;
+    const prevStatusQueueLen = this.statusHighlightQueue.length;
     let s = applyEffects(this.state, choice.effects, this.ctx());
     s = { ...s, timedChoiceDeadline: null };
     if (choice.next && s.mode === 'story') {
@@ -474,8 +570,9 @@ export class GameApp {
     }
     this.state = this.stabilize(s);
     if (this.state.sceneId !== prevScene) {
-      this.diaryEntryQueue = [];
-      this.statusHighlightQueue = [];
+      this.sessionObjectiveVisible = false;
+      this.diaryEntryQueue = this.diaryEntryQueue.slice(prevDiaryQueueLen);
+      this.statusHighlightQueue = this.statusHighlightQueue.slice(prevStatusQueueLen);
     }
     this.render();
   }
@@ -587,8 +684,11 @@ export class GameApp {
     this.syncMenuScrollLock();
     const drawer = this.root.querySelector('.menu-drawer');
     const backdrop = this.root.querySelector('.menu-backdrop');
+    const hBtn = this.root.querySelector<HTMLButtonElement>('.hamburger');
     drawer?.classList.remove('open');
+    drawer?.setAttribute('aria-hidden', 'true');
     backdrop?.classList.remove('open');
+    hBtn?.setAttribute('aria-expanded', 'false');
   }
 
   private syncMenuScrollLock(): void {
@@ -602,13 +702,18 @@ export class GameApp {
     this.syncMenuScrollLock();
     const drawer = this.root.querySelector('.menu-drawer');
     const backdrop = this.root.querySelector('.menu-backdrop');
+    const hBtn = this.root.querySelector<HTMLButtonElement>('.hamburger');
     if (this.menuOpen) {
       drawer?.classList.add('open');
+      drawer?.setAttribute('aria-hidden', 'false');
       backdrop?.classList.add('open');
+      hBtn?.setAttribute('aria-expanded', 'true');
       this.unlockAudio();
     } else {
       drawer?.classList.remove('open');
+      drawer?.setAttribute('aria-hidden', 'true');
       backdrop?.classList.remove('open');
+      hBtn?.setAttribute('aria-expanded', 'false');
     }
   }
 
@@ -670,14 +775,17 @@ export class GameApp {
         this.clearDiceRollTimers();
         this.pendingStoryDiceRoll = null;
         const prevScene = this.state.sceneId;
+        const prevDiaryQueueLen = this.diaryEntryQueue.length;
+        const prevStatusQueueLen = this.statusHighlightQueue.length;
         let s: GameState = { ...nextState, timedChoiceDeadline: null };
         if (s.sceneId !== prevScene) {
           s = tickActiveBuffs(s);
         }
         this.state = this.stabilize(s);
         if (this.state.sceneId !== prevScene) {
-          this.diaryEntryQueue = [];
-          this.statusHighlightQueue = [];
+          this.sessionObjectiveVisible = false;
+          this.diaryEntryQueue = this.diaryEntryQueue.slice(prevDiaryQueueLen);
+          this.statusHighlightQueue = this.statusHighlightQueue.slice(prevStatusQueueLen);
         }
         this.audio.playUiClick();
         this.render();
@@ -742,6 +850,16 @@ export class GameApp {
       registry: this.registry,
       scene,
       sceneArtHighlight,
+      sessionObjective: this.sessionObjectiveVisible ? this.buildSessionObjective() : null,
+      onboardingPrimer:
+        this.onboardingPrimerVisible && this.state.chapter === 1 && this.state.day <= 2
+          ? {
+              onDismiss: () => {
+                this.onboardingPrimerVisible = false;
+                this.saveOnboardingPrimerVisible();
+              },
+            }
+          : null,
       overlay: {
         pendingStoryDiceRoll: this.pendingStoryDiceRoll,
         storyDiceHost: this.storyDiceHostBinding(),

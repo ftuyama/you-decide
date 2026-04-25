@@ -134,6 +134,26 @@ const REPUTATION_TONE_DOWN_PT: Record<FactionId, readonly string[]> = {
   ],
 };
 
+const REPUTATION_UI_SLOW_LEDGER_PT: readonly string[] = [
+  'Um gesto ficou assinado nas margens do teu registo; falta outro feito para que o numero mude nos arquivos da faccao.',
+  'Os escribas anotam o rumor e fecham o livro sem mexer no marcador: ainda nao ha peso suficiente para virar a pagina.',
+  'A faccao ouviu, mas guardou o eco em nota de rodape; o saldo so muda quando o proximo sinal confirmar a tendencia.',
+  'Nos corredores, teu nome circula em voz baixa: a reputacao ainda nao desloca o ponteiro oficial.',
+];
+
+const REPUTATION_UI_CAPPED_DIRECT_PT: readonly string[] = [
+  'Os escribas ja nao tem onde subir ou descer este nome: o tom mantem-se, por ora, inamovivel.',
+  'A margem do registro terminou; qualquer novo abalo bate no limite e retorna sem alterar o numero.',
+  'Selo no topo e lacre no fundo: nesta faccao, tua reputacao encostou no extremo permitido.',
+  'O arquivo range, mas nao cede: os limites da faccao travam qualquer ajuste adicional neste momento.',
+];
+
+function pickRandomUiLine(lines: readonly string[]): string {
+  if (lines.length === 0) return '';
+  const idx = Math.floor(Math.random() * lines.length);
+  return lines[idx] ?? '';
+}
+
 function pickReputationToneLine(lines: readonly string[], prev: number, next: number, faction: FactionId): string {
   if (lines.length === 0) return '';
   let h = 0;
@@ -167,8 +187,7 @@ function emitReputationUi(
       type: 'statusHighlight',
       variant: 'neutral',
       title: `${name} — rumor em aberto`,
-      subtitle:
-        'Um gesto ficou assinado nas margens do teu registo; falta outro feito para que o número mude nos arquivos da facção.',
+      subtitle: pickRandomUiLine(REPUTATION_UI_SLOW_LEDGER_PT),
     });
     return;
   }
@@ -177,8 +196,7 @@ function emitReputationUi(
       type: 'statusHighlight',
       variant: 'neutral',
       title: `${name} — margens esgotadas`,
-      subtitle:
-        'Os escribas já não têm onde subir ou descer este nome: o tom mantém-se, por ora, inamovível.',
+      subtitle: pickRandomUiLine(REPUTATION_UI_CAPPED_DIRECT_PT),
     });
     return;
   }

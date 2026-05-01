@@ -2,7 +2,7 @@
 id: act5/frost_summit/encounters/fallen_god_combat
 title: O trono responde
 chapter: 5
-ambientTheme: boss
+ambientTheme: ancient_macabre
 artKey: frost_summit_fallen
 choices:
   - text: "Encarar o que desceu do panteão"

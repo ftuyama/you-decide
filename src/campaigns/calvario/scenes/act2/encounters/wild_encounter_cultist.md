@@ -8,9 +8,9 @@ choices:
     effects:
       - op: startCombat
         encounterId: cultist_patrol
-        onVictory: act2/hub_catacomb
+        onVictory: shared/explore_nav_act2
         onDefeat: shared/game_over
-        onFlee: act2/hub_catacomb
+        onFlee: shared/explore_nav_act2
 onEnter: []
 ---
 Um **cultista** demasiado confiante separa-se do coro. A voz dele **treme** — não de medo, de **êxtase** barato.

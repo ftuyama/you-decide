@@ -42,6 +42,41 @@ const ACT2_WILD_WEIGHTS: { weight: number; encounterId: string }[] = [
   { weight: 0.2, encounterId: 'act2_rare_lone_swarm' },
 ];
 
+/** Pesos dos encontros aleatórios de navegação do act3. */
+const ACT3_WILD_WEIGHTS: { weight: number; encounterId: string }[] = [
+  { weight: 1, encounterId: 'stone_guard_fight' },
+  { weight: 1, encounterId: 'cult_ambush' },
+];
+
+/** Pesos dos encontros aleatórios de navegação do act5. */
+const ACT5_WILD_WEIGHTS: { weight: number; encounterId: string }[] = [
+  { weight: 1, encounterId: 'frost_whelps' },
+  { weight: 1, encounterId: 'frost_whelp_solo' },
+  { weight: 1, encounterId: 'cultist_patrol' },
+  { weight: 0.25, encounterId: 'frost_hunt_party' },
+  { weight: 0.1, encounterId: 'frost_howl_horde' },
+];
+
+/** Pesos dos encontros aleatórios de navegação do act6. */
+const ACT6_WILD_WEIGHTS: { weight: number; encounterId: string }[] = [
+  { weight: 1, encounterId: 'act6_wild_fragment_solo' },
+  { weight: 1, encounterId: 'act6_wild_fragments_pair' },
+  { weight: 1, encounterId: 'act6_wild_scribe_solo' },
+  { weight: 1, encounterId: 'act6_wild_murmur_solo' },
+  { weight: 1, encounterId: 'act6_wild_chain_solo' },
+  { weight: 0.35, encounterId: 'act6_wild_veil_fragment' },
+  { weight: 0.35, encounterId: 'act6_wild_echo_fragment' },
+  { weight: 0.2, encounterId: 'act6_wild_triple_fragments' },
+  { weight: 0.08, encounterId: 'act6_wild_regent_solo' },
+  { weight: 0.6, encounterId: 'act6_wild_stain_horde' },
+];
+
+const EXPLORATION_WILD_WEIGHTS_BY_GRAPH: Record<string, { weight: number; encounterId: string }[]> = {
+  act3_depths: ACT3_WILD_WEIGHTS,
+  act5_frost: ACT5_WILD_WEIGHTS,
+  act6_fractured_nave: ACT6_WILD_WEIGHTS,
+};
+
 export function validateExplorationGraphContract(graph: ExplorationGraph): void {
   const nodeById = new Map<string, ExplorationNode>();
   for (const node of graph.nodes) {
@@ -94,15 +129,20 @@ export function getEdgeFromNode(
 }
 
 /** Escolha pesada (mesma lógica que randomBranch de cena). */
-export function pickWeightedEncounterId(seed: number): {
+export function pickWeightedEncounterId(
+  seed: number,
+  graphId?: string
+): {
   encounterId: string;
   nextSeed: number;
 } {
-  const rng = mulberry32(seed ^ ACT2_WILD_WEIGHTS.length);
-  const w = ACT2_WILD_WEIGHTS.reduce((a, b) => a + b.weight, 0);
+  const weights =
+    (graphId ? EXPLORATION_WILD_WEIGHTS_BY_GRAPH[graphId] : undefined) ?? ACT2_WILD_WEIGHTS;
+  const rng = mulberry32(seed ^ weights.length);
+  const w = weights.reduce((a, b) => a + b.weight, 0);
   let t = rng() * w;
-  let pick = ACT2_WILD_WEIGHTS[0]!.encounterId;
-  for (const b of ACT2_WILD_WEIGHTS) {
+  let pick = weights[0]!.encounterId;
+  for (const b of weights) {
     t -= b.weight;
     if (t <= 0) {
       pick = b.encounterId;

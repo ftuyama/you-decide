@@ -8,9 +8,9 @@ choices:
     effects:
       - op: startCombat
         encounterId: act6_wild_scribe_solo
-        onVictory: act6/hub_fractured_nave
+        onVictory: shared/explore_nav_act6
         onDefeat: shared/game_over
-        onFlee: act6/hub_fractured_nave
+        onFlee: shared/explore_nav_act6
 onEnter: []
 ---
 Uma figura **alta** atravessa a penumbra como quem **escreve** no ar — não há sangue, há **certeza** a escorrer dos cantos do véu; **tinta** onde devia haver pele.

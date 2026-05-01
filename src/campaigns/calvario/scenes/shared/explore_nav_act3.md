@@ -5,9 +5,10 @@ chapter: 3
 type: exploration
 ambientTheme: act3
 choices:
-  - id: explore_force
-    text: "Forçar encontro (combate aleatório)"
-    preview: "Sem mover no mapa — só violência."
+  - id: explore_patrol_random
+    text: "Patrulhar ao acaso (encontro aleatório)"
+    next: act3/encounters/random_router
+    preview: "Sem mover no mapa — as profundezas decidem na violência."
   - id: explore_leave
     text: "Recuar para o núcleo das profundezas"
     next: act3/hub_depths

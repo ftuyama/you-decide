@@ -8,9 +8,9 @@ choices:
     effects:
       - op: startCombat
         encounterId: frost_howl_horde
-        onVictory: act5/frost_hub
+        onVictory: shared/explore_nav_act5
         onDefeat: shared/game_over
-        onFlee: act5/frost_hub
+        onFlee: shared/explore_nav_act5
 onEnter: []
 ---
 Quando o vento **vira**, vês quatro formas: três crias e um **saqueador da geada** a abrir caminho como **machado** vivo. O uivo não vem da garganta — vem do **metal** e do **osso** a combinarem fome.

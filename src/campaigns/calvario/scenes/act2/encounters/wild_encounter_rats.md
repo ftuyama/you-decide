@@ -8,9 +8,9 @@ choices:
     effects:
       - op: startCombat
         encounterId: rats_cellar_pair
-        onVictory: act2/hub_catacomb
+        onVictory: shared/explore_nav_act2
         onDefeat: shared/game_over
-        onFlee: act2/flee_rats
+        onFlee: shared/explore_nav_act2
 onEnter: []
 ---
 Dois **vórtices** de dentes fecham-te o corredor. Não é emboscada de gente — é **fome** organizada.

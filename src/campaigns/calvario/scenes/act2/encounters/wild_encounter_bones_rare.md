@@ -8,9 +8,9 @@ choices:
     effects:
       - op: startCombat
         encounterId: act2_rare_bone_sentinel
-        onVictory: act2/hub_catacomb
+        onVictory: shared/explore_nav_act2
         onDefeat: shared/game_over
-        onFlee: act2/hub_catacomb
+        onFlee: shared/explore_nav_act2
 onEnter: []
 ---
 Um único **esqueleto** ergue-se no cruzamento, sem cântico e sem pressa. Quando te vê, aponta a lâmina como quem cumpre um juramento antigo.

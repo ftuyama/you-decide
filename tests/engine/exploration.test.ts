@@ -74,6 +74,38 @@ describe('pickWeightedEncounterId', () => {
       'act2_rare_lone_swarm',
     ]).toContain(p.encounterId);
   });
+
+  it('uses act6 encounter pool when graph id is act6_fractured_nave', () => {
+    const p = pickWeightedEncounterId(999, 'act6_fractured_nave');
+    expect([
+      'act6_wild_fragment_solo',
+      'act6_wild_fragments_pair',
+      'act6_wild_scribe_solo',
+      'act6_wild_murmur_solo',
+      'act6_wild_chain_solo',
+      'act6_wild_veil_fragment',
+      'act6_wild_echo_fragment',
+      'act6_wild_triple_fragments',
+      'act6_wild_regent_solo',
+      'act6_wild_stain_horde',
+    ]).toContain(p.encounterId);
+  });
+
+  it('uses act3 encounter pool when graph id is act3_depths', () => {
+    const p = pickWeightedEncounterId(999, 'act3_depths');
+    expect(['stone_guard_fight', 'cult_ambush']).toContain(p.encounterId);
+  });
+
+  it('uses act5 encounter pool when graph id is act5_frost', () => {
+    const p = pickWeightedEncounterId(999, 'act5_frost');
+    expect([
+      'frost_whelps',
+      'frost_whelp_solo',
+      'cultist_patrol',
+      'frost_hunt_party',
+      'frost_howl_horde',
+    ]).toContain(p.encounterId);
+  });
 });
 
 describe('startExplorationCombatEffects', () => {

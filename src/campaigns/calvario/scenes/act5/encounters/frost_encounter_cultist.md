@@ -8,9 +8,9 @@ choices:
     effects:
       - op: startCombat
         encounterId: cultist_patrol
-        onVictory: act5/frost_hub
+        onVictory: shared/explore_nav_act5
         onDefeat: shared/game_over
-        onFlee: act5/frost_hub
+        onFlee: shared/explore_nav_act5
 onEnter: []
 ---
 Alguém **canta** baixo — não uma oração, um **compasso** que não combina com o vento. Os olhos dele já **venderam** o céu a outro sino. A neve agarra-se-lhe à barba como **cinza** benta; por baixo da pele, porém, há **fervura**.

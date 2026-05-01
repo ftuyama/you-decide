@@ -8,9 +8,9 @@ choices:
     effects:
       - op: startCombat
         encounterId: act6_wild_stain_horde
-        onVictory: act6/hub_fractured_nave
+        onVictory: shared/explore_nav_act6
         onDefeat: shared/game_over
-        onFlee: act6/hub_fractured_nave
+        onFlee: shared/explore_nav_act6
 onEnter: []
 ---
 A **corrupção** que carregas não é segredo para a pedra — ela **vibra**, chama **lascas** e um **pregador** que já **tinha** o teu nome escrito na língua.

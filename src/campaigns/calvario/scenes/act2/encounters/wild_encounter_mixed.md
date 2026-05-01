@@ -8,9 +8,9 @@ choices:
     effects:
       - op: startCombat
         encounterId: cellar_mixed
-        onVictory: act2/hub_catacomb
+        onVictory: shared/explore_nav_act2
         onDefeat: shared/game_over
-        onFlee: act2/flee_rats
+        onFlee: shared/explore_nav_act2
 onEnter: []
 ---
 **Rato** e **esqueleto** dividem o mesmo chão — como se a morte e a vida tivessem combinado **preço**.

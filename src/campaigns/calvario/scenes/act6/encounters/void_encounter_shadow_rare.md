@@ -8,9 +8,9 @@ choices:
     effects:
       - op: startCombat
         encounterId: act6_wild_regent_solo
-        onVictory: act6/hub_fractured_nave
+        onVictory: shared/explore_nav_act6
         onDefeat: shared/game_over
-        onFlee: act6/hub_fractured_nave
+        onFlee: shared/explore_nav_act6
 onEnter: []
 ---
 Por um **fio** de segundo, o ar **fica** contigo — não espelha; **reina** sobre cacos. O que se move não pede nome: **impõe** silêncio onde tu ainda **negociavas** com a dúvida.

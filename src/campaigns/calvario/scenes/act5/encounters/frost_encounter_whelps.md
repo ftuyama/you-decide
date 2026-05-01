@@ -8,9 +8,9 @@ choices:
     effects:
       - op: startCombat
         encounterId: frost_whelps
-        onVictory: act5/frost_hub
+        onVictory: shared/explore_nav_act5
         onDefeat: shared/game_over
-        onFlee: act5/frost_hub
+        onFlee: shared/explore_nav_act5
 onEnter: []
 ---
 Do **branco** saltam duas silhuetas famintas — não é a emboscada da missão; é a montanha a **cobrar** visita. Os dentes **tilintam** como vidro; o hálito cheira a **tempestade** adiada.

@@ -8,9 +8,9 @@ choices:
     effects:
       - op: startCombat
         encounterId: act6_wild_fragment_solo
-        onVictory: act6/hub_fractured_nave
+        onVictory: shared/explore_nav_act6
         onDefeat: shared/game_over
-        onFlee: act6/hub_fractured_nave
+        onFlee: shared/explore_nav_act6
 onEnter: []
 ---
 Do chão **levanta-se** uma silhueta sem rosto estável — não veio de fora; **escapou-te** há anos e aprendeu a **caminhar** sozinha.

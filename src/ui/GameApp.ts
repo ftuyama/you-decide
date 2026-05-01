@@ -552,17 +552,8 @@ export class GameApp {
       this.render();
       return;
     }
-    const pick = pickWeightedEncounterId(s.rngSeed);
+    const pick = pickWeightedEncounterId(s.rngSeed, ex.graphId);
     s = { ...s, rngSeed: pick.nextSeed };
-    s = applyEffects(s, startExplorationCombatEffects(pick.encounterId, this.state.sceneId), this.ctx());
-    this.state = this.stabilize(s);
-    this.render();
-  }
-
-  private applyExplorationForcedCombat(): void {
-    if (!this.state.exploration) return;
-    const pick = pickWeightedEncounterId(this.state.rngSeed);
-    let s: GameState = { ...this.state, rngSeed: pick.nextSeed, timedChoiceDeadline: null };
     s = applyEffects(s, startExplorationCombatEffects(pick.encounterId, this.state.sceneId), this.ctx());
     this.state = this.stabilize(s);
     this.render();
@@ -578,10 +569,6 @@ export class GameApp {
     const id = choice.id;
     if (id?.startsWith('explore_move_')) {
       this.applyExplorationMove(id.slice('explore_move_'.length));
-      return;
-    }
-    if (id === 'explore_force') {
-      this.applyExplorationForcedCombat();
       return;
     }
     const prevScene = this.state.sceneId;

@@ -8,7 +8,8 @@ choices:
   - text: "Recomeçar"
     effects:
       - { op: resetRun }
-onEnter: []
+onEnter:
+  - { op: clearAsciiMap }
 ---
 # Silêncio de pedra
 

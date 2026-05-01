@@ -8,9 +8,9 @@ choices:
     effects:
       - op: startCombat
         encounterId: act6_wild_echo_fragment
-        onVictory: act6/hub_fractured_nave
+        onVictory: shared/explore_nav_act6
         onDefeat: shared/game_over
-        onFlee: act6/hub_fractured_nave
+        onFlee: shared/explore_nav_act6
 onEnter: []
 ---
 O **hospedeiro** repete o que não disseste; a **lasca** completa com o que **fugiste** de dizer. Entre os dois, nasce uma história **nova** — pior que a tua, porque é **coerente**.

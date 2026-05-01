@@ -8,9 +8,9 @@ choices:
     effects:
       - op: startCombat
         encounterId: frost_whelp_solo
-        onVictory: act5/frost_hub
+        onVictory: shared/explore_nav_act5
         onDefeat: shared/game_over
-        onFlee: act5/frost_hub
+        onFlee: shared/explore_nav_act5
 onEnter: []
 ---
 Uma só **cria** te seguiu pelo eco dos teus passos — curiosidade ou **fome**, o resultado é o mesmo. Olha-te como quem lê **preço** numa vitrine: não há vergonha, só **cálculo** gelado.

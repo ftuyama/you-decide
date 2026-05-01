@@ -6,16 +6,8 @@ import {
   getCharacterArmorClass,
 } from '../../src/engine/combat/index.ts';
 import { createInitialState, createPlayerCharacter } from '../../src/engine/core/index.ts';
-import { emptyGameData } from '../../src/engine/data/index.ts';
-import type { CampaignIndex, EnemyDef, Encounter, ItemDef } from '../../src/engine/schema/index.ts';
-
-const testCampaign: CampaignIndex = {
-  id: 'test',
-  name: 'Test',
-  entryScene: 'act1/title',
-  startingCompanionPool: [],
-  scenes: [],
-};
+import type { EnemyDef, Encounter, ItemDef } from '../../src/engine/schema/index.ts';
+import { createTestData, testCampaign } from '../helpers/engineTestData.ts';
 
 const leather: ItemDef = {
   id: 'leather',
@@ -31,11 +23,7 @@ const leather: ItemDef = {
 
 describe('getCharacterArmorClass', () => {
   it('uses 7 + AGI mod + item armor', () => {
-    const data = emptyGameData(testCampaign, {
-      defaultHeroName: () => 'H',
-      getHeroClassLabel: () => '—',
-      getPathUnlockBonus: () => null,
-    });
+    const data = createTestData();
     data.items = { leather };
     const knight = createPlayerCharacter('K', 'knight');
     // knight agi 9 -> mod 1; CA = 7 + 1 + 2 = 10
@@ -58,12 +46,8 @@ const dummyEnemy: EnemyDef = {
   attackStrategy: 'random',
 };
 
-function combatTestData(): ReturnType<typeof emptyGameData> {
-  const data = emptyGameData(testCampaign, {
-    defaultHeroName: () => 'H',
-    getHeroClassLabel: () => '—',
-    getPathUnlockBonus: () => null,
-  });
+function combatTestData() {
+  const data = createTestData();
   data.enemies = { dummy: dummyEnemy };
   return data;
 }

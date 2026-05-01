@@ -4,21 +4,11 @@ import {
   filterChoices,
 } from '../../src/engine/core/index.ts';
 import { ChoiceSchema } from '../../src/engine/schema/index.ts';
-import { createInitialState, createPlayerCharacter } from '../../src/engine/core/index.ts';
-import type { CampaignIndex, Choice, GameState } from '../../src/engine/schema/index.ts';
-
-const testCampaign: CampaignIndex = {
-  id: 'test',
-  name: 'Test',
-  entryScene: 'act1/title',
-  startingCompanionPool: [],
-  scenes: [],
-};
+import type { Choice, GameState } from '../../src/engine/schema/index.ts';
+import { createStateWithHero } from '../helpers/engineTestData.ts';
 
 function baseState(level: number): GameState {
-  let s = createInitialState(testCampaign, 1);
-  s = { ...s, party: [createPlayerCharacter('H', 'knight')], level };
-  return s;
+  return createStateWithHero({ level });
 }
 
 describe('buildStoryChoiceRows', () => {

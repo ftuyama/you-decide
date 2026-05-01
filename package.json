@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
+    "check:engine-boundaries": "node scripts/check-engine-boundaries.mjs",
+    "verify:refactor": "npm run check:engine-boundaries && npm run test",
     "validate:scenes": "node scripts/validate-scenes.mjs",
     "validate:unreachable": "node scripts/find-unreachable-scenes.mjs",
     "check:ascii-art": "node scripts/check-pending-ascii-art.mjs",

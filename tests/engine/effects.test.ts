@@ -2,27 +2,14 @@ import { describe, expect, it } from 'vitest';
 import { applyEffects } from '../../src/engine/core/index.ts';
 import { EventBus } from '../../src/engine/core/index.ts';
 import { createInitialState, createPlayerCharacter } from '../../src/engine/core/index.ts';
-import { emptyGameData } from '../../src/engine/data/index.ts';
-import type { CampaignIndex } from '../../src/engine/schema/index.ts';
-
-const testCampaign: CampaignIndex = {
-  id: 'test',
-  name: 'Test',
-  entryScene: 'act1/title',
-  startingCompanionPool: [],
-  scenes: [],
-};
+import { createTestData, testCampaign } from '../helpers/engineTestData.ts';
 
 describe('applyEffects', () => {
   it('applies setFlag', () => {
     let s = createInitialState(testCampaign, 1);
     s = { ...s, party: [createPlayerCharacter('H', 'knight')] };
     const bus = new EventBus();
-    const data = emptyGameData(testCampaign, {
-      defaultHeroName: () => 'H',
-      getHeroClassLabel: () => '—',
-      getPathUnlockBonus: () => null,
-    });
+    const data = createTestData();
     const next = applyEffects(s, [{ op: 'setFlag', key: 'door_open', value: true }], {
       sceneId: 'test/scene',
       data,
@@ -35,11 +22,7 @@ describe('applyEffects', () => {
     let s = createInitialState(testCampaign, 1);
     s = { ...s, party: [createPlayerCharacter('H', 'knight')], resources: { ...s.resources, gold: 990 } };
     const bus = new EventBus();
-    const data = emptyGameData(testCampaign, {
-      defaultHeroName: () => 'H',
-      getHeroClassLabel: () => '—',
-      getPathUnlockBonus: () => null,
-    });
+    const data = createTestData();
     const next = applyEffects(s, [{ op: 'addResource', resource: 'gold', delta: 50 }], {
       sceneId: 'test/scene',
       data,
@@ -52,11 +35,7 @@ describe('applyEffects', () => {
     let s = createInitialState(testCampaign, 1);
     s = { ...s, party: [createPlayerCharacter('H', 'knight')] };
     const bus = new EventBus();
-    const data = emptyGameData(testCampaign, {
-      defaultHeroName: () => 'H',
-      getHeroClassLabel: () => '—',
-      getPathUnlockBonus: () => null,
-    });
+    const data = createTestData();
     const next = applyEffects(
       s,
       [{ op: 'addRep', faction: 'vigilia', delta: 1, directGain: true }],
@@ -70,11 +49,7 @@ describe('applyEffects', () => {
     let s = createInitialState(testCampaign, 1);
     s = { ...s, party: [createPlayerCharacter('H', 'knight')] };
     const bus = new EventBus();
-    const data = emptyGameData(testCampaign, {
-      defaultHeroName: () => 'H',
-      getHeroClassLabel: () => '—',
-      getPathUnlockBonus: () => null,
-    });
+    const data = createTestData();
     const next = applyEffects(s, [{ op: 'multiplyLeadHp', factor: 0.5 }], {
       sceneId: 'test/scene',
       data,
@@ -88,11 +63,7 @@ describe('applyEffects', () => {
     let s = createInitialState(testCampaign, 1);
     s = { ...s, party: [createPlayerCharacter('H', 'knight')] };
     const bus = new EventBus();
-    const data = emptyGameData(testCampaign, {
-      defaultHeroName: () => 'H',
-      getHeroClassLabel: () => '—',
-      getPathUnlockBonus: () => null,
-    });
+    const data = createTestData();
     const ctx = { sceneId: 'test/scene', data, bus };
     const a = applyEffects(s, [{ op: 'addRep', faction: 'circulo', delta: 1 }], ctx);
     expect(a.reputation.circulo).toBe(0);
@@ -111,11 +82,7 @@ describe('applyEffects', () => {
       reputation: { ...s.reputation, vigilia: 1 },
     };
     const bus = new EventBus();
-    const data = emptyGameData(testCampaign, {
-      defaultHeroName: () => 'H',
-      getHeroClassLabel: () => '—',
-      getPathUnlockBonus: () => null,
-    });
+    const data = createTestData();
     const next = applyEffects(s, [{ op: 'addRep', faction: 'vigilia', delta: -1 }], {
       sceneId: 'test/scene',
       data,
@@ -130,11 +97,7 @@ describe('applyEffects', () => {
     s = { ...s, party: [createPlayerCharacter('H', 'knight')] };
     const bus = new EventBus();
     const data = {
-      ...emptyGameData(testCampaign, {
-        defaultHeroName: () => 'H',
-        getHeroClassLabel: () => '—',
-        getPathUnlockBonus: () => null,
-      }),
+      ...createTestData(),
       leadStoryPassives: { test_passive: { name: 'T', description: 'D' } },
     };
     const ctx = { sceneId: 'test/scene', data, bus };
@@ -157,11 +120,7 @@ describe('applyEffects', () => {
       resources: { ...s.resources, supply: 2 },
     };
     const bus = new EventBus();
-    const data = emptyGameData(testCampaign, {
-      defaultHeroName: () => 'H',
-      getHeroClassLabel: () => '—',
-      getPathUnlockBonus: () => null,
-    });
+    const data = createTestData();
     const next = applyEffects(s, [{ op: 'campRest' }], {
       sceneId: 'test/scene',
       data,
@@ -184,11 +143,7 @@ describe('applyEffects', () => {
       exploration: { graphId: 'act2_catacomb', nodeId: 'cross_start' },
     };
     const bus = new EventBus();
-    const data = emptyGameData(testCampaign, {
-      defaultHeroName: () => 'H',
-      getHeroClassLabel: () => '—',
-      getPathUnlockBonus: () => null,
-    });
+    const data = createTestData();
     const next = applyEffects(
       s,
       [{ op: 'setExploration', graphId: 'act2_catacomb', nodeId: 'cross_north' }],

@@ -7,22 +7,10 @@ import {
   xpToNextLevel,
 } from '../../src/engine/progression/index.ts';
 import { createInitialState, createPlayerCharacter } from '../../src/engine/core/index.ts';
-import { emptyGameData } from '../../src/engine/data/index.ts';
-import type { CampaignIndex, Encounter } from '../../src/engine/schema/index.ts';
+import type { Encounter } from '../../src/engine/schema/index.ts';
+import { createTestData, testCampaign } from '../helpers/engineTestData.ts';
 
-const testCampaign: CampaignIndex = {
-  id: 'test',
-  name: 'Test',
-  entryScene: 'act1/title',
-  startingCompanionPool: [],
-  scenes: [],
-};
-
-const minimalData = emptyGameData(testCampaign, {
-  defaultHeroName: () => 'H',
-  getHeroClassLabel: () => '—',
-  getPathUnlockBonus: () => null,
-});
+const minimalData = createTestData();
 
 describe('xpToNextLevel', () => {
   it('matches ladder: 50 at level 1, +10 per level', () => {

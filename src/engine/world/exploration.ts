@@ -27,6 +27,9 @@ export type ExplorationGraph = {
   nodes: ExplorationNode[];
 };
 
+/** Contrato de leitura de grafos por campanha (UI injeta apenas dados). */
+export type ExplorationGraphProvider = (graphId: string) => ExplorationGraph | null;
+
 export const EXPLORE_NAV_SCENE_ID = 'shared/explore_nav';
 
 /** Flag definida ao chegar ao nó objetivo do grafo act2 (catacumba). */
@@ -40,6 +43,42 @@ const ACT2_WILD_WEIGHTS: { weight: number; encounterId: string }[] = [
   { weight: 0.2, encounterId: 'act2_rare_bone_sentinel' },
   { weight: 0.2, encounterId: 'act2_rare_lone_swarm' },
 ];
+
+export function validateExplorationGraphContract(graph: ExplorationGraph): void {
+  const nodeById = new Map<string, ExplorationNode>();
+  for (const node of graph.nodes) {
+    if (nodeById.has(node.id)) {
+      throw new Error(`ExplorationGraph[${graph.id}] node duplicado: "${node.id}"`);
+    }
+    nodeById.set(node.id, node);
+    for (const edge of node.edges) {
+      if (edge.encounterChance < 0 || edge.encounterChance > 1) {
+        throw new Error(
+          `ExplorationGraph[${graph.id}] edge "${edge.id}" em "${node.id}" com encounterChance fora de 0..1`
+        );
+      }
+    }
+  }
+  if (!nodeById.has(graph.startNodeId)) {
+    throw new Error(`ExplorationGraph[${graph.id}] startNodeId inválido: "${graph.startNodeId}"`);
+  }
+  for (const node of graph.nodes) {
+    for (const edge of node.edges) {
+      if (!nodeById.has(edge.to)) {
+        throw new Error(`ExplorationGraph[${graph.id}] edge "${edge.id}" aponta para nó inexistente "${edge.to}"`);
+      }
+    }
+  }
+}
+
+export function validateExplorationGraphCatalog(graphs: Record<string, ExplorationGraph>): void {
+  for (const [id, graph] of Object.entries(graphs)) {
+    if (graph.id !== id) {
+      throw new Error(`ExplorationGraph catálogo com chave "${id}" divergente do id "${graph.id}"`);
+    }
+    validateExplorationGraphContract(graph);
+  }
+}
 
 export function buildExplorationNodeIndex(
   graph: ExplorationGraph

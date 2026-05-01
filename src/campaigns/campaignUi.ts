@@ -1,5 +1,5 @@
 import type { ClassId } from '../engine/schema/index.ts';
-import type { ExplorationGraph } from '../engine/world/index.ts';
+import type { ExplorationGraphProvider } from '../engine/world/index.ts';
 
 /** Maps, ASCII art, and hero copy used only by the UI layer for a campaign. */
 export type CampaignUIAdapter = {
@@ -12,5 +12,5 @@ export type CampaignUIAdapter = {
   getHeroClassLabel: (classId: ClassId, path: string | null | undefined) => string;
   getHeroLore: (classId: ClassId, path: string | null | undefined) => string;
   /** Grafo de exploração por id (ex.: act2_catacomb); omitido se a campanha não usar. */
-  getExplorationGraph?: (graphId: string) => ExplorationGraph | null;
+  getExplorationGraph?: ExplorationGraphProvider;
 };

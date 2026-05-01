@@ -37,37 +37,33 @@ import {
 import { formatCampaignHeaderTitle } from './campaignHeaderTitle.ts';
 import { mountAppChrome, syncAppChrome, type AppChromeRefs } from './gameAppShell.ts';
 import { openCreditsModal } from './gameAppSidebar.ts';
+import { dayAdvanceSubtitle, handleGameEvent } from './gameAppEvents.ts';
+import {
+  buildGameAppStorageKeys,
+  loadDevMode,
+  loadFontStep,
+  loadOnboardingPrimerVisible,
+  loadSceneArtHighlightEnabled,
+  loadSidebarSections,
+  loadTimedChoiceMode,
+  saveDevMode,
+  saveFontStep,
+  saveOnboardingPrimerVisible,
+  saveSceneArtHighlightEnabled,
+  saveSidebarSections,
+  saveTimedChoiceMode,
+  type GameAppStorageKeys,
+} from './gameAppPreferences.ts';
 import './css/styles.css';
 import gameVersionRaw from '../../VERSION?raw';
 
 const GAME_VERSION = gameVersionRaw.trim() || '?';
 
-/** Legenda do aviso quando o dia narrativo avança (varia com o tempo sob pedra). */
-function dayAdvanceSubtitle(day: number): string {
-  if (day >= 30) return 'Até o número parece estranho na língua.';
-  if (day >= 25) return 'Quem conta dias conta também medo.';
-  if (day >= 20) return 'A pedra não distingue pressa de desespero.';
-  if (day >= 15) return 'O subsolo não perdoa quem demora.';
-  if (day >= 12) return 'O abismo não tem pressa — tu é que tens.';
-  if (day >= 9) return 'Sem sol: só hábito e eco.';
-  if (day >= 6) return 'Os túneis não esquecem quem passa.';
-  if (day >= 4) return 'Cada viragem arrasta mais silêncio.';
-  if (day >= 2) return 'Primeiras marcas na contagem — ainda sabes em voz alta.';
-  return 'Passou tempo desde a última paragem.';
-}
-
 export class GameApp {
   private readonly campaignId: string;
   /** Gravação única antiga (`{campaignId}_save_v1`) — migrada para o slot 1 na primeira execução. */
   private readonly legacySaveKey: string;
-  private readonly sidebarKey: string;
-  private readonly fontKey: string;
-  private readonly timedChoiceKey: string;
-  private readonly sceneArtHighlightKey: string;
-  private readonly devModeKey: string;
-  private readonly onboardingPrimerKey: string;
-  private readonly returnRewardDateKey: string;
-  private readonly legacyBriefingKey: string;
+  private readonly storageKeys: GameAppStorageKeys;
   private registry: ContentRegistry;
   private bus = new EventBus();
   private audio: GameAudio;
@@ -121,21 +117,14 @@ export class GameApp {
     this.root = root;
     this.campaignId = campaignId;
     this.legacySaveKey = `${campaignId}_save_v1`;
-    this.sidebarKey = `${campaignId}_sidebar_sections_v1`;
-    this.fontKey = `${campaignId}_font_step_v1`;
-    this.timedChoiceKey = `${campaignId}_timed_choice_v1`;
-    this.sceneArtHighlightKey = `${campaignId}_scene_art_highlight_v1`;
-    this.devModeKey = `${campaignId}_dev_mode`;
-    this.onboardingPrimerKey = `${campaignId}_onboarding_primer_v1`;
-    this.returnRewardDateKey = `${campaignId}_return_reward_date_v1`;
-    this.legacyBriefingKey = `${campaignId}_legacy_briefing_v1`;
+    this.storageKeys = buildGameAppStorageKeys(campaignId);
     this.registry = new ContentRegistry(campaignId);
     this.audio = new GameAudio(campaignId);
-    this.fontStep = this.loadFontStep();
-    this.timedChoiceMode = this.loadTimedChoiceMode();
-    this.sceneArtHighlightEnabled = this.loadSceneArtHighlightEnabled();
-    this.devMode = this.loadDevMode();
-    this.onboardingPrimerVisible = this.loadOnboardingPrimerVisible();
+    this.fontStep = loadFontStep(this.storageKeys.fontKey);
+    this.timedChoiceMode = loadTimedChoiceMode(this.storageKeys.timedChoiceKey);
+    this.sceneArtHighlightEnabled = loadSceneArtHighlightEnabled(this.storageKeys.sceneArtHighlightKey);
+    this.devMode = loadDevMode(this.storageKeys.devModeKey);
+    this.onboardingPrimerVisible = loadOnboardingPrimerVisible(this.storageKeys.onboardingPrimerKey);
     this.choiceHotkeyHandler = (e: KeyboardEvent): void => {
       const el = e.target;
       if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement || el instanceof HTMLSelectElement) {
@@ -187,59 +176,58 @@ export class GameApp {
     };
     document.addEventListener('keydown', this.choiceHotkeyHandler, true);
 
-    this.bus.subscribe((ev) => {
-      if (ev.type === 'combat.end' && ev.victory) {
-        this.audio.playVictory();
-      }
-      if (ev.type === 'combat.end' && !ev.victory) {
-        this.audio.playDefeat();
-      }
-      if (ev.type === 'faith.miracle') {
-        this.faithMiraclePending = true;
-        this.unlockAudio();
-        this.audio.playFaithMiracle();
-      }
-      if (ev.type === 'item.acquired') {
-        this.itemAcquireQueue.push(ev.itemId);
-        this.unlockAudio();
-        this.audio.playItemAcquire();
-      }
-      if (ev.type === 'xp.gained' && ev.amount > 0 && this.state.mode === 'story') {
-        this.statusHighlightQueue.push({
-          type: 'statusHighlight',
-          variant: 'good',
-          title: `+${ev.amount} XP`,
-          subtitle: 'Experiência recebida',
-        });
-        this.unlockAudio();
-      }
-      if (ev.type === 'diary.entryAdded') {
-        this.diaryEntryQueue.push(ev.text);
-        this.unlockAudio();
-      }
-      if (ev.type === 'camp.rest') {
-        this.unlockAudio();
-        this.audio.playCampRest();
-      }
-      if (ev.type === 'time.dayAdvanced') {
-        this.unlockAudio();
-        this.audio.playDayAdvance();
-        this.statusHighlightQueue.push({
-          type: 'statusHighlight',
-          variant: 'good',
-          title: `Dia ${ev.day}`,
-          subtitle: dayAdvanceSubtitle(ev.day),
-        });
-      }
-      if (ev.type === 'statusHighlight') {
-        this.statusHighlightQueue.push(ev);
-      }
-    });
+    this.bus.subscribe((ev) =>
+      handleGameEvent(ev, {
+        isStoryMode: this.state.mode === 'story',
+        onCombatVictory: () => this.audio.playVictory(),
+        onCombatDefeat: () => this.audio.playDefeat(),
+        onFaithMiracle: () => {
+          this.faithMiraclePending = true;
+          this.unlockAudio();
+          this.audio.playFaithMiracle();
+        },
+        onItemAcquired: (itemId) => {
+          this.itemAcquireQueue.push(itemId);
+          this.unlockAudio();
+          this.audio.playItemAcquire();
+        },
+        onXpGained: (amount) => {
+          this.statusHighlightQueue.push({
+            type: 'statusHighlight',
+            variant: 'good',
+            title: `+${amount} XP`,
+            subtitle: 'Experiência recebida',
+          });
+          this.unlockAudio();
+        },
+        onDiaryEntryAdded: (text) => {
+          this.diaryEntryQueue.push(text);
+          this.unlockAudio();
+        },
+        onCampRest: () => {
+          this.unlockAudio();
+          this.audio.playCampRest();
+        },
+        onTimeDayAdvanced: (day) => {
+          this.unlockAudio();
+          this.audio.playDayAdvance();
+          this.statusHighlightQueue.push({
+            type: 'statusHighlight',
+            variant: 'good',
+            title: `Dia ${day}`,
+            subtitle: dayAdvanceSubtitle(day),
+          });
+        },
+        onStatusHighlight: (event) => {
+          this.statusHighlightQueue.push(event);
+        },
+      })
+    );
     this.state = createInitialState(this.registry.data.campaign);
     this.state = this.stabilize(this.state);
     this.applyReturnRewardIfNeeded();
     this.applyLegacyBriefingIfNeeded();
-    this.sidebarSections = this.loadSidebarSections();
+    this.sidebarSections = loadSidebarSections(this.storageKeys.sidebarKey);
     this.migrateLegacySaveIfNeeded();
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
@@ -262,85 +250,10 @@ export class GameApp {
     this.render();
   }
 
-  private loadFontStep(): number {
-    try {
-      const raw = localStorage.getItem(this.fontKey);
-      const n = raw != null ? parseInt(raw, 10) : 0;
-      if (n === 1 || n === 2) return n;
-      return 0;
-    } catch {
-      return 0;
-    }
-  }
-
-  private saveFontStep(): void {
-    try {
-      localStorage.setItem(this.fontKey, String(this.fontStep));
-    } catch {
-      /* noop */
-    }
-  }
-
-  private loadDevMode(): boolean {
-    try {
-      return localStorage.getItem(this.devModeKey) === '1';
-    } catch {
-      return false;
-    }
-  }
-
-  private loadTimedChoiceMode(): boolean {
-    try {
-      return localStorage.getItem(this.timedChoiceKey) === '1';
-    } catch {
-      return false;
-    }
-  }
-
-  private saveTimedChoiceMode(): void {
-    try {
-      localStorage.setItem(this.timedChoiceKey, this.timedChoiceMode ? '1' : '0');
-    } catch {
-      /* noop */
-    }
-  }
-
-  private loadSceneArtHighlightEnabled(): boolean {
-    try {
-      return localStorage.getItem(this.sceneArtHighlightKey) !== '0';
-    } catch {
-      return true;
-    }
-  }
-
-  private saveSceneArtHighlightEnabled(): void {
-    try {
-      localStorage.setItem(this.sceneArtHighlightKey, this.sceneArtHighlightEnabled ? '1' : '0');
-    } catch {
-      /* noop */
-    }
-  }
-
-  private loadOnboardingPrimerVisible(): boolean {
-    try {
-      return localStorage.getItem(this.onboardingPrimerKey) !== '0';
-    } catch {
-      return true;
-    }
-  }
-
-  private saveOnboardingPrimerVisible(): void {
-    try {
-      localStorage.setItem(this.onboardingPrimerKey, this.onboardingPrimerVisible ? '1' : '0');
-    } catch {
-      /* noop */
-    }
-  }
-
   private applyReturnRewardIfNeeded(): void {
     const today = new Date().toISOString().slice(0, 10);
     try {
-      if (localStorage.getItem(this.returnRewardDateKey) === today) return;
+      if (localStorage.getItem(this.storageKeys.returnRewardDateKey) === today) return;
       this.state = this.stabilize(
         applyEffects(
           this.state,
@@ -351,7 +264,7 @@ export class GameApp {
           this.ctx()
         )
       );
-      localStorage.setItem(this.returnRewardDateKey, today);
+      localStorage.setItem(this.storageKeys.returnRewardDateKey, today);
       this.statusHighlightQueue.push({
         type: 'statusHighlight',
         variant: 'good',
@@ -401,7 +314,7 @@ export class GameApp {
     if (legacy.echoes <= 0) return;
     const stamp = `${legacy.echoes}:${legacy.lastRunSummary}:${legacy.titles.join('|')}`;
     try {
-      if (localStorage.getItem(this.legacyBriefingKey) === stamp) return;
+      if (localStorage.getItem(this.storageKeys.legacyBriefingKey) === stamp) return;
       const topTitle = legacy.titles[legacy.titles.length - 1];
       if (topTitle) {
         this.statusHighlightQueue.push({
@@ -423,15 +336,7 @@ export class GameApp {
           )
         );
       }
-      localStorage.setItem(this.legacyBriefingKey, stamp);
-    } catch {
-      /* noop */
-    }
-  }
-
-  private saveDevMode(): void {
-    try {
-      localStorage.setItem(this.devModeKey, this.devMode ? '1' : '0');
+      localStorage.setItem(this.storageKeys.legacyBriefingKey, stamp);
     } catch {
       /* noop */
     }
@@ -444,7 +349,7 @@ export class GameApp {
 
   private cycleFontSize(): void {
     this.fontStep = (this.fontStep + 1) % 3;
-    this.saveFontStep();
+    saveFontStep(this.storageKeys.fontKey, this.fontStep);
     this.closeMenu();
     this.render();
   }
@@ -515,27 +420,6 @@ export class GameApp {
     this.closeMenu();
   }
 
-  private loadSidebarSections(): Record<string, boolean> {
-    const defaults: Record<string, boolean> = { recursos: true };
-    try {
-      const raw = sessionStorage.getItem(this.sidebarKey);
-      if (!raw) return { ...defaults };
-      const o = JSON.parse(raw) as unknown;
-      if (typeof o !== 'object' || o === null) return { ...defaults };
-      return { ...defaults, ...(o as Record<string, boolean>) };
-    } catch {
-      return { ...defaults };
-    }
-  }
-
-  private saveSidebarSections(): void {
-    try {
-      sessionStorage.setItem(this.sidebarKey, JSON.stringify(this.sidebarSections));
-    } catch {
-      /* noop */
-    }
-  }
-
   private canOpenSidebarSection(key: string): boolean {
     const visitedCount = Object.keys(this.state.visitedScenes).length;
     if (key === 'inventario') {
@@ -557,7 +441,7 @@ export class GameApp {
         changed = true;
       }
     }
-    if (changed) this.saveSidebarSections();
+    if (changed) saveSidebarSections(this.storageKeys.sidebarKey, this.sidebarSections);
   }
 
   private unlockAudio(): void {
@@ -601,7 +485,7 @@ export class GameApp {
     }
   }
 
-  private ctx(): { sceneId: string; data: import('../engine/gameData').GameData; bus: EventBus } {
+  private ctx(): { sceneId: string; data: import('../engine/data/index.ts').GameData; bus: EventBus } {
     return { sceneId: this.state.sceneId, data: this.registry.data, bus: this.bus };
   }
 
@@ -635,6 +519,8 @@ export class GameApp {
     });
     if (!resolved.ok) return;
     const { edge, toNode } = resolved;
+    const goalFlagKey = toNode.goalFlag ?? 'act2_explore_goal_reached';
+    const reachedGoalNow = toNode.isGoal === true && this.state.flags[goalFlagKey] !== true;
     const effs: Effect[] = [
       { op: 'adjustLeadStress', delta: 1 },
       { op: 'setExploration', graphId: ex.graphId, nodeId: edge.to },
@@ -642,7 +528,7 @@ export class GameApp {
     if (toNode.isGoal) {
       effs.push({
         op: 'setFlag',
-        key: toNode.goalFlag ?? 'act2_explore_goal_reached',
+        key: goalFlagKey,
         value: true,
       });
     }
@@ -650,6 +536,16 @@ export class GameApp {
     s = { ...s, timedChoiceDeadline: null };
     const roll = shouldTriggerEncounter(s, edge.encounterChance);
     s = { ...s, rngSeed: roll.nextSeed };
+    if (reachedGoalNow) {
+      this.statusHighlightQueue.push({
+        type: 'statusHighlight',
+        variant: 'good',
+        title: 'Objetivo concluído',
+        subtitle: 'Descida encontrada. A travessia pelas catacumbas valeu a pena.',
+      });
+      this.unlockAudio();
+      this.audio.playCheckSuccess();
+    }
     if (!roll.trigger) {
       this.state = this.stabilize(s);
       this.render();
@@ -986,7 +882,7 @@ export class GameApp {
           ? {
               onDismiss: () => {
                 this.onboardingPrimerVisible = false;
-                this.saveOnboardingPrimerVisible();
+                saveOnboardingPrimerVisible(this.storageKeys.onboardingPrimerKey, this.onboardingPrimerVisible);
               },
             }
           : null,
@@ -1087,19 +983,19 @@ export class GameApp {
       setVolume: (n: number) => this.audio.setVolume(n),
       onDevModeChange: (v: boolean) => {
         this.devMode = v;
-        this.saveDevMode();
+        saveDevMode(this.storageKeys.devModeKey, this.devMode);
         this.closeMenu();
         this.render();
       },
       onTimedChoiceChange: (v: boolean) => {
         this.timedChoiceMode = v;
-        this.saveTimedChoiceMode();
+        saveTimedChoiceMode(this.storageKeys.timedChoiceKey, this.timedChoiceMode);
         this.closeMenu();
         this.render();
       },
       onSceneArtHighlightChange: (v: boolean) => {
         this.sceneArtHighlightEnabled = v;
-        this.saveSceneArtHighlightEnabled();
+        saveSceneArtHighlightEnabled(this.storageKeys.sceneArtHighlightKey, this.sceneArtHighlightEnabled);
         this.closeMenu();
         this.render();
       },
@@ -1132,7 +1028,7 @@ export class GameApp {
           return;
         }
         this.sidebarSections[key] = open;
-        this.saveSidebarSections();
+        saveSidebarSections(this.storageKeys.sidebarKey, this.sidebarSections);
       },
       playUiClick: () => this.audio.playUiClick(),
       fillMain: (main: HTMLElement) => {

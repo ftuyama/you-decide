@@ -104,3 +104,11 @@ export const ACT2_CATACOMB_GRAPH: ExplorationGraph = {
 export const EXPLORATION_GRAPHS: Record<string, ExplorationGraph> = {
   act2_catacomb: ACT2_CATACOMB_GRAPH,
 };
+
+/**
+ * Contrato:
+ * - chave do catálogo == graph.id
+ * - startNodeId existente no grafo
+ * - arestas com `to` válido e `encounterChance` em 0..1
+ * Validação executada no loader da campanha (bundle).
+ */

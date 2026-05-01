@@ -7,6 +7,7 @@ import {
   type SpellDef,
 } from '../../engine/schema/index.ts';
 import { emptyGameData } from '../../engine/data/index.ts';
+import { validateExplorationGraphCatalog } from '../../engine/world/index.ts';
 import type { CampaignUIAdapter } from '../campaignUi.ts';
 import campaignIndex from './index.json';
 import { enemies as enemiesTs } from './data/enemies.ts';
@@ -21,6 +22,8 @@ import { renderMap } from './maps.ts';
 import { SCENE_ART } from './ascii/art.ts';
 import { getHeroClassLabel, getHeroLore } from './classHero.ts';
 import { EXPLORATION_GRAPHS } from './exploration/graphs.ts';
+
+validateExplorationGraphCatalog(EXPLORATION_GRAPHS);
 
 const sceneRaw = import.meta.glob<string>('./scenes/**/*.md', {
   query: '?raw',

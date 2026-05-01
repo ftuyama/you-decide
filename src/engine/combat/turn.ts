@@ -6,7 +6,7 @@ import {
   roll3d6DropLowest,
   rollD6,
   type AttackRollSpecial,
-} from '../rng.ts';
+} from '../core/rng.ts';
 import type {
   Character,
   CombatLogEntry,
@@ -14,13 +14,13 @@ import type {
   EnemyInstance,
   GameState,
   Stance,
-} from '../schema.ts';
-import type { GameData } from '../gameData.ts';
-import { isLeadPassiveUnlocked } from '../state.ts';
-import { effectiveLeadAttr, tickActiveBuffs } from '../leadStats.ts';
-import type { EventBus } from '../eventBus.ts';
-import { getArmorValue, getWeaponDamage, statMod } from '../combatStats.ts';
-import { getEffectiveLuck } from '../luck.ts';
+} from '../schema/index.ts';
+import type { GameData } from '../data/gameData.ts';
+import { isLeadPassiveUnlocked } from '../core/state.ts';
+import { effectiveLeadAttr, tickActiveBuffs } from '../progression/leadStats.ts';
+import type { EventBus } from '../core/eventBus.ts';
+import { getArmorValue, getWeaponDamage, statMod } from '../combat/combatStats.ts';
+import { getEffectiveLuck } from '../progression/luck.ts';
 import {
   DEFAULT_ENEMY_COMBAT_LINE_CHANCE,
   DEFAULT_ENEMY_CRIT_CONFIRM,

@@ -1,15 +1,15 @@
-import type { Character, ClassId, GameState, SpellDef } from '../engine/schema.ts';
-import { effectiveLeadAttr } from '../engine/leadStats.ts';
-import { PASSIVE_UNLOCK_ITEM_ID } from '../engine/state.ts';
+import type { Character, ClassId, GameState, SpellDef } from '../engine/schema/index.ts';
+import { effectiveLeadAttr } from '../engine/progression/leadStats.ts';
+import { PASSIVE_UNLOCK_ITEM_ID } from '../engine/core/state.ts';
 import {
   getCharacterArmorClass,
   getEquippedArmorPoints,
   sumEquippedItemBonuses,
-} from '../engine/combat.ts';
-import { getEffectiveLuck } from '../engine/luck.ts';
-import { MAX_LEVEL, xpToNextLevel } from '../engine/progression.ts';
+} from '../engine/combat/combat.ts';
+import { getEffectiveLuck } from '../engine/progression/luck.ts';
+import { MAX_LEVEL, xpToNextLevel } from '../engine/progression/progression.ts';
 import type { ContentRegistry } from '../content/registry.ts';
-import { displayTitleForMark } from '../engine/effects.ts';
+import { displayTitleForMark } from '../engine/core/effects.ts';
 import {
   escHtml,
   hpBarMarkup,

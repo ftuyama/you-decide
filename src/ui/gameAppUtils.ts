@@ -1,4 +1,4 @@
-import type { CombatLogEntry, LevelUpStatDeltas, SpellDef } from '../engine/schema.ts';
+import type { CombatLogEntry, LevelUpStatDeltas, SpellDef } from '../engine/schema/index.ts';
 import { icons, type IconId } from './icons/index.ts';
 
 export type CombatLogDisplayItem =

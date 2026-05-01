@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { CombatLogEntry } from '../../src/engine/schema.ts';
+import type { CombatLogEntry } from '../../src/engine/schema/index.ts';
 import { parseCombatLogRounds, parseTurnBannerMessage } from '../../src/ui/gameAppUtils.ts';
 
 describe('parseTurnBannerMessage', () => {

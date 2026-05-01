@@ -2,10 +2,10 @@ import { describe, expect, it } from 'vitest';
 import {
   buildStoryChoiceRows,
   filterChoices,
-} from '../../src/engine/sceneRuntime.ts';
-import { ChoiceSchema } from '../../src/engine/schema.ts';
-import { createInitialState, createPlayerCharacter } from '../../src/engine/state.ts';
-import type { CampaignIndex, Choice, GameState } from '../../src/engine/schema.ts';
+} from '../../src/engine/core/sceneRuntime.ts';
+import { ChoiceSchema } from '../../src/engine/schema/index.ts';
+import { createInitialState, createPlayerCharacter } from '../../src/engine/core/state.ts';
+import type { CampaignIndex, Choice, GameState } from '../../src/engine/schema/index.ts';
 
 const testCampaign: CampaignIndex = {
   id: 'test',

@@ -1,5 +1,5 @@
-import type { GameState } from '../../engine/schema.ts';
-import type { StoryDiceRollBreakdown } from '../../engine/sceneRuntime.ts';
+import type { GameState } from '../../engine/schema/index.ts';
+import type { StoryDiceRollBreakdown } from '../../engine/core/sceneRuntime.ts';
 import { formatDiceAscii } from '../diceAscii.ts';
 
 export type StoryDiceBannerHost = {

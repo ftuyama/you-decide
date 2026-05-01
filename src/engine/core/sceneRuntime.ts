@@ -1,18 +1,18 @@
 import { marked } from 'marked';
-import { splitFrontmatter } from './frontmatter.ts';
+import { splitFrontmatter } from '../data/frontmatter.ts';
 import DOMPurify from 'dompurify';
 import {
   SceneFrontmatterSchema,
   type Choice,
   type GameState,
   type SceneFrontmatter,
-} from './schema.ts';
+} from '../schema/index.ts';
 import { evaluateCondition } from './conditions.ts';
 import { applyEffects, tickActiveBuffs } from './effects.ts';
 import { injectText } from './template.ts';
 import type { EventBus } from './eventBus.ts';
-import type { GameData } from './gameData.ts';
-import { getEffectiveLuck } from './luck.ts';
+import type { GameData } from '../data/gameData.ts';
+import { getEffectiveLuck } from '../progression/luck.ts';
 import { mulberry32, nextRngSeed, roll2d6 } from './rng.ts';
 
 export type LoadedScene = {

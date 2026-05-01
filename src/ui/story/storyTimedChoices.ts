@@ -1,4 +1,4 @@
-import type { Choice, GameState } from '../../engine/schema.ts';
+import type { Choice, GameState } from '../../engine/schema/index.ts';
 
 type TimedChoicesContext = {
   navigation: { applyChoice: (choice: Choice) => void };

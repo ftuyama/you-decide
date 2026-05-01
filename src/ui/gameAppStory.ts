@@ -4,11 +4,11 @@ import {
   type LoadedScene,
   type StoryChoiceRow,
   type StoryDiceRollBreakdown,
-} from '../engine/sceneRuntime.ts';
-import type { Choice, GameState } from '../engine/schema.ts';
+} from '../engine/core/sceneRuntime.ts';
+import type { Choice, GameState } from '../engine/schema/index.ts';
 import type { ContentRegistry } from '../content/registry.ts';
 import { formatLevelUpDeltaLine, randomCampCombatHint } from './gameAppUtils.ts';
-import type { GameEvent } from '../engine/eventBus.ts';
+import type { GameEvent } from '../engine/core/eventBus.ts';
 import { appendStoryMapPanel } from './storyMapPanel.ts';
 import {
   appendCampEquipmentPanel,

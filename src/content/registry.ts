@@ -1,6 +1,6 @@
 /** Cenas parseadas e `GameData`; os loaders de campanha estão em `src/campaigns/registry.ts`. */
-import { parseSceneMarkdown, type LoadedScene } from '../engine/sceneRuntime.ts';
-import type { GameData } from '../engine/gameData.ts';
+import { parseSceneMarkdown, type LoadedScene } from '../engine/core/sceneRuntime.ts';
+import type { GameData } from '../engine/data/gameData.ts';
 import { loadCampaignContent } from '../campaigns/registry.ts';
 import type { CampaignUIAdapter } from '../campaigns/campaignUi.ts';
 

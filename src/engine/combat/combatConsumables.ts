@@ -1,11 +1,11 @@
-import type { GameState } from '../schema.ts';
-import type { GameData } from '../gameData.ts';
-import type { EventBus } from '../eventBus.ts';
+import type { GameState } from '../schema/index.ts';
+import type { GameData } from '../data/gameData.ts';
+import type { EventBus } from '../core/eventBus.ts';
 import {
   applyConsumableToCharacter,
   isConsumable,
   removeOneInventoryItem,
-} from '../consumables.ts';
+} from '../progression/consumables.ts';
 import { advanceToEnemyTurn } from './turn.ts';
 
 function getLead(state: GameState) {

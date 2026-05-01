@@ -1,6 +1,6 @@
-import type { Character, GameState } from './schema.ts';
-import type { GameData } from './gameData.ts';
-import { effectiveLeadAttr } from './leadStats.ts';
+import type { Character, GameState } from '../schema/index.ts';
+import type { GameData } from '../data/gameData.ts';
+import { effectiveLeadAttr } from '../progression/leadStats.ts';
 
 /** Sorte base (+ buffs temporários) + bônus de itens equipados */
 export function getEffectiveLuck(c: Character, data: GameData, state?: GameState): number {

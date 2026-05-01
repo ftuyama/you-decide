@@ -1,5 +1,5 @@
-import type { ClassId } from '../engine/schema.ts';
-import type { ExplorationGraph } from '../engine/exploration.ts';
+import type { ClassId } from '../engine/schema/index.ts';
+import type { ExplorationGraph } from '../engine/world/exploration.ts';
 
 /** Maps, ASCII art, and hero copy used only by the UI layer for a campaign. */
 export type CampaignUIAdapter = {

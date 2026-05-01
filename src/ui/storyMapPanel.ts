@@ -1,4 +1,4 @@
-import type { GameState, SceneFrontmatter } from '../engine/schema.ts';
+import type { GameState, SceneFrontmatter } from '../engine/schema/index.ts';
 import type { ContentRegistry } from '../content/registry.ts';
 import { iconWrap, icons } from './icons/index.ts';
 

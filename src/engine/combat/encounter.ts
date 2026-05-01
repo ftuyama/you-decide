@@ -1,13 +1,13 @@
-import { mulberry32, roll2d6 } from '../rng.ts';
+import { mulberry32, roll2d6 } from '../core/rng.ts';
 import type {
   CombatLogEntry,
   CombatState,
   Encounter,
   EnemyInstance,
   GameState,
-} from '../schema.ts';
-import type { GameData } from '../gameData.ts';
-import { effectiveLeadAttr } from '../leadStats.ts';
+} from '../schema/index.ts';
+import type { GameData } from '../data/gameData.ts';
+import { effectiveLeadAttr } from '../progression/leadStats.ts';
 
 /** Ajusta seed global após consumo de RNG em combate */
 export function bumpRngSeed(state: GameState): GameState {

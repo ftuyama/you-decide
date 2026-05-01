@@ -1,4 +1,4 @@
-import type { FactionId } from './schema.ts';
+import type { FactionId } from '../schema/index.ts';
 
 /** Limita reputação de facção ao intervalo do jogo (−3..+3). */
 export function clampReputation(n: number): number {

@@ -2,10 +2,10 @@ import '../css/styles.css';
 import DOMPurify from 'dompurify';
 import { marked } from 'marked';
 import { getRegisteredCampaignIds, loadCampaignContent } from '../../campaigns/registry.ts';
-import { parseSceneMarkdown, type LoadedScene } from '../../engine/sceneRuntime.ts';
-import type { Choice } from '../../engine/schema.ts';
-import { sceneActId, sortedSceneActsFromNodes, type SceneGraphNode } from '../../engine/sceneGraph.ts';
-import type { ItemDef, EnemyDef } from '../../engine/schema.ts';
+import { parseSceneMarkdown, type LoadedScene } from '../../engine/core/sceneRuntime.ts';
+import type { Choice } from '../../engine/schema/index.ts';
+import { sceneActId, sortedSceneActsFromNodes, type SceneGraphNode } from '../../engine/world/sceneGraph.ts';
+import type { ItemDef, EnemyDef } from '../../engine/schema/index.ts';
 import { resolveSceneArtFromFrontmatter } from '../gameAppStory.ts';
 import { GameAudio, AMBIENT_THEMES, type AmbientTheme } from '../sound/index.ts';
 import {

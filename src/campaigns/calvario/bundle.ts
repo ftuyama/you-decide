@@ -5,8 +5,8 @@ import {
   type Encounter,
   type ItemDef,
   type SpellDef,
-} from '../../engine/schema.ts';
-import { emptyGameData } from '../../engine/gameData.ts';
+} from '../../engine/schema/index.ts';
+import { emptyGameData } from '../../engine/data/gameData.ts';
 import type { CampaignUIAdapter } from '../campaignUi.ts';
 import campaignIndex from './index.json';
 import { enemies as enemiesTs } from './data/enemies.ts';

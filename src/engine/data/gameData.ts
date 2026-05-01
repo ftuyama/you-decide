@@ -6,7 +6,7 @@ import type {
   Encounter,
   ItemDef,
   SpellDef,
-} from './schema.ts';
+} from '../schema/index.ts';
 
 /** Bónus aplicados uma vez ao ganhar um arquétipo narrativo (`setPath` com path não nulo). */
 export type PathUnlockBonus = {

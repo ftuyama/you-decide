@@ -1,5 +1,5 @@
-import type { FactionId, GameState } from './schema.ts';
-import { MAX_LEVEL, xpToNextLevel } from './progression.ts';
+import type { FactionId, GameState } from '../schema/index.ts';
+import { MAX_LEVEL, xpToNextLevel } from '../progression/progression.ts';
 
 /** Resumo humano do desfecho do trono (Act 4) para epílogo e abertura do gelo. */
 function throneOutcomeLine(state: GameState): string {

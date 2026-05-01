@@ -1,5 +1,5 @@
-import type { Character, EnemyDef, GameState } from '../schema.ts';
-import type { AttackRollSpecial } from '../rng.ts';
+import type { Character, EnemyDef, GameState } from '../schema/index.ts';
+import type { AttackRollSpecial } from '../core/rng.ts';
 
 /** Confirmação de crítico inimigo após 6+6 (padrão ~25%) */
 export const DEFAULT_ENEMY_CRIT_CONFIRM = 0.25;

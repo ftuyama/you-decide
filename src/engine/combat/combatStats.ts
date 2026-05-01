@@ -1,6 +1,6 @@
-import { effectiveLeadAttr } from './leadStats.ts';
-import type { Character, GameState } from './schema.ts';
-import type { GameData } from './gameData.ts';
+import { effectiveLeadAttr } from '../progression/leadStats.ts';
+import type { Character, GameState } from '../schema/index.ts';
+import type { GameData } from '../data/gameData.ts';
 
 export function statMod(attr: number): number {
   return Math.floor((attr - 6) / 2);

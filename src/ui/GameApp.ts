@@ -1,6 +1,6 @@
 import { ContentRegistry } from '../content/registry.ts';
-import { createInitialState, deserializeState, serializeState } from '../engine/state.ts';
-import { EventBus, type GameEvent } from '../engine/eventBus.ts';
+import { createInitialState, deserializeState, serializeState } from '../engine/core/state.ts';
+import { EventBus, type GameEvent } from '../engine/core/eventBus.ts';
 import {
   enterScene,
   resolveLuckCheck,
@@ -8,17 +8,17 @@ import {
   resolveSkillCheck,
   type LoadedScene,
   type StoryDiceRollBreakdown,
-} from '../engine/sceneRuntime.ts';
-import { applyEffects } from '../engine/effects.ts';
+} from '../engine/core/sceneRuntime.ts';
+import { applyEffects } from '../engine/core/effects.ts';
 import {
   explorationMoveEffects,
   pickWeightedEncounterId,
   shouldTriggerEncounter,
   startExplorationCombatEffects,
-} from '../engine/exploration.ts';
-import { tickActiveBuffs } from '../engine/leadStats.ts';
-import type { Choice, Effect, GameState } from '../engine/schema.ts';
-import { migrateLegacyKnownSpells } from '../engine/spellsKnown.ts';
+} from '../engine/world/exploration.ts';
+import { tickActiveBuffs } from '../engine/progression/leadStats.ts';
+import type { Choice, Effect, GameState } from '../engine/schema/index.ts';
+import { migrateLegacyKnownSpells } from '../engine/progression/spellsKnown.ts';
 import { GameAudio, type AmbientTheme } from './sound/index.ts';
 import { buildDevToolsHref, buildScenesGraphHref } from './campaignUrl.ts';
 import {

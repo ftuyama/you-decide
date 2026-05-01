@@ -7,7 +7,7 @@ import {
   fleeDifficultyTn,
   SACRIFICE_MIN_CORRUPTION,
   useCombatConsumable,
-} from '../engine/combat.ts';
+} from '../engine/combat/combat.ts';
 import { getSacrificeValues } from '../engine/combat/constants.ts';
 import type {
   Character,
@@ -16,10 +16,10 @@ import type {
   ItemDef,
   SpellDef,
   Stance,
-} from '../engine/schema.ts';
-import type { GameData } from '../engine/gameData.ts';
+} from '../engine/schema/index.ts';
+import type { GameData } from '../engine/data/gameData.ts';
 import type { ContentRegistry } from '../content/registry.ts';
-import type { EventBus } from '../engine/eventBus.ts';
+import type { EventBus } from '../engine/core/eventBus.ts';
 import { formatDiceAscii } from './diceAscii.ts';
 import {
   buildCombatLogDisplayItems,

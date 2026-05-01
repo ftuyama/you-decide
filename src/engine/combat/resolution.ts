@@ -1,14 +1,14 @@
-import { mulberry32 } from '../rng.ts';
+import { mulberry32 } from '../core/rng.ts';
 import type {
   CombatState,
   EnemyLootDrop,
   GameState,
-} from '../schema.ts';
-import type { GameData } from '../gameData.ts';
-import { extraLifeReadyFromFaith } from '../state.ts';
-import { tickActiveBuffs } from '../leadStats.ts';
-import { addXp, computeCombatXp } from '../progression.ts';
-import type { EventBus } from '../eventBus.ts';
+} from '../schema/index.ts';
+import type { GameData } from '../data/gameData.ts';
+import { extraLifeReadyFromFaith } from '../core/state.ts';
+import { tickActiveBuffs } from '../progression/leadStats.ts';
+import { addXp, computeCombatXp } from '../progression/progression.ts';
+import type { EventBus } from '../core/eventBus.ts';
 
 /** Milagre: −5 fé, HP a metade do máximo, combate termina em narrativa em returnScene (sem vitória nem derrota). */
 export function finishCombatFaithRescue(

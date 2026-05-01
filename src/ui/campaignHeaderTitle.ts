@@ -1,4 +1,4 @@
-import type { CampaignIndex } from '../engine/schema.ts';
+import type { CampaignIndex } from '../engine/schema/index.ts';
 
 /** Cabeçalho do jogo: `{nome da campanha} / {nome do ato}`. */
 export function formatCampaignHeaderTitle(campaign: CampaignIndex, chapter: number): string {

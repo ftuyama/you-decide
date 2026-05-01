@@ -6,7 +6,7 @@ import {
   nextRngSeed,
   roll2d6,
   rollD6,
-} from '../../src/engine/rng.ts';
+} from '../../src/engine/core/rng.ts';
 
 describe('mulberry32', () => {
   it('is deterministic for a fixed seed', () => {

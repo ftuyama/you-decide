@@ -1,5 +1,5 @@
-import type { LeadStoryPassiveDef } from '../../../engine/gameData.ts';
-import type { ClassId } from '../../../engine/schema.ts';
+import type { LeadStoryPassiveDef } from '../../../engine/data/gameData.ts';
+import type { ClassId } from '../../../engine/schema/index.ts';
 
 export type ClassPassiveDef = {
   id: string;

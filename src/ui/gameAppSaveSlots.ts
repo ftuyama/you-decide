@@ -1,5 +1,5 @@
-import { deserializeState, serializeState } from '../engine/state.ts';
-import type { GameState } from '../engine/schema.ts';
+import { deserializeState, serializeState } from '../engine/core/state.ts';
+import type { GameState } from '../engine/schema/index.ts';
 
 /** Slots visíveis e graváveis fora do modo desenvolvedor. */
 export const SAVE_SLOT_COUNT_PLAYER = 3;

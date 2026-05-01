@@ -1,5 +1,5 @@
-import type { Effect, GameState } from './schema.ts';
-import { mulberry32 } from './rng.ts';
+import type { Effect, GameState } from '../schema/index.ts';
+import { mulberry32 } from '../core/rng.ts';
 
 /** Grafo de navegação por área (dados em campanha). */
 export type ExplorationEdge = {

@@ -1,4 +1,4 @@
-import type { Effect, GameState } from '../../engine/schema.ts';
+import type { Effect, GameState } from '../../engine/schema/index.ts';
 import type { ContentRegistry } from '../../content/registry.ts';
 import { formatItemEquipmentStatParts } from '../formatItemEquipment.ts';
 import { iconWrap, icons } from '../icons/index.ts';

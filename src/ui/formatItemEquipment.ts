@@ -1,4 +1,4 @@
-import type { ItemDef } from '../engine/schema.ts';
+import type { ItemDef } from '../engine/schema/index.ts';
 
 export function formatItemEquipmentStatParts(it: ItemDef): string[] {
   const parts: string[] = [];

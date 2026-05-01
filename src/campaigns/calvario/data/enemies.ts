@@ -1,4 +1,4 @@
-import type { EnemyDef } from '../../../engine/schema.ts';
+import type { EnemyDef } from '../../../engine/schema/index.ts';
 import * as E from '../ascii/sprites/enemies/index.ts';
 
 export const enemies: Record<string, EnemyDef> = {

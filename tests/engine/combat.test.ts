@@ -4,10 +4,10 @@ import {
   fleeCombat,
   fleeDifficultyTn,
   getCharacterArmorClass,
-} from '../../src/engine/combat.ts';
-import { createInitialState, createPlayerCharacter } from '../../src/engine/state.ts';
-import { emptyGameData } from '../../src/engine/gameData.ts';
-import type { CampaignIndex, EnemyDef, Encounter, ItemDef } from '../../src/engine/schema.ts';
+} from '../../src/engine/combat/combat.ts';
+import { createInitialState, createPlayerCharacter } from '../../src/engine/core/state.ts';
+import { emptyGameData } from '../../src/engine/data/gameData.ts';
+import type { CampaignIndex, EnemyDef, Encounter, ItemDef } from '../../src/engine/schema/index.ts';
 
 const testCampaign: CampaignIndex = {
   id: 'test',

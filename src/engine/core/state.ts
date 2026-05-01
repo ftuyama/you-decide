@@ -1,4 +1,4 @@
-import { SCHEMA_VERSION, type CampaignIndex, type ClassId, type GameState } from './schema.ts';
+import { SCHEMA_VERSION, type CampaignIndex, type ClassId, type GameState } from '../schema/index.ts';
 import { parseSeedFromSearch } from './rng.ts';
 
 const defaultRep = { vigilia: 0, circulo: 0, culto: 0 } as GameState['reputation'];

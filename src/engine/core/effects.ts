@@ -1,24 +1,24 @@
-import type { Effect, FactionId, GameState } from './schema.ts';
-import { GameStateSchema } from './schema.ts';
+import type { Effect, FactionId, GameState } from '../schema/index.ts';
+import { GameStateSchema } from '../schema/index.ts';
 import type { EventBus } from './eventBus.ts';
-import { beginEncounter } from './combat/encounter.ts';
-import type { GameData } from './gameData.ts';
-import { addXp } from './progression.ts';
-import { initialKnownSpellIds } from './spellsKnown.ts';
+import { beginEncounter } from '../combat/encounter.ts';
+import type { GameData } from '../data/gameData.ts';
+import { addXp } from '../progression/progression.ts';
+import { initialKnownSpellIds } from '../progression/spellsKnown.ts';
 import {
   createInitialState,
   createPlayerCharacter,
   extraLifeReadyFromFaith,
   syncLeadPassiveStats,
 } from './state.ts';
-import { clampLeadStat, tickActiveBuffs, type LeadStatAttr } from './leadStats.ts';
-import { applyConsumableToCharacter, isConsumable, removeOneInventoryItem } from './consumables.ts';
+import { clampLeadStat, tickActiveBuffs, type LeadStatAttr } from '../progression/leadStats.ts';
+import { applyConsumableToCharacter, isConsumable, removeOneInventoryItem } from '../progression/consumables.ts';
 import { injectText } from './template.ts';
 import {
   clampReputation,
   computeAddRepResult,
   defaultFactionGainPending,
-} from './reputation.ts';
+} from '../progression/reputation.ts';
 
 export { tickActiveBuffs };
 

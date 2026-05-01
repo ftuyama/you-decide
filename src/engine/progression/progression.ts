@@ -1,8 +1,8 @@
-import type { Character, ClassId, GameState, LevelUpStatDeltas, LevelUpStep } from './schema.ts';
-import type { GameData } from './gameData.ts';
-import type { Encounter } from './schema.ts';
+import type { Character, ClassId, GameState, LevelUpStatDeltas, LevelUpStep } from '../schema/index.ts';
+import type { GameData } from '../data/gameData.ts';
+import type { Encounter } from '../schema/index.ts';
 import type { EventBus } from './eventBus.ts';
-import { unlockSpellsForNewLevel } from './spellsKnown.ts';
+import { unlockSpellsForNewLevel } from '../progression/spellsKnown.ts';
 
 /** Quando um efeito de subida de nível se aplica em relação ao nível alcançado */
 export type LevelUpWhen = 'every' | 'even' | 'odd';

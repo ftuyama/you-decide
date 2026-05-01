@@ -6,7 +6,7 @@
  * Cenas já parseadas: `src/content/registry.ts` (ContentRegistry).
  */
 import type { CampaignUIAdapter } from './campaignUi.ts';
-import type { GameData } from '../engine/gameData.ts';
+import type { GameData } from '../engine/data/gameData.ts';
 import { loadCalvarioContent } from './calvario/bundle.ts';
 import { loadDemoContent } from './demo/bundle.ts';
 

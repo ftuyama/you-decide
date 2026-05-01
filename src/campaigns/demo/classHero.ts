@@ -1,5 +1,5 @@
-import type { ClassId } from '../../engine/schema.ts';
-import type { PathUnlockBonus } from '../../engine/gameData.ts';
+import type { ClassId } from '../../engine/schema/index.ts';
+import type { PathUnlockBonus } from '../../engine/data/gameData.ts';
 
 const CLASS_LABEL: Record<ClassId, string> = {
   knight: 'Cavaleiro',

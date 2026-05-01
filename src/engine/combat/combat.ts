@@ -3,15 +3,15 @@ export {
   DEFAULT_ENEMY_COMBAT_LINE_CHANCE,
   DEFAULT_FOCUS_LEADER_WEIGHT,
   SACRIFICE_MIN_CORRUPTION,
-} from './combat/constants.ts';
-export { bumpRngSeed, beginEncounter } from './combat/encounter.ts';
+} from './constants.ts';
+export { bumpRngSeed, beginEncounter } from './encounter.ts';
 export { getCharacterArmorClass, getEquippedArmorPoints, sumEquippedItemBonuses } from './combatStats.ts';
-export { canCastSpell, castSpell, executeSpellTurn } from './combat/spells.ts';
-export { canUseCombatConsumable, useCombatConsumable } from './combat/combatConsumables.ts';
+export { canCastSpell, castSpell, executeSpellTurn } from './spells.ts';
+export { canUseCombatConsumable, useCombatConsumable } from './combatConsumables.ts';
 export {
   applyPlayerStance,
   executePlayerTurn,
   fleeCombat,
   fleeDifficultyTn,
   playerAttack,
-} from './combat/turn.ts';
+} from './turn.ts';

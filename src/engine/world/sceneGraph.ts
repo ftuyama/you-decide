@@ -1,6 +1,6 @@
-import { loadCampaignContent } from '../campaigns/registry.ts';
-import { parseSceneMarkdown, type LoadedScene } from './sceneRuntime.ts';
-import type { Effect, SceneFrontmatter } from './schema.ts';
+import { loadCampaignContent } from '../../campaigns/registry.ts';
+import { parseSceneMarkdown, type LoadedScene } from '../core/sceneRuntime.ts';
+import type { Effect, SceneFrontmatter } from '../schema/index.ts';
 
 export type SceneGraphEdge = { from: string; to: string; kind: string };
 

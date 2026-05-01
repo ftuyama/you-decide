@@ -1,8 +1,8 @@
-import { mulberry32, rollD6 } from '../rng.ts';
-import type { Character, CombatState, GameState } from '../schema.ts';
-import type { GameData } from '../gameData.ts';
-import { getTotalMind, statMod } from '../combatStats.ts';
-import type { EventBus } from '../eventBus.ts';
+import { mulberry32, rollD6 } from '../core/rng.ts';
+import type { Character, CombatState, GameState } from '../schema/index.ts';
+import type { GameData } from '../data/gameData.ts';
+import { getTotalMind, statMod } from '../combat/combatStats.ts';
+import type { EventBus } from '../core/eventBus.ts';
 import { finishCombat } from './resolution.ts';
 import { advanceToEnemyTurn } from './turn.ts';
 

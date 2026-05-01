@@ -1,6 +1,6 @@
-import type { SceneFrontmatter } from '../../engine/schema.ts';
+import type { SceneFrontmatter } from '../../engine/schema/index.ts';
 import type { ContentRegistry } from '../../content/registry.ts';
-import type { LoadedScene } from '../../engine/sceneRuntime.ts';
+import type { LoadedScene } from '../../engine/core/sceneRuntime.ts';
 
 /** Arte de cena: YAML `art` inline ou `artKey` na tabela `sceneArt` da campanha. */
 export function resolveSceneArtFromFrontmatter(

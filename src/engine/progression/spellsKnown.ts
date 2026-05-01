@@ -1,5 +1,5 @@
-import type { Character, GameState, SpellDef } from './schema.ts';
-import type { GameData } from './gameData.ts';
+import type { Character, GameState, SpellDef } from '../schema/index.ts';
+import type { GameData } from '../data/gameData.ts';
 
 export function spellMatchesHeroClass(spell: SpellDef, lead: Character): boolean {
   return spell.classId === 'any' || spell.classId === lead.class;

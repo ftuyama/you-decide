@@ -1,4 +1,4 @@
-import type { GameState } from '../engine/schema.ts';
+import type { GameState } from '../engine/schema/index.ts';
 import type { ContentRegistry } from '../content/registry.ts';
 import { buildGameSidebar, KOFI_SUPPORT_URL } from './gameAppSidebar.ts';
 import { buildMenuSaveSlot, saveSlotLimit } from './gameAppSaveSlots.ts';

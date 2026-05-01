@@ -46,11 +46,6 @@ choices:
   - text: "Mercador de tenda azul-trovão"
     next: act5/frost_merchant
     preview: "Troca de ouro e itens; preço do frio."
-  - text: "Patrulhar ao acaso — a cordilheira morde"
-    next: act5/encounters/frost_random_router
-    preview: "Sem escolher rota a tempo, recuas para o acampamento."
-    timedMs: 14000
-    fallbackNext: act5/camp/frost_camp
   - text: "Montanhas de neve — rumor de um monge na gruta"
     next: act5/frost_snow_mountains_enter
     condition:

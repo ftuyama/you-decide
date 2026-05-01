@@ -6,8 +6,8 @@ type: exploration
 ambientTheme: act5
 choices:
   - id: explore_force
-    text: "Forçar encontro (combate aleatório)"
-    preview: "Sem mover no mapa — só violência."
+    text: "Patrulhar ao acaso (encontro aleatório)"
+    preview: "Sem mover no mapa — a cordilheira decide na violência."
   - id: explore_leave
     text: "Voltar ao acampamento no gelo"
     next: act5/frost_hub

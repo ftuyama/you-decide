@@ -554,7 +554,7 @@ export class GameApp {
     }
     const pick = pickWeightedEncounterId(s.rngSeed);
     s = { ...s, rngSeed: pick.nextSeed };
-    s = applyEffects(s, startExplorationCombatEffects(pick.encounterId), this.ctx());
+    s = applyEffects(s, startExplorationCombatEffects(pick.encounterId, this.state.sceneId), this.ctx());
     this.state = this.stabilize(s);
     this.render();
   }
@@ -563,7 +563,7 @@ export class GameApp {
     if (!this.state.exploration) return;
     const pick = pickWeightedEncounterId(this.state.rngSeed);
     let s: GameState = { ...this.state, rngSeed: pick.nextSeed, timedChoiceDeadline: null };
-    s = applyEffects(s, startExplorationCombatEffects(pick.encounterId), this.ctx());
+    s = applyEffects(s, startExplorationCombatEffects(pick.encounterId, this.state.sceneId), this.ctx());
     this.state = this.stabilize(s);
     this.render();
   }

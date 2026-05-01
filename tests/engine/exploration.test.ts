@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   explorationMoveEffects,
   pickWeightedEncounterId,
+  startExplorationCombatEffects,
   shouldTriggerEncounter,
   type ExplorationGraph,
 } from '../../src/engine/world/index.ts';
@@ -51,6 +52,15 @@ describe('shouldTriggerEncounter', () => {
     expect(a.trigger).toBe(true);
     expect(a.nextSeed).toBe((12345 + 41) >>> 0);
   });
+
+  it('guarantees encounter when lead stress is max', () => {
+    const state = {
+      rngSeed: 12345,
+      party: [{ stress: 4 }],
+    } as unknown as GameState;
+    const a = shouldTriggerEncounter(state, 0.2);
+    expect(a.trigger).toBe(true);
+  });
 });
 
 describe('pickWeightedEncounterId', () => {
@@ -63,5 +73,19 @@ describe('pickWeightedEncounterId', () => {
       'act2_rare_bone_sentinel',
       'act2_rare_lone_swarm',
     ]).toContain(p.encounterId);
+  });
+});
+
+describe('startExplorationCombatEffects', () => {
+  it('uses the current exploration scene as return target', () => {
+    const effects = startExplorationCombatEffects('rats_cellar_pair', 'shared/explore_nav_act3');
+    expect(effects).toHaveLength(1);
+    expect(effects[0]).toMatchObject({
+      op: 'startCombat',
+      encounterId: 'rats_cellar_pair',
+      onVictory: 'shared/explore_nav_act3',
+      onFlee: 'shared/explore_nav_act3',
+      onDefeat: 'shared/game_over',
+    });
   });
 });

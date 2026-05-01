@@ -52,11 +52,6 @@ choices:
   - text: "Negociar com o mercador da banca esquecida"
     next: act6/fractured_merchant
     preview: "Remédios e preços em ouro ou em promessa."
-  - text: "Vagar entre as colunas — o vazio escolhe o próximo passo"
-    next: act6/encounters/fractured_void_router
-    preview: "Só depois da primeira prova: o vazio empurra-te ao acaso."
-    timedMs: 14000
-    fallbackNext: act6/camp/void_camp
   - text: "Ouvir o sussurro sob as colunas (rota de corrupção)"
     next: act6/void_secret_entry
     condition:

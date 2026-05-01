@@ -1,13 +1,14 @@
 ---
-id: shared/explore_nav
+id: shared/explore_nav_act2
 title: Perímetro dos túneis
 chapter: 2
 type: exploration
 ambientTheme: explore
 choices:
-  - id: explore_force
-    text: "Forçar encontro (combate aleatório)"
-    preview: "Sem mover no mapa — só violência."
+  - id: explore_patrol_random
+    text: "Patrulhar ao acaso (encontro aleatório)"
+    next: act2/encounters/random_router
+    preview: "Sem mover no mapa — os túneis escolhem por ti."
   - id: explore_leave
     text: "Montar acampamento no cruzeiro"
     next: act2/hub_catacomb

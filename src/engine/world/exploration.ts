@@ -30,8 +30,6 @@ export type ExplorationGraph = {
 /** Contrato de leitura de grafos por campanha (UI injeta apenas dados). */
 export type ExplorationGraphProvider = (graphId: string) => ExplorationGraph | null;
 
-export const EXPLORE_NAV_SCENE_ID = 'shared/explore_nav';
-
 /** Flag definida ao chegar ao nó objetivo do grafo act2 (catacumba). */
 export const ACT2_EXPLORE_GOAL_FLAG = 'act2_explore_goal_reached';
 
@@ -130,20 +128,25 @@ export function shouldTriggerEncounter(
   state: GameState,
   chance: number
 ): { trigger: boolean; nextSeed: number } {
+  const leadStress = state.party?.[0]?.stress ?? 0;
+  if (leadStress >= 4 && chance > 0) {
+    return { trigger: true, nextSeed: (state.rngSeed + 41) >>> 0 };
+  }
   const rng = mulberry32(state.rngSeed ^ 0x5bd1e995);
   const roll = rng();
   return { trigger: roll < chance, nextSeed: (state.rngSeed + 41) >>> 0 };
 }
 
 export function startExplorationCombatEffects(
-  encounterId: string
+  encounterId: string,
+  returnSceneId: string
 ): Effect[] {
   return [
     {
       op: 'startCombat',
       encounterId,
-      onVictory: EXPLORE_NAV_SCENE_ID,
-      onFlee: EXPLORE_NAV_SCENE_ID,
+      onVictory: returnSceneId,
+      onFlee: returnSceneId,
       onDefeat: 'shared/game_over',
     },
   ];

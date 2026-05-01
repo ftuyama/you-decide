@@ -58,7 +58,7 @@ choices:
     next: act2/camp/vigilia_camp
     preview: "Fogo, reza e um sopro de suprimento."
   - text: "Patrulha do perímetro (explorar mapa)"
-    next: shared/explore_nav
+    next: shared/explore_nav_act2
     preview: "Move-te pelos túneis — stress sobe; encontros possíveis."
     effects:
       - { op: setExploration, graphId: act2_catacomb, nodeId: center_breach }

@@ -6,7 +6,7 @@ import {
   type ItemDef,
   type SpellDef,
 } from '../../engine/schema/index.ts';
-import { emptyGameData } from '../../engine/data/gameData.ts';
+import { emptyGameData } from '../../engine/data/index.ts';
 import type { CampaignUIAdapter } from '../campaignUi.ts';
 import campaignIndex from './index.json';
 import { enemies as enemiesTs } from './data/enemies.ts';

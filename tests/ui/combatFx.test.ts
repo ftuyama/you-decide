@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import type { CombatLogEntry, CombatState, EnemyDef } from '../../src/engine/schema/index.ts';
-import type { GameData } from '../../src/engine/data/gameData.ts';
-import { emptyGameData } from '../../src/engine/data/gameData.ts';
-import { createPlayerCharacter } from '../../src/engine/core/state.ts';
+import type { GameData } from '../../src/engine/data/index.ts';
+import { emptyGameData } from '../../src/engine/data/index.ts';
+import { createPlayerCharacter } from '../../src/engine/core/index.ts';
 import {
   extractLethalGhosts,
   isBuffInfoEntry,

@@ -4,7 +4,7 @@ import {
   pickWeightedEncounterId,
   shouldTriggerEncounter,
   type ExplorationGraph,
-} from '../../src/engine/world/exploration.ts';
+} from '../../src/engine/world/index.ts';
 import type { GameState } from '../../src/engine/schema/index.ts';
 
 const miniGraph: ExplorationGraph = {

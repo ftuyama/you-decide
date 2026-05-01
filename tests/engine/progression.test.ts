@@ -5,9 +5,9 @@ import {
   computeCombatXp,
   projectCharacterToLevel,
   xpToNextLevel,
-} from '../../src/engine/progression/progression.ts';
-import { createInitialState, createPlayerCharacter } from '../../src/engine/core/state.ts';
-import { emptyGameData } from '../../src/engine/data/gameData.ts';
+} from '../../src/engine/progression/index.ts';
+import { createInitialState, createPlayerCharacter } from '../../src/engine/core/index.ts';
+import { emptyGameData } from '../../src/engine/data/index.ts';
 import type { CampaignIndex, Encounter } from '../../src/engine/schema/index.ts';
 
 const testCampaign: CampaignIndex = {

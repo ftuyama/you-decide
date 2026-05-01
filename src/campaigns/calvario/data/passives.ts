@@ -1,4 +1,4 @@
-import type { LeadStoryPassiveDef } from '../../../engine/data/gameData.ts';
+import type { LeadStoryPassiveDef } from '../../../engine/data/index.ts';
 import type { ClassId } from '../../../engine/schema/index.ts';
 
 export type ClassPassiveDef = {

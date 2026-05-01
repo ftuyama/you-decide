@@ -1,4 +1,4 @@
-import type { JourneyMarkDef } from '../../../engine/data/gameData.ts';
+import type { JourneyMarkDef } from '../../../engine/data/index.ts';
 
 /**
  * Marcas da jornada (`state.marks`): texto para diário, toasts e badges.

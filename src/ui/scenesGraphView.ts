@@ -5,7 +5,7 @@ import {
   sortedSceneActsFromNodes,
   type SceneGraphEdge,
   type SceneGraphNode,
-} from '../engine/world/sceneGraph.ts';
+} from '../engine/world/index.ts';
 import { getRegisteredCampaignIds } from '../campaigns/registry.ts';
 import { buildGameHref, resolveScenesGraphActFromLocation } from './campaignUrl.ts';
 

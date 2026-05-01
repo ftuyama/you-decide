@@ -1,4 +1,4 @@
-import { deserializeState, serializeState } from '../engine/core/state.ts';
+import { deserializeState, serializeState } from '../engine/core/index.ts';
 import type { GameState } from '../engine/schema/index.ts';
 
 /** Slots visíveis e graváveis fora do modo desenvolvedor. */

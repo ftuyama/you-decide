@@ -1,5 +1,5 @@
 import type { ClassId } from '../../engine/schema/index.ts';
-import type { PathUnlockBonus } from '../../engine/data/gameData.ts';
+import type { PathUnlockBonus } from '../../engine/data/index.ts';
 
 /** Rótulo curto da classe (PT-BR). */
 export const CLASS_LABEL_PT: Record<ClassId, string> = {

@@ -5,7 +5,7 @@ import type {
   CombatState,
   SpellDef,
 } from '../engine/schema/index.ts';
-import type { GameData } from '../engine/data/gameData.ts';
+import type { GameData } from '../engine/data/index.ts';
 
 /** Per-weapon overlay flavour (items without id here use class fallback). */
 const WEAPON_MELEE_STYLE: Partial<Record<string, 'slash' | 'blunt' | 'staff'>> = {

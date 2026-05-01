@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { applyEffects } from '../../src/engine/core/effects.ts';
-import { EventBus } from '../../src/engine/core/eventBus.ts';
-import { createInitialState, createPlayerCharacter } from '../../src/engine/core/state.ts';
-import { emptyGameData } from '../../src/engine/data/gameData.ts';
+import { applyEffects } from '../../src/engine/core/index.ts';
+import { EventBus } from '../../src/engine/core/index.ts';
+import { createInitialState, createPlayerCharacter } from '../../src/engine/core/index.ts';
+import { emptyGameData } from '../../src/engine/data/index.ts';
 import type { CampaignIndex } from '../../src/engine/schema/index.ts';
 
 const testCampaign: CampaignIndex = {

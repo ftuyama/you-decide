@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { injectText } from '../../src/engine/core/template.ts';
+import { injectText } from '../../src/engine/core/index.ts';
 import type { GameState } from '../../src/engine/schema/index.ts';
-import { createInitialState } from '../../src/engine/core/state.ts';
+import { createInitialState } from '../../src/engine/core/index.ts';
 import campaignIndex from '../../src/campaigns/calvario/index.json';
 
 function baseState(): GameState {

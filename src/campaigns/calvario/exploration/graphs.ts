@@ -1,4 +1,4 @@
-import type { ExplorationGraph } from '../../../engine/world/exploration.ts';
+import type { ExplorationGraph } from '../../../engine/world/index.ts';
 
 /** Grafo do perímetro do cruzeiro (act2). Células alinhadas a `MAPS.act2_catacomb`. */
 export const ACT2_CATACOMB_GRAPH: ExplorationGraph = {

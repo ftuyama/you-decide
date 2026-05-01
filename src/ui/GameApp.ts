@@ -21,6 +21,7 @@ import type { Choice, Effect, GameState } from '../engine/schema/index.ts';
 import { migrateLegacyKnownSpells } from '../engine/progression/index.ts';
 import { GameAudio, type AmbientTheme } from './sound/index.ts';
 import { buildDevToolsHref, buildScenesGraphHref } from './campaignUrl.ts';
+import { preserveExplorationNodeForChoiceEffects } from './gameAppUtils.ts';
 import {
   saveSlotLimit,
   migrateLegacySaveIfNeeded as migrateLegacySaveSlot,
@@ -586,7 +587,8 @@ export class GameApp {
     const prevScene = this.state.sceneId;
     const prevDiaryQueueLen = this.diaryEntryQueue.length;
     const prevStatusQueueLen = this.statusHighlightQueue.length;
-    let s = applyEffects(this.state, choice.effects, this.ctx());
+    const effects = preserveExplorationNodeForChoiceEffects(choice.effects, this.state.exploration);
+    let s = applyEffects(this.state, effects, this.ctx());
     s = { ...s, timedChoiceDeadline: null };
     if (choice.next && s.mode === 'story') {
       s = { ...s, sceneId: choice.next };

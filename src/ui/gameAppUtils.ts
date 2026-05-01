@@ -1,4 +1,9 @@
-import type { CombatLogEntry, LevelUpStatDeltas, SpellDef } from '../engine/schema/index.ts';
+import type {
+  CombatLogEntry,
+  Effect,
+  LevelUpStatDeltas,
+  SpellDef,
+} from '../engine/schema/index.ts';
 import { icons, type IconId } from './icons/index.ts';
 
 export type CombatLogDisplayItem =
@@ -9,6 +14,19 @@ export type CombatLogDisplayItem =
       damage: CombatLogEntry;
       quaseCritico?: CombatLogEntry;
     };
+
+export function preserveExplorationNodeForChoiceEffects(
+  effects: Effect[],
+  currentExploration: { graphId: string; nodeId: string } | null
+): Effect[] {
+  if (!currentExploration) return effects;
+  return effects.map((effect) => {
+    if (effect.op !== 'setExploration') return effect;
+    if (effect.graphId !== currentExploration.graphId) return effect;
+    if (effect.nodeId === currentExploration.nodeId) return effect;
+    return { ...effect, nodeId: currentExploration.nodeId };
+  });
+}
 
 export function escHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');

@@ -7,6 +7,12 @@ ambientTheme: void
 artKey: fractured_nave
 highlight: true
 choices:
+  - text: "Patrulhar a nave fraturada (explorar mapa)"
+    next: shared/explore_nav_act6
+    preview: "Mover-se entre colunas e ruínas; stress sobe e o vazio pode responder."
+    effects:
+      - { op: setExploration, graphId: act6_fractured_nave, nodeId: nave_will_altar }
+      - { op: setAsciiMap, mapId: act6_fractured_nave }
   - text: "Seguir o corredor dos espelhos partidos (Prova da Realidade)"
     next: act6/reality_trial
     condition:
@@ -38,6 +44,7 @@ choices:
         - { flag: act6_memory_done }
         - { flag: act6_will_done }
         - { level: { gte: 30 } }
+        - { flag: act6_explore_goal_reached }
     preview: "Três provas feitas; o espelho final abre."
   - text: "Acender a fogueira de cinzas espelhadas (acampamento)"
     next: act6/camp/void_camp

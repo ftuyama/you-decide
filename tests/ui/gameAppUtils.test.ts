@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
+import type { Effect } from '../../src/engine/schema/index.ts';
 import type { CombatLogEntry } from '../../src/engine/schema/index.ts';
-import { parseCombatLogRounds, parseTurnBannerMessage } from '../../src/ui/gameAppUtils.ts';
+import {
+  parseCombatLogRounds,
+  parseTurnBannerMessage,
+  preserveExplorationNodeForChoiceEffects,
+} from '../../src/ui/gameAppUtils.ts';
 
 describe('parseTurnBannerMessage', () => {
   it('reconhece sua vez e inimigos com travessão ou hífen', () => {
@@ -34,5 +39,22 @@ describe('parseCombatLogRounds', () => {
     expect(rounds[0]!.sections[1]!.kind).toBe('enemy');
     expect(rounds[1]!.round).toBe(2);
     expect(rounds[1]!.sections[0]!.body.map((e) => e.message)).toEqual(['Vitória!']);
+  });
+});
+
+describe('preserveExplorationNodeForChoiceEffects', () => {
+  it('mantém nodeId atual ao reentrar no mesmo grafo', () => {
+    const effects: Effect[] = [
+      { op: 'setExploration', graphId: 'act2_catacomb', nodeId: 'center_breach' },
+      { op: 'setAsciiMap', mapId: 'act2_catacomb' },
+    ];
+    const next = preserveExplorationNodeForChoiceEffects(effects, {
+      graphId: 'act2_catacomb',
+      nodeId: 'cross_north',
+    });
+    expect(next).toEqual([
+      { op: 'setExploration', graphId: 'act2_catacomb', nodeId: 'cross_north' },
+      { op: 'setAsciiMap', mapId: 'act2_catacomb' },
+    ]);
   });
 });

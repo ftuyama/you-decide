@@ -61,7 +61,7 @@ choices:
     next: shared/explore_nav
     preview: "Move-te pelos túneis — stress sobe; encontros possíveis."
     effects:
-      - { op: setExploration, graphId: act2_catacomb, nodeId: cross_start }
+      - { op: setExploration, graphId: act2_catacomb, nodeId: center_breach }
       - { op: setAsciiMap, mapId: act2_catacomb }
   - text: "Passagem marcada — eco de juramentos"
     next: act2/lore/lore_crossroads

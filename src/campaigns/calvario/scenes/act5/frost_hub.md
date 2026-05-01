@@ -7,6 +7,12 @@ artKey: frost_peaks
 highlight: true
 title: Desfiladeiro — acampamento improvisado
 choices:
+  - text: "Patrulhar o desfiladeiro (explorar mapa)"
+    next: shared/explore_nav_act5
+    preview: "Caminhar pelo gelo com risco de encontro e aumento de stress."
+    effects:
+      - { op: setExploration, graphId: act5_frost, nodeId: frost_broken_watch }
+      - { op: setAsciiMap, mapId: act5_frost }
   - text: "Seguir o rasto de garras na neve (missão)"
     next: act5/frost_ridgeline
     condition:
@@ -60,8 +66,9 @@ choices:
       all:
         - { level: { gte: 25 } }
         - { day: { lte: 10 } }
+        - { flag: act5_explore_goal_reached }
     showWhenLocked: true
-    lockedHint: "O cume exige corpo de veterano (nível 25) e janela curta no calendário da tempestade (até ao dia 10)."
+    lockedHint: "O cume exige nível 25, janela até ao dia 10 e encontrar primeiro a trilha do templo no mapa."
     preview: "Ascensão perigosa ao templo e ao que dorme no cume."
 onEnter:
   - { op: addXp, amount: 14 }

@@ -7,14 +7,21 @@ ambientTheme: act3
 artKey: depths
 highlight: true
 choices:
+  - text: "Patrulhar as profundezas (explorar mapa)"
+    next: shared/explore_nav_act3
+    preview: "Mover-te pelos corredores; stress sobe e encontros podem acontecer."
+    effects:
+      - { op: setExploration, graphId: act3_depths, nodeId: depths_drowned_gallery }
+      - { op: setAsciiMap, mapId: act3_depths }
   - text: "Rumo ao trono de ossos"
     next: act4/throne/throne_gate
     condition:
       all:
         - { level: { gte: 10 } }
         - { flag: stone_guard_defeated }
+        - { flag: act3_explore_goal_reached }
     showWhenLocked: true
-    lockedHint: "Precisas de nível 10 e de já teres posto abaixo o guardião de pedra — só então o trono deixa de ser rumor."
+    lockedHint: "Precisas de nível 10, de derrotar o guardião de pedra e de alcançar o portão nas profundezas."
     preview: "Capítulo 4 — confronto com Morvayn; o trono espera."
     timedMs: 15000
     fallbackNext: act3/stone_corridor

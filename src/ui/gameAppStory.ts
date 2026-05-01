@@ -2,6 +2,7 @@ import {
   buildStoryChoiceRows,
   renderSceneBody,
   type LoadedScene,
+  type StoryChoiceRow,
   type StoryDiceRollBreakdown,
 } from '../engine/sceneRuntime.ts';
 import type { Choice, Effect, GameState, SceneFrontmatter } from '../engine/schema.ts';
@@ -36,6 +37,48 @@ const CAMP_EQUIPMENT_SCENES = new Set([
 
 export function isCampEquipmentScene(sceneId: string): boolean {
   return CAMP_EQUIPMENT_SCENES.has(sceneId);
+}
+
+function buildExplorationMovementRows(
+  state: GameState,
+  registry: ContentRegistry
+): StoryChoiceRow[] {
+  const ex = state.exploration;
+  const getG = registry.ui.getExplorationGraph;
+  if (!ex || !getG) return [];
+  const graph = getG(ex.graphId);
+  if (!graph) return [];
+  const node = graph.nodes.find((n) => n.id === ex.nodeId);
+  if (!node) return [];
+  const lead = state.party[0];
+  const atMaxStress = lead !== undefined && lead.stress >= 4;
+  const rows: StoryChoiceRow[] = [];
+  for (const edge of node.edges) {
+    const preview = 'Stress +1 · possível encontro';
+    if (atMaxStress) {
+      rows.push({
+        kind: 'locked',
+        choice: {
+          id: `explore_move_${edge.id}`,
+          text: edge.text,
+          preview,
+          effects: [],
+        },
+        hint: 'Stress no máximo — não consegues avançar pelos túneis.',
+      });
+    } else {
+      rows.push({
+        kind: 'enabled',
+        choice: {
+          id: `explore_move_${edge.id}`,
+          text: edge.text,
+          preview,
+          effects: [],
+        },
+      });
+    }
+  }
+  return rows;
 }
 
 function inventoryEquipmentIdsForSlot(
@@ -974,14 +1017,35 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
   inner.appendChild(body);
 
   if (ctx.state.asciiMap) {
-    const rm = ctx.registry.ui.renderMap(ctx.state.asciiMap.mapId);
+    const fm = ctx.scene.frontmatter;
+    const isExplorationScene = fm.type === 'exploration';
+    const hasRumorMap = ctx.state.inventory.includes('rumor_map');
+    let marker: { x: number; y: number } | undefined;
+    if (isExplorationScene && hasRumorMap && ctx.state.exploration && ctx.registry.ui.getExplorationGraph) {
+      const g = ctx.registry.ui.getExplorationGraph(ctx.state.exploration.graphId);
+      const n = g?.nodes.find((x) => x.id === ctx.state.exploration!.nodeId);
+      marker = n?.mapCell;
+    }
+    const rm = ctx.registry.ui.renderMap(
+      ctx.state.asciiMap.mapId,
+      isExplorationScene && hasRumorMap ? marker : undefined
+    );
     if (rm) {
       const wrap = document.createElement('div');
       wrap.innerHTML = `<div class="map-hint sidebar-line--with-icon">${iconWrap(icons.map)}<span>Mapa</span></div>`;
-      const pre = document.createElement('pre');
-      pre.className = 'ascii-map';
-      pre.textContent = rm.lines.join('\n');
-      wrap.appendChild(pre);
+      if (isExplorationScene && !hasRumorMap) {
+        const noMap = document.createElement('p');
+        noMap.className = 'explore-map-hint';
+        noMap.textContent =
+          'Sem o mapa rasgado do mercador, só sentes pedra e corrente — não traças posição no papel.';
+        wrap.appendChild(noMap);
+      }
+      if (!(isExplorationScene && !hasRumorMap)) {
+        const pre = document.createElement('pre');
+        pre.className = 'ascii-map';
+        pre.textContent = rm.lines.join('\n');
+        wrap.appendChild(pre);
+      }
       inner.appendChild(wrap);
     }
   }
@@ -1071,7 +1135,14 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     inner.appendChild(row);
   }
 
-  const choiceRows = buildStoryChoiceRows(ctx.scene.frontmatter.choices, ctx.state);
+  const explorationMoves =
+    ctx.scene.frontmatter.type === 'exploration'
+      ? buildExplorationMovementRows(ctx.state, ctx.registry)
+      : [];
+  const choiceRows = [
+    ...explorationMoves,
+    ...buildStoryChoiceRows(ctx.scene.frontmatter.choices, ctx.state),
+  ];
   const enabledChoices = choiceRows
     .filter((r): r is { kind: 'enabled'; choice: Choice } => r.kind === 'enabled')
     .map((r) => r.choice);

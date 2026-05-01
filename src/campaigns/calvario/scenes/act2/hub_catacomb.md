@@ -41,7 +41,7 @@ choices:
         - any:
             - { rep: { faction: culto, gte: 2 } }
             - { rep: { faction: culto, lte: -2 } }
-    preview: "Devção ou ruptura com o Terceiro Sino. Uma vez só."
+    preview: "Devoção ou ruptura com o Terceiro Sino. Uma vez só."
   - text: "Ouvir proposta de Mira"
     next: act2/recruit_offer
     condition: { noFlag: mira_recruited }
@@ -57,11 +57,12 @@ choices:
   - text: "Acampamento da Vigília"
     next: act2/camp/vigilia_camp
     preview: "Fogo, reza e um sopro de suprimento."
-  - text: "Patrulha do perímetro (combate aleatório)"
-    next: act2/encounters/random_router
-    preview: "O túnel exige decisão rápida — ou recuas para o acampamento."
-    timedMs: 14000
-    fallbackNext: act2/camp/vigilia_camp
+  - text: "Patrulha do perímetro (explorar mapa)"
+    next: shared/explore_nav
+    preview: "Move-te pelos túneis — stress sobe; encontros possíveis."
+    effects:
+      - { op: setExploration, graphId: act2_catacomb, nodeId: cross_start }
+      - { op: setAsciiMap, mapId: act2_catacomb }
   - text: "Passagem marcada — eco de juramentos"
     next: act2/lore/lore_crossroads
     condition:
@@ -90,11 +91,17 @@ choices:
     preview: "Voz seca no cruzeiro; registo no diário."
     effects:
       - { op: addDiary, text: "Uma voz presa ao teto: \"Já vais no dia {{day}}.\"" }
+  - text: "—"
+    next: act2/encounters/random_router
+    condition: { flag: __scenegraph_anchor_act2_random_router }
   - text: "Descer mais fundo"
     next: act3/descent
-    condition: { level: { gte: 5 } }
+    condition:
+      all:
+        - { level: { gte: 5 } }
+        - { flag: act2_explore_goal_reached }
     showWhenLocked: true
-    lockedHint: "Precisas de pelo menos nível 5 para enfrentar o que desce daqui."
+    lockedHint: "Precisas de nível 5 e de encontrar o limiar no mapa do perímetro (exploração a partir do cruzeiro)."
     preview: "Capítulo 3 — a masmorra aperta o silêncio."
     effects:
       - { op: setChapter, chapter: 3 }

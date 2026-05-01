@@ -50,6 +50,9 @@ export class GameAmbientPlayer {
       case 'explore':
         this.playAmbientExplore();
         break;
+      case 'act2':
+        this.playAmbientAct2();
+        break;
       case 'combat':
         this.playAmbientCombat();
         break;
@@ -258,6 +261,96 @@ export class GameAmbientPlayer {
       const when = ac.currentTime + 0.02;
       triggerPluck(ctx, master, when, note, this.host.gain(0.118), 'triangle', 1.8);
     }, 1500);
+
+    this.bgCleanup = () => {
+      if (this.bgPulseTimer) {
+        clearInterval(this.bgPulseTimer);
+        this.bgPulseTimer = null;
+      }
+      if (this.bgRhythmTimer) {
+        clearInterval(this.bgRhythmTimer);
+        this.bgRhythmTimer = null;
+      }
+      for (const o of oscillators) {
+        try {
+          o.stop();
+        } catch {
+          /* noop */
+        }
+      }
+      try {
+        master.disconnect();
+        comp.disconnect();
+      } catch {
+        /* noop */
+      }
+    };
+  }
+
+  /**
+   * Ato 2: mesma base da exploração, com pulsação e motivo um pouco mais densos.
+   */
+  private playAmbientAct2(): void {
+    if (this.bgCleanup) return;
+    const ctx = this.host.ensureContext();
+
+    const master = ctx.createGain();
+    master.gain.value = this.host.gain(0.23);
+
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -27;
+    comp.knee.value = 12;
+    comp.ratio.value = 4;
+    comp.attack.value = 0.003;
+    comp.release.value = 0.24;
+    master.connect(comp);
+    comp.connect(ctx.destination);
+
+    const layers: { freq: number; level: number; type: OscillatorType }[] = [
+      { freq: 55, level: 0.22, type: 'sine' },
+      { freq: 110, level: 0.2, type: 'sine' },
+      { freq: 123.47, level: 0.16, type: 'triangle' },
+      { freq: 164.81, level: 0.14, type: 'sine' },
+      { freq: 196, level: 0.08, type: 'triangle' },
+    ];
+
+    const oscillators: OscillatorNode[] = [];
+    for (const { freq, level, type } of layers) {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      o.detune.value = (Math.random() - 0.5) * 10;
+      g.gain.value = level * 0.46;
+      o.connect(g);
+      g.connect(master);
+      o.start();
+      oscillators.push(o);
+    }
+
+    let t = 0;
+    this.bgPulseTimer = setInterval(() => {
+      const ac = this.host.getAudioContext();
+      if (!ac) return;
+      t += 0.04;
+      const breathe = 0.12 + Math.sin(t) * 0.036 + Math.sin(t * 0.43) * 0.016;
+      try {
+        master.gain.setTargetAtTime(this.host.gain(breathe), ac.currentTime, 0.52);
+      } catch {
+        /* noop */
+      }
+    }, 360);
+
+    let melodyStep = 0;
+    this.bgRhythmTimer = setInterval(() => {
+      const ac = this.host.getAudioContext();
+      if (!ac) return;
+      const note = EXPLORE_PIANO_MELODY[melodyStep % EXPLORE_PIANO_MELODY.length];
+      melodyStep++;
+      const when = ac.currentTime + 0.02;
+      triggerPluck(ctx, master, when, note, this.host.gain(0.13), 'triangle', 1.7);
+      triggerPluck(ctx, master, when + 0.1, note * 0.5, this.host.gain(0.07), 'sine', 1.9);
+    }, 1420);
 
     this.bgCleanup = () => {
       if (this.bgPulseTimer) {

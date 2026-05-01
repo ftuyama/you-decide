@@ -10,8 +10,14 @@ import {
   type StoryDiceRollBreakdown,
 } from '../engine/sceneRuntime.ts';
 import { applyEffects } from '../engine/effects.ts';
+import {
+  explorationMoveEffects,
+  pickWeightedEncounterId,
+  shouldTriggerEncounter,
+  startExplorationCombatEffects,
+} from '../engine/exploration.ts';
 import { tickActiveBuffs } from '../engine/leadStats.ts';
-import type { Choice, GameState } from '../engine/schema.ts';
+import type { Choice, Effect, GameState } from '../engine/schema.ts';
 import { migrateLegacyKnownSpells } from '../engine/spellsKnown.ts';
 import { GameAudio, type AmbientTheme } from './sound/index.ts';
 import { buildDevToolsHref, buildScenesGraphHref } from './campaignUrl.ts';
@@ -533,7 +539,7 @@ export class GameApp {
   private canOpenSidebarSection(key: string): boolean {
     const visitedCount = Object.keys(this.state.visitedScenes).length;
     if (key === 'inventario') {
-      return this.state.chapter >= 2 || visitedCount >= 6 || this.state.day >= 4;
+      return this.state.chapter >= 2 || visitedCount >= 6;
     }
     if (key === 'faccoes') {
       const rep = this.state.reputation;
@@ -566,7 +572,11 @@ export class GameApp {
       return 'combat';
     }
     const sceneTheme = this.registry.getScene(this.state.sceneId)?.frontmatter.ambientTheme;
-    if (sceneTheme) return sceneTheme;
+    if (sceneTheme) {
+      // Act 2 mantém a base "explore", mas com arranjo um pouco mais tenso.
+      if (sceneTheme === 'explore' && this.state.chapter === 2) return 'act2';
+      return sceneTheme;
+    }
     return 'explore';
   }
 
@@ -610,12 +620,72 @@ export class GameApp {
     return s;
   }
 
+  private applyExplorationMove(edgeId: string): void {
+    const ex = this.state.exploration;
+    const getG = this.registry.ui.getExplorationGraph;
+    if (!ex || !getG) return;
+    const graph = getG(ex.graphId);
+    if (!graph) return;
+    const lead = this.state.party[0];
+    if (lead !== undefined && lead.stress >= 4) return;
+    const resolved = explorationMoveEffects({
+      graph,
+      fromNodeId: ex.nodeId,
+      edgeId,
+    });
+    if (!resolved.ok) return;
+    const { edge, toNode } = resolved;
+    const effs: Effect[] = [
+      { op: 'adjustLeadStress', delta: 1 },
+      { op: 'setExploration', graphId: ex.graphId, nodeId: edge.to },
+    ];
+    if (toNode.isGoal) {
+      effs.push({
+        op: 'setFlag',
+        key: toNode.goalFlag ?? 'act2_explore_goal_reached',
+        value: true,
+      });
+    }
+    let s = applyEffects(this.state, effs, this.ctx());
+    s = { ...s, timedChoiceDeadline: null };
+    const roll = shouldTriggerEncounter(s, edge.encounterChance);
+    s = { ...s, rngSeed: roll.nextSeed };
+    if (!roll.trigger) {
+      this.state = this.stabilize(s);
+      this.render();
+      return;
+    }
+    const pick = pickWeightedEncounterId(s.rngSeed);
+    s = { ...s, rngSeed: pick.nextSeed };
+    s = applyEffects(s, startExplorationCombatEffects(pick.encounterId), this.ctx());
+    this.state = this.stabilize(s);
+    this.render();
+  }
+
+  private applyExplorationForcedCombat(): void {
+    if (!this.state.exploration) return;
+    const pick = pickWeightedEncounterId(this.state.rngSeed);
+    let s: GameState = { ...this.state, rngSeed: pick.nextSeed, timedChoiceDeadline: null };
+    s = applyEffects(s, startExplorationCombatEffects(pick.encounterId), this.ctx());
+    this.state = this.stabilize(s);
+    this.render();
+  }
+
   private applyChoice(choice: Choice): void {
     this.unlockAudio();
     this.audio.playUiClick();
     if (this.timedTimer) {
       clearTimeout(this.timedTimer);
       this.timedTimer = null;
+    }
+    const id = choice.id;
+    if (id?.startsWith('explore_move_')) {
+      this.applyExplorationMove(id.slice('explore_move_'.length));
+      return;
+    }
+    if (id === 'explore_force') {
+      this.applyExplorationForcedCombat();
+      return;
     }
     const prevScene = this.state.sceneId;
     const prevDiaryQueueLen = this.diaryEntryQueue.length;

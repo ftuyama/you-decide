@@ -67,6 +67,12 @@ h1 {
   margin-bottom: 1.25rem;
 }
 
+.explore-map-hint {
+  margin: 0.5rem 0 0.75rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
 .story-body :is(p, li) {
   margin: 0.65em 0;
 }

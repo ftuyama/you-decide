@@ -20,6 +20,7 @@ import { calvarioHeroNarrative } from './heroNarrative.ts';
 import { renderMap } from './maps.ts';
 import { SCENE_ART } from './ascii/art.ts';
 import { getHeroClassLabel, getHeroLore } from './classHero.ts';
+import { EXPLORATION_GRAPHS } from './exploration/graphs.ts';
 
 const sceneRaw = import.meta.glob<string>('./scenes/**/*.md', {
   query: '?raw',
@@ -32,6 +33,7 @@ export const calvarioUI: CampaignUIAdapter = {
   sceneArt: SCENE_ART,
   getHeroClassLabel,
   getHeroLore,
+  getExplorationGraph: (id: string) => EXPLORATION_GRAPHS[id] ?? null,
 };
 
 export function loadCalvarioContent() {

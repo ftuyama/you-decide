@@ -42,6 +42,7 @@ export function createInitialState(campaign: CampaignIndex, seed?: number): Game
     visitedScenes: {},
     sceneArtHighlightShown: {},
     asciiMap: null,
+    exploration: null,
     pendingInterleave: null,
     timedChoiceDeadline: null,
     lastCombatXpGain: null,
@@ -232,6 +233,15 @@ export function deserializeState(json: string): GameState {
       ? { ...(rawHighlight as Record<string, boolean>) }
       : {};
 
+  const rawEx = (o as Partial<GameState>).exploration;
+  const exploration: GameState['exploration'] =
+    rawEx &&
+    typeof rawEx === 'object' &&
+    typeof rawEx.graphId === 'string' &&
+    typeof rawEx.nodeId === 'string'
+      ? { graphId: rawEx.graphId, nodeId: rawEx.nodeId }
+      : null;
+
   const merged: GameState = {
     ...(o as GameState),
     campaignId,
@@ -242,6 +252,7 @@ export function deserializeState(json: string): GameState {
     flags,
     legacy,
     sceneArtHighlightShown,
+    exploration,
     extraLifeReady: extraLifeReadyFromFaith(resources.faith),
     level: typeof (o as GameState).level === 'number' ? (o as GameState).level : 1,
     xp: typeof (o as GameState).xp === 'number' ? (o as GameState).xp : 0,

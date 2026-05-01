@@ -1,5 +1,6 @@
 export type AmbientTheme =
   | 'explore'
+  | 'act2'
   | 'combat'
   | 'camp'
   | 'boss'
@@ -14,6 +15,7 @@ export type AmbientTheme =
 /** Lista canónica (alinhada ao switch em `gameAudio/GameAmbientPlayer` e ao YAML `ambientTheme`). */
 export const AMBIENT_THEMES: readonly AmbientTheme[] = [
   'explore',
+  'act2',
   'combat',
   'camp',
   'boss',

@@ -4,11 +4,28 @@ export const MAPS: Record<string, string[]> = {
 };
 
 export function renderMap(
-  mapId: string
+  mapId: string,
+  markerCell?: { x: number; y: number }
 ): { lines: string[]; width: number; height: number } | null {
   const rows = MAPS[mapId];
   if (!rows) return null;
   const h = rows.length;
   const w = rows[0]?.length ?? 0;
-  return { lines: [...rows], width: w, height: h };
+  const lines = rows.map((row) => row.split(''));
+  if (
+    markerCell &&
+    markerCell.y >= 0 &&
+    markerCell.y < h &&
+    markerCell.x >= 0 &&
+    markerCell.x < w
+  ) {
+    const row = lines[markerCell.y];
+    if (row) {
+      const ch = row[markerCell.x];
+      if (ch !== undefined && ch !== '#') {
+        row[markerCell.x] = '@';
+      }
+    }
+  }
+  return { lines: lines.map((r) => r.join('')), width: w, height: h };
 }

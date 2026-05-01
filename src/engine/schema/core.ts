@@ -152,6 +152,16 @@ export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
   z.object({ op: z.literal('dismissCompanion'), companionId: z.string() }),
   z.object({ op: z.literal('setAsciiMap'), mapId: z.string() }),
   z.object({ op: z.literal('clearAsciiMap') }),
+  z.object({
+    op: z.literal('setExploration'),
+    graphId: z.string(),
+    nodeId: z.string(),
+  }),
+  z.object({ op: z.literal('clearExploration') }),
+  z.object({
+    op: z.literal('adjustLeadStress'),
+    delta: z.number().int(),
+  }),
   z.object({ op: z.literal('initClass'), class: ClassIdSchema }),
   z.object({ op: z.literal('addXp'), amount: z.number().int().min(1) }),
   z.object({ op: z.literal('learnSpell'), spellId: z.string() }),
@@ -211,6 +221,9 @@ export type Effect =
   | { op: 'dismissCompanion'; companionId: string }
   | { op: 'setAsciiMap'; mapId: string }
   | { op: 'clearAsciiMap' }
+  | { op: 'setExploration'; graphId: string; nodeId: string }
+  | { op: 'clearExploration' }
+  | { op: 'adjustLeadStress'; delta: number }
   | { op: 'initClass'; class: ClassId }
   | { op: 'addXp'; amount: number }
   | { op: 'learnSpell'; spellId: string }
@@ -341,11 +354,12 @@ export const SceneFrontmatterSchema = z.object({
   id: z.string(),
   title: z.string().optional(),
   chapter: z.number().int().min(1).default(1),
-  type: z.enum(['story', 'hub', 'combat_intro']).default('story'),
+  type: z.enum(['story', 'hub', 'combat_intro', 'exploration']).default('story'),
   /** Tema ambiente da cena (música/ambiente no UI). */
   ambientTheme: z
     .enum([
       'explore',
+      'act2',
       'combat',
       'camp',
       'boss',

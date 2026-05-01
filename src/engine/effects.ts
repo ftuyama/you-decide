@@ -588,6 +588,27 @@ function applyOne(
       };
     case 'clearAsciiMap':
       return { ...state, asciiMap: null };
+    case 'setExploration': {
+      const cur = state.exploration;
+      if (cur && cur.graphId === e.graphId) {
+        return state;
+      }
+      return {
+        ...state,
+        exploration: { graphId: e.graphId, nodeId: e.nodeId },
+      };
+    }
+    case 'clearExploration':
+      return { ...state, exploration: null };
+    case 'adjustLeadStress': {
+      const lead = state.party[0];
+      if (!lead) return state;
+      const next = Math.max(0, Math.min(4, lead.stress + e.delta));
+      return {
+        ...state,
+        party: state.party.map((p, i) => (i === 0 ? { ...p, stress: next } : p)),
+      };
+    }
     case 'initClass': {
       const heroName = ctx.data.heroNarrative.defaultHeroName(e.class);
       const pc = createPlayerCharacter(heroName, e.class);

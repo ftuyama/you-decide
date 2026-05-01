@@ -330,10 +330,18 @@ export const GameStateSchema = z.object({
   visitedScenes: z.record(z.string(), z.boolean()).default({}),
   /** Cenas em que o overlay `highlight` da arte já foi mostrado (persiste na gravação). */
   sceneArtHighlightShown: z.record(z.string(), z.boolean()).default({}),
-  /** Mapa ASCII ativo (só visual; sem posição de jogador no estado) */
+  /** Mapa ASCII ativo; posição do jogador vem do grafo de exploração + `mapCell` do nó. */
   asciiMap: z
     .object({
       mapId: z.string(),
+    })
+    .nullable()
+    .default(null),
+  /** Navegação em grafo (cena `shared/explore_nav` e hubs que inicializam com setExploration). */
+  exploration: z
+    .object({
+      graphId: z.string(),
+      nodeId: z.string(),
     })
     .nullable()
     .default(null),

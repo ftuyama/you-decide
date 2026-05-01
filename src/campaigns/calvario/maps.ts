@@ -28,13 +28,29 @@ export const MAPS: Record<string, string[]> = {
 
 export function renderMap(
   mapId: string,
-  markerCell?: { x: number; y: number }
+  markerCell?: { x: number; y: number },
+  goalCell?: { x: number; y: number }
 ): { lines: string[]; width: number; height: number } | null {
   const rows = MAPS[mapId];
   if (!rows) return null;
   const h = rows.length;
   const w = rows[0]?.length ?? 0;
   const lines = rows.map((row) => row.split(''));
+  if (
+    goalCell &&
+    goalCell.y >= 0 &&
+    goalCell.y < h &&
+    goalCell.x >= 0 &&
+    goalCell.x < w
+  ) {
+    const row = lines[goalCell.y];
+    if (row) {
+      const ch = row[goalCell.x];
+      if (ch !== undefined && ch !== '#') {
+        row[goalCell.x] = 'X';
+      }
+    }
+  }
   if (
     markerCell &&
     markerCell.y >= 0 &&

@@ -12,6 +12,7 @@ import { formatItemEquipmentStatParts } from './formatItemEquipment.ts';
 import { formatDiceAscii } from './diceAscii.ts';
 import { iconWrap, icons } from './icons/index.ts';
 import type { GameEvent } from '../engine/eventBus.ts';
+import { appendStoryMapPanel } from './storyMapPanel.ts';
 
 /** Arte de cena: YAML `art` inline ou `artKey` na tabela `sceneArt` da campanha. */
 export function resolveSceneArtFromFrontmatter(
@@ -1016,39 +1017,11 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
   body.innerHTML = renderSceneBody(ctx.scene.bodyRaw, ctx.state);
   inner.appendChild(body);
 
-  if (ctx.state.asciiMap) {
-    const fm = ctx.scene.frontmatter;
-    const isExplorationScene = fm.type === 'exploration';
-    const hasRumorMap = ctx.state.inventory.includes('rumor_map');
-    let marker: { x: number; y: number } | undefined;
-    if (isExplorationScene && hasRumorMap && ctx.state.exploration && ctx.registry.ui.getExplorationGraph) {
-      const g = ctx.registry.ui.getExplorationGraph(ctx.state.exploration.graphId);
-      const n = g?.nodes.find((x) => x.id === ctx.state.exploration!.nodeId);
-      marker = n?.mapCell;
-    }
-    const rm = ctx.registry.ui.renderMap(
-      ctx.state.asciiMap.mapId,
-      isExplorationScene && hasRumorMap ? marker : undefined
-    );
-    if (rm) {
-      const wrap = document.createElement('div');
-      wrap.innerHTML = `<div class="map-hint sidebar-line--with-icon">${iconWrap(icons.map)}<span>Mapa</span></div>`;
-      if (isExplorationScene && !hasRumorMap) {
-        const noMap = document.createElement('p');
-        noMap.className = 'explore-map-hint';
-        noMap.textContent =
-          'Sem o mapa rasgado do mercador, só sentes pedra e corrente — não traças posição no papel.';
-        wrap.appendChild(noMap);
-      }
-      if (!(isExplorationScene && !hasRumorMap)) {
-        const pre = document.createElement('pre');
-        pre.className = 'ascii-map';
-        pre.textContent = rm.lines.join('\n');
-        wrap.appendChild(pre);
-      }
-      inner.appendChild(wrap);
-    }
-  }
+  appendStoryMapPanel(inner, {
+    state: ctx.state,
+    frontmatter: ctx.scene.frontmatter,
+    registry: ctx.registry,
+  });
 
   appendCampEquipmentPanel(inner, ctx.state, ctx.registry, ctx.campCallbacks);
 

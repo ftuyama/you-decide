@@ -24,6 +24,18 @@ choices:
       - { op: grantItem, itemId: iron_dagger }
       - { op: addResource, resource: gold, delta: -3 }
     preview: "Arma · para o inventário"
+  - text: "Comprar Hidromel (−2 ouro)"
+    next: act2/hub_catacomb
+    condition:
+      all:
+        - { resource: { gold: { gte: 2 } } }
+        - { level: { gte: 2 } }
+        - { noFlag: act2_merch_moon_stress_1 }
+    effects:
+      - { op: addResource, resource: gold, delta: -2 }
+      - { op: grantItem, itemId: potion_stress }
+      - { op: setFlag, key: act2_merch_moon_stress_1, value: true }
+    preview: "Consumível · reduz estresse"
   - text: "Comprar Suprimento (−5 ouro)"
     next: act2/hub_catacomb
     condition:

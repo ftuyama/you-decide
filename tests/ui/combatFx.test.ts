@@ -89,7 +89,7 @@ const minimalData = (): GameData => {
     },
     potion_stress: {
       id: 'potion_stress',
-      name: 'Infusão Serena',
+      name: 'Hidromel',
       slot: 'consumable',
       bonusStr: 0,
       bonusAgi: 0,

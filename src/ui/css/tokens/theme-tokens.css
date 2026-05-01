@@ -81,6 +81,11 @@
   --scrollbar-thumb-hover: #4d5f4d;
   --combat-log-entry-border: #2a2824;
   --combat-log-msg: #c4baa8;
+  --map-char-wall: #2b3138;
+  --map-char-floor: #9aa0a6;
+  --map-char-mark: #c49a57;
+  --map-char-goal: #e2c16a;
+  --map-char-player: #7ad7d0;
 }
 
 html[data-theme='snow'] {
@@ -157,6 +162,11 @@ html[data-theme='snow'] {
   --scrollbar-thumb-hover: #4a6888;
   --combat-log-entry-border: #2a3848;
   --combat-log-msg: #b8c4d0;
+  --map-char-wall: #273744;
+  --map-char-floor: #9cb4c8;
+  --map-char-mark: #d0b484;
+  --map-char-goal: #f0d28f;
+  --map-char-player: #8fdde8;
 }
 
 html[data-theme='void'] {
@@ -233,6 +243,11 @@ html[data-theme='void'] {
   --scrollbar-thumb-hover: #5a4880;
   --combat-log-entry-border: #3a2850;
   --combat-log-msg: #c8b8d8;
+  --map-char-wall: #332644;
+  --map-char-floor: #b19bc8;
+  --map-char-mark: #d3a880;
+  --map-char-goal: #f0c47b;
+  --map-char-player: #b59dff;
 }
 
 /** Ato 7 — cinzas do céu: carvão quente, ferrugem, pouca saturação (apocalipse terrestre). */
@@ -310,4 +325,9 @@ html[data-theme='ash'] {
   --scrollbar-thumb-hover: #5a4838;
   --combat-log-entry-border: #3a3028;
   --combat-log-msg: #c8b0a0;
+  --map-char-wall: #3a2e28;
+  --map-char-floor: #b69d90;
+  --map-char-mark: #d39763;
+  --map-char-goal: #f0c06a;
+  --map-char-player: #8bcac2;
 }

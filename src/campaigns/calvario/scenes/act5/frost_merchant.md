@@ -36,7 +36,7 @@ choices:
       - { op: addResource, resource: gold, delta: -10 }
       - { op: grantItem, itemId: potion_mana }
       - { op: setFlag, key: act5_merch_mana_1, value: true }
-  - text: "Comprar Infusão Serena (4 ouro) (x1)"
+  - text: "Comprar Hidromel (4 ouro) (x1)"
     next: act5/frost_merchant
     condition:
       all:

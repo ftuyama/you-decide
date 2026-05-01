@@ -8,7 +8,7 @@ export const ACT2_CATACOMB_GRAPH: ExplorationGraph = {
   nodes: [
     {
       id: 'cross_start',
-      mapCell: { x: 8, y: 2 },
+      mapCell: { x: 7, y: 2 },
       edges: [
         {
           id: 'e_left',
@@ -32,7 +32,7 @@ export const ACT2_CATACOMB_GRAPH: ExplorationGraph = {
     },
     {
       id: 'bend_west',
-      mapCell: { x: 4, y: 4 },
+      mapCell: { x: 3, y: 4 },
       edges: [
         {
           id: 'w_back',
@@ -50,7 +50,7 @@ export const ACT2_CATACOMB_GRAPH: ExplorationGraph = {
     },
     {
       id: 'bend_east',
-      mapCell: { x: 12, y: 4 },
+      mapCell: { x: 13, y: 4 },
       edges: [
         {
           id: 'e_back',
@@ -68,7 +68,7 @@ export const ACT2_CATACOMB_GRAPH: ExplorationGraph = {
     },
     {
       id: 'tight_climb',
-      mapCell: { x: 8, y: 6 },
+      mapCell: { x: 9, y: 6 },
       edges: [
         {
           id: 't_back',
@@ -88,7 +88,7 @@ export const ACT2_CATACOMB_GRAPH: ExplorationGraph = {
       id: 'descent_gate',
       isGoal: true,
       goalFlag: 'act2_explore_goal_reached',
-      mapCell: { x: 8, y: 8 },
+      mapCell: { x: 9, y: 8 },
       edges: [
         {
           id: 'g_back',

@@ -128,7 +128,7 @@ export const items: Record<string, ItemDef> = {
   }),
   potion_stress: z({
     id: 'potion_stress',
-    name: 'Infusão Serena',
+    name: 'Hidromel',
     slot: 'consumable',
     stressRelief: 1,
     sprite: itemSprites.potion_stress,

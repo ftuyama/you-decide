@@ -5,7 +5,8 @@ import type { ExplorationGraph } from '../engine/exploration.ts';
 export type CampaignUIAdapter = {
   renderMap: (
     mapId: string,
-    markerCell?: { x: number; y: number }
+    markerCell?: { x: number; y: number },
+    goalCell?: { x: number; y: number }
   ) => { lines: string[]; width: number; height: number } | null;
   sceneArt: Record<string, string>;
   getHeroClassLabel: (classId: ClassId, path: string | null | undefined) => string;

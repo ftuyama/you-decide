@@ -485,14 +485,52 @@ button.camp-equip-candidate {
 }
 
 .ascii-map {
-  font-size: 0.75rem;
+  font-size: 1rem;
   line-height: 1.15;
   white-space: pre;
   background: #050605;
   padding: 0.75rem;
   border: 1px solid var(--border);
-  margin: 0.75rem 0;
+  margin: 0;
   user-select: none;
+}
+
+.ascii-map--palette {
+  color: var(--map-char-floor);
+}
+
+.ascii-map-char {
+  color: inherit;
+}
+
+.ascii-map-char--wall {
+  color: var(--map-char-wall);
+}
+
+.ascii-map-char--floor {
+  color: var(--map-char-floor);
+}
+
+.ascii-map-char--mark {
+  color: var(--map-char-mark);
+}
+
+.ascii-map-char--goal {
+  color: var(--map-char-goal);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--map-char-goal) 45%, transparent);
+}
+
+.ascii-map-char--player {
+  color: var(--map-char-player);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--map-char-player) 55%, transparent);
+}
+
+.explore-map-panel {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.9rem;
+  margin: 0.75rem 0;
 }
 
 .map-hint {
@@ -507,6 +545,28 @@ button.camp-equip-candidate {
 
 .map-hint.sidebar-line--with-icon .ui-icon-wrap {
   margin-top: 0;
+}
+
+.ascii-map-legend {
+  min-width: 11rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  padding: 0.55rem 0.65rem;
+}
+
+.ascii-map-legend__title {
+  color: var(--text);
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.ascii-map-legend code {
+  display: inline-block;
+  min-width: 1.1rem;
+  color: var(--text);
 }
 
 .timed-bar {

@@ -143,4 +143,57 @@ describe('applyEffects', () => {
     const b = applyEffects(a, [{ op: 'grantLeadStoryPassive', id: 'test_passive' }], ctx);
     expect(b.leadStoryPassives).toEqual(['test_passive']);
   });
+
+  it('campRest consome 1 suprimento e remove todo o stress da party', () => {
+    let s = createInitialState(testCampaign, 1);
+    const hero = createPlayerCharacter('H', 'knight');
+    const ally = createPlayerCharacter('A', 'mage');
+    s = {
+      ...s,
+      party: [
+        { ...hero, hp: 3, mana: 1, stress: 4 },
+        { ...ally, hp: 2, mana: 0, stress: 2 },
+      ],
+      resources: { ...s.resources, supply: 2 },
+    };
+    const bus = new EventBus();
+    const data = emptyGameData(testCampaign, {
+      defaultHeroName: () => 'H',
+      getHeroClassLabel: () => '—',
+      getPathUnlockBonus: () => null,
+    });
+    const next = applyEffects(s, [{ op: 'campRest' }], {
+      sceneId: 'test/scene',
+      data,
+      bus,
+    });
+    expect(next.resources.supply).toBe(1);
+    expect(next.party[0]!.hp).toBe(next.party[0]!.maxHp);
+    expect(next.party[0]!.mana).toBe(next.party[0]!.maxMana);
+    expect(next.party[0]!.stress).toBe(0);
+    expect(next.party[1]!.hp).toBe(next.party[1]!.maxHp);
+    expect(next.party[1]!.mana).toBe(next.party[1]!.maxMana);
+    expect(next.party[1]!.stress).toBe(0);
+  });
+
+  it('setExploration atualiza nodeId no mesmo graphId', () => {
+    let s = createInitialState(testCampaign, 1);
+    s = {
+      ...s,
+      party: [createPlayerCharacter('H', 'knight')],
+      exploration: { graphId: 'act2_catacomb', nodeId: 'cross_start' },
+    };
+    const bus = new EventBus();
+    const data = emptyGameData(testCampaign, {
+      defaultHeroName: () => 'H',
+      getHeroClassLabel: () => '—',
+      getPathUnlockBonus: () => null,
+    });
+    const next = applyEffects(
+      s,
+      [{ op: 'setExploration', graphId: 'act2_catacomb', nodeId: 'cross_north' }],
+      { sceneId: 'test/scene', data, bus }
+    );
+    expect(next.exploration).toEqual({ graphId: 'act2_catacomb', nodeId: 'cross_north' });
+  });
 });

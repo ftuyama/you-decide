@@ -458,7 +458,7 @@ function applyOne(
         ...p,
         hp: p.maxHp,
         mana: p.maxMana,
-        stress: Math.max(0, p.stress - 1),
+        stress: 0,
       }));
       return { ...state, resources: res, party };
     }
@@ -590,7 +590,7 @@ function applyOne(
       return { ...state, asciiMap: null };
     case 'setExploration': {
       const cur = state.exploration;
-      if (cur && cur.graphId === e.graphId) {
+      if (cur && cur.graphId === e.graphId && cur.nodeId === e.nodeId) {
         return state;
       }
       return {

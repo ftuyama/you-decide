@@ -2,7 +2,7 @@
 id: act2/lore/lore_penitent_recall_mind
 title: Lembrança que pesa
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 skillCheck:
   id: penitent_recall_mind
   attr: mind

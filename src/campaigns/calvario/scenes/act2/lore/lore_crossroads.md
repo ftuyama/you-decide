@@ -1,7 +1,7 @@
 ---
 id: act2/lore/lore_crossroads
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 title: Eco de juramentos
 choices:
   - text: "Aceitar o nome de Cavaleiro caído (cavaleiro)"

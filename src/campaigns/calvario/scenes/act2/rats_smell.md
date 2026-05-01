@@ -2,7 +2,7 @@
 id: act2/rats_smell
 title: Cheiro
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 choices:
   - text: "Enfrentar o enxame"
     next: act2/encounters/rats_combat_intro

@@ -1,7 +1,7 @@
 ---
 id: act2/flee_skeleton
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 title: Fuga — ossos a perseguir
 choices:
   - text: "Voltar ao cruzeiro"

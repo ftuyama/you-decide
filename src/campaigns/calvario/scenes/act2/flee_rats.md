@@ -1,7 +1,7 @@
 ---
 id: act2/flee_rats
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 title: Fuga — dentes na bota
 choices:
   - text: "Meter medo ao medo e voltar ao cruzeiro"

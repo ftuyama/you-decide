@@ -2,7 +2,7 @@
 id: act2/recruit_mira
 title: Mira Junta-se ao Grupo
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 artKey: mira_offer
 choices:
   - text: "Continuar"

@@ -2,7 +2,7 @@
 id: act2/circle_ritual/circle_ritual_refuse_mind
 title: Recusa quieta
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 skillCheck:
   id: circle_refuse_mind
   attr: mind

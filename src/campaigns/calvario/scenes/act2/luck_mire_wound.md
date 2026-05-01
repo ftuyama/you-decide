@@ -1,7 +1,7 @@
 ---
 id: act2/luck_mire_wound
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 title: Mordida do poço
 onEnter:
   - { op: adjustLeadStat, attr: agi, delta: -1 }

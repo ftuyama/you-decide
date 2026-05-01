@@ -1,7 +1,7 @@
 ---
 id: act2/luck_mire_safe
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 title: Fio de sorte
 onEnter:
   - { op: grantTemporaryBuff, attr: str, delta: 2, remainingScenes: 3 }

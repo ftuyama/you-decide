@@ -1,7 +1,7 @@
 ---
 id: act2/encounters/wild_encounter_bones_rare
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 title: Ossos sem coro
 choices:
   - text: "Enfrentar o sentinela de osso"

@@ -1,7 +1,7 @@
 ---
 id: act2/encounters/wild_encounter_lone_swarm_rare
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 title: Ninho rompido
 choices:
   - text: "Pisotear o enxame isolado"

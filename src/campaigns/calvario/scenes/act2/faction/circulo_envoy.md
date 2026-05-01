@@ -2,7 +2,7 @@
 id: act2/faction/circulo_envoy
 title: Cinza viva — Círculo
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 choices:
   - text: "Deixar o Círculo fechar um símbolo favorável"
     condition: { rep: { faction: circulo, gte: 2 } }

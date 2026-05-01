@@ -2,7 +2,7 @@
 id: act2/faction/culto_envoy
 title: Carne de sino — Culto
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 choices:
   - text: "Aceitar o preço do Terceiro Sino"
     condition: { rep: { faction: culto, gte: 2 } }

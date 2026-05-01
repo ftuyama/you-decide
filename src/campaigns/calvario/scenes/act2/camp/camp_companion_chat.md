@@ -1,7 +1,7 @@
 ---
 id: act2/camp/camp_companion_chat
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 title: Palavra ao lado do fogo
 choices:
   - text: "Ouvir Mira sem a pedra julgar"

@@ -2,7 +2,7 @@
 id: act2/encounters/random_router
 title: Escaramuças da Catacumba
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 randomBranch:
   id: act2_random_combat
   branches:

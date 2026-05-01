@@ -2,7 +2,7 @@
 id: act2/recruit_offer
 title: A Oferta de Mira
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 artKey: mira_offer
 highlight: true
 choices:

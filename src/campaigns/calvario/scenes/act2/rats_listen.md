@@ -2,7 +2,7 @@
 id: act2/rats_listen
 title: Escuta
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 choices:
   - text: "Preparar-se e enfrentar"
     next: act2/encounters/rats_combat_intro

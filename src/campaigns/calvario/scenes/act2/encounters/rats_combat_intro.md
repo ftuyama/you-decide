@@ -1,7 +1,7 @@
 ---
 id: act2/encounters/rats_combat_intro
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 artKey: rats
 title: Antes do salto
 choices:

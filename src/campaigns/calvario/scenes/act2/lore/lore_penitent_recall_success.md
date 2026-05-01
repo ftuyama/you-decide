@@ -2,7 +2,7 @@
 id: act2/lore/lore_penitent_recall_success
 title: Confissão que fica
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 choices:
   - text: "Regressar ao cruzeiro"
     next: act2/hub_catacomb

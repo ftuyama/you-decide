@@ -458,8 +458,6 @@ export class GameApp {
     }
     const sceneTheme = this.registry.getScene(this.state.sceneId)?.frontmatter.ambientTheme;
     if (sceneTheme) {
-      // Act 2 mantém a base "explore", mas com arranjo um pouco mais tenso.
-      if (sceneTheme === 'explore' && this.state.chapter === 2) return 'act2';
       return sceneTheme;
     }
     return 'explore';

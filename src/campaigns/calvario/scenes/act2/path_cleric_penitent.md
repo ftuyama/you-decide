@@ -1,7 +1,7 @@
 ---
 id: act2/path_cleric_penitent
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 title: Clérigo penitente
 onEnter:
   - { op: setPath, path: penitent }

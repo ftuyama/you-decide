@@ -1,7 +1,7 @@
 ---
 id: act2/luck_mire
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 title: O lodo que sussurra
 luckCheck:
   id: mire_touch

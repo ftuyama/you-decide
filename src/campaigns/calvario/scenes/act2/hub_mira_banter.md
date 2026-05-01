@@ -2,7 +2,7 @@
 id: act2/hub_mira_banter
 title: Cruzeiro — palavra com Mira
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 choices:
   - text: "Voltar ao cruzeiro"
     next: act2/hub_catacomb

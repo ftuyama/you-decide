@@ -1,7 +1,7 @@
 ---
 id: act2/encounters/wild_encounter_rats
 chapter: 2
-ambientTheme: explore
+ambientTheme: act2
 title: Enxame duplo
 choices:
   - text: "Encarar dois enxames"

@@ -8,7 +8,7 @@ choices:
   - text: "Levantar os olhos — o céu já não pede desculpa"
     next: act7/opening_terminal_glow
   - text: "Fechar o diário por agora"
-    next: act4/epilogue_close
+    next: endings/epilogue_depths
 onEnter:
   - { op: registerEnding, endingId: epilogue_mirror }
   - { op: addResource, resource: faith, delta: 1 }

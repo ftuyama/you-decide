@@ -300,6 +300,12 @@ button.choice.choice--locked[class*='choice--tone-']:hover {
 
 .skill-row {
   margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.skill-row > button.choice {
+  width: 100%;
 }
 
 .camp-equip-panel {

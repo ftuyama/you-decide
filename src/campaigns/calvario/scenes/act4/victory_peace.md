@@ -4,11 +4,11 @@ title: Vitória em Silêncio
 chapter: 4
 ambientTheme: explore
 choices:
-  - text: "Epílogo"
-    next: act4/epilogue_modular
+  - text: "Recolher o que resta — ouvir o trono"
+    next: act4/passage_graywind_heights
 onEnter:
   - { op: addMark, mark: morvayn_slain }
 ---
-O pulso verde **esmorece**. O mundo respira — um sopro, não um hino.
+O **estalo** sob a coroa soa a **fecho**, não a coro: porta que cede quando do outro lado já não há **quem** empurre.
 
-**Vitória.**
+O pulso verde **derrete** no silêncio; o trono, um instante **mobília**, a seguir **pedra** outra vez. **Vitória**, **magra**: ficaste em pé.

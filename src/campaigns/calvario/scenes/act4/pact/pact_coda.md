@@ -5,7 +5,7 @@ chapter: 4
 ambientTheme: explore
 choices:
   - text: "Aceitar o que ficou escrito em ti"
-    next: act4/epilogue_modular
+    next: act4/passage_graywind_heights
 onEnter:
   - { op: addResource, resource: corruption, delta: 3 }
   - { op: addMark, mark: pact_bound }

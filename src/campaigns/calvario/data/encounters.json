@@ -83,6 +83,19 @@
     "xpReward": 3,
     "fleeRate": 0.64
   },
+  "cult_horde": {
+    "id": "cult_horde",
+    "enemies": [
+      "cultist",
+      "cultist",
+      "cultist",
+      "cultist"
+    ],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 5,
+    "fleeRate": 0.54
+  },
   "stone_guard_fight": {
     "id": "stone_guard_fight",
     "enemies": [
@@ -118,12 +131,27 @@
   },
   "boss_morvayn_1_disadv": {
     "id": "boss_morvayn_1_disadv",
+    "isBoss": true,
     "enemies": [
       "morvayn_p1"
     ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "fleeRate": 0.5
+    "fleeRate": 0.5,
+    "twists": [
+      {
+        "id": "morvayn_p1_echo",
+        "when": {
+          "minRound": 4
+        },
+        "apply": [
+          {
+            "op": "combatLog",
+            "message": "O eco das catacumbas repete o teu nome uma vez a mais — como aviso, não como bênção."
+          }
+        ]
+      }
+    ]
   },
   "boss_morvayn_2": {
     "id": "boss_morvayn_2",
@@ -167,12 +195,43 @@
   },
   "boss_morvayn_2_disadv": {
     "id": "boss_morvayn_2_disadv",
+    "isBoss": true,
     "enemies": [
       "morvayn_p2"
     ],
     "playerAdvantage": false,
     "enemyAdvantage": true,
-    "fleeRate": 0.5
+    "fleeRate": 0.5,
+    "twists": [
+      {
+        "id": "morvayn_throne_falter",
+        "when": {
+          "totalHpFractionLte": 0.5
+        },
+        "apply": [
+          {
+            "op": "combatLog",
+            "message": "O trono de ossos estremece — Morvayn recua meio passo, e o silêncio da sala aperta como uma argola."
+          },
+          {
+            "op": "setEnemyAdvantage",
+            "value": true
+          }
+        ]
+      },
+      {
+        "id": "morvayn_round_pressure",
+        "when": {
+          "minRound": 5
+        },
+        "apply": [
+          {
+            "op": "combatLog",
+            "message": "Cada respiração tua pesa; o osso aprendeu o teu ritmo."
+          }
+        ]
+      }
+    ]
   },
   "vigil_hunter_fight": {
     "id": "vigil_hunter_fight",

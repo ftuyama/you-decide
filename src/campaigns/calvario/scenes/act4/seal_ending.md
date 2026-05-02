@@ -7,7 +7,7 @@ skillCheck:
   id: seal_calvario
   attr: mind
   tn: 12
-  successNext: act4/epilogue_modular
+  successNext: act4/passage_graywind_heights
   failNext: act4/seal_ending_fail
   label: "Sustentar o selo até o último eco"
 choices: []

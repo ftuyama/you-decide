@@ -15,9 +15,9 @@
       "title": "Cinzas com nome",
       "blurb": "O apocalipse ficou mais honesto; o teu eco reparte-se entre estrada e silêncio."
     },
-    "epilogue_close": {
-      "title": "Fecho do diário",
-      "blurb": "O que ficou ficou — o que perdeste e o que escolheste."
+    "epilogue_depths": {
+      "title": "Depths of the axis",
+      "blurb": "Another fold of stone — a deeper stratum, silence under a different name."
     },
     "frost_epilogue": {
       "title": "Epílogo de geada",
@@ -27,9 +27,9 @@
       "title": "Espelho quebrado",
       "blurb": "A nave fraturada fica contigo como corte na palma; escolheste como contar o pulso."
     },
-    "epilogue_modular": {
-      "title": "Epílogo do trono",
-      "blurb": "Corrupção e fé à mostra; o eixo não fechou e o frio espera nas Cimeiras."
+    "passage_graywind_heights": {
+      "title": "Passagem ao fundo do eixo",
+      "blurb": "Além do trono, outra camada — dobra de pedra e gelo que ainda pergunta quem manda no silêncio."
     }
   },
   "entryScene": "act1/title",

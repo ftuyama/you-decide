@@ -54,9 +54,11 @@ const ACT2_WILD_BRANCHES: ExplorationWildBranch[] = [
 
 const ACT3_WILD_BRANCHES: ExplorationWildBranch[] = [
   { weight: 1, encounterId: 'cult_ambush' },
-  { weight: 1, encounterId: 'stone_guard_fight' },
   { weight: 1, encounterId: 'cultist_patrol' },
+  { weight: 0.7, encounterId: 'cultist_horde' },
+  { weight: 0.2, encounterId: 'act2_rare_bone_sentinel' },
   { weight: 0.35, encounterId: 'vigil_hunter_fight' },
+  { weight: 0.05, encounterId: 'stone_guard_fight' },
 ];
 
 /** Alinhado ao antigo `frost_random_router` (combates + viajante + hub). */

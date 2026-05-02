@@ -1,6 +1,7 @@
 import {
   buildStoryChoiceRows,
   renderSceneBody,
+  type GameEvent,
   type LoadedScene,
   type StoryChoiceRow,
   type StoryDiceRollBreakdown,
@@ -8,7 +9,6 @@ import {
 import type { Choice, GameState } from '../engine/schema/index.ts';
 import type { ContentRegistry } from '../content/registry.ts';
 import { formatLevelUpDeltaLine, randomCampCombatHint } from './gameAppUtils.ts';
-import type { GameEvent } from '../engine/core/index.ts';
 import { appendStoryMapPanel } from './storyMapPanel.ts';
 import {
   appendCampEquipmentPanel,
@@ -16,6 +16,7 @@ import {
 } from './story/storyCampEquipmentPanel.ts';
 import { appendStoryDiceRollBanner, type StoryDiceBannerHost } from './story/storyDiceBanner.ts';
 import { resolveSceneArt } from './story/storyArt.ts';
+import { appendFaithMiracleBanner } from './story/storyFaithMiracleBanner.ts';
 import { setupTimedChoices } from './story/storyTimedChoices.ts';
 import { applyChoiceButtonLabel } from './story/choicePresentation.ts';
 import {
@@ -163,34 +164,11 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
   }
 
   if (ctx.overlay.faithMiraclePending) {
-    const miracle = document.createElement('div');
-    miracle.className = 'faith-miracle-banner';
-    const kicker = document.createElement('div');
-    kicker.className = 'faith-miracle-kicker';
-    kicker.textContent = 'Intercessão';
-    miracle.appendChild(kicker);
-    const titleEl = document.createElement('div');
-    titleEl.className = 'faith-miracle-title';
-    titleEl.textContent = 'A fé recusa-te à morte.';
-    miracle.appendChild(titleEl);
-    const sub = document.createElement('div');
-    sub.className = 'faith-miracle-subtitle';
-    sub.textContent =
-      'Algo em ti não cede — acordas ferido, mas de pé. Cinco medidas de convicção consumiram-se para te manter no mundo.';
-    miracle.appendChild(sub);
-    const btnM = document.createElement('button');
-    btnM.type = 'button';
-    btnM.className = 'faith-miracle-dismiss';
-    btnM.dataset.quickNavContinue = '';
-    btnM.title = 'Barra de espaço';
-    btnM.textContent = '[Espaço] — Continuar';
-    btnM.addEventListener('click', () => {
-      ctx.overlay.setFaithMiraclePending(false);
-      ctx.audio.playUiClick();
-      ctx.render();
+    appendFaithMiracleBanner(inner, {
+      setFaithMiraclePending: ctx.overlay.setFaithMiraclePending,
+      playUiClick: ctx.audio.playUiClick,
+      render: ctx.render,
     });
-    miracle.appendChild(btnM);
-    inner.appendChild(miracle);
   }
 
   if (ctx.overlay.statusHighlightQueue.length > 0) {

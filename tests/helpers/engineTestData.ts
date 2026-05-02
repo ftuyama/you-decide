@@ -1,6 +1,6 @@
 import { createInitialState, createPlayerCharacter } from '../../src/engine/core/index.ts';
 import { emptyGameData } from '../../src/engine/data/index.ts';
-import type { CampaignIndex, GameState, HeroClass } from '../../src/engine/schema/index.ts';
+import type { CampaignIndex, ClassId, GameState } from '../../src/engine/schema/index.ts';
 
 export const testCampaign: CampaignIndex = {
   id: 'test',
@@ -22,7 +22,7 @@ export function createTestData() {
 export function createStateWithHero(opts?: {
   level?: number;
   seed?: number;
-  heroClass?: HeroClass;
+  heroClass?: ClassId;
   heroName?: string;
 }): GameState {
   const level = opts?.level ?? 1;

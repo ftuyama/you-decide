@@ -1,15 +1,18 @@
 import { ContentRegistry } from '../content/registry.ts';
-import { createInitialState, deserializeState, serializeState } from '../engine/core/index.ts';
-import { EventBus, type GameEvent } from '../engine/core/index.ts';
 import {
+  applyEffects,
+  createInitialState,
+  deserializeState,
   enterScene,
-  resolveLuckCheck,
+  EventBus,
   resolveDualAttrSkillCheck,
+  resolveLuckCheck,
   resolveSkillCheck,
+  serializeState,
+  type GameEvent,
   type LoadedScene,
   type StoryDiceRollBreakdown,
 } from '../engine/core/index.ts';
-import { applyEffects } from '../engine/core/index.ts';
 import {
   explorationMoveEffects,
   pickWildOutcome,
@@ -102,10 +105,8 @@ export class GameApp {
   private diaryEntryQueue: string[] = [];
   /** Milagre de fé após quase-morte em combate — banner até fechar */
   private faithMiraclePending = false;
-  /** Só reproduz efeitos de som para entradas novas do log de combate */
-  private combatLogSoundCursor: { encounterId: string; index: number } = { encounterId: '', index: 0 };
-  /** Mesmo slice do log que `combatLogSoundCursor` — animações FX por entrada nova. */
-  private combatLogFxCursor: { encounterId: string; index: number } = { encounterId: '', index: 0 };
+  /** Índice até onde som/FX do log de combate já foram consumidos (som e FX partilham o mesmo cursor). */
+  private combatLogCursor: { encounterId: string; index: number } = { encounterId: '', index: 0 };
   /** Rola teste de perícia/sorte: estado só aplica após o overlay (dados já resolvidos no motor). */
   private pendingStoryDiceRoll: {
     nextState: GameState;
@@ -995,8 +996,7 @@ export class GameApp {
     this.clearDiceRollTimers();
     this.syncSidebarDisclosureSections();
     if (this.state.mode !== 'combat') {
-      this.combatLogSoundCursor = { encounterId: '', index: 0 };
-      this.combatLogFxCursor = { encounterId: '', index: 0 };
+      this.combatLogCursor = { encounterId: '', index: 0 };
     }
 
     const headerTitle = formatCampaignHeaderTitle(this.registry.data.campaign, this.state.chapter);
@@ -1082,11 +1082,10 @@ export class GameApp {
             bus: this.bus,
             audio: this.audio,
             combatLog: {
-              soundCursor: this.combatLogSoundCursor,
-              fxCursor: this.combatLogFxCursor,
+              soundCursor: this.combatLogCursor,
+              fxCursor: this.combatLogCursor,
               setSoundCursor: (v) => {
-                this.combatLogSoundCursor = v;
-                this.combatLogFxCursor = v;
+                this.combatLogCursor = v;
               },
             },
             lifecycle: {

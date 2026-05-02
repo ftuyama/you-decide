@@ -6,7 +6,7 @@ type: exploration
 ambientTheme: explore
 choices:
   - id: explore_leave
-    text: "Montar acampamento no cruzeiro"
+    text: "Retornar ao hub do cruzeiro"
     next: act2/hub_catacomb
     uiSection: "No perímetro"
     effects:

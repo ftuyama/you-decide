@@ -37,17 +37,34 @@ export function readRawSlot(campaignId: string, slot: number): string | null {
   }
 }
 
-export function slotPreviewLines(campaignId: string, slot: number): { line1: string } {
+export type SlotPreview =
+  | { kind: 'empty' }
+  | { kind: 'invalid' }
+  | { kind: 'wrongCampaign' }
+  | { kind: 'ok'; chapter: number; level: number; playerName: string };
+
+export function getSlotPreview(campaignId: string, slot: number): SlotPreview {
   const raw = readRawSlot(campaignId, slot);
-  if (!raw?.trim()) return { line1: 'Vazio' };
+  if (!raw?.trim()) return { kind: 'empty' };
   try {
     const s = deserializeState(raw);
-    if (s.campaignId !== campaignId) return { line1: 'Outra campanha' };
-    return {
-      line1: `Cap. ${s.chapter} · Nv. ${s.level} · ${s.playerName}`,
-    };
+    if (s.campaignId !== campaignId) return { kind: 'wrongCampaign' };
+    return { kind: 'ok', chapter: s.chapter, level: s.level, playerName: s.playerName };
   } catch {
-    return { line1: 'Gravação inválida' };
+    return { kind: 'invalid' };
+  }
+}
+
+function previewTitle(slot: number, p: SlotPreview): string {
+  switch (p.kind) {
+    case 'empty':
+      return `Slot ${slot} — sem gravação`;
+    case 'invalid':
+      return `Slot ${slot} — gravação inválida`;
+    case 'wrongCampaign':
+      return `Slot ${slot} — outra campanha`;
+    case 'ok':
+      return `Slot ${slot} — ${p.playerName} · Cap. ${p.chapter} · Nv. ${p.level}`;
   }
 }
 
@@ -61,48 +78,87 @@ export function buildMenuSaveSlot(
   campaignId: string,
   cbs: SaveSlotMenuCallbacks
 ): HTMLElement {
+  const preview = getSlotPreview(campaignId, slot);
+
   const wrap = document.createElement('div');
   wrap.className = 'menu-save-slot';
+  wrap.setAttribute('role', 'group');
+  wrap.setAttribute('aria-label', previewTitle(slot, preview));
 
-  const info = document.createElement('div');
-  info.className = 'menu-save-slot-info';
-  const titleEl = document.createElement('div');
-  titleEl.className = 'menu-save-slot-title';
-  titleEl.textContent = `Slot ${slot}`;
-  const meta = document.createElement('div');
-  meta.className = 'menu-save-slot-meta';
-  const lines = slotPreviewLines(campaignId, slot);
-  meta.textContent = lines.line1;
-  meta.title = lines.line1;
-  info.appendChild(titleEl);
-  info.appendChild(meta);
+  const row = document.createElement('div');
+  row.className = 'menu-save-slot-row';
+
+  const badge = document.createElement('span');
+  badge.className = 'menu-save-slot-badge';
+  badge.textContent = String(slot);
+  badge.setAttribute('aria-hidden', 'true');
+
+  const details = document.createElement('div');
+  details.className = 'menu-save-slot-details';
+  if (preview.kind === 'ok') {
+    const nameEl = document.createElement('div');
+    nameEl.className = 'menu-save-slot-name';
+    nameEl.textContent = preview.playerName;
+    const stats = document.createElement('div');
+    stats.className = 'menu-save-slot-stats';
+    const cap = document.createElement('span');
+    cap.textContent = `Cap. ${preview.chapter}`;
+    const sep = document.createElement('span');
+    sep.className = 'menu-save-slot-stats-sep';
+    sep.textContent = '·';
+    const lv = document.createElement('span');
+    lv.textContent = `Nv. ${preview.level}`;
+    stats.append(cap, sep, lv);
+    details.append(nameEl, stats);
+  } else {
+    const msg = document.createElement('div');
+    msg.className = 'menu-save-slot-message';
+    if (preview.kind === 'empty') {
+      wrap.classList.add('menu-save-slot--empty');
+      wrap.classList.remove('menu-save-slot--warn');
+      msg.textContent = 'Sem gravação';
+    } else {
+      wrap.classList.remove('menu-save-slot--empty');
+      wrap.classList.add('menu-save-slot--warn');
+      msg.textContent =
+        preview.kind === 'invalid' ? 'Gravação inválida' : 'Outra campanha';
+    }
+    details.appendChild(msg);
+  }
+
+  row.append(badge, details);
+  wrap.title = previewTitle(slot, preview);
 
   const actions = document.createElement('div');
   actions.className = 'menu-save-slot-actions';
 
   const saveBtn = document.createElement('button');
   saveBtn.type = 'button';
-  saveBtn.className = 'menu-item menu-save-slot-btn';
+  saveBtn.className = 'menu-item menu-save-slot-btn menu-save-slot-btn--secondary';
   saveBtn.textContent = 'Salvar';
+  saveBtn.setAttribute('aria-label', `Salvar partida atual no slot ${slot}`);
   saveBtn.addEventListener('click', () => cbs.onSave(slot));
 
   const loadBtn = document.createElement('button');
   loadBtn.type = 'button';
-  loadBtn.className = 'menu-item menu-save-slot-btn';
   const raw = readRawSlot(campaignId, slot);
   const hasSave = raw != null && raw.trim().length > 0;
+  loadBtn.className = hasSave
+    ? 'menu-item menu-save-slot-btn menu-save-slot-btn--primary'
+    : 'menu-item menu-save-slot-btn menu-save-slot-btn--ghost';
   loadBtn.disabled = !hasSave;
-  if (!hasSave) loadBtn.classList.add('menu-save-slot-btn--disabled');
   loadBtn.textContent = 'Carregar';
+  loadBtn.setAttribute(
+    'aria-label',
+    hasSave ? `Carregar gravação do slot ${slot}` : `Slot ${slot} vazio — carregar indisponível`
+  );
   loadBtn.addEventListener('click', () => {
     if (!hasSave) return;
     cbs.onLoad(slot);
   });
 
-  actions.appendChild(saveBtn);
-  actions.appendChild(loadBtn);
-  wrap.appendChild(info);
-  wrap.appendChild(actions);
+  actions.append(saveBtn, loadBtn);
+  wrap.append(row, actions);
   return wrap;
 }
 

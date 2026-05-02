@@ -42,10 +42,12 @@ const ACT2_WILD_WEIGHTS: { weight: number; encounterId: string }[] = [
   { weight: 0.2, encounterId: 'act2_rare_lone_swarm' },
 ];
 
-/** Pesos dos encontros aleatórios de navegação do act3. */
+/** Alinhado a `act3/encounters/random_router` (pesos e encounterId por ramo). */
 const ACT3_WILD_WEIGHTS: { weight: number; encounterId: string }[] = [
-  { weight: 1, encounterId: 'stone_guard_fight' },
   { weight: 1, encounterId: 'cult_ambush' },
+  { weight: 1, encounterId: 'stone_guard_fight' },
+  { weight: 1, encounterId: 'cultist_patrol' },
+  { weight: 0.35, encounterId: 'vigil_hunter_fight' },
 ];
 
 /** Pesos dos encontros aleatórios de navegação do act5. */
@@ -179,13 +181,15 @@ export function shouldTriggerEncounter(
 
 export function startExplorationCombatEffects(
   encounterId: string,
-  returnSceneId: string
+  returnSceneId: string,
+  /** Quando definido, vitória vai para esta cena em vez de `returnSceneId` (ex.: boss com flag/loot). */
+  onVictorySceneId?: string
 ): Effect[] {
   return [
     {
       op: 'startCombat',
       encounterId,
-      onVictory: returnSceneId,
+      onVictory: onVictorySceneId ?? returnSceneId,
       onFlee: returnSceneId,
       onDefeat: 'shared/game_over',
     },

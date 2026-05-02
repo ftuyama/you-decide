@@ -554,11 +554,23 @@ export class GameApp {
     const roll = shouldTriggerEncounter(s, edge.encounterChance);
     s = { ...s, rngSeed: roll.nextSeed };
     if (reachedGoalNow) {
+      const exploreGoalSubtitle: Record<string, string> = {
+        act2_catacomb:
+          'Descida encontrada. A travessia pelas catacumbas valeu a pena.',
+        act3_depths:
+          'O portão de pedra nas profundezas assinala-se no mapa — Morvayn deixa de ser só rumor.',
+        act5_frost:
+          'A trilha no gelo fecha-se num ponto que o desfiladeiro não esconde por completo.',
+        act6_fractured_nave:
+          'Um limiar na nave fraturada deixa de negar o nome que escutas.',
+      };
       this.statusHighlightQueue.push({
         type: 'statusHighlight',
         variant: 'good',
         title: 'Objetivo concluído',
-        subtitle: 'Descida encontrada. A travessia pelas catacumbas valeu a pena.',
+        subtitle:
+          exploreGoalSubtitle[ex.graphId] ??
+          'O objetivo desta exploração ficou marcado.',
       });
       this.unlockAudio();
       this.audio.playCheckSuccess();
@@ -570,7 +582,15 @@ export class GameApp {
     }
     const pick = pickWeightedEncounterId(s.rngSeed, ex.graphId);
     s = { ...s, rngSeed: pick.nextSeed };
-    s = applyEffects(s, startExplorationCombatEffects(pick.encounterId, this.state.sceneId), this.ctx());
+    const stoneVictory =
+      ex.graphId === 'act3_depths' && pick.encounterId === 'stone_guard_fight'
+        ? 'act3/stone_guard_victory'
+        : undefined;
+    s = applyEffects(
+      s,
+      startExplorationCombatEffects(pick.encounterId, this.state.sceneId, stoneVictory),
+      this.ctx()
+    );
     this.state = this.stabilize(s);
     this.render();
   }

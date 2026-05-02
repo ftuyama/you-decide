@@ -93,7 +93,9 @@ describe('pickWeightedEncounterId', () => {
 
   it('uses act3 encounter pool when graph id is act3_depths', () => {
     const p = pickWeightedEncounterId(999, 'act3_depths');
-    expect(['stone_guard_fight', 'cult_ambush']).toContain(p.encounterId);
+    expect(['cult_ambush', 'stone_guard_fight', 'cultist_patrol', 'vigil_hunter_fight']).toContain(
+      p.encounterId
+    );
   });
 
   it('uses act5 encounter pool when graph id is act5_frost', () => {
@@ -118,6 +120,19 @@ describe('startExplorationCombatEffects', () => {
       onVictory: 'shared/explore_nav_act3',
       onFlee: 'shared/explore_nav_act3',
       onDefeat: 'shared/game_over',
+    });
+  });
+
+  it('routes victory to override scene when provided (act3 stone guard)', () => {
+    const effects = startExplorationCombatEffects(
+      'stone_guard_fight',
+      'shared/explore_nav_act3',
+      'act3/stone_guard_victory'
+    );
+    expect(effects[0]).toMatchObject({
+      op: 'startCombat',
+      onVictory: 'act3/stone_guard_victory',
+      onFlee: 'shared/explore_nav_act3',
     });
   });
 });

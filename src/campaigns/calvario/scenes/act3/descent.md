@@ -25,10 +25,12 @@ choices:
   - text: "Anotar isto no diário"
     preview: "Fixar o cheiro antes que o silêncio o devore."
     next: act3/diary_trigger
-    effects:
-      - { op: addDiary, text: "O ar cheira a cobre podre." }
+  - text: "Ouvir o que Mira diz do cheiro e do silêncio"
+    preview: "Uma voz que já assinou com o subsolo."
+    next: act3/mira_descent_whisper
+    condition: { companionInParty: rogue_mira }
 onEnter: []
 ---
-A escada **afunda** e o pulso verde bate com o teu coração — por baixo, túneis são também **tratos** entre facções. Cada lance rouba um fio de **ruído** até restar só o ritmo da pedra e o teu.
+A escada **afunda** e o pulso verde bate com o teu coração — por baixo, túneis são também **tratos** entre facções. Cada lance rouba um fio de **ruído** até restar só o ritmo da pedra e o teu. **Não há fogo** que valha abrigo aqui — só pedra húmida e acordos que não pediram a tua permissão.
 
 Com o **Mapa Rasgado**, abre-se um atalho que o mapa comum não mostra.

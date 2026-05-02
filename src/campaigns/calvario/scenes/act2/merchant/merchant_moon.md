@@ -6,6 +6,7 @@ artKey: merchant
 title: Mercador sem rosto
 choices:
   - text: "Aceitar o mapa rasgado (−1 ouro)"
+    uiSection: "À venda"
     next: act2/hub_catacomb
     condition:
       all:
@@ -15,6 +16,7 @@ choices:
       - { op: grantItem, itemId: rumor_map }
       - { op: addResource, resource: gold, delta: -1 }
   - text: "Comprar adaga de ferro (−3 ouro)"
+    uiSection: "À venda"
     next: act2/hub_catacomb
     condition:
       all:
@@ -25,6 +27,7 @@ choices:
       - { op: addResource, resource: gold, delta: -3 }
     preview: "Arma · para o inventário"
   - text: "Comprar Hidromel (−2 ouro)"
+    uiSection: "À venda"
     next: act2/hub_catacomb
     condition:
       all:
@@ -37,6 +40,7 @@ choices:
       - { op: setFlag, key: act2_merch_moon_stress_1, value: true }
     preview: "Consumível · reduz estresse"
   - text: "Comprar Suprimento (−5 ouro)"
+    uiSection: "À venda"
     next: act2/hub_catacomb
     condition:
       all:
@@ -49,6 +53,7 @@ choices:
       - { op: setFlag, key: act2_merch_moon_supply_1, value: true }
     preview: "Descansar também é parte da batalha"
   - text: "Comprar Suprimento (−5 ouro)"
+    uiSection: "À venda"
     next: act2/hub_catacomb
     condition:
       all:
@@ -61,6 +66,7 @@ choices:
       - { op: setFlag, key: act2_merch_moon_supply_2, value: true }
     preview: "Recurso · estoque único"
   - text: "Comprar Resto de Suprimento (−10 ouro)"
+    uiSection: "À venda"
     next: act2/hub_catacomb
     condition:
       all:
@@ -73,10 +79,13 @@ choices:
       - { op: setFlag, key: act2_merch_moon_supply_3, value: true }
     preview: "Um verdadeiro achado"
   - text: "Recusar educadamente"
+    uiSection: "Conversa"
     next: act2/hub_catacomb
   - text: "Perguntar de onde veio o mapa"
+    uiSection: "Conversa"
     next: act2/merchant/merchant_ask
   - text: "Mencionar patrulhas da Vigília (aliados)"
+    uiSection: "Conversa"
     next: act2/hub_catacomb
     condition: { rep: { faction: vigilia, gte: 2 } }
     showWhenLocked: true
@@ -85,12 +94,14 @@ choices:
       - { op: addDiary, text: "O mercador hesitou quando falei da Vigília — interesse compra silêncio." }
     preview: "Diário · rumor de respeito"
   - text: "Sussurrar símbolos do Círculo"
+    uiSection: "Conversa"
     next: act2/merchant/merchant_circle_bet
     condition: { rep: { faction: circulo, gte: 1 } }
     showWhenLocked: true
     lockedHint: "O Círculo só ouve sussurros de quem já lhes deve atenção (reputação ≥1)."
     preview: "Teste de sorte · aposta amaldiçoada"
   - text: "Deixar o Terceiro Sino nomear o preço"
+    uiSection: "Conversa"
     next: act2/hub_catacomb
     condition:
       all:

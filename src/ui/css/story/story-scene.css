@@ -123,6 +123,31 @@ h1 {
   gap: 0.45rem;
 }
 
+.choices.choices--sectioned {
+  gap: 0;
+}
+
+.choices-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.choices-section + .choices-section {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--border);
+}
+
+.choices-section__title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 0.4rem;
+}
+
 button.choice {
   text-align: left;
   font: inherit;
@@ -171,6 +196,100 @@ button.choice.choice--locked .choice-locked-hint {
   color: color-mix(in srgb, var(--fg) 58%, transparent);
   margin-top: 0.25rem;
   font-style: italic;
+}
+
+/* Marcador inicial `[#]` … `[%]` — só o glifo; classes não pintam o botão inteiro. */
+button.choice .choice-badge {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+button.choice .choice-badge--hash {
+  color: var(--stat-build-bonus);
+}
+
+button.choice .choice-badge--star {
+  color: var(--magic);
+}
+
+button.choice .choice-badge--plus {
+  color: var(--sidebar-spell);
+}
+
+button.choice .choice-badge--bang {
+  color: var(--danger);
+}
+
+button.choice .choice-badge--at {
+  color: var(--camp-equip-hint);
+}
+
+button.choice .choice-badge--gt {
+  color: color-mix(in srgb, var(--magic) 88%, var(--muted));
+}
+
+button.choice .choice-badge--tilde {
+  color: color-mix(in srgb, var(--accent) 90%, var(--fg));
+}
+
+button.choice .choice-badge--pct {
+  color: color-mix(in srgb, var(--combat-actions-hdr) 85%, var(--combat-border));
+}
+
+/* Tom do botão: listra + fundo suave (não combinar com excesso de marcadores de classe). */
+button.choice.choice--tone-risk {
+  background: color-mix(in srgb, var(--danger) 12%, var(--surface-raised));
+  box-shadow: inset 3px 0 0 0 var(--danger);
+}
+
+button.choice.choice--tone-combat {
+  background: color-mix(in srgb, var(--combat-border) 14%, var(--surface-raised));
+  box-shadow: inset 3px 0 0 0 var(--combat-actions-border);
+}
+
+button.choice.choice--tone-rest {
+  background: color-mix(in srgb, var(--accent) 12%, var(--surface-raised));
+  box-shadow: inset 3px 0 0 0 var(--accent);
+}
+
+button.choice.choice--tone-camp {
+  background: color-mix(in srgb, var(--camp-equip-hint) 14%, var(--surface-raised));
+  box-shadow: inset 3px 0 0 0 var(--camp-equip-hint);
+}
+
+button.choice.choice--tone-explore {
+  background: color-mix(in srgb, var(--magic) 12%, var(--surface-raised));
+  box-shadow: inset 3px 0 0 0 color-mix(in srgb, var(--magic) 70%, var(--border));
+}
+
+button.choice[class*='choice--tone-']:hover {
+  background: color-mix(in srgb, var(--surface-hover-alt) 92%, var(--surface-raised));
+  border-color: var(--accent);
+}
+
+button.choice.choice--tone-risk:hover {
+  background: color-mix(in srgb, var(--danger) 14%, var(--surface-hover-alt));
+}
+
+button.choice.choice--tone-combat:hover {
+  background: color-mix(in srgb, var(--combat-border) 16%, var(--surface-hover-alt));
+}
+
+button.choice.choice--tone-rest:hover {
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface-hover-alt));
+}
+
+button.choice.choice--tone-camp:hover {
+  background: color-mix(in srgb, var(--camp-equip-hint) 16%, var(--surface-hover-alt));
+}
+
+button.choice.choice--tone-explore:hover {
+  background: color-mix(in srgb, var(--magic) 14%, var(--surface-hover-alt));
+}
+
+button.choice.choice--locked[class*='choice--tone-']:hover {
+  border-color: var(--border);
+  background: var(--surface-raised);
 }
 
 .skill-row {

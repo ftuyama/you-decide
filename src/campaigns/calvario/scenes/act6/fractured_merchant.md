@@ -6,6 +6,7 @@ artKey: merchant
 title: Banca do último preço
 choices:
   - text: "Comprar planta da nave (−4 ouro)"
+    uiSection: "À venda"
     next: act6/fractured_merchant
     condition:
       all:
@@ -15,6 +16,7 @@ choices:
       - { op: grantItem, itemId: fractured_nave_map }
       - { op: addResource, resource: gold, delta: -4 }
   - text: "Comprar Poção Rubra (8 ouro) (x2)"
+    uiSection: "À venda"
     next: act6/fractured_merchant
     condition:
       all:
@@ -25,6 +27,7 @@ choices:
       - { op: grantItem, itemId: potion_hp }
       - { op: setFlag, key: act6_merch_hp_1, value: true }
   - text: "Comprar Poção Rubra (5 ouro) (x1)"
+    uiSection: "À venda"
     next: act6/fractured_merchant
     condition:
       all:
@@ -36,6 +39,7 @@ choices:
       - { op: grantItem, itemId: potion_hp }
       - { op: setFlag, key: act6_merch_hp_2, value: true }
   - text: "Comprar Tônico Azul (7 ouro) (x1)"
+    uiSection: "À venda"
     next: act6/fractured_merchant
     condition:
       all:
@@ -46,6 +50,7 @@ choices:
       - { op: grantItem, itemId: potion_mana }
       - { op: setFlag, key: act6_merch_mana_1, value: true }
   - text: "Comprar Hidromel (6 ouro) (x1)"
+    uiSection: "À venda"
     next: act6/fractured_merchant
     condition:
       all:
@@ -56,6 +61,7 @@ choices:
       - { op: grantItem, itemId: potion_stress }
       - { op: setFlag, key: act6_merch_stress_1, value: true }
   - text: "Comprar Suprimento (5 ouro) (x2)"
+    uiSection: "À venda"
     next: act6/fractured_merchant
     condition:
       all:
@@ -66,6 +72,7 @@ choices:
       - { op: addResource, resource: supply, delta: 1 }
       - { op: setFlag, key: act6_merch_supply_1, value: true }
   - text: "Comprar Suprimento (5 ouro) (x1)"
+    uiSection: "À venda"
     next: act6/fractured_merchant
     condition:
       all:
@@ -77,6 +84,7 @@ choices:
       - { op: addResource, resource: supply, delta: 1 }
       - { op: setFlag, key: act6_merch_supply_2, value: true }
   - text: "Comprar Suprimento (10 ouro) (x1)"
+    uiSection: "À venda"
     next: act6/fractured_merchant
     condition:
       all:
@@ -90,6 +98,7 @@ choices:
       - { op: addResource, resource: supply, delta: 1 }
       - { op: setFlag, key: act6_merch_supply_3, value: true }
   - text: "Afastar-me da banca"
+    uiSection: "Conversa"
     next: act6/hub_fractured_nave
 onEnter: []
 ---

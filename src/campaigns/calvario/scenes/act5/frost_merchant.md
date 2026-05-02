@@ -6,6 +6,7 @@ artKey: merchant
 title: Tenda do comerciante de geada
 choices:
   - text: "Comprar Poção Rubra (5 ouro) (x2)"
+    uiSection: "À venda"
     next: act5/frost_merchant
     condition:
       all:
@@ -16,6 +17,7 @@ choices:
       - { op: grantItem, itemId: potion_hp }
       - { op: setFlag, key: act5_merch_hp_1, value: true }
   - text: "Comprar Poção Rubra (5 ouro) (x1)"
+    uiSection: "À venda"
     next: act5/frost_merchant
     condition:
       all:
@@ -27,6 +29,7 @@ choices:
       - { op: grantItem, itemId: potion_hp }
       - { op: setFlag, key: act5_merch_hp_2, value: true }
   - text: "Comprar Tônico Azul (10 ouro) (x1)"
+    uiSection: "À venda"
     next: act5/frost_merchant
     condition:
       all:
@@ -37,6 +40,7 @@ choices:
       - { op: grantItem, itemId: potion_mana }
       - { op: setFlag, key: act5_merch_mana_1, value: true }
   - text: "Comprar Hidromel (4 ouro) (x1)"
+    uiSection: "À venda"
     next: act5/frost_merchant
     condition:
       all:
@@ -47,6 +51,7 @@ choices:
       - { op: grantItem, itemId: potion_stress }
       - { op: setFlag, key: act5_merch_stress_1, value: true }
   - text: "Comprar Suprimento (5 ouro) (x2)"
+    uiSection: "À venda"
     next: act5/frost_merchant
     condition:
       all:
@@ -57,6 +62,7 @@ choices:
       - { op: addResource, resource: supply, delta: 1 }
       - { op: setFlag, key: act5_merch_supply_1, value: true }
   - text: "Comprar Suprimento (5 ouro) (x1)"
+    uiSection: "À venda"
     next: act5/frost_merchant
     condition:
       all:
@@ -68,6 +74,7 @@ choices:
       - { op: addResource, resource: supply, delta: 1 }
       - { op: setFlag, key: act5_merch_supply_2, value: true }
   - text: "Comprar Suprimento (10 ouro) (x1)"
+    uiSection: "À venda"
     next: act5/frost_merchant
     condition:
       all:
@@ -81,6 +88,7 @@ choices:
       - { op: addResource, resource: supply, delta: 1 }
       - { op: setFlag, key: act5_merch_supply_3, value: true }
   - text: "Comprar Último Suprimento (15 ouro) (x1)"
+    uiSection: "À venda"
     next: act5/frost_merchant
     condition:
       all:
@@ -95,6 +103,7 @@ choices:
       - { op: addResource, resource: supply, delta: 1 }
       - { op: setFlag, key: act5_merch_supply_4, value: true }
   - text: "Afastar-me da tenda"
+    uiSection: "Conversa"
     next: act5/frost_hub
 onEnter: []
 ---

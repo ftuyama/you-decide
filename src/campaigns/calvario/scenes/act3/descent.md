@@ -4,9 +4,11 @@ title: Descida ao silêncio profundo
 chapter: 3
 ambientTheme: act3
 choices:
-  - text: "Seguir até o poço"
+  - text: "Descer até ao poço"
+    preview: "Lá em baixo, a água sussurra promessas que ninguém confirma."
     next: act3/well_lies
-  - text: "Tentar o mapa (rumor)"
+  - text: "Forçar o atalho do mapa rasgado"
+    preview: "Traços de tinta e medo — um caminho que os mapas honestos apagam."
     next: act3/cult_passage
     condition:
       all:
@@ -14,17 +16,14 @@ choices:
         - { level: { gte: 6 } }
     showWhenLocked: true
     lockedHint: "Precisas do mapa-rumor no inventário e de nível 6 para forçar esse atalho."
-  - text: "Mapa mini (exploração ASCII)"
-    next: act3/ascii_explore
-    condition: { level: { gte: 8 } }
-    showWhenLocked: true
-    lockedHint: "Só com nível 8 o subsolo deixa-te ler esse mapa como território."
-  - text: "Evento de corrupção"
+  - text: "Ir ao encontro do que a corrupção promete"
+    preview: "Algo puxa por baixo da pele; fingir surdez custa cada vez mais caro."
     next: act3/corruption_event
     condition: { level: { gte: 6 } }
     showWhenLocked: true
     lockedHint: "Com nível 6 a corrupção deixa de ser só rumor — torna-se encontro."
-  - text: "Nota no diário"
+  - text: "Anotar isto no diário"
+    preview: "Fixar o cheiro antes que o silêncio o devore."
     next: act3/diary_trigger
     effects:
       - { op: addDiary, text: "O ar cheira a cobre podre." }

@@ -17,6 +17,11 @@ import {
 import { appendStoryDiceRollBanner, type StoryDiceBannerHost } from './story/storyDiceBanner.ts';
 import { resolveSceneArt } from './story/storyArt.ts';
 import { setupTimedChoices } from './story/storyTimedChoices.ts';
+import { applyChoiceButtonLabel } from './story/choicePresentation.ts';
+import {
+  groupStoryChoiceRowsByUiSection,
+  shouldUseChoiceSectionLayout,
+} from './story/choiceSections.ts';
 
 export { isCampEquipmentScene } from './story/storyCampEquipmentPanel.ts';
 export { resolveSceneArtFromFrontmatter, resolveSceneArt } from './story/storyArt.ts';
@@ -45,6 +50,7 @@ function buildExplorationMovementRows(
           text: edge.text,
           preview,
           effects: [],
+          uiSection: 'Navegação',
         },
         hint: 'Stress no máximo — não consegues avançar pelos túneis.',
       });
@@ -56,6 +62,7 @@ function buildExplorationMovementRows(
           text: edge.text,
           preview,
           effects: [],
+          uiSection: 'Navegação',
         },
       });
     }
@@ -74,7 +81,6 @@ export type StoryOverlayState = {
   statusHighlightQueue: Extract<GameEvent, { type: 'statusHighlight' }>[];
   setStatusHighlightQueue: (q: Extract<GameEvent, { type: 'statusHighlight' }>[]) => void;
   itemAcquireQueue: string[];
-  setItemAcquireQueue: (q: string[]) => void;
   diaryEntryQueue: string[];
   setDiaryEntryQueue: (q: string[]) => void;
 };
@@ -265,18 +271,6 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
       }
       wrap.appendChild(block);
     }
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'item-acquire-dismiss';
-    btn.dataset.quickNavContinue = '';
-    btn.title = 'Barra de espaço';
-    btn.textContent = '[Espaço] — Continuar';
-    btn.addEventListener('click', () => {
-      ctx.overlay.setItemAcquireQueue([]);
-      ctx.audio.playUiClick();
-      ctx.render();
-    });
-    wrap.appendChild(btn);
     inner.appendChild(wrap);
   }
 
@@ -509,6 +503,7 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     ctx.scene.frontmatter.type === 'exploration'
       ? buildExplorationMovementRows(ctx.state, ctx.registry)
       : [];
+  const explorationMoveCount = explorationMoves.length;
   const choiceRows = [
     ...explorationMoves,
     ...buildStoryChoiceRows(ctx.scene.frontmatter.choices, ctx.state),
@@ -519,31 +514,43 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
   const chWrap = document.createElement('div');
   chWrap.className = 'choices';
 
-  choiceRows.forEach((row, i) => {
+  const choiceSections = groupStoryChoiceRowsByUiSection(choiceRows);
+  const useChoiceSections = shouldUseChoiceSectionLayout(choiceSections);
+
+  let choiceRowIndex = 0;
+  const appendStoryChoiceButton = (parent: HTMLElement, row: StoryChoiceRow): void => {
+    const i = choiceRowIndex;
+    choiceRowIndex += 1;
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'choice';
     const navNum = storyNavIndex + i + 1;
+    const syntheticExplore = i < explorationMoveCount;
 
     if (row.kind === 'locked') {
       btn.disabled = true;
       btn.classList.add('choice--locked');
       btn.title = row.hint;
-      const labelText = `${navNum} - ${row.choice.text}`;
-      btn.appendChild(document.createTextNode(labelText));
+      applyChoiceButtonLabel(btn, navNum, row.choice, { syntheticExplore });
+      const chLocked = row.choice;
+      if (chLocked.preview) {
+        const prev = document.createElement('span');
+        prev.className = 'preview';
+        prev.textContent = chLocked.preview;
+        btn.appendChild(prev);
+      }
       const hintSpan = document.createElement('span');
       hintSpan.className = 'choice-locked-hint';
       hintSpan.textContent = row.hint;
       btn.appendChild(hintSpan);
-      chWrap.appendChild(btn);
+      parent.appendChild(btn);
       return;
     }
 
     const ch = row.choice;
     const runChoice = (): void => ctx.navigation.applyChoice(ch);
     if (navNum < 10) btn.title = storyQuickKeyHint(navNum);
-    const labelText = `${navNum} - ${ch.text}`;
-    btn.appendChild(document.createTextNode(labelText));
+    applyChoiceButtonLabel(btn, navNum, ch, { syntheticExplore });
     if (ch.preview) {
       const span = document.createElement('span');
       span.className = 'preview';
@@ -551,8 +558,30 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
       btn.appendChild(span);
     }
     btn.addEventListener('click', runChoice);
-    chWrap.appendChild(btn);
-  });
+    parent.appendChild(btn);
+  };
+
+  if (useChoiceSections) {
+    chWrap.classList.add('choices--sectioned');
+    for (const sec of choiceSections) {
+      const secEl = document.createElement('div');
+      secEl.className = 'choices-section';
+      if (sec.label !== undefined) {
+        const titleEl = document.createElement('div');
+        titleEl.className = 'choices-section__title';
+        titleEl.textContent = sec.label;
+        secEl.appendChild(titleEl);
+      }
+      for (const row of sec.rows) {
+        appendStoryChoiceButton(secEl, row);
+      }
+      chWrap.appendChild(secEl);
+    }
+  } else {
+    for (const row of choiceRows) {
+      appendStoryChoiceButton(chWrap, row);
+    }
+  }
   inner.appendChild(chWrap);
 
   const hasTimedChoice =

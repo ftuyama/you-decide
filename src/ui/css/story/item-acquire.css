@@ -44,19 +44,3 @@
   border-radius: 2px;
   overflow-x: auto;
 }
-
-.item-acquire-dismiss {
-  display: block;
-  margin: 0.85rem 0 0;
-  padding: 0.4rem 0.9rem;
-  font-size: 0.78rem;
-  cursor: pointer;
-  color: #dfe8d8;
-  background: #2a3328;
-  border: 1px solid #5a6a52;
-  border-radius: 2px;
-}
-
-.item-acquire-dismiss:hover {
-  background: #354038;
-}

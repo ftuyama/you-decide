@@ -5,14 +5,17 @@ ambientTheme: act2
 title: Eco de juramentos
 choices:
   - text: "Aceitar o nome de Cavaleiro caído (cavaleiro)"
+    uiSection: "Juramento"
     next: act2/encounters/trial_fallen_angel_gate
     condition: { class: knight }
     preview: "Provação · anjo caído; título só se venceres"
   - text: "Aceitar o título de Mago das trevas (arcanista)"
+    uiSection: "Juramento"
     next: act2/encounters/trial_fallen_angel_gate
     condition: { class: mage }
     preview: "Provação · anjo caído; título só se venceres"
   - text: "Voltar-se ao Clérigo penitente"
+    uiSection: "Juramento"
     next: act2/encounters/trial_fallen_angel_gate
     condition:
       all:
@@ -21,25 +24,30 @@ choices:
             path: penitent
     preview: "Provação · anjo caído; título só se venceres"
   - text: "Mergulhar o braço no lodo que sussurra"
+    uiSection: "Sorte"
     next: act2/luck_mire
     preview: Sorte — 2d6 + SOR · sem decidir, recuas ao cruzeiro.
     timedMs: 12000
     fallbackNext: act2/hub_catacomb
   - text: "Recordar o cavaleiro caído (eco do path)"
+    uiSection: "Memória"
     next: act2/hub_catacomb
     condition: { path: fallen }
     effects:
       - { op: addDiary, text: "O cruzeiro lembrou-me o nome que aceitei: caído, mas ainda de pé." }
   - text: "Recordar o arcano sombrio (eco do path)"
+    uiSection: "Memória"
     next: act2/hub_catacomb
     condition: { path: dark }
     effects:
       - { op: addDiary, text: "Sombras não pedem permissão — eu dei mesma assim." }
   - text: "Recordar o penitente (eco do path)"
+    uiSection: "Memória"
     next: act2/lore/lore_penitent_recall_mind
     condition: { path: penitent }
     preview: "Mente — sustentar a memória (TN 8)"
   - text: "Regressar ao cruzeiro"
+    uiSection: "Partir"
     next: act2/hub_catacomb
 onEnter: []
 ---

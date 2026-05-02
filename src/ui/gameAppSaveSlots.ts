@@ -37,19 +37,14 @@ export function readRawSlot(campaignId: string, slot: number): string | null {
   }
 }
 
-export function slotPreviewLines(
-  campaignId: string,
-  slot: number
-): { line1: string; line2?: string } {
+export function slotPreviewLines(campaignId: string, slot: number): { line1: string } {
   const raw = readRawSlot(campaignId, slot);
   if (!raw?.trim()) return { line1: 'Vazio' };
   try {
     const s = deserializeState(raw);
     if (s.campaignId !== campaignId) return { line1: 'Outra campanha' };
-    const sceneShort = s.sceneId.length > 28 ? `${s.sceneId.slice(0, 25)}…` : s.sceneId;
     return {
-      line1: `Cap. ${s.chapter} · ${s.playerName}`,
-      line2: sceneShort,
+      line1: `Cap. ${s.chapter} · Nv. ${s.level} · ${s.playerName}`,
     };
   } catch {
     return { line1: 'Gravação inválida' };
@@ -77,18 +72,8 @@ export function buildMenuSaveSlot(
   const meta = document.createElement('div');
   meta.className = 'menu-save-slot-meta';
   const lines = slotPreviewLines(campaignId, slot);
-  const line1El = document.createElement('div');
-  line1El.className = 'menu-save-slot-meta-line';
-  line1El.textContent = lines.line1;
-  meta.appendChild(line1El);
-  if (lines.line2 !== undefined) {
-    const line2El = document.createElement('div');
-    line2El.className = 'menu-save-slot-meta-line menu-save-slot-meta-line--scene';
-    line2El.textContent = lines.line2;
-    meta.appendChild(line2El);
-  }
-  meta.title =
-    lines.line2 !== undefined ? `${lines.line1}\n${lines.line2}` : lines.line1;
+  meta.textContent = lines.line1;
+  meta.title = lines.line1;
   info.appendChild(titleEl);
   info.appendChild(meta);
 

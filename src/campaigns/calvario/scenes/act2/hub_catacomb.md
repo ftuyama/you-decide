@@ -8,14 +8,17 @@ highlight: true
 title: Cruzeiro — hub
 choices:
   - text: "Voltar ao corredor dos ratos"
+    uiSection: "Corredor e troca"
     next: act2/rats_choice
     condition: { noFlag: rats_cleared }
     preview: "Ainda há rangido e fedor a ninho."
   - text: "Ir ao mercador fantasma"
+    uiSection: "Corredor e troca"
     next: act2/merchant/merchant_moon
     condition: { day: { gte: 2 } }
     preview: "Comércio estranho; preço em ouro ou em segredo — raramente aparece no primeiro dia."
   - text: "Farol — voz da Vigília no cruzeiro"
+    uiSection: "Facções"
     next: act2/faction/vigilia_envoy
     condition:
       all:
@@ -25,6 +28,7 @@ choices:
             - { rep: { faction: vigilia, lte: -2 } }
     preview: "Reputação forte com a ordem — ou inimizade aberta. Uma vez só."
   - text: "Símbolos frescos — eco do Círculo"
+    uiSection: "Facções"
     next: act2/faction/circulo_envoy
     condition:
       all:
@@ -34,6 +38,7 @@ choices:
             - { rep: { faction: circulo, lte: -2 } }
     preview: "Círculo de confiança ou cinza hostil. Uma vez só."
   - text: "Carne de sino — rumor do Culto"
+    uiSection: "Facções"
     next: act2/faction/culto_envoy
     condition:
       all:
@@ -43,10 +48,12 @@ choices:
             - { rep: { faction: culto, lte: -2 } }
     preview: "Devoção ou ruptura com o Terceiro Sino. Uma vez só."
   - text: "Ouvir proposta de Mira"
+    uiSection: "Convites e ritos"
     next: act2/recruit_offer
     condition: { noFlag: mira_recruited }
     preview: "Uma voz na sombra oferece companhia."
   - text: "Ritual do Círculo (evento)"
+    uiSection: "Convites e ritos"
     next: act2/circle_ritual/circle_ritual
     condition:
       all:
@@ -55,15 +62,18 @@ choices:
         - { noFlag: act2_circle_ritual_tribute_done }
     preview: "O Círculo cobra presença; a corrupção anota."
   - text: "Acampamento da Vigília"
+    uiSection: "Fogo e patrulha"
     next: act2/camp/vigilia_camp
     preview: "Fogo, reza e um sopro de suprimento."
   - text: "Patrulha do perímetro (explorar mapa)"
+    uiSection: "Fogo e patrulha"
     next: shared/explore_nav_act2
     preview: "Move-te pelos túneis — stress sobe; encontros possíveis."
     effects:
       - { op: setExploration, graphId: act2_catacomb, nodeId: center_breach }
       - { op: setAsciiMap, mapId: act2_catacomb }
   - text: "Passagem marcada — eco de juramentos"
+    uiSection: "Ecos do cruzeiro"
     next: act2/lore/lore_crossroads
     condition:
       all:
@@ -71,9 +81,11 @@ choices:
         - { day: { lte: 6 } }
     preview: "Memória antiga; perícia e sorte pesam — mas o eco some se demorares demasiado."
   - text: "Observar o cruzeiro: marcas no chão"
+    uiSection: "Ecos do cruzeiro"
     next: act2/hub_observe
     preview: "Ler o chão como mapa de quem passou antes."
   - text: "Mexer na cera das velas — moeda presa (uma vez)"
+    uiSection: "Ecos do cruzeiro"
     next: act2/cruzeiro_echo_once
     condition:
       all:
@@ -81,20 +93,23 @@ choices:
         - { day: { gte: 10 } }
     preview: "+1 ouro; sem combate."
   - text: "Escutar um eco que sussurra o dia"
+    uiSection: "Ecos do cruzeiro"
     next: act2/hub_catacomb
     condition:
       all:
         - { level: { gte: 6 } }
         - { day: { lte: 5 } }
-    showWhenLocked: true
+    showWhenLocked: false
     lockedHint: "Precisas de nível 6 e de ouvir isto antes do dia 6 — depois o eco cala-se."
     preview: "Voz seca no cruzeiro; registo no diário."
     effects:
       - { op: addDiary, text: "Uma voz presa ao teto: \"Já vais no dia {{day}}.\"" }
   - text: "—"
+    uiSection: "Avançar"
     next: act2/encounters/random_router
     condition: { flag: __scenegraph_anchor_act2_random_router }
   - text: "Descer mais fundo"
+    uiSection: "Avançar"
     next: act3/descent
     condition:
       all:

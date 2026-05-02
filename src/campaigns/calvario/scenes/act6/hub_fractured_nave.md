@@ -8,12 +8,14 @@ artKey: fractured_nave
 highlight: true
 choices:
   - text: "Patrulhar a nave fraturada (explorar mapa)"
+    uiSection: "Explorar"
     next: shared/explore_nav_act6
     preview: "Mover-se entre colunas e ruínas; stress sobe e o vazio pode responder."
     effects:
       - { op: setExploration, graphId: act6_fractured_nave, nodeId: nave_will_altar }
       - { op: setAsciiMap, mapId: act6_fractured_nave }
   - text: "Seguir o corredor dos espelhos partidos (Prova da Realidade)"
+    uiSection: "Provas"
     next: act6/reality_trial
     condition:
       all:
@@ -21,6 +23,7 @@ choices:
         - { level: { gte: 25 } }
     preview: "Primeiro cordão: realidade; marca permanente conforme o desfecho."
   - text: "Descer ao poço de memórias sem fundo (Prova da Memória)"
+    uiSection: "Provas"
     next: act6/memory_trial
     condition:
       all:
@@ -29,6 +32,7 @@ choices:
         - { level: { gte: 25 } }
     preview: "Só depois do real: memória; eco deixa marca."
   - text: "Subir ao altar da vontade nua (Prova da Vontade)"
+    uiSection: "Provas"
     next: act6/encounters/will_trial
     condition:
       all:
@@ -37,6 +41,7 @@ choices:
         - { level: { gte: 25 } }
     preview: "Última prova antes do espelho; vontade medida ou partida."
   - text: "Atravessar o Portão do Espelho Interior"
+    uiSection: "Provas"
     next: act6/mirror_gate
     condition:
       all:
@@ -47,12 +52,15 @@ choices:
         - { flag: act6_explore_goal_reached }
     preview: "Três provas feitas; o espelho final abre."
   - text: "Acender a fogueira de cinzas espelhadas (acampamento)"
+    uiSection: "Refúgio e troca"
     next: act6/camp/void_camp
     preview: "Um sopro de suprimento e silêncio partido."
   - text: "Negociar com o mercador da banca esquecida"
+    uiSection: "Refúgio e troca"
     next: act6/fractured_merchant
     preview: "Remédios e preços em ouro ou em promessa."
   - text: "Ouvir o sussurro sob as colunas (rota de corrupção)"
+    uiSection: "Vazio"
     next: act6/void_secret_entry
     condition:
       all:

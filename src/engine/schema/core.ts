@@ -266,6 +266,11 @@ export const ChoiceSchema = z
     showWhenLocked: z.boolean().optional(),
     /** Texto curto ao jogador quando a escolha está bloqueada (requisito / gancho). */
     lockedHint: z.string().optional(),
+    /**
+     * Agrupa escolhas consecutivas com o mesmo valor na UI (ex.: mercador: «À venda» vs «Conversa»).
+     * Omitir em todas as escolhas mantém a lista única como antes.
+     */
+    uiSection: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.showWhenLocked) {

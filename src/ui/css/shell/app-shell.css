@@ -210,21 +210,10 @@ a.menu-item {
   font-size: 0.82rem;
   color: var(--muted);
   line-height: 1.35;
-  display: flex;
-  flex-direction: column;
-  gap: 0.12rem;
   min-width: 0;
-}
-
-.menu-save-slot-meta-line {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.menu-save-slot-meta-line--scene {
-  font-size: 0.74rem;
-  opacity: 0.92;
 }
 
 .menu-save-slot-actions {

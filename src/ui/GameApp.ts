@@ -491,6 +491,20 @@ export class GameApp {
     return { sceneId: this.state.sceneId, data: this.registry.data, bus: this.bus };
   }
 
+  /** Mantém só overlays ligados à transição atual (como diário / destaques / itens). */
+  private trimOverlayQueuesIfSceneChanged(
+    prevScene: string,
+    prevDiaryLen: number,
+    prevStatusLen: number,
+    prevItemAcquireLen: number
+  ): void {
+    if (this.state.sceneId === prevScene) return;
+    this.sessionObjectiveVisible = false;
+    this.diaryEntryQueue = this.diaryEntryQueue.slice(prevDiaryLen);
+    this.statusHighlightQueue = this.statusHighlightQueue.slice(prevStatusLen);
+    this.itemAcquireQueue = this.itemAcquireQueue.slice(prevItemAcquireLen);
+  }
+
   /** Não reentrar em cenas narrativas enquanto o combate está ativo (evita sobrescrever mode). */
   private stabilize(state: GameState): GameState {
     state = migrateLegacyKnownSpells(state, this.registry.data);
@@ -576,6 +590,7 @@ export class GameApp {
     const prevScene = this.state.sceneId;
     const prevDiaryQueueLen = this.diaryEntryQueue.length;
     const prevStatusQueueLen = this.statusHighlightQueue.length;
+    const prevItemAcquireQueueLen = this.itemAcquireQueue.length;
     const effects = preserveExplorationNodeForChoiceEffects(choice.effects, this.state.exploration);
     let s = applyEffects(this.state, effects, this.ctx());
     s = { ...s, timedChoiceDeadline: null };
@@ -586,11 +601,12 @@ export class GameApp {
       s = tickActiveBuffs(s);
     }
     this.state = this.stabilize(s);
-    if (this.state.sceneId !== prevScene) {
-      this.sessionObjectiveVisible = false;
-      this.diaryEntryQueue = this.diaryEntryQueue.slice(prevDiaryQueueLen);
-      this.statusHighlightQueue = this.statusHighlightQueue.slice(prevStatusQueueLen);
-    }
+    this.trimOverlayQueuesIfSceneChanged(
+      prevScene,
+      prevDiaryQueueLen,
+      prevStatusQueueLen,
+      prevItemAcquireQueueLen
+    );
     this.render();
   }
 
@@ -794,16 +810,18 @@ export class GameApp {
         const prevScene = this.state.sceneId;
         const prevDiaryQueueLen = this.diaryEntryQueue.length;
         const prevStatusQueueLen = this.statusHighlightQueue.length;
+        const prevItemAcquireQueueLen = this.itemAcquireQueue.length;
         let s: GameState = { ...nextState, timedChoiceDeadline: null };
         if (s.sceneId !== prevScene) {
           s = tickActiveBuffs(s);
         }
         this.state = this.stabilize(s);
-        if (this.state.sceneId !== prevScene) {
-          this.sessionObjectiveVisible = false;
-          this.diaryEntryQueue = this.diaryEntryQueue.slice(prevDiaryQueueLen);
-          this.statusHighlightQueue = this.statusHighlightQueue.slice(prevStatusQueueLen);
-        }
+        this.trimOverlayQueuesIfSceneChanged(
+          prevScene,
+          prevDiaryQueueLen,
+          prevStatusQueueLen,
+          prevItemAcquireQueueLen
+        );
         this.audio.playUiClick();
         this.render();
       },
@@ -889,9 +907,6 @@ export class GameApp {
           this.statusHighlightQueue = q;
         },
         itemAcquireQueue: this.itemAcquireQueue,
-        setItemAcquireQueue: (q) => {
-          this.itemAcquireQueue = q;
-        },
         diaryEntryQueue: this.diaryEntryQueue,
         setDiaryEntryQueue: (q) => {
           this.diaryEntryQueue = q;
@@ -913,10 +928,20 @@ export class GameApp {
         unlockAudio: () => this.unlockAudio(),
         playUiClick: () => this.audio.playUiClick(),
         commitEquipEffects: (effects) => {
+          const prevScene = this.state.sceneId;
+          const prevDiaryQueueLen = this.diaryEntryQueue.length;
+          const prevStatusQueueLen = this.statusHighlightQueue.length;
+          const prevItemAcquireQueueLen = this.itemAcquireQueue.length;
           this.state = this.stabilize({
             ...applyEffects(this.state, effects, this.ctx()),
             timedChoiceDeadline: null,
           });
+          this.trimOverlayQueuesIfSceneChanged(
+            prevScene,
+            prevDiaryQueueLen,
+            prevStatusQueueLen,
+            prevItemAcquireQueueLen
+          );
           this.render();
         },
       },
@@ -1042,7 +1067,17 @@ export class GameApp {
               unlockAudio: () => this.unlockAudio(),
               stabilize: (s) => this.stabilize(s),
               commitState: (s) => {
+                const prevScene = this.state.sceneId;
+                const prevDiaryQueueLen = this.diaryEntryQueue.length;
+                const prevStatusQueueLen = this.statusHighlightQueue.length;
+                const prevItemAcquireQueueLen = this.itemAcquireQueue.length;
                 this.state = this.stabilize(s);
+                this.trimOverlayQueuesIfSceneChanged(
+                  prevScene,
+                  prevDiaryQueueLen,
+                  prevStatusQueueLen,
+                  prevItemAcquireQueueLen
+                );
                 this.render();
               },
             },

@@ -6,6 +6,7 @@ artKey: merchant
 title: Mercador do trono
 choices:
   - text: "Comprar Poção Rubra (14 ouro) (x2)"
+    uiSection: "À venda"
     next: act4/late_merchant
     condition:
       all:
@@ -16,6 +17,7 @@ choices:
       - { op: grantItem, itemId: potion_hp }
       - { op: setFlag, key: act4_merch_hp_1, value: true }
   - text: "Comprar Poção Rubra (14 ouro) (x1)"
+    uiSection: "À venda"
     next: act4/late_merchant
     condition:
       all:
@@ -27,6 +29,7 @@ choices:
       - { op: grantItem, itemId: potion_hp }
       - { op: setFlag, key: act4_merch_hp_2, value: true }
   - text: "Comprar Tônico Azul (18 ouro) (x1)"
+    uiSection: "À venda"
     next: act4/late_merchant
     condition:
       all:
@@ -37,6 +40,7 @@ choices:
       - { op: grantItem, itemId: potion_mana }
       - { op: setFlag, key: act4_merch_mana_1, value: true }
   - text: "Comprar Hidromel (12 ouro) (x1)"
+    uiSection: "À venda"
     next: act4/late_merchant
     condition:
       all:
@@ -47,6 +51,7 @@ choices:
       - { op: grantItem, itemId: potion_stress }
       - { op: setFlag, key: act4_merch_stress_1, value: true }
   - text: "Afastar-me do mercador"
+    uiSection: "Conversa"
     next: act4/throne/throne_gate
 onEnter: []
 ---

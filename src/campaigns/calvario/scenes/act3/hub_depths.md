@@ -8,12 +8,14 @@ artKey: depths
 highlight: true
 choices:
   - text: "Patrulhar as profundezas (explorar mapa)"
+    uiSection: "Explorar"
     next: shared/explore_nav_act3
     preview: "Mover-te pelos corredores; stress sobe e encontros podem acontecer."
     effects:
       - { op: setExploration, graphId: act3_depths, nodeId: depths_drowned_gallery }
       - { op: setAsciiMap, mapId: act3_depths }
   - text: "Rumo ao trono de ossos"
+    uiSection: "Trono e pedra"
     next: act4/throne/throne_gate
     condition:
       all:
@@ -29,14 +31,17 @@ choices:
       - { op: setChapter, chapter: 4 }
       - { op: addDiary, text: "O trono chama." }
   - text: "Lado do guardião (opcional)"
+    uiSection: "Trono e pedra"
     next: act3/stone_corridor
     condition: { noFlag: stone_guard_defeated }
     preview: "Runas, golem e provas antes do trono."
   - text: "Rever o corredor de pedra (eco do guardião)"
+    uiSection: "Trono e pedra"
     next: act3/stone_corridor
     condition: { flag: stone_guard_defeated }
     preview: "O silêncio agora é teu — runas e nicho, sem o golem."
   - text: "Seguir rasto de cinza e corda — mensageiro interrompido"
+    uiSection: "Rumores"
     next: act3/messenger_cold_trail
     condition:
       all:
@@ -44,6 +49,7 @@ choices:
         - { noFlag: act3_messenger_done }
     preview: "Furtividade ou força; Vigília ou Círculo cobram o despacho."
   - text: "Ouvir tubagens sob a pedra"
+    uiSection: "Rumores"
     next: act3/pipes_whisper
     condition:
       all:
@@ -51,6 +57,7 @@ choices:
         - { noFlag: act3_pipes_done }
     preview: "Sorte; sucesso dá pista, falha gasta suprimento."
   - text: "Voltar ao Cruzeiro — hub"
+    uiSection: "Regresso"
     next: act2/hub_catacomb
     preview: "Sobe ao cruzeiro; capítulo 2 no mapa da história."
     effects:

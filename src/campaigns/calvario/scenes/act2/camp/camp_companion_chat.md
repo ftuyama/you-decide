@@ -5,30 +5,39 @@ ambientTheme: act2
 title: Palavra ao lado do fogo
 choices:
   - text: "Ouvir Mira sem a pedra julgar"
+    uiSection: "Ao pé do fogo"
     next: act2/camp/camp_mira_fireside
     condition: { companionInParty: rogue_mira }
   - text: "Sentar junto ao escudo de Tomás"
+    uiSection: "Ao pé do fogo"
     next: act2/camp/camp_tomas_fireside
     condition: { companionInParty: squire_tomas }
   - text: "Mira cruza contigo um olhar de quem reconhece muralha no ombro"
+    uiSection: "Tu e eles"
     next: act2/camp/camp_mira_fireside
     condition: { all: [ { companionInParty: rogue_mira }, { class: knight } ] }
   - text: "Mira mede o teu silêncio de arcanista — não julga, anota"
+    uiSection: "Tu e eles"
     next: act2/camp/camp_mira_fireside
     condition: { all: [ { companionInParty: rogue_mira }, { class: mage } ] }
   - text: "Mira: «A Vigília fala alto; tu ouves baixo demais para ser só dogma»"
+    uiSection: "Tu e eles"
     next: act2/camp/camp_mira_fireside
     condition: { all: [ { companionInParty: rogue_mira }, { class: cleric } ] }
   - text: "Tomás: «Honra pesada empurra gente para buracos — estás inteiro?»"
+    uiSection: "Tu e eles"
     next: act2/camp/camp_tomas_fireside
     condition: { all: [ { companionInParty: squire_tomas }, { class: knight } ] }
   - text: "Tomás hesita: «Torre e masmorra — qual das duas te come primeiro?»"
+    uiSection: "Tu e eles"
     next: act2/camp/camp_tomas_fireside
     condition: { all: [ { companionInParty: squire_tomas }, { class: mage } ] }
   - text: "Tomás baixa a voz: «Fé de vigia é coisa séria; não a uses como muro»"
+    uiSection: "Tu e eles"
     next: act2/camp/camp_tomas_fireside
     condition: { all: [ { companionInParty: squire_tomas }, { class: cleric } ] }
   - text: "Voltar ao acampamento"
+    uiSection: "Voltar"
     next: act2/camp/vigilia_camp
 onEnter: []
 ---

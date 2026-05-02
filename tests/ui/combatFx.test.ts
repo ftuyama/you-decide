@@ -17,6 +17,7 @@ const minimalData = (): GameData => {
       defaultHeroName: () => 'H',
       getHeroClassLabel: () => 'k',
       getPathUnlockBonus: () => null,
+      getPathPromotionNarrativePt: () => null,
     }
   );
   d.spells = {

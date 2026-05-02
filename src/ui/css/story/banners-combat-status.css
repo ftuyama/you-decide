@@ -75,6 +75,69 @@
   border-bottom: 1px solid rgba(140, 160, 80, 0.35);
 }
 
+/* Promoção de arquétipo (setPath) — pós-combate ou cena de juramento */
+.path-promotion-banner {
+  margin: 0 0 1.1rem;
+  padding: 0.75rem 1rem 0.85rem;
+  border: 2px solid #8a6a38;
+  border-radius: 2px;
+  background: linear-gradient(
+    145deg,
+    rgba(42, 32, 22, 0.98) 0%,
+    rgba(28, 22, 18, 0.99) 50%,
+    rgba(18, 14, 22, 0.99) 100%
+  );
+  box-shadow:
+    0 0 0 1px rgba(200, 160, 90, 0.15),
+    0 0 26px rgba(120, 80, 40, 0.4),
+    inset 0 1px 0 rgba(255, 220, 160, 0.05);
+  animation: path-promotion-pulse 1.2s ease-out 1;
+}
+
+@keyframes path-promotion-pulse {
+  0% {
+    box-shadow:
+      0 0 0 1px rgba(255, 200, 120, 0.35),
+      0 0 36px rgba(180, 120, 60, 0.55),
+      inset 0 1px 0 rgba(255, 230, 180, 0.1);
+  }
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(200, 160, 90, 0.15),
+      0 0 26px rgba(120, 80, 40, 0.4),
+      inset 0 1px 0 rgba(255, 220, 160, 0.05);
+  }
+}
+
+.path-promotion-kicker {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #d4b080;
+  margin-bottom: 0.35rem;
+}
+
+.path-promotion-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #f2e8d0;
+  text-shadow:
+    0 0 14px rgba(200, 150, 80, 0.45),
+    0 1px 0 rgba(20, 12, 8, 0.9);
+  margin-bottom: 0.45rem;
+  line-height: 1.2;
+}
+
+.path-promotion-subtitle {
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.45;
+  color: #b8a898;
+  letter-spacing: 0.03em;
+}
+
 .level-up-kicker {
   font-size: 1.15rem;
   font-weight: 800;

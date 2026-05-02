@@ -688,14 +688,10 @@ function applyOne(
       let s: GameState = {
         ...state,
         party: state.party.map((p, i) => (i === 0 ? { ...p, path: e.path } : p)),
+        lastPathPromotion: null,
       };
       if (e.path) {
-        bus.emit({
-          type: 'statusHighlight',
-          variant: 'neutral',
-          title: ctx.data.heroNarrative.getHeroClassLabel(lead.class, e.path),
-          subtitle: 'Novo arquétipo narrativo',
-        });
+        const label = ctx.data.heroNarrative.getHeroClassLabel(lead.class, e.path);
         const bonus = ctx.data.heroNarrative.getPathUnlockBonus(lead.class, e.path);
         if (bonus) {
           if (bonus.stats) {
@@ -717,6 +713,14 @@ function applyOne(
             }, ctx);
           }
         }
+        const narrativePt = ctx.data.heroNarrative.getPathPromotionNarrativePt(lead.class, e.path);
+        s = {
+          ...s,
+          lastPathPromotion:
+            narrativePt != null
+              ? { label, narrativePt }
+              : { label },
+        };
       }
       return s;
     }

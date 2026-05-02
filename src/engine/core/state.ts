@@ -47,6 +47,7 @@ export function createInitialState(campaign: CampaignIndex, seed?: number): Game
     lastCombatXpGain: null,
     lastCombatLevelUps: null,
     lastCombatLootLines: null,
+    lastPathPromotion: null,
     activeBuffs: [],
     companionFriendship: {},
   };
@@ -161,6 +162,7 @@ export function serializeState(state: GameState): string {
     lastCombatXpGain: _x,
     lastCombatLevelUps: _l,
     lastCombatLootLines: _loot,
+    lastPathPromotion: _pp,
     timedChoiceDeadline: _td,
     ...rest
   } = state;
@@ -274,6 +276,7 @@ export function deserializeState(json: string): GameState {
     lastCombatXpGain: null,
     lastCombatLevelUps: null,
     lastCombatLootLines: null,
+    lastPathPromotion: null,
     timedChoiceDeadline: null,
     activeBuffs: Array.isArray((o as GameState).activeBuffs) ? (o as GameState).activeBuffs : [],
     knownSpells: Array.isArray((o as GameState).knownSpells) ? (o as GameState).knownSpells : [],

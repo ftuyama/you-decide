@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { applyEffects } from '../../src/engine/core/index.ts';
 import { EventBus } from '../../src/engine/core/index.ts';
 import { createInitialState, createPlayerCharacter } from '../../src/engine/core/index.ts';
-import type { Character } from '../../src/engine/schema/index.ts';
+import type { Character, ClassId } from '../../src/engine/schema/index.ts';
 import { createTestData, testCampaign } from '../helpers/engineTestData.ts';
 
 describe('applyEffects', () => {
@@ -274,5 +274,50 @@ describe('applyEffects', () => {
     });
     expect(next.companionFriendship.ally_test).toBe(8);
     expect(next.party).toHaveLength(2);
+  });
+
+  it('setPath com path grava lastPathPromotion para o banner de UI', () => {
+    let s = createInitialState(testCampaign, 1);
+    s = { ...s, party: [createPlayerCharacter('H', 'knight')] };
+    const bus = new EventBus();
+    const base = createTestData();
+    const data = {
+      ...base,
+      heroNarrative: {
+        ...base.heroNarrative,
+        getHeroClassLabel: (_c: ClassId, path: string | null | undefined) =>
+          path === 'fallen' ? 'Cavaleiro caído' : '—',
+        getPathPromotionNarrativePt: (_c: ClassId, path: string | null | undefined) =>
+          path === 'fallen' ? 'O aço lembra o que juraste e o que quebraste.' : null,
+      },
+    };
+    const next = applyEffects(s, [{ op: 'setPath', path: 'fallen' }], {
+      sceneId: 'test/scene',
+      data,
+      bus,
+    });
+    expect(next.party[0]!.path).toBe('fallen');
+    expect(next.lastPathPromotion).toEqual({
+      label: 'Cavaleiro caído',
+      narrativePt: 'O aço lembra o que juraste e o que quebraste.',
+    });
+  });
+
+  it('setPath com path null zera lastPathPromotion', () => {
+    let s = createInitialState(testCampaign, 1);
+    s = {
+      ...s,
+      party: [createPlayerCharacter('H', 'knight')],
+      lastPathPromotion: { label: 'Temp' },
+    };
+    const bus = new EventBus();
+    const data = createTestData();
+    const next = applyEffects(s, [{ op: 'setPath', path: null }], {
+      sceneId: 'test/scene',
+      data,
+      bus,
+    });
+    expect(next.party[0]!.path).toBe(null);
+    expect(next.lastPathPromotion).toBe(null);
   });
 });

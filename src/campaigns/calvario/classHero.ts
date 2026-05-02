@@ -39,6 +39,16 @@ const PATH_LABEL_PT: Partial<Record<string, string>> = {
   'cleric:penitent': 'Clérigo penitente',
 };
 
+/** Texto do banner de promoção (`setPath`) — tom narrativo curto por arquétipo. */
+const PATH_PROMOTION_NARRATIVE_PT: Partial<Record<string, string>> = {
+  'knight:fallen':
+    'O ferro não te largou: mudou o que escreves por cima da armadura — promessa partida que ainda corta, sem ilusão de honra que lave o que viste nas galerias.',
+  'mage:dark':
+    'Os símbolos seguros ficaram pequenos no véu. A partir daqui carregas outros no sangue e no silêncio — e cada traço sabe a que preço abriu a porta.',
+  'cleric:penitent':
+    'A fé não te soltou; o corpo é que aprendeu outro idioma de contrato — marcas que a Vigília não precisa abençoar para doer, e orações renegociadas com o silêncio.',
+};
+
 /** Bónus de jogo ao desbloquear arquétipo (`classId:path`). Mago/clérigo já recebem magia nas cenas de path. */
 const PATH_UNLOCK_BONUS: Partial<Record<string, PathUnlockBonus>> = {
   'knight:fallen': {
@@ -271,4 +281,14 @@ export function getPathUnlockBonus(
   const k = pathKey(classId, path);
   if (!k) return null;
   return PATH_UNLOCK_BONUS[k] ?? null;
+}
+
+export function getPathPromotionNarrativePt(
+  classId: ClassId,
+  path: string | null | undefined
+): string | null {
+  const k = pathKey(classId, path);
+  if (!k) return null;
+  const t = PATH_PROMOTION_NARRATIVE_PT[k];
+  return t != null && t.trim().length > 0 ? t.trim() : null;
 }

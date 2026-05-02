@@ -192,6 +192,11 @@ export class GameAudio {
     this.sfx.playLevelUpCelebration();
   }
 
+  /** Arquétipo narrativo desbloqueado (ex.: Cavaleiro caído). */
+  playPathPromotion(): void {
+    this.sfx.playPathPromotion();
+  }
+
   playDefeat(): void {
     this.sfx.playDefeat();
   }

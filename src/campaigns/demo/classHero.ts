@@ -40,3 +40,10 @@ export function getHeroStoryProgress(
 export function getPathUnlockBonus(_classId: ClassId, _path: string | null | undefined): PathUnlockBonus | null {
   return null;
 }
+
+export function getPathPromotionNarrativePt(
+  _classId: ClassId,
+  _path: string | null | undefined
+): string | null {
+  return null;
+}

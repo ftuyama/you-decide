@@ -1,6 +1,11 @@
 import type { ClassId } from '../../engine/schema/index.ts';
 import type { HeroNarrative } from '../../engine/data/index.ts';
-import { DEFAULT_HERO_NAME, getHeroClassLabel, getPathUnlockBonus } from './classHero.ts';
+import {
+  DEFAULT_HERO_NAME,
+  getHeroClassLabel,
+  getPathPromotionNarrativePt,
+  getPathUnlockBonus,
+} from './classHero.ts';
 
 export const demoHeroNarrative: HeroNarrative = {
   defaultHeroName(cls: ClassId): string {
@@ -8,4 +13,5 @@ export const demoHeroNarrative: HeroNarrative = {
   },
   getHeroClassLabel,
   getPathUnlockBonus,
+  getPathPromotionNarrativePt,
 };

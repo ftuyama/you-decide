@@ -22,6 +22,11 @@ export type HeroNarrative = {
   defaultHeroName(classId: ClassId): string;
   getHeroClassLabel(classId: ClassId, path: string | null | undefined): string;
   getPathUnlockBonus(classId: ClassId, path: string | null | undefined): PathUnlockBonus | null;
+  /** Uma ou duas frases para o banner de promoção de arquétipo; `null` usa texto genérico na UI. */
+  getPathPromotionNarrativePt(
+    classId: ClassId,
+    path: string | null | undefined
+  ): string | null;
 };
 
 /** Marca da jornada (`state.marks`): narrativa no diário / toast. */

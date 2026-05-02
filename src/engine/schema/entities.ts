@@ -354,6 +354,14 @@ export const GameStateSchema = z.object({
   lastCombatLevelUps: z.array(LevelUpStepSchema).nullable().default(null),
   /** Linhas de loot da última vitória (texto UI) — mostrado uma vez na narrativa (omitido no save). */
   lastCombatLootLines: z.array(z.string()).nullable().default(null),
+  /** Arquétipo narrativo recém-adquirido (`setPath`) — banner + som uma vez na narrativa (omitido no save). */
+  lastPathPromotion: z
+    .object({
+      label: z.string(),
+      narrativePt: z.string().optional(),
+    })
+    .nullable()
+    .default(null),
   /** Bónus temporários (poções); decrementa ao mudar de cena */
   activeBuffs: z.array(TemporaryBuffSchema).default([]),
   /** Vínculo com companheiros (0–100 por id de `CompanionDef`); afecta stats via patamares. */

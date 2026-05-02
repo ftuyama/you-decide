@@ -941,6 +941,7 @@ export class GameApp {
         unlockAudio: () => this.unlockAudio(),
         playUiClick: () => this.audio.playUiClick(),
         playLevelUpCelebration: () => this.audio.playLevelUpCelebration(),
+        playPathPromotion: () => this.audio.playPathPromotion(),
       },
       render: () => this.render(),
       navigation: {
@@ -1132,13 +1133,15 @@ export class GameApp {
     if (
       this.state.lastCombatXpGain != null ||
       this.state.lastCombatLevelUps != null ||
-      this.state.lastCombatLootLines != null
+      this.state.lastCombatLootLines != null ||
+      this.state.lastPathPromotion != null
     ) {
       this.state = {
         ...this.state,
         lastCombatXpGain: null,
         lastCombatLevelUps: null,
         lastCombatLootLines: null,
+        lastPathPromotion: null,
       };
     }
     this.syncAmbientTheme();

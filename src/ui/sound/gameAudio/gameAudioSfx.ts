@@ -653,6 +653,48 @@ export class GameSfxPlayer {
     });
   }
 
+  /**
+   * Promoção de arquétipo narrativo — graves em serra + ressonância menor (distinto da subida de nível).
+   */
+  playPathPromotion(): void {
+    const ctx = this.host.ensureContext();
+    const g = this.host.gain(0.24);
+    if (g <= 0) return;
+    const t0 = ctx.currentTime;
+    const lows = [
+      { f: 155.56, t: 0, dur: 0.32 },
+      { f: 184.99, t: 0.2, dur: 0.38 },
+    ];
+    for (const { f, t, dur } of lows) {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'sawtooth';
+      o.frequency.value = f;
+      const start = t0 + t;
+      gn.gain.setValueAtTime(0.001, start);
+      gn.gain.exponentialRampToValueAtTime(g * 0.32, start + 0.05);
+      gn.gain.exponentialRampToValueAtTime(0.001, start + dur);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(start);
+      o.stop(start + dur + 0.06);
+    }
+    const ringT = t0 + 0.48;
+    for (const f of [311.13, 415.3, 523.25]) {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'triangle';
+      o.frequency.value = f;
+      gn.gain.setValueAtTime(0.001, ringT);
+      gn.gain.exponentialRampToValueAtTime(g * 0.48, ringT + 0.04);
+      gn.gain.exponentialRampToValueAtTime(0.001, ringT + 0.8);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(ringT);
+      o.stop(ringT + 0.85);
+    }
+  }
+
   /** Fanfarra curta ao subir de nível (após vitória). */
   playLevelUpCelebration(): void {
     const ctx = this.host.ensureContext();

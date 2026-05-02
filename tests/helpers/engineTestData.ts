@@ -15,6 +15,7 @@ export function createTestData() {
     defaultHeroName: () => 'H',
     getHeroClassLabel: () => '—',
     getPathUnlockBonus: () => null,
+    getPathPromotionNarrativePt: () => null,
   });
 }
 

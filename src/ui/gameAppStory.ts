@@ -116,6 +116,7 @@ export type StoryRenderContext = {
     unlockAudio: () => void;
     playUiClick: () => void;
     playLevelUpCelebration: () => void;
+    playPathPromotion: () => void;
   };
   render: () => void;
   navigation: {
@@ -312,6 +313,30 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     objective.className = 'session-objective';
     objective.textContent = ctx.sessionObjective;
     inner.appendChild(objective);
+  }
+
+  const pathPromo = ctx.state.lastPathPromotion;
+  if (pathPromo != null) {
+    ctx.audio.unlockAudio();
+    ctx.audio.playPathPromotion();
+    const promo = document.createElement('div');
+    promo.className = 'path-promotion-banner';
+    promo.setAttribute('role', 'status');
+    const kicker = document.createElement('div');
+    kicker.className = 'path-promotion-kicker';
+    kicker.textContent = 'Novo arquétipo';
+    promo.appendChild(kicker);
+    const titleEl = document.createElement('div');
+    titleEl.className = 'path-promotion-title';
+    titleEl.textContent = pathPromo.label;
+    promo.appendChild(titleEl);
+    const sub = document.createElement('div');
+    sub.className = 'path-promotion-subtitle';
+    sub.textContent =
+      pathPromo.narrativePt?.trim() ||
+      'A ficha passa a mostrar este nome no lugar da classe base; os bónus do arquétipo já estão ativos.';
+    promo.appendChild(sub);
+    inner.appendChild(promo);
   }
 
   const xpGain = ctx.state.lastCombatXpGain;

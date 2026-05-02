@@ -33,6 +33,13 @@ body {
   max-height: 100dvh;
 }
 
+@media (max-width: 480px) {
+  #app {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
 /** Jogo: #app é o viewport lógico; scroll fica em `.story-shell` / `.player-sidebar`. */
 #app:not(.app--dev-tools):not(.app--scenes-graph) {
   display: flex;

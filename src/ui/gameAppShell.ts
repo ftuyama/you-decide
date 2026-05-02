@@ -64,6 +64,10 @@ export type AppChromeRefs = {
   devSettingsExtrasEl: HTMLElement;
   /** Só os cartões de slot (actualizado em `syncAppChrome` após gravar/importar). */
   saveSlotsWrap: HTMLElement;
+  /** Painel `aria-live` para mensagens não bloqueantes (substitui `alert`). */
+  toastRegion: HTMLElement;
+  /** Menu lateral (`role="dialog"`). */
+  menuDrawer: HTMLElement;
 };
 
 function fillMenuSaveSlots(
@@ -88,6 +92,19 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
   const frame = document.createElement('div');
   frame.className = 'app-frame';
   frame.style.setProperty('--app-font-pct', `${100 + opts.fontStep * 10}%`);
+
+  const skipLink = document.createElement('a');
+  skipLink.className = 'skip-link';
+  skipLink.href = '#story-main';
+  skipLink.textContent = 'Ir para a história';
+  frame.appendChild(skipLink);
+
+  const toastRegion = document.createElement('div');
+  toastRegion.className = 'app-toast-region';
+  toastRegion.setAttribute('role', 'status');
+  toastRegion.setAttribute('aria-live', 'polite');
+  toastRegion.setAttribute('aria-atomic', 'true');
+  frame.appendChild(toastRegion);
 
   const header = document.createElement('header');
   header.className = 'app-top';
@@ -115,14 +132,16 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
   drawer.setAttribute('role', 'dialog');
   drawer.setAttribute('aria-modal', 'true');
   drawer.setAttribute('aria-hidden', 'true');
+  drawer.setAttribute('aria-labelledby', 'menu-drawer-heading');
   const drawerScroll = document.createElement('div');
   drawerScroll.className = 'menu-drawer-scroll';
-  const createMenuSection = (titleText: string): HTMLDivElement => {
+  const createMenuSection = (titleText: string, sectionTitleId?: string): HTMLDivElement => {
     const section = document.createElement('section');
     section.className = 'menu-section';
     const titleEl = document.createElement('h3');
     titleEl.className = 'menu-section-title';
     titleEl.textContent = titleText;
+    if (sectionTitleId) titleEl.id = sectionTitleId;
     const body = document.createElement('div');
     body.className = 'menu-section-body';
     section.appendChild(titleEl);
@@ -277,7 +296,7 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
   devSettingsExtrasEl.appendChild(devToolsBtn);
   devSettingsExtrasEl.appendChild(graphBtn);
 
-  const saveSection = createMenuSection('Partida');
+  const saveSection = createMenuSection('Partida', 'menu-drawer-heading');
   const saveSlotsWrap = document.createElement('div');
   saveSlotsWrap.className = 'menu-save-slots';
   fillMenuSaveSlots(saveSlotsWrap, opts.campaignId, opts.devMode, opts.onSaveSlot, opts.onLoadSlot);
@@ -336,6 +355,8 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
 
   const mainEl = document.createElement('main');
   mainEl.className = 'story-shell';
+  mainEl.id = 'story-main';
+  mainEl.tabIndex = -1;
   opts.fillMain(mainEl);
 
   bodyRow.appendChild(sidebarEl);
@@ -358,6 +379,8 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
     devSaveExtrasEl,
     devSettingsExtrasEl,
     saveSlotsWrap,
+    toastRegion,
+    menuDrawer: drawer,
   };
 }
 

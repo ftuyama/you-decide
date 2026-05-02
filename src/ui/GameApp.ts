@@ -43,6 +43,8 @@ import {
   type StoryRenderContext,
 } from './gameAppStory.ts';
 import { formatCampaignHeaderTitle } from './campaignHeaderTitle.ts';
+import { showAppToast } from './appToast.ts';
+import { attachFocusTrap, focusableElementsIn } from './focusTrap.ts';
 import { mountAppChrome, syncAppChrome, type AppChromeRefs } from './gameAppShell.ts';
 import { openCreditsModal } from './gameAppSidebar.ts';
 import { dayAdvanceSubtitle, handleGameEvent } from './gameAppEvents.ts';
@@ -82,6 +84,7 @@ export class GameApp {
   private lastMainScrollResetKey: string | null = null;
   private timedTimer: ReturnType<typeof setTimeout> | null = null;
   private menuOpen = false;
+  private menuFocusTrapRelease: (() => void) | null = null;
   /** 0 = 100%, 1 = 110%, 2 = 120% */
   private fontStep = 0;
   /** Modo dev (ferramentas de autor). */
@@ -236,8 +239,7 @@ export class GameApp {
     this.sidebarSections = loadSidebarSections(this.storageKeys.sidebarKey);
     this.migrateLegacySaveIfNeeded();
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        this.menuOpen = false;
+      if (e.key === 'Escape' && this.menuOpen) {
         this.closeMenu();
       }
     });
@@ -360,12 +362,25 @@ export class GameApp {
     this.render();
   }
 
+  private showToast(message: string, variant: 'info' | 'error' = 'info'): void {
+    const el = this.chromeRefs?.toastRegion;
+    if (!el) return;
+    showAppToast(el, message, variant);
+  }
+
+  private focusFirstInMenuDrawer(): void {
+    const drawer =
+      this.chromeRefs?.menuDrawer ?? this.root.querySelector<HTMLElement>('.menu-drawer');
+    if (!drawer) return;
+    focusableElementsIn(drawer)[0]?.focus();
+  }
+
   private exportSaveToClipboard(): void {
     this.unlockAudio();
     const json = serializeState(this.state);
     void navigator.clipboard.writeText(json).then(
       () => {
-        alert('Gravação copiada para a área de transferência (JSON).');
+        this.showToast('Gravação copiada para a área de transferência (JSON).');
         this.closeMenu();
       },
       () => {
@@ -380,8 +395,9 @@ export class GameApp {
     const applyRawSave = (raw: string): void => {
       const parsed = deserializeState(raw);
       if (parsed.campaignId !== this.campaignId) {
-        alert(
-          `Esta gravação é da campanha "${parsed.campaignId}". Campanha ativa: "${this.campaignId}".`
+        this.showToast(
+          `Esta gravação é da campanha "${parsed.campaignId}". Campanha ativa: "${this.campaignId}".`,
+          'error'
         );
         return;
       }
@@ -392,13 +408,13 @@ export class GameApp {
     void navigator.clipboard.readText().then(
       (raw) => {
         if (!raw?.trim()) {
-          alert('Área de transferência vazia.');
+          this.showToast('Área de transferência vazia.', 'error');
           return;
         }
         try {
           applyRawSave(raw);
         } catch {
-          alert('JSON inválido na área de transferência.');
+          this.showToast('JSON inválido na área de transferência.', 'error');
         }
       },
       () => {
@@ -410,7 +426,7 @@ export class GameApp {
         try {
           applyRawSave(pasted);
         } catch {
-          alert('JSON inválido.');
+          this.showToast('JSON inválido.', 'error');
         }
       }
     );
@@ -718,13 +734,14 @@ export class GameApp {
     try {
       const raw = readSaveSlotRaw(this.campaignId, slot);
       if (!raw?.trim()) {
-        alert('Este slot está vazio.');
+        this.showToast('Este slot está vazio.', 'error');
         return;
       }
       const parsed = deserializeState(raw);
       if (parsed.campaignId !== this.campaignId) {
-        alert(
-          `Esta gravação é da campanha "${parsed.campaignId}". Campanha ativa: "${this.campaignId}".`
+        this.showToast(
+          `Esta gravação é da campanha "${parsed.campaignId}". Campanha ativa: "${this.campaignId}".`,
+          'error'
         );
         this.closeMenu();
         return;
@@ -733,21 +750,31 @@ export class GameApp {
       this.state = this.stabilize(this.state);
       this.render();
     } catch {
-      alert('Não foi possível carregar esta gravação.');
+      this.showToast('Não foi possível carregar esta gravação.', 'error');
     }
     this.closeMenu();
   }
 
   private closeMenu(): void {
+    if (this.menuFocusTrapRelease) {
+      this.menuFocusTrapRelease();
+      this.menuFocusTrapRelease = null;
+    }
+    const wasOpen = this.menuOpen;
     this.menuOpen = false;
     this.syncMenuScrollLock();
-    const drawer = this.root.querySelector('.menu-drawer');
-    const backdrop = this.root.querySelector('.menu-backdrop');
-    const hBtn = this.root.querySelector<HTMLButtonElement>('.hamburger');
+    const drawer =
+      this.chromeRefs?.menuDrawer ?? this.root.querySelector<HTMLElement>('.menu-drawer');
+    const backdrop = this.root.querySelector<HTMLElement>('.menu-backdrop');
+    const hBtn =
+      this.chromeRefs?.hamburgerBtn ?? this.root.querySelector<HTMLButtonElement>('.hamburger');
     drawer?.classList.remove('open');
     drawer?.setAttribute('aria-hidden', 'true');
     backdrop?.classList.remove('open');
     hBtn?.setAttribute('aria-expanded', 'false');
+    if (wasOpen) {
+      hBtn?.focus();
+    }
   }
 
   private syncMenuScrollLock(): void {
@@ -757,23 +784,29 @@ export class GameApp {
   }
 
   private toggleMenu(): void {
-    this.menuOpen = !this.menuOpen;
-    this.syncMenuScrollLock();
-    const drawer = this.root.querySelector('.menu-drawer');
-    const backdrop = this.root.querySelector('.menu-backdrop');
-    const hBtn = this.root.querySelector<HTMLButtonElement>('.hamburger');
     if (this.menuOpen) {
-      drawer?.classList.add('open');
-      drawer?.setAttribute('aria-hidden', 'false');
-      backdrop?.classList.add('open');
-      hBtn?.setAttribute('aria-expanded', 'true');
-      this.unlockAudio();
-    } else {
-      drawer?.classList.remove('open');
-      drawer?.setAttribute('aria-hidden', 'true');
-      backdrop?.classList.remove('open');
-      hBtn?.setAttribute('aria-expanded', 'false');
+      this.closeMenu();
+      return;
     }
+    this.menuOpen = true;
+    this.syncMenuScrollLock();
+    const drawer =
+      this.chromeRefs?.menuDrawer ?? this.root.querySelector<HTMLElement>('.menu-drawer');
+    const backdrop = this.root.querySelector<HTMLElement>('.menu-backdrop');
+    const hBtn =
+      this.chromeRefs?.hamburgerBtn ?? this.root.querySelector<HTMLButtonElement>('.hamburger');
+    drawer?.classList.add('open');
+    drawer?.setAttribute('aria-hidden', 'false');
+    backdrop?.classList.add('open');
+    hBtn?.setAttribute('aria-expanded', 'true');
+    this.unlockAudio();
+    window.requestAnimationFrame(() => {
+      this.focusFirstInMenuDrawer();
+      if (drawer) {
+        if (this.menuFocusTrapRelease) this.menuFocusTrapRelease();
+        this.menuFocusTrapRelease = attachFocusTrap(drawer);
+      }
+    });
   }
 
   private getFullscreenElement(): Element | null {

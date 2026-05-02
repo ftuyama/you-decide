@@ -29,6 +29,7 @@ import {
 } from './gameAppUtils.ts';
 import { formatItemEquipmentStatParts } from './formatItemEquipment.ts';
 import { collapseTriggerStart, iconWrap, icons } from './icons/index.ts';
+import { attachFocusTrap } from './focusTrap.ts';
 
 type SidebarBuilderParams = {
   state: GameState;
@@ -48,9 +49,14 @@ type SidebarDisclosure = {
 
 let overlayModalLayer: HTMLDivElement | null = null;
 let overlayModalOnKey: ((e: KeyboardEvent) => void) | null = null;
+let overlayModalFocusTrapRelease: (() => void) | null = null;
 
 /** Fecha qualquer modal de overlay (diário ou ficha) para não empilhar diálogos. */
 function closeOverlayModal(): void {
+  if (overlayModalFocusTrapRelease) {
+    overlayModalFocusTrapRelease();
+    overlayModalFocusTrapRelease = null;
+  }
   if (overlayModalOnKey) {
     window.removeEventListener('keydown', overlayModalOnKey);
     overlayModalOnKey = null;
@@ -277,7 +283,10 @@ function openDiaryModal({ diary: entries, marks, registry }: DiaryModalOpenParam
   };
   window.addEventListener('keydown', overlayModalOnKey);
 
-  requestAnimationFrame(() => dismiss.focus());
+  requestAnimationFrame(() => {
+    dismiss.focus();
+    overlayModalFocusTrapRelease = attachFocusTrap(layer);
+  });
 }
 
 /** Página de apoio (menu Sobre → Apoiar no Ko-fi). */
@@ -375,7 +384,10 @@ export function openCreditsModal({
   };
   window.addEventListener('keydown', overlayModalOnKey);
 
-  requestAnimationFrame(() => dismiss.focus());
+  requestAnimationFrame(() => {
+    dismiss.focus();
+    overlayModalFocusTrapRelease = attachFocusTrap(layer);
+  });
 }
 
 function countEquippedSlots(c: Character): number {
@@ -723,7 +735,10 @@ function openCharacterSheetModal(params: CharacterSheetOpenParams, playUiClick?:
   };
   window.addEventListener('keydown', overlayModalOnKey);
 
-  requestAnimationFrame(() => dismiss.focus());
+  requestAnimationFrame(() => {
+    dismiss.focus();
+    overlayModalFocusTrapRelease = attachFocusTrap(layer);
+  });
 }
 
 function statHint(label: string): string {

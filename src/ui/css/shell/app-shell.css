@@ -10,6 +10,98 @@
   overflow: hidden;
 }
 
+.skip-link:not(:focus):not(:focus-visible) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: 0.35rem;
+  top: 0.35rem;
+  z-index: 60;
+  padding: 0.45rem 0.65rem;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--fg);
+  background: var(--surface-raised);
+  border: 1px solid var(--accent);
+  border-radius: 2px;
+  text-decoration: none;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.app-toast-region {
+  position: fixed;
+  left: 50%;
+  top: max(0.75rem, env(safe-area-inset-top, 0px));
+  transform: translateX(-50%);
+  z-index: 10060;
+  max-width: min(36rem, calc(100vw - 2rem));
+  padding: 0.55rem 0.85rem;
+  font-size: 0.88rem;
+  line-height: 1.35;
+  color: var(--fg);
+  background: var(--surface-drawer);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.app-toast-msg {
+  flex: 1 1 auto;
+  min-width: 0;
+  pointer-events: none;
+}
+
+.app-toast-dismiss {
+  flex: 0 0 auto;
+  pointer-events: auto;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 0.2rem 0.45rem;
+  color: var(--fg);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+}
+
+.app-toast-dismiss:hover {
+  border-color: var(--accent);
+}
+
+.app-toast-dismiss:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.app-toast-region:empty {
+  display: none;
+}
+
+.app-toast-region--error {
+  border-color: var(--danger);
+  color: var(--text-strong);
+}
+
 .app-top {
   display: flex;
   align-items: center;
@@ -25,7 +117,7 @@
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--text-section);
 }
 
 button.hamburger {
@@ -103,6 +195,12 @@ button.hamburger:focus-visible,
 
 .menu-drawer.open {
   transform: translateX(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .menu-drawer {
+    transition: none;
+  }
 }
 
 .menu-section {

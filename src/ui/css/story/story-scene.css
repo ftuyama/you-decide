@@ -14,6 +14,12 @@
   overflow-x: auto;
 }
 
+@media (max-width: 720px) {
+  .scene-art {
+    font-size: clamp(0.45rem, 2.8vw, 0.65rem);
+  }
+}
+
 /** Primeira visita com `highlight: true` no frontmatter — overlay sobre o viewport */
 .scene-art-highlight-layer {
   position: fixed;
@@ -420,6 +426,11 @@ button.choice.choice--locked[class*='choice--tone-']:hover {
 @media (prefers-reduced-motion: reduce) {
   .scene-art-highlight-layer {
     transition: none;
+  }
+
+  .timed-bar > i {
+    animation: none;
+    transform: scaleX(0);
   }
 }
 

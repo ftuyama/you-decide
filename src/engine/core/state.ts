@@ -29,7 +29,7 @@ export function createInitialState(campaign: CampaignIndex, seed?: number): Game
     factionGainPending: { vigilia: 0, circulo: 0, culto: 0 },
     flags: {},
     marks: [],
-    legacy: { echoes: 0, titles: [], lastRunSummary: '', lastRunEchoGain: 0 },
+    legacy: { echoes: 0, titles: [], discoveredEndings: [], lastRunSummary: '', lastRunEchoGain: 0 },
     leadStoryPassives: [],
     resources: { supply: 5, faith: 3, corruption: 0, gold: 8 },
     extraLifeReady: false,
@@ -215,6 +215,11 @@ export function deserializeState(json: string): GameState {
         : 0,
     titles: Array.isArray(rawLegacy?.titles)
       ? rawLegacy.titles.filter((x): x is string => typeof x === 'string' && x.trim().length > 0)
+      : [],
+    discoveredEndings: Array.isArray(rawLegacy?.discoveredEndings)
+      ? rawLegacy.discoveredEndings.filter(
+          (x): x is string => typeof x === 'string' && x.trim().length > 0
+        )
       : [],
     lastRunSummary: typeof rawLegacy?.lastRunSummary === 'string' ? rawLegacy.lastRunSummary : '',
     lastRunEchoGain:

@@ -1,4 +1,11 @@
-import type { Character, ClassId, GameState, ItemDef, SpellDef } from '../engine/schema/index.ts';
+import type {
+  CampaignIndex,
+  Character,
+  ClassId,
+  GameState,
+  ItemDef,
+  SpellDef,
+} from '../engine/schema/index.ts';
 import {
   effectiveLeadAttr,
   friendshipTier,
@@ -392,11 +399,12 @@ export function openCreditsModal({
 
 export type OpenChronicleModalOpts = {
   state: GameState;
+  campaign: CampaignIndex;
   playUiClick?: () => void;
 };
 
 /** Crónica: títulos do legado e dica de replay. */
-export function openChronicleModal({ state, playUiClick }: OpenChronicleModalOpts): void {
+export function openChronicleModal({ state, campaign, playUiClick }: OpenChronicleModalOpts): void {
   closeOverlayModal();
   playUiClick?.();
 
@@ -421,6 +429,40 @@ export function openChronicleModal({ state, playUiClick }: OpenChronicleModalOpt
     pClass.className = 'diary-modal-section-body';
     pClass.textContent = `Nesta partida: ${lead.name} (${lead.class}).`;
     scroll.appendChild(pClass);
+  }
+
+  const endingsMeta = campaign.endings ?? {};
+  const discovered = state.legacy.discoveredEndings ?? [];
+  if (discovered.length > 0) {
+    const secEnd = document.createElement('section');
+    secEnd.className = 'diary-modal-section';
+    const hEnd = document.createElement('h3');
+    hEnd.className = 'diary-modal-section-title';
+    hEnd.textContent = 'Finais descobertos';
+    secEnd.appendChild(hEnd);
+    const ulEnd = document.createElement('ul');
+    ulEnd.className = 'credits-modal-about';
+    for (const eid of discovered) {
+      const meta = endingsMeta[eid];
+      const li = document.createElement('li');
+      if (meta) {
+        const strong = document.createElement('strong');
+        strong.textContent = meta.title;
+        li.appendChild(strong);
+        if (meta.blurb?.trim()) {
+          li.appendChild(document.createElement('br'));
+          const span = document.createElement('span');
+          span.className = 'chronicle-ending-blurb';
+          span.textContent = meta.blurb.trim();
+          li.appendChild(span);
+        }
+      } else {
+        li.textContent = eid;
+      }
+      ulEnd.appendChild(li);
+    }
+    secEnd.appendChild(ulEnd);
+    scroll.appendChild(secEnd);
   }
 
   if (state.legacy.titles.length === 0) {

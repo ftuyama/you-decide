@@ -375,3 +375,30 @@
   background: #445048;
   border-color: #7a8a72;
 }
+
+/* Fila de destaques: fade-out + deslize final (duração / easing nos tokens; sync com GameApp). */
+@keyframes story-overlay-fade-out {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+  58% {
+    opacity: 0.42;
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(2.75rem, 0, 0);
+  }
+}
+
+.status-highlight-banner--exiting {
+  animation: story-overlay-fade-out var(--story-banner-fade-duration)
+    var(--story-banner-fade-easing) forwards;
+  pointer-events: none;
+}
+
+.status-highlight-banner--debuff.status-highlight-banner--exiting {
+  animation: story-overlay-fade-out var(--story-banner-fade-duration)
+    var(--story-banner-fade-easing) forwards;
+}

@@ -4,7 +4,8 @@ title: Fecho do Diário
 chapter: 4
 ambientTheme: explore
 choices: []
-onEnter: []
+onEnter:
+  - { op: registerEnding, endingId: epilogue_close }
 ---
 O diário **fecha**. O que ficou ficou — o que perdeste, o que escolheste.
 

@@ -64,6 +64,8 @@ export function beginEncounter(
     onVictory: opts.onVictory,
     onFlee: opts.onFlee,
     onDefeat: opts.onDefeat,
+    bossTwistAppliedIds: [],
+    bossTwistInitialHpSum: enc.isBoss ? enemies.reduce((s, e) => s + e.hp, 0) : undefined,
   };
 
   combat.turnOrder = buildTurnOrder(state, combat, data, mulberry32(state.rngSeed));

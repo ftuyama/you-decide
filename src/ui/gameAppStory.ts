@@ -74,16 +74,24 @@ function buildExplorationMovementRows(
 export type { CampEquipmentCallbacks } from './story/storyCampEquipmentPanel.ts';
 export type { StoryDiceBannerHost } from './story/storyDiceBanner.ts';
 
+/** Fila de destaques na história: tokens TTL + fade geridos no `GameApp`. */
+export type StoryStatusHighlightRow = Extract<GameEvent, { type: 'statusHighlight' }> & {
+  dismissToken?: number;
+  exiting?: boolean;
+};
+
 export type StoryOverlayState = {
   pendingStoryDiceRoll: { nextState: GameState; breakdown: StoryDiceRollBreakdown } | null;
   storyDiceHost: StoryDiceBannerHost;
   faithMiraclePending: boolean;
   setFaithMiraclePending: (v: boolean) => void;
-  statusHighlightQueue: Extract<GameEvent, { type: 'statusHighlight' }>[];
-  setStatusHighlightQueue: (q: Extract<GameEvent, { type: 'statusHighlight' }>[]) => void;
+  statusHighlightQueue: StoryStatusHighlightRow[];
+  setStatusHighlightQueue: (q: StoryStatusHighlightRow[]) => void;
   itemAcquireQueue: string[];
   diaryEntryQueue: string[];
   setDiaryEntryQueue: (q: string[]) => void;
+  diaryBannerExiting: boolean;
+  itemAcquireBannerExiting: boolean;
 };
 
 /** Overlay automático: arte em tela cheia (~1s + fade); `onBegin`/`onEnd` ligam ao ciclo de vida no GameApp. */
@@ -180,6 +188,9 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     for (const h of ctx.overlay.statusHighlightQueue) {
       const block = document.createElement('div');
       block.className = `status-highlight-banner status-highlight-banner--${h.variant}`;
+      if (h.exiting) {
+        block.classList.add('status-highlight-banner--exiting');
+      }
       if (h.variant === 'debuff') {
         const kicker = document.createElement('div');
         kicker.className = 'status-highlight-debuff-kicker';
@@ -204,6 +215,9 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
   if (ctx.overlay.diaryEntryQueue.length > 0) {
     const wrap = document.createElement('div');
     wrap.className = 'diary-entry-banner';
+    if (ctx.overlay.diaryBannerExiting) {
+      wrap.classList.add('diary-entry-banner--exiting');
+    }
     const kicker = document.createElement('div');
     kicker.className = 'diary-entry-kicker';
     kicker.textContent = 'Cronista';
@@ -228,6 +242,9 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     const unique = [...new Set(ctx.overlay.itemAcquireQueue)];
     const wrap = document.createElement('div');
     wrap.className = 'item-acquire-banner';
+    if (ctx.overlay.itemAcquireBannerExiting) {
+      wrap.classList.add('item-acquire-banner--exiting');
+    }
     const kicker = document.createElement('div');
     kicker.className = 'item-acquire-kicker';
     kicker.textContent = unique.length > 1 ? 'Novos itens adquiridos' : 'Item adquirido';

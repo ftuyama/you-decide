@@ -8,6 +8,7 @@ choices:
   - text: "Fechar o diário — o fim também cansa"
     next: act4/epilogue_close
 onEnter:
+  - { op: registerEnding, endingId: epilogue_apocalypse }
   - { op: addDiary, text: "O apocalipse não terminou — só ficou mais honesto: cinza com nome, vento com conta, e eu no meio a aprender a respirar sem pedir licença ao céu." }
 ---
 O mundo **continua** sem ti; o teu **eco** reparte-se entre **estrada**, **marca** e **silêncio** comprado ou recusado.

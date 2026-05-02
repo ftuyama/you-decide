@@ -129,5 +129,6 @@ export function emitReputationUi(
     variant,
     title: `${name} — reputação ${deltaStr ? (improved ? 'sobe' : 'cai') : 'ajusta-se'}${deltaStr}`,
     subtitle: `${reputationTonePt(faction, prev, next)} Valor: ${prev} → ${next}.`,
+    ...(variant === 'bad' ? { autoDismissMs: 0 } : {}),
   });
 }

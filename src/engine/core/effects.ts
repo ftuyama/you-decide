@@ -96,6 +96,7 @@ function applyOne(
         variant: isBad ? 'bad' : 'neutral',
         title: displayTitleForMark(e.mark, ctx.data),
         subtitle: 'Nova marca no personagem',
+        ...(isBad ? { autoDismissMs: 0 } : {}),
       });
       return { ...state, marks: [...state.marks, e.mark] };
     }
@@ -213,6 +214,7 @@ function applyOne(
           variant: isDebuff ? 'debuff' : 'good',
           title: `${RESOURCE_LABEL[res]} ${actual > 0 ? '+' : ''}${actual}`,
           subtitle: isDebuff ? resourceDebuffSubtitle(res) : resourceGainSubtitle(res),
+          ...(isDebuff ? { autoDismissMs: 0 } : {}),
         });
       }
       return {
@@ -591,12 +593,26 @@ function applyOne(
       notifyCompanionFriendshipChange(ctx.bus, ctx.data, e.companionId, before, after);
       return s;
     }
+    case 'registerEnding': {
+      const id = e.endingId.trim();
+      if (!id) return state;
+      const cur = state.legacy?.discoveredEndings ?? [];
+      if (cur.includes(id)) return state;
+      return {
+        ...state,
+        legacy: {
+          ...state.legacy,
+          discoveredEndings: [...cur, id],
+        },
+      };
+    }
     case 'resetRun': {
       const gain = computeLegacyEchoGain(state);
       const title = resolveLegacyTitle(state);
       const nextLegacy: GameState['legacy'] = {
         echoes: Math.max(0, (state.legacy?.echoes ?? 0) + gain),
         titles: uniqueTitles([...(state.legacy?.titles ?? []), title]),
+        discoveredEndings: [...(state.legacy?.discoveredEndings ?? [])],
         lastRunSummary: buildLegacySummary(state),
         lastRunEchoGain: gain,
       };

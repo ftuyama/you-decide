@@ -1,5 +1,6 @@
 import {
   CampaignIndexSchema,
+  EncounterSchema,
   type CompanionDef,
   type EnemyDef,
   type Encounter,
@@ -47,7 +48,14 @@ export function loadCalvarioContent() {
   const idx = CampaignIndexSchema.parse(campaignIndex);
   const data = emptyGameData(idx, calvarioHeroNarrative);
   data.enemies = enemiesTs as Record<string, EnemyDef>;
-  data.encounters = encounters as Record<string, Encounter>;
+  const encRecord = encounters as Record<string, Encounter>;
+  for (const enc of Object.values(encRecord)) {
+    EncounterSchema.parse(enc);
+    if ((enc.twists?.length ?? 0) > 0 && !enc.isBoss) {
+      throw new Error(`[calvario] Encounter "${enc.id}" has twists but isBoss is not true`);
+    }
+  }
+  data.encounters = encRecord;
   data.items = itemsTs as Record<string, ItemDef>;
   data.companions = companions as Record<string, CompanionDef>;
   data.spells = spellsTs as Record<string, SpellDef>;

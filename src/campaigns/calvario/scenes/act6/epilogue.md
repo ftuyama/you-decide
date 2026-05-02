@@ -10,6 +10,7 @@ choices:
   - text: "Fechar o diário por agora"
     next: act4/epilogue_close
 onEnter:
+  - { op: registerEnding, endingId: epilogue_mirror }
   - { op: addResource, resource: faith, delta: 1 }
 ---
 Levas a nave fraturada nos olhos — **caco** de espelho que mentiu no primeiro degrau, agora **corte** na palma. Para quem olha depressa, o mundo acima é o mesmo.

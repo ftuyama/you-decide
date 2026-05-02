@@ -320,4 +320,18 @@ describe('applyEffects', () => {
     expect(next.party[0]!.path).toBe(null);
     expect(next.lastPathPromotion).toBe(null);
   });
+
+  it('registerEnding acumula finais únicos no legado', () => {
+    let s = createInitialState(testCampaign, 1);
+    s = { ...s, party: [createPlayerCharacter('H', 'knight')] };
+    const bus = new EventBus();
+    const data = createTestData();
+    const ctx = { sceneId: 'test/scene', data, bus };
+    const a = applyEffects(s, [{ op: 'registerEnding', endingId: 'fin_a' }], ctx);
+    expect(a.legacy.discoveredEndings).toEqual(['fin_a']);
+    const b = applyEffects(a, [{ op: 'registerEnding', endingId: 'fin_a' }], ctx);
+    expect(b.legacy.discoveredEndings).toEqual(['fin_a']);
+    const c = applyEffects(b, [{ op: 'registerEnding', endingId: 'fin_b' }], ctx);
+    expect(c.legacy.discoveredEndings).toEqual(['fin_a', 'fin_b']);
+  });
 });

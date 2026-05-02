@@ -86,6 +86,10 @@
   --map-char-mark: #c49a57;
   --map-char-goal: #e2c16a;
   --map-char-player: #7ad7d0;
+  /** Banners de história (status / diário / item): espelhar `STORY_BANNER_*_MS` em `GameApp.ts`. */
+  --story-banner-hold-duration: 1s;
+  --story-banner-fade-duration: 2s;
+  --story-banner-fade-easing: ease-in-out;
 }
 
 html[data-theme='snow'] {

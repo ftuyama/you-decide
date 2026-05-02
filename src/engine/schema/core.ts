@@ -201,6 +201,7 @@ export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
     onceFlag: z.string().optional(),
   }),
   z.object({ op: z.literal('advanceDay') }),
+  z.object({ op: z.literal('registerEnding'), endingId: z.string() }),
   z.object({ op: z.literal('resetRun') }),
 ]);
 
@@ -252,6 +253,7 @@ export type Effect =
   | { op: 'useConsumable'; itemId: string; targetIndex?: number }
   | { op: 'adjustCompanionFriendship'; companionId: string; delta: number; onceFlag?: string }
   | { op: 'advanceDay' }
+  | { op: 'registerEnding'; endingId: string }
   | { op: 'resetRun' };
 
 export const ChoiceSchema = z

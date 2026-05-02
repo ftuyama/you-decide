@@ -40,6 +40,7 @@ import {
   finishCombatFaithRescue,
   reducePartyStressAfterCombat,
 } from './resolution.ts';
+import { applyBossTwistsAfterEnemyPhase, finishCombatIfAllEnemiesDead } from './bossTwists.ts';
 
 function getLead(state: GameState): Character {
   return state.party[0]!;
@@ -499,7 +500,7 @@ export function advanceToEnemyTurn(
       message: `Rodada ${c.round} — inimigos`,
     },
   ];
-  const enemies = [...c.enemies];
+  let enemies = [...c.enemies];
   let party = state.party.map((p) => ({ ...p }));
   let carryState = state;
 
@@ -651,7 +652,7 @@ export function advanceToEnemyTurn(
   const nextRound = c.round + 1;
   const roundPrep = applyStartOfPlayerTurnPassive(state, party, log);
   party = roundPrep.party;
-  const nextLog = [
+  let nextLog = [
     ...roundPrep.log,
     {
       kind: 'turn_banner' as const,
@@ -659,11 +660,30 @@ export function advanceToEnemyTurn(
     },
   ];
 
+  const twistOut = applyBossTwistsAfterEnemyPhase(data, c, party, enemies, nextRound);
+  party = twistOut.party;
+  enemies = twistOut.enemies;
+  nextLog = [...nextLog, ...twistOut.twistLog];
+  const twistCombatPatch = twistOut.combatPatch;
+
+  const victoryAfterTwist = finishCombatIfAllEnemiesDead(
+    carryState,
+    c,
+    party,
+    enemies,
+    nextLog,
+    twistCombatPatch,
+    data,
+    bus
+  );
+  if (victoryAfterTwist) return victoryAfterTwist;
+
   return {
     ...carryState,
     party,
     combat: {
       ...c,
+      ...twistCombatPatch,
       enemies,
       log: nextLog,
       phase: 'choose_stance',

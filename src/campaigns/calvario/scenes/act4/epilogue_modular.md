@@ -7,7 +7,8 @@ choices:
   - text: "Partir para as Cimeiras do Vento Cinzento — seguir o rumor do gelo"
     next: act5/frost_opening
     preview: "Capítulo 5. Longe do trono, o frio ainda pergunta quem manda no silêncio."
-onEnter: []
+onEnter:
+  - { op: registerEnding, endingId: epilogue_modular }
 ---
 ## Epílogo
 

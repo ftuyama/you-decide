@@ -10,6 +10,28 @@
     "6": "O Vazio",
     "7": "Cinzas do Céu"
   },
+  "endings": {
+    "epilogue_apocalypse": {
+      "title": "Cinzas com nome",
+      "blurb": "O apocalipse ficou mais honesto; o teu eco reparte-se entre estrada e silêncio."
+    },
+    "epilogue_close": {
+      "title": "Fecho do diário",
+      "blurb": "O que ficou ficou — o que perdeste e o que escolheste."
+    },
+    "frost_epilogue": {
+      "title": "Epílogo de geada",
+      "blurb": "Vetrnax caiu; sob o gelo, o Terceiro Sino aprende um nome novo."
+    },
+    "epilogue_mirror": {
+      "title": "Espelho quebrado",
+      "blurb": "A nave fraturada fica contigo como corte na palma; escolheste como contar o pulso."
+    },
+    "epilogue_modular": {
+      "title": "Epílogo do trono",
+      "blurb": "Corrupção e fé à mostra; o eixo não fechou e o frio espera nas Cimeiras."
+    }
+  },
   "entryScene": "act1/title",
   "startingCompanionPool": ["rogue_mira"],
   "scenes": []

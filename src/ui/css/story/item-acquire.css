@@ -9,6 +9,12 @@
   box-shadow: 0 0 16px rgba(74, 90, 72, 0.35);
 }
 
+.item-acquire-banner--exiting {
+  animation: story-overlay-fade-out var(--story-banner-fade-duration)
+    var(--story-banner-fade-easing) forwards;
+  pointer-events: none;
+}
+
 .item-acquire-kicker {
   font-size: 0.68rem;
   font-weight: 700;

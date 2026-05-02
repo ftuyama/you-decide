@@ -55,9 +55,44 @@ export const EnemyDefSchema = z.object({
 
 export type EnemyDef = z.infer<typeof EnemyDefSchema>;
 
+const BossTwistWhenSchema = z.object({
+  minRound: z.number().int().min(1).optional(),
+  /** Dispara quando o primeiro inimigo vivo tem HP <= este valor. */
+  firstEnemyHpLte: z.number().int().min(0).optional(),
+  /** Dispara quando a soma dos HP actuais dos inimigos <= esta fração (0–1) do total inicial. */
+  totalHpFractionLte: z.number().min(0).max(1).optional(),
+});
+
+const BossTwistApplySchema = z.discriminatedUnion('op', [
+  z.object({ op: z.literal('combatLog'), message: z.string() }),
+  z.object({ op: z.literal('setEnemyAdvantage'), value: z.boolean() }),
+  z.object({ op: z.literal('setPlayerAdvantage'), value: z.boolean() }),
+  z.object({
+    op: z.literal('buffLeadArmorClass'),
+    delta: z.number().int(),
+  }),
+  z.object({
+    op: z.literal('buffLeadAttackRoll'),
+    delta: z.number().int(),
+  }),
+  z.object({
+    op: z.literal('damageAllEnemies'),
+    amount: z.number().int().min(0),
+  }),
+]);
+
+const BossTwistSchema = z.object({
+  id: z.string(),
+  when: BossTwistWhenSchema,
+  apply: z.array(BossTwistApplySchema).min(1),
+});
+
 export const EncounterSchema = z.object({
   id: z.string(),
   enemies: z.array(z.string()),
+  /** Só encontros de boss podem declarar `twists`; o validador de dados exige correspondência. */
+  isBoss: z.boolean().optional(),
+  twists: z.array(BossTwistSchema).optional(),
   playerAdvantage: z.boolean().optional(),
   enemyAdvantage: z.boolean().optional(),
   /** Probabilidade base de fuga (0–1); maior = TN mais baixo no teste 2d6 + mod(AGI). */
@@ -248,6 +283,10 @@ export const CombatStateSchema = z.object({
   onVictory: z.string().optional(),
   onFlee: z.string().optional(),
   onDefeat: z.string().optional(),
+  /** Boss: IDs de twists já disparados neste combate. */
+  bossTwistAppliedIds: z.array(z.string()).default([]),
+  /** Boss: soma dos HP iniciais dos inimigos (para `totalHpFractionLte`). */
+  bossTwistInitialHpSum: z.number().int().min(0).optional(),
 });
 
 export type CombatState = z.infer<typeof CombatStateSchema>;
@@ -307,10 +346,18 @@ export const GameStateSchema = z.object({
     .object({
       echoes: z.number().int().min(0).default(0),
       titles: z.array(z.string()).default([]),
+      /** IDs de finais vistos (`registerEnding` / Crónica); persistem entre runs. */
+      discoveredEndings: z.array(z.string()).default([]),
       lastRunSummary: z.string().default(''),
       lastRunEchoGain: z.number().int().min(0).default(0),
     })
-    .default({ echoes: 0, titles: [], lastRunSummary: '', lastRunEchoGain: 0 }),
+    .default({
+      echoes: 0,
+      titles: [],
+      discoveredEndings: [],
+      lastRunSummary: '',
+      lastRunEchoGain: 0,
+    }),
   /** Passivos de história do líder (ids em `GameData.leadStoryPassives`), ex. bênção do monge. */
   leadStoryPassives: z.array(z.string()).default([]),
   resources: z.object({
@@ -380,11 +427,18 @@ export const GameStateSchema = z.object({
 
 export type GameState = z.infer<typeof GameStateSchema>;
 
+export const CampaignEndingDefSchema = z.object({
+  title: z.string(),
+  blurb: z.string().optional(),
+});
+
 export const CampaignIndexSchema = z.object({
   id: z.string(),
   name: z.string(),
   /** Rótulos de UI por capítulo (1 = primeiro ato, …). Chaves como dígitos em string. */
   chapterTitles: z.record(z.string(), z.string()).optional(),
+  /** Metadados para `registerEnding` / Crónica (chave = endingId). */
+  endings: z.record(z.string(), CampaignEndingDefSchema).optional(),
   entryScene: z.string(),
   /** IDs still available to recruit at a new run */
   startingCompanionPool: z.array(z.string()).default([]),

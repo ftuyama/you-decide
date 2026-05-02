@@ -94,12 +94,27 @@
   },
   "boss_morvayn_1": {
     "id": "boss_morvayn_1",
+    "isBoss": true,
     "enemies": [
       "morvayn_p1"
     ],
     "playerAdvantage": false,
     "enemyAdvantage": false,
-    "fleeRate": 0.61
+    "fleeRate": 0.61,
+    "twists": [
+      {
+        "id": "morvayn_p1_echo",
+        "when": {
+          "minRound": 4
+        },
+        "apply": [
+          {
+            "op": "combatLog",
+            "message": "O eco das catacumbas repete o teu nome uma vez a mais — como aviso, não como bênção."
+          }
+        ]
+      }
+    ]
   },
   "boss_morvayn_1_disadv": {
     "id": "boss_morvayn_1_disadv",
@@ -112,12 +127,43 @@
   },
   "boss_morvayn_2": {
     "id": "boss_morvayn_2",
+    "isBoss": true,
     "enemies": [
       "morvayn_p2"
     ],
     "playerAdvantage": true,
     "enemyAdvantage": false,
-    "fleeRate": 0.69
+    "fleeRate": 0.69,
+    "twists": [
+      {
+        "id": "morvayn_throne_falter",
+        "when": {
+          "totalHpFractionLte": 0.5
+        },
+        "apply": [
+          {
+            "op": "combatLog",
+            "message": "O trono de ossos estremece — Morvayn recua meio passo, e o silêncio da sala aperta como uma argola."
+          },
+          {
+            "op": "setEnemyAdvantage",
+            "value": true
+          }
+        ]
+      },
+      {
+        "id": "morvayn_round_pressure",
+        "when": {
+          "minRound": 5
+        },
+        "apply": [
+          {
+            "op": "combatLog",
+            "message": "Cada respiração tua pesa; o osso aprendeu o teu ritmo."
+          }
+        ]
+      }
+    ]
   },
   "boss_morvayn_2_disadv": {
     "id": "boss_morvayn_2_disadv",

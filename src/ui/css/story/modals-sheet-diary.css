@@ -388,6 +388,15 @@
   margin-bottom: 0;
 }
 
+.chronicle-ending-blurb {
+  display: inline-block;
+  margin-top: 0.2rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
 .credits-modal-thanks {
   font-size: 0.82rem;
   font-style: italic;

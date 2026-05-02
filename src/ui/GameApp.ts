@@ -42,6 +42,7 @@ import {
   resolveSceneArt,
   type StoryDiceBannerHost,
   type StoryRenderContext,
+  type StoryStatusHighlightRow,
 } from './gameAppStory.ts';
 import { formatCampaignHeaderTitle } from './campaignHeaderTitle.ts';
 import { showAppToast } from './appToast.ts';
@@ -69,6 +70,11 @@ import './css/styles.css';
 import gameVersionRaw from '../../VERSION?raw';
 
 const GAME_VERSION = gameVersionRaw.trim() || '?';
+
+/** Tempo a opacidade plena antes do fade (por banner, em sequência). Espelha `--story-banner-hold-duration`. */
+const STORY_BANNER_HOLD_MS = 1000;
+/** Duração do fade-out (animação CSS). Espelha `--story-banner-fade-duration` em `theme-tokens.css`. */
+const STORY_BANNER_FADE_MS = 2000;
 
 export class GameApp {
   private readonly campaignId: string;
@@ -103,14 +109,23 @@ export class GameApp {
   private readonly choiceHotkeyHandler: (e: KeyboardEvent) => void;
   /** Secções colapsáveis (recursos, inventário, facções, personagem…) — persistido em sessionStorage */
   private sidebarSections: Record<string, boolean> = {};
-  /** Buffs/debuffs/marcas — mostra banner até o jogador fechar */
-  private statusHighlightQueue: Extract<GameEvent, { type: 'statusHighlight' }>[] = [];
+  /** Buffs/debuffs/marcas — fila com fade sequencial no `GameApp` */
+  private statusHighlightQueue: StoryStatusHighlightRow[] = [];
   /** Itens recém-adquiridos (grantItem) — mostra banner até o jogador fechar */
   private itemAcquireQueue: string[] = [];
   /** Entradas novas de diário (`addDiary`) — banner até fechar */
   private diaryEntryQueue: string[] = [];
   /** Milagre de fé após quase-morte em combate — banner até fechar */
   private faithMiraclePending = false;
+  private nextStatusDismissToken = 0;
+  private statusHighlightHoldTimer: ReturnType<typeof setTimeout> | null = null;
+  private statusHighlightFadeTimer: ReturnType<typeof setTimeout> | null = null;
+  private diaryBannerHoldTimer: ReturnType<typeof setTimeout> | null = null;
+  private diaryBannerFadeTimer: ReturnType<typeof setTimeout> | null = null;
+  private diaryBannerExiting = false;
+  private itemBannerHoldTimer: ReturnType<typeof setTimeout> | null = null;
+  private itemBannerFadeTimer: ReturnType<typeof setTimeout> | null = null;
+  private itemAcquireBannerExiting = false;
   /** Índice até onde som/FX do log de combate já foram consumidos (som e FX partilham o mesmo cursor). */
   private combatLogCursor: { encounterId: string; index: number } = { encounterId: '', index: 0 };
   /** Rola teste de perícia/sorte: estado só aplica após o overlay (dados já resolvidos no motor). */
@@ -200,11 +215,12 @@ export class GameApp {
         },
         onItemAcquired: (itemId) => {
           this.itemAcquireQueue.push(itemId);
+          this.kickItemBannerPipeline();
           this.unlockAudio();
           this.audio.playItemAcquire();
         },
         onXpGained: (amount) => {
-          this.statusHighlightQueue.push({
+          this.enqueueStatusHighlight({
             type: 'statusHighlight',
             variant: 'good',
             title: `+${amount} XP`,
@@ -214,6 +230,7 @@ export class GameApp {
         },
         onDiaryEntryAdded: (text) => {
           this.diaryEntryQueue.push(text);
+          this.kickDiaryBannerPipeline();
           this.unlockAudio();
         },
         onCampRest: () => {
@@ -223,7 +240,7 @@ export class GameApp {
         onTimeDayAdvanced: (day) => {
           this.unlockAudio();
           this.audio.playDayAdvance();
-          this.statusHighlightQueue.push({
+          this.enqueueStatusHighlight({
             type: 'statusHighlight',
             variant: 'good',
             title: `Dia ${day}`,
@@ -231,13 +248,13 @@ export class GameApp {
           });
         },
         onStatusHighlight: (event) => {
-          this.statusHighlightQueue.push(event);
+          this.enqueueStatusHighlight(event);
         },
         onLevelUp: (level) => {
           if (this.state.mode !== 'story') return;
           this.unlockAudio();
           this.audio.playLevelUpCelebration();
-          this.statusHighlightQueue.push({
+          this.enqueueStatusHighlight({
             type: 'statusHighlight',
             variant: 'good',
             title: `Nível ${level}`,
@@ -288,7 +305,7 @@ export class GameApp {
         )
       );
       localStorage.setItem(this.storageKeys.returnRewardDateKey, today);
-      this.statusHighlightQueue.push({
+      this.enqueueStatusHighlight({
         type: 'statusHighlight',
         variant: 'good',
         title: 'Retorno às catacumbas',
@@ -340,7 +357,7 @@ export class GameApp {
       if (localStorage.getItem(this.storageKeys.legacyBriefingKey) === stamp) return;
       const topTitle = legacy.titles[legacy.titles.length - 1];
       if (topTitle) {
-        this.statusHighlightQueue.push({
+        this.enqueueStatusHighlight({
           type: 'statusHighlight',
           variant: 'neutral',
           title: `Legado ativo — ${topTitle}`,
@@ -525,6 +542,128 @@ export class GameApp {
     return { sceneId: this.state.sceneId, data: this.registry.data, bus: this.bus };
   }
 
+  private cancelStatusHighlightDismissalPipeline(): void {
+    if (this.statusHighlightHoldTimer != null) {
+      clearTimeout(this.statusHighlightHoldTimer);
+      this.statusHighlightHoldTimer = null;
+    }
+    if (this.statusHighlightFadeTimer != null) {
+      clearTimeout(this.statusHighlightFadeTimer);
+      this.statusHighlightFadeTimer = null;
+    }
+    for (const h of this.statusHighlightQueue) {
+      if (h.exiting) delete h.exiting;
+    }
+  }
+
+  private kickStatusHighlightDismissalPipeline(): void {
+    if (this.statusHighlightHoldTimer != null || this.statusHighlightFadeTimer != null) return;
+    this.runNextStatusHighlightDismissalStep();
+  }
+
+  private runNextStatusHighlightDismissalStep(): void {
+    if (this.statusHighlightQueue.some((h) => h.exiting)) return;
+    const idx = this.statusHighlightQueue.findIndex(
+      (h) => h.dismissToken != null && !h.exiting
+    );
+    if (idx < 0) return;
+
+    this.statusHighlightHoldTimer = setTimeout(() => {
+      this.statusHighlightHoldTimer = null;
+      const row = this.statusHighlightQueue[idx];
+      if (!row || row.dismissToken == null || row.exiting) {
+        this.runNextStatusHighlightDismissalStep();
+        return;
+      }
+      row.exiting = true;
+      this.render();
+
+      const tok = row.dismissToken;
+      this.statusHighlightFadeTimer = setTimeout(() => {
+        this.statusHighlightFadeTimer = null;
+        this.statusHighlightQueue = this.statusHighlightQueue.filter((h) => h.dismissToken !== tok);
+        this.render();
+        this.runNextStatusHighlightDismissalStep();
+      }, STORY_BANNER_FADE_MS);
+    }, STORY_BANNER_HOLD_MS);
+  }
+
+  /** `autoDismissMs: 0` (ou omitido em debuffs) mantém até mudança de cena; caso contrário hold+fade sequencial. */
+  private enqueueStatusHighlight(event: Extract<GameEvent, { type: 'statusHighlight' }>): void {
+    const persist =
+      event.autoDismissMs !== undefined && event.autoDismissMs <= 0;
+    const { dismissToken: _dt, exiting: _ex, ...rest } = event as StoryStatusHighlightRow;
+    if (persist) {
+      this.statusHighlightQueue.push(rest);
+      return;
+    }
+    const token = ++this.nextStatusDismissToken;
+    this.statusHighlightQueue.push({ ...rest, dismissToken: token });
+    this.kickStatusHighlightDismissalPipeline();
+  }
+
+  private cancelDiaryBannerPipeline(): void {
+    if (this.diaryBannerHoldTimer != null) {
+      clearTimeout(this.diaryBannerHoldTimer);
+      this.diaryBannerHoldTimer = null;
+    }
+    if (this.diaryBannerFadeTimer != null) {
+      clearTimeout(this.diaryBannerFadeTimer);
+      this.diaryBannerFadeTimer = null;
+    }
+    this.diaryBannerExiting = false;
+  }
+
+  private kickDiaryBannerPipeline(): void {
+    if (this.diaryEntryQueue.length === 0) return;
+    if (this.diaryBannerHoldTimer != null || this.diaryBannerFadeTimer != null) return;
+    this.diaryBannerHoldTimer = setTimeout(() => {
+      this.diaryBannerHoldTimer = null;
+      this.diaryBannerExiting = true;
+      this.render();
+      this.diaryBannerFadeTimer = setTimeout(() => {
+        this.diaryBannerFadeTimer = null;
+        this.diaryEntryQueue = [];
+        this.diaryBannerExiting = false;
+        this.render();
+      }, STORY_BANNER_FADE_MS);
+    }, STORY_BANNER_HOLD_MS);
+  }
+
+  private cancelItemBannerPipeline(): void {
+    if (this.itemBannerHoldTimer != null) {
+      clearTimeout(this.itemBannerHoldTimer);
+      this.itemBannerHoldTimer = null;
+    }
+    if (this.itemBannerFadeTimer != null) {
+      clearTimeout(this.itemBannerFadeTimer);
+      this.itemBannerFadeTimer = null;
+    }
+    this.itemAcquireBannerExiting = false;
+  }
+
+  private kickItemBannerPipeline(): void {
+    if (this.itemAcquireQueue.length === 0) return;
+    if (this.itemBannerHoldTimer != null || this.itemBannerFadeTimer != null) return;
+    this.itemBannerHoldTimer = setTimeout(() => {
+      this.itemBannerHoldTimer = null;
+      this.itemAcquireBannerExiting = true;
+      this.render();
+      this.itemBannerFadeTimer = setTimeout(() => {
+        this.itemBannerFadeTimer = null;
+        this.itemAcquireQueue = [];
+        this.itemAcquireBannerExiting = false;
+        this.render();
+      }, STORY_BANNER_FADE_MS);
+    }, STORY_BANNER_HOLD_MS);
+  }
+
+  private cancelAllStoryBannerAnimations(): void {
+    this.cancelStatusHighlightDismissalPipeline();
+    this.cancelDiaryBannerPipeline();
+    this.cancelItemBannerPipeline();
+  }
+
   /** Mantém só overlays ligados à transição atual (como diário / destaques / itens). */
   private trimOverlayQueuesIfSceneChanged(
     prevScene: string,
@@ -534,9 +673,15 @@ export class GameApp {
   ): void {
     if (this.state.sceneId === prevScene) return;
     this.sessionObjectiveVisible = false;
+    this.cancelAllStoryBannerAnimations();
+
     this.diaryEntryQueue = this.diaryEntryQueue.slice(prevDiaryLen);
     this.statusHighlightQueue = this.statusHighlightQueue.slice(prevStatusLen);
     this.itemAcquireQueue = this.itemAcquireQueue.slice(prevItemAcquireLen);
+
+    this.kickStatusHighlightDismissalPipeline();
+    this.kickDiaryBannerPipeline();
+    this.kickItemBannerPipeline();
   }
 
   /** Não reentrar em cenas narrativas enquanto o combate está ativo (evita sobrescrever mode). */
@@ -598,7 +743,7 @@ export class GameApp {
         act6_fractured_nave:
           'Um limiar na nave fraturada deixa de negar o nome que escutas.',
       };
-      this.statusHighlightQueue.push({
+      this.enqueueStatusHighlight({
         type: 'statusHighlight',
         variant: 'good',
         title: 'Objetivo concluído',
@@ -983,12 +1128,18 @@ export class GameApp {
         },
         statusHighlightQueue: this.statusHighlightQueue,
         setStatusHighlightQueue: (q) => {
+          this.cancelStatusHighlightDismissalPipeline();
           this.statusHighlightQueue = q;
+          this.kickStatusHighlightDismissalPipeline();
         },
         itemAcquireQueue: this.itemAcquireQueue,
         diaryEntryQueue: this.diaryEntryQueue,
+        diaryBannerExiting: this.diaryBannerExiting,
+        itemAcquireBannerExiting: this.itemAcquireBannerExiting,
         setDiaryEntryQueue: (q) => {
+          this.cancelDiaryBannerPipeline();
           this.diaryEntryQueue = q;
+          this.kickDiaryBannerPipeline();
         },
       },
       audio: {
@@ -1111,6 +1262,7 @@ export class GameApp {
         this.unlockAudio();
         openChronicleModal({
           state: this.state,
+          campaign: this.registry.data.campaign,
           playUiClick: () => this.audio.playUiClick(),
         });
         this.closeMenu();

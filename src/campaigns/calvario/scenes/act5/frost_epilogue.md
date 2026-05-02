@@ -7,6 +7,7 @@ choices:
   - text: "Seguir o eco sob o gelo — atravessar o Umbral do Vazio"
     next: act6/opening_void_threshold
 onEnter:
+  - { op: registerEnding, endingId: frost_epilogue }
   - { op: grantItem, itemId: frost_wyrm_scale }
   - { op: addMark, mark: vetrnax_slain }
   - { op: addDiary, text: "Vetrnax caiu. O gelo partiu-se como vidro — e por baixo, por um instante, ouvi o Terceiro Sino a aprender um nome novo." }

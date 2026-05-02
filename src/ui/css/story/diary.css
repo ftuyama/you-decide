@@ -38,6 +38,12 @@
   border-color: #7a6a52;
 }
 
+.diary-entry-banner--exiting {
+  animation: story-overlay-fade-out var(--story-banner-fade-duration)
+    var(--story-banner-fade-easing) forwards;
+  pointer-events: none;
+}
+
 /** Cabeçalhos/rodapé de modais (diário, ficha) — `html[data-theme]` */
 .diary-entry-kicker {
   font-size: 0.62rem;

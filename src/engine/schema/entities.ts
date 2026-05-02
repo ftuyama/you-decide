@@ -76,6 +76,14 @@ const BossTwistApplySchema = z.discriminatedUnion('op', [
     delta: z.number().int(),
   }),
   z.object({
+    op: z.literal('buffBossArmorClass'),
+    delta: z.number().int(),
+  }),
+  z.object({
+    op: z.literal('buffBossAttackRoll'),
+    delta: z.number().int(),
+  }),
+  z.object({
     op: z.literal('damageAllEnemies'),
     amount: z.number().int().min(0),
   }),
@@ -214,6 +222,7 @@ export type EnemyInstance = z.infer<typeof EnemyInstanceSchema>;
 export const CombatLogEntrySchema = z.object({
   kind: z.enum([
     'info',
+    'boss_twist',
     'enemy_line',
     'attack',
     'damage',
@@ -268,6 +277,10 @@ export const CombatStateSchema = z.object({
   buffAttackRoll: z.number().int().min(0).default(0),
   /** Bónus de magia do líder: somado à CA vs inimigos (resto do combate). */
   buffArmorClass: z.number().int().min(0).default(0),
+  /** Bónus de twist de boss: somado à CA dos inimigos vs ataques físicos do grupo (resto do combate). */
+  enemyBuffArmorClass: z.number().int().min(0).default(0),
+  /** Bónus de twist de boss: somado ao ataque de cada inimigo (resto do combate). */
+  enemyBuffAttackRoll: z.number().int().min(0).default(0),
   /**
    * Postura do líder no turno de ataque recém-resolvido, usada só na fase inimiga seguinte
    * (+2 CA se defensiva). Evita perder `pendingStance` ao limpar o estado antes dos ataques inimigos.

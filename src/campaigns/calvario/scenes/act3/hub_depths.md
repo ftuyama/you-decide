@@ -28,7 +28,7 @@ choices:
     effects:
       - { op: setChapter, chapter: 4 }
       - { op: addDiary, text: "O trono chama." }
-  - text: "Lado do guardião (opcional)"
+  - text: "Lado do guardião"
     uiSection: "Trono e pedra"
     next: act3/stone_corridor
     condition: { noFlag: stone_guard_defeated }

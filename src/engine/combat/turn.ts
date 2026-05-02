@@ -224,7 +224,7 @@ function physicalAttackForCharacter(
     : attackRollSpecial2d6(dice[0]!, dice[1]!);
 
   const targetDef = def.agi + def.armor;
-  const defense = 7 + Math.floor(targetDef / 2);
+  const defense = 7 + Math.floor(targetDef / 2) + (c.enemyBuffArmorClass ?? 0);
 
   const logOut = [...log];
   let newEnemies = [...enemies];
@@ -536,6 +536,7 @@ export function advanceToEnemyTurn(
       atk = d1 + d2 + statMod(def.str);
       special = attackRollSpecial2d6(d1, d2);
     }
+    atk += c.enemyBuffAttackRoll ?? 0;
     const panicPenalty =
       targetIndex === 0 && party[0] && party[0].stress >= 4 ? 2 : 0;
     const defScore =
@@ -750,7 +751,7 @@ export function fleeCombat(state: GameState, data: GameData, bus?: EventBus): Ga
   let rngSeed = (state.rngSeed + 31) >>> 0;
 
   if (success) {
-    bus?.emit({ type: 'combat.end', victory: false });
+    bus?.emit({ type: 'combat.end', victory: false, fled: true });
     const stateAfterStress = reducePartyStressAfterCombat(state);
     return tickActiveBuffs({
       ...stateAfterStress,

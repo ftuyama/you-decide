@@ -134,6 +134,8 @@ const combatStub = (overrides?: Partial<CombatState>): CombatState => ({
   pendingSacrificeCost: 0,
   buffAttackRoll: 0,
   buffArmorClass: 0,
+  enemyBuffArmorClass: 0,
+  enemyBuffAttackRoll: 0,
   bossTwistAppliedIds: [],
   log: [],
   returnScene: 'x',

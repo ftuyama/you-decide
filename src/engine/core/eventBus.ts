@@ -2,7 +2,8 @@ export type GameEvent =
   | { type: 'scene.enter'; sceneId: string }
   | { type: 'reputation.changed'; faction: string; value: number }
   | { type: 'combat.start'; encounterId: string }
-  | { type: 'combat.end'; victory: boolean }
+  /** `fled` só importa quando `victory` é false — fuga bem-sucedida vs derrota. */
+  | { type: 'combat.end'; victory: boolean; fled?: boolean }
   /** Combate terminou por milagre de fé: herói salvo, sem game over. */
   | { type: 'faith.miracle' }
   | { type: 'effect.applied'; op: string }

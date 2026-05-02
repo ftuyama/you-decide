@@ -201,6 +201,14 @@ export class GameAudio {
     this.sfx.playDefeat();
   }
 
+  playFlee(): void {
+    this.sfx.playFlee();
+  }
+
+  playBossTwistRevelation(): void {
+    this.sfx.playBossTwistRevelation();
+  }
+
   private gain(base: number): number {
     return base * this.volume;
   }

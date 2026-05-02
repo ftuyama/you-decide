@@ -60,6 +60,8 @@ export function beginEncounter(
     pendingSacrificeCost: 0,
     buffAttackRoll: 0,
     buffArmorClass: 0,
+    enemyBuffArmorClass: 0,
+    enemyBuffAttackRoll: 0,
     returnScene: opts.returnScene,
     onVictory: opts.onVictory,
     onFlee: opts.onFlee,

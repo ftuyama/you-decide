@@ -17,6 +17,7 @@ export function dayAdvanceSubtitle(day: number): string {
 export type GameEventHandlers = {
   isStoryMode: boolean;
   onCombatVictory: () => void;
+  onCombatFlee: () => void;
   onCombatDefeat: () => void;
   onFaithMiracle: () => void;
   onItemAcquired: (itemId: string) => void;
@@ -30,7 +31,10 @@ export type GameEventHandlers = {
 
 export function handleGameEvent(ev: GameEvent, h: GameEventHandlers): void {
   if (ev.type === 'combat.end' && ev.victory) h.onCombatVictory();
-  if (ev.type === 'combat.end' && !ev.victory) h.onCombatDefeat();
+  if (ev.type === 'combat.end' && !ev.victory) {
+    if (ev.fled) h.onCombatFlee();
+    else h.onCombatDefeat();
+  }
   if (ev.type === 'faith.miracle') h.onFaithMiracle();
   if (ev.type === 'item.acquired') h.onItemAcquired(ev.itemId);
   if (ev.type === 'xp.gained' && ev.amount > 0 && h.isStoryMode) h.onXpGained(ev.amount);

@@ -61,6 +61,8 @@ export function applyBossTwistsAfterEnemyPhase(
 
   let buffAC = c.buffArmorClass ?? 0;
   let buffAtk = c.buffAttackRoll ?? 0;
+  let enemyBuffAC = c.enemyBuffArmorClass ?? 0;
+  let enemyBuffAtk = c.enemyBuffAttackRoll ?? 0;
   let enemyAdv = c.enemyAdvantage === true;
   let playerAdv = c.playerAdvantage === true;
 
@@ -72,7 +74,7 @@ export function applyBossTwistsAfterEnemyPhase(
     for (const op of twist.apply) {
       switch (op.op) {
         case 'combatLog':
-          twistLog.push({ kind: 'info', message: op.message });
+          twistLog.push({ kind: 'boss_twist', message: op.message });
           break;
         case 'setEnemyAdvantage':
           enemyAdv = op.value;
@@ -89,6 +91,14 @@ export function applyBossTwistsAfterEnemyPhase(
         case 'buffLeadAttackRoll':
           buffAtk = Math.max(0, buffAtk + op.delta);
           combatPatch.buffAttackRoll = buffAtk;
+          break;
+        case 'buffBossArmorClass':
+          enemyBuffAC = Math.max(0, enemyBuffAC + op.delta);
+          combatPatch.enemyBuffArmorClass = enemyBuffAC;
+          break;
+        case 'buffBossAttackRoll':
+          enemyBuffAtk = Math.max(0, enemyBuffAtk + op.delta);
+          combatPatch.enemyBuffAttackRoll = enemyBuffAtk;
           break;
         case 'damageAllEnemies':
           enemiesNext = enemiesNext.map((e) =>

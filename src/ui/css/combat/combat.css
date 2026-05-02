@@ -1675,6 +1675,27 @@ button.combat-flee-btn:hover {
   color: #9a9a8a;
 }
 
+/** Twist de boss — destaque narrativo no log */
+.combat-log-entry.combat-log-boss_twist {
+  margin: 0.35rem 0;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid color-mix(in srgb, var(--danger) 35%, var(--combat-log-entry-border));
+  border-left: 4px solid color-mix(in srgb, var(--danger) 55%, var(--border));
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--panel-overlay-32) 88%, var(--danger) 8%);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--danger) 12%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 6%, transparent);
+}
+
+.combat-log-entry.combat-log-boss_twist .combat-log-msg {
+  font-size: 0.88rem;
+  font-weight: 500;
+  font-style: italic;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--text-strong) 90%, var(--danger) 10%);
+}
+
 .combat-log-entry.combat-log-stress .combat-log-msg {
   color: #b898a8;
 }
@@ -1905,4 +1926,110 @@ button.combat-potion:disabled {
 
 .combat-log-entry.combat-log-heal .combat-log-msg {
   color: #7ec8a0;
+}
+
+/* Overlay de twist de boss (acima de modais da app, z-index 60) */
+.combat-boss-twist-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+
+.combat-boss-twist-backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--panel-overlay-45);
+  cursor: pointer;
+  border: none;
+}
+
+.combat-boss-twist-panel {
+  position: relative;
+  z-index: 1;
+  max-width: 36rem;
+  width: 100%;
+  padding: 1.35rem 1.5rem 1.15rem;
+  border: 1px solid color-mix(in srgb, var(--danger) 28%, var(--border));
+  border-radius: 4px;
+  background: linear-gradient(
+    165deg,
+    color-mix(in srgb, var(--panel-overlay-35) 92%, var(--danger) 8%) 0%,
+    var(--panel-overlay-32) 100%
+  );
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.45),
+    0 0 0 1px color-mix(in srgb, var(--danger) 15%, transparent),
+    inset 0 1px 0 color-mix(in srgb, #fff 5%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .combat-boss-twist-panel {
+    animation: combat-boss-twist-panel-in 0.32s ease-out;
+  }
+}
+
+@keyframes combat-boss-twist-panel-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(0.35rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.combat-boss-twist-title {
+  margin: 0 0 0.85rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: center;
+  color: color-mix(in srgb, var(--text-strong) 85%, var(--danger) 15%);
+  text-shadow: 0 1px 12px color-mix(in srgb, var(--danger) 25%, transparent);
+}
+
+.combat-boss-twist-body {
+  margin-bottom: 1.1rem;
+  text-align: center;
+}
+
+.combat-boss-twist-para {
+  margin: 0 0 0.75rem;
+  font-size: 1.02rem;
+  line-height: 1.55;
+  font-style: italic;
+  color: var(--text-strong);
+}
+
+.combat-boss-twist-para:last-child {
+  margin-bottom: 0;
+}
+
+button.combat-boss-twist-continue {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+  padding: 0.55rem 1rem;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  color: var(--text-strong);
+  background: color-mix(in srgb, var(--danger) 22%, var(--panel-overlay-28));
+  border: 1px solid color-mix(in srgb, var(--danger) 40%, var(--border));
+  border-radius: 3px;
+}
+
+button.combat-boss-twist-continue:hover {
+  background: color-mix(in srgb, var(--danger) 32%, var(--panel-overlay-28));
+  border-color: color-mix(in srgb, var(--danger) 55%, var(--border));
 }

@@ -176,6 +176,76 @@ function aggregateAmbientCounts(scenes: Map<string, LoadedScene>): Map<AmbientTh
   return m;
 }
 
+type DevToolsSfxPreviewRow = { label: string; play: (audio: GameAudio) => void };
+
+type DevToolsSfxCategory = { category: string; rows: readonly DevToolsSfxPreviewRow[] };
+
+/** Pré-escuta na aba Música (`?view=dev&tab=music`) — espelha `GameAudio` + `GameSfxPlayer`. */
+const DEV_TOOLS_SFX_BY_CATEGORY: readonly DevToolsSfxCategory[] = [
+  {
+    category: 'Interface e testes',
+    rows: [
+      { label: 'Clique (UI)', play: (a) => a.playUiClick() },
+      { label: 'Bloqueado', play: (a) => a.playBlocked() },
+      { label: 'Dados', play: (a) => a.playDice() },
+      { label: 'Teste falhou', play: (a) => a.playCheckFail() },
+      { label: 'Teste passou', play: (a) => a.playCheckSuccess() },
+    ],
+  },
+  {
+    category: 'Combate — golpes',
+    rows: [
+      { label: 'Acerto (genérico)', play: (a) => a.playHit() },
+      { label: 'Corte (lâmina)', play: (a) => a.playSwordSlash() },
+      { label: 'Impacto (contundente)', play: (a) => a.playBluntImpact() },
+      { label: 'Cajado', play: (a) => a.playStaffWhoosh() },
+      { label: 'Crítico', play: (a) => a.playCritImpact() },
+      { label: 'Errou', play: (a) => a.playMiss() },
+      { label: 'Golpe letal', play: (a) => a.playLethalStrike() },
+      { label: 'Armadura estilhaçada', play: (a) => a.playArmorShatter() },
+    ],
+  },
+  {
+    category: 'Combate — magia e itens',
+    rows: [
+      { label: 'Magia (fogo)', play: (a) => a.playSpellFire() },
+      { label: 'Magia (arcano)', play: (a) => a.playSpellArcaneBurst() },
+      { label: 'Magia (gelo)', play: (a) => a.playSpellIceSpark() },
+      { label: 'Cura (magia)', play: (a) => a.playSpellHeal() },
+      { label: 'Poção', play: (a) => a.playPotionDrink() },
+      { label: 'Buff', play: (a) => a.playBuffCast() },
+      { label: 'Foco do guerreiro', play: (a) => a.playWarriorsFocus() },
+    ],
+  },
+  {
+    category: 'Combate — herói',
+    rows: [
+      { label: 'Dano recebido', play: (a) => a.playDamageTaken() },
+      { label: 'Stress', play: (a) => a.playStressSting() },
+    ],
+  },
+  {
+    category: 'Progressão',
+    rows: [
+      { label: 'Descanso (acamp.)', play: (a) => a.playCampRest() },
+      { label: 'Novo dia', play: (a) => a.playDayAdvance() },
+      { label: 'Item obtido', play: (a) => a.playItemAcquire() },
+      { label: 'Milagre (fé)', play: (a) => a.playFaithMiracle() },
+      { label: 'Level up', play: (a) => a.playLevelUpCelebration() },
+      { label: 'Promoção de caminho', play: (a) => a.playPathPromotion() },
+    ],
+  },
+  {
+    category: 'Desfechos',
+    rows: [
+      { label: 'Vitória', play: (a) => a.playVictory() },
+      { label: 'Derrota', play: (a) => a.playDefeat() },
+      { label: 'Fuga', play: (a) => a.playFlee() },
+      { label: 'Revelação (boss twist)', play: (a) => a.playBossTwistRevelation() },
+    ],
+  },
+];
+
 /** Alinhado a `GameApp.resolveVisualTheme` — paleta CSS (`html[data-theme]`). */
 type DevToolsVisualThemeId = 'default' | 'snow' | 'void' | 'ash';
 
@@ -345,6 +415,56 @@ function mountMusicPanel(
   table.appendChild(tbody);
   parent.appendChild(note);
   parent.appendChild(table);
+
+  const sfxHdr = document.createElement('div');
+  sfxHdr.className = 'dev-tools-subhdr dev-tools-subhdr--music-sfx';
+  sfxHdr.textContent = 'Efeitos sonoros';
+  parent.appendChild(sfxHdr);
+
+  const sfxNote = document.createElement('p');
+  sfxNote.className = 'dev-tools-note';
+  sfxNote.textContent =
+    'Tons curtos por síntese (Web Audio), mesmos métodos do jogo. Cada botão toca uma vez; o volume segue a preferência guardada da campanha.';
+  parent.appendChild(sfxNote);
+
+  const sfxTable = document.createElement('table');
+  sfxTable.className = 'dev-tools-table dev-tools-table--sfx';
+  const sfxThead = document.createElement('thead');
+  sfxThead.innerHTML = '<tr><th>Categoria</th><th>Efeito</th><th>Pré-escuta</th></tr>';
+  sfxTable.appendChild(sfxThead);
+  const sfxTbody = document.createElement('tbody');
+  for (const cat of DEV_TOOLS_SFX_BY_CATEGORY) {
+    const n = cat.rows.length;
+    for (let i = 0; i < n; i++) {
+      const row = cat.rows[i]!;
+      const tr = document.createElement('tr');
+      if (i === 0) {
+        const tdCat = document.createElement('td');
+        tdCat.className = 'dev-tools-sfx-category';
+        tdCat.rowSpan = n;
+        tdCat.textContent = cat.category;
+        tr.appendChild(tdCat);
+      }
+      const tdLabel = document.createElement('td');
+      tdLabel.textContent = row.label;
+      const tdPlay = document.createElement('td');
+      tdPlay.className = 'dev-tools-music-actions';
+      const playSfx = document.createElement('button');
+      playSfx.type = 'button';
+      playSfx.className = 'dev-tools-btn';
+      playSfx.textContent = 'Ouvir';
+      playSfx.addEventListener('click', () => {
+        audio.ensureContext();
+        row.play(audio);
+      });
+      tdPlay.appendChild(playSfx);
+      tr.appendChild(tdLabel);
+      tr.appendChild(tdPlay);
+      sfxTbody.appendChild(tr);
+    }
+  }
+  sfxTable.appendChild(sfxTbody);
+  parent.appendChild(sfxTable);
 }
 
 function appendSceneChoicesSection(parent: HTMLElement, choices: Choice[]): void {

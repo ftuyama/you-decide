@@ -229,7 +229,6 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
       statusDismiss.addEventListener('click', () => {
         ctx.overlay.requestStatusHighlightStackDismiss();
         ctx.audio.playUiClick();
-        ctx.render();
       });
       wrap.appendChild(statusDismiss);
     }
@@ -268,7 +267,6 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     diaryDismiss.addEventListener('click', () => {
       ctx.overlay.requestDiaryBannerDismiss();
       ctx.audio.playUiClick();
-      ctx.render();
     });
     wrap.appendChild(diaryDismiss);
     inner.appendChild(wrap);
@@ -312,7 +310,6 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     itemDismiss.addEventListener('click', () => {
       ctx.overlay.requestItemAcquireBannerDismiss();
       ctx.audio.playUiClick();
-      ctx.render();
     });
     wrap.appendChild(itemDismiss);
     inner.appendChild(wrap);

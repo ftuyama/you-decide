@@ -14,12 +14,12 @@ export class GameSfxPlayer {
   }
 
   playBlocked(): void {
-    this.playTone(90, 0.06, 0.05, 'sine');
+    this.playTone(90, 0.06, 0.45, 'sine');
   }
 
   playDice(): void {
     const ctx = this.host.ensureContext();
-    const g = this.host.gain(0.07);
+    const g = this.host.gain(0.17);
     if (g <= 0) return;
     for (let i = 0; i < 3; i++) {
       const o = ctx.createOscillator();
@@ -233,30 +233,53 @@ export class GameSfxPlayer {
   playCritImpact(): void {
     const ctx = this.host.ensureContext();
     const t0 = ctx.currentTime;
-    const g = this.host.gain(0.08);
+    const g = this.host.gain(0.4);
     if (g <= 0) return;
-    const o = ctx.createOscillator();
-    const gn = ctx.createGain();
-    o.type = 'square';
-    o.frequency.setValueAtTime(180, t0);
-    o.frequency.exponentialRampToValueAtTime(45, t0 + 0.08);
-    gn.gain.setValueAtTime(g * 0.6, t0);
-    gn.gain.exponentialRampToValueAtTime(0.01, t0 + 0.1);
-    o.connect(gn);
-    gn.connect(ctx.destination);
-    o.start(t0);
-    o.stop(t0 + 0.11);
-    const ping = ctx.createOscillator();
-    const gPing = ctx.createGain();
-    ping.type = 'triangle';
-    ping.frequency.value = 660;
-    gPing.gain.setValueAtTime(0.001, t0 + 0.02);
-    gPing.gain.exponentialRampToValueAtTime(this.host.gain(0.05), t0 + 0.028);
-    gPing.gain.exponentialRampToValueAtTime(0.01, t0 + 0.09);
-    ping.connect(gPing);
-    gPing.connect(ctx.destination);
-    ping.start(t0 + 0.02);
-    ping.stop(t0 + 0.1);
+    const snap = ctx.createOscillator();
+    const gSnap = ctx.createGain();
+    snap.type = 'square';
+    snap.frequency.setValueAtTime(2800, t0);
+    snap.frequency.exponentialRampToValueAtTime(520, t0 + 0.03);
+    gSnap.gain.setValueAtTime(g * 0.26, t0);
+    gSnap.gain.exponentialRampToValueAtTime(0.01, t0 + 0.045);
+    snap.connect(gSnap);
+    gSnap.connect(ctx.destination);
+    snap.start(t0);
+    snap.stop(t0 + 0.05);
+    const chunk = ctx.createOscillator();
+    const gChunk = ctx.createGain();
+    chunk.type = 'square';
+    chunk.frequency.setValueAtTime(210, t0);
+    chunk.frequency.exponentialRampToValueAtTime(48, t0 + 0.088);
+    gChunk.gain.setValueAtTime(g * 0.54, t0);
+    gChunk.gain.exponentialRampToValueAtTime(0.01, t0 + 0.105);
+    chunk.connect(gChunk);
+    gChunk.connect(ctx.destination);
+    chunk.start(t0);
+    chunk.stop(t0 + 0.115);
+    const ring = ctx.createOscillator();
+    const gRing = ctx.createGain();
+    ring.type = 'triangle';
+    ring.frequency.value = 783.99;
+    gRing.gain.setValueAtTime(0.001, t0 + 0.012);
+    gRing.gain.exponentialRampToValueAtTime(g * 0.32, t0 + 0.024);
+    gRing.gain.exponentialRampToValueAtTime(0.01, t0 + 0.11);
+    ring.connect(gRing);
+    gRing.connect(ctx.destination);
+    ring.start(t0 + 0.012);
+    ring.stop(t0 + 0.12);
+    const spark = ctx.createOscillator();
+    const gSpark = ctx.createGain();
+    spark.type = 'sine';
+    spark.frequency.setValueAtTime(1567.98, t0 + 0.022);
+    spark.frequency.exponentialRampToValueAtTime(880, t0 + 0.09);
+    gSpark.gain.setValueAtTime(0.001, t0 + 0.022);
+    gSpark.gain.exponentialRampToValueAtTime(g * 0.15, t0 + 0.032);
+    gSpark.gain.exponentialRampToValueAtTime(0.01, t0 + 0.1);
+    spark.connect(gSpark);
+    gSpark.connect(ctx.destination);
+    spark.start(t0 + 0.022);
+    spark.stop(t0 + 0.105);
   }
 
   /** Magia de cura no líder (tom suave ascendente + brilho). */
@@ -368,46 +391,73 @@ export class GameSfxPlayer {
     });
   }
 
-  /** Foco de Guerreiro — corte seco + tensão (diferente do sino mágico de outros buffs). */
+  /**
+   * Foco de Guerreiro — aproximação de grito humano (ruído aspirado + pregas + peito),
+   * sem sample; Web Audio só.
+   */
   playWarriorsFocus(): void {
     const ctx = this.host.ensureContext();
     const t0 = ctx.currentTime;
-    const g = this.host.gain(0.072);
+    const g = this.host.gain(0.272);
     if (g <= 0) return;
-    const edge = ctx.createOscillator();
-    const gEdge = ctx.createGain();
-    edge.type = 'square';
-    edge.frequency.setValueAtTime(380, t0);
-    edge.frequency.exponentialRampToValueAtTime(140, t0 + 0.038);
-    gEdge.gain.setValueAtTime(g * 0.38, t0);
-    gEdge.gain.exponentialRampToValueAtTime(0.01, t0 + 0.055);
-    edge.connect(gEdge);
-    gEdge.connect(ctx.destination);
-    edge.start(t0);
-    edge.stop(t0 + 0.06);
-    const rush = ctx.createOscillator();
-    const gRush = ctx.createGain();
-    rush.type = 'sawtooth';
-    rush.frequency.setValueAtTime(420, t0 + 0.012);
-    rush.frequency.exponentialRampToValueAtTime(110, t0 + 0.1);
-    gRush.gain.setValueAtTime(0.001, t0 + 0.012);
-    gRush.gain.exponentialRampToValueAtTime(g * 0.32, t0 + 0.022);
-    gRush.gain.exponentialRampToValueAtTime(0.01, t0 + 0.12);
-    rush.connect(gRush);
-    gRush.connect(ctx.destination);
-    rush.start(t0 + 0.012);
-    rush.stop(t0 + 0.13);
-    const ping = ctx.createOscillator();
-    const gPing = ctx.createGain();
-    ping.type = 'triangle';
-    ping.frequency.value = 247.31;
-    gPing.gain.setValueAtTime(0.001, t0 + 0.04);
-    gPing.gain.exponentialRampToValueAtTime(g * 0.28, t0 + 0.05);
-    gPing.gain.exponentialRampToValueAtTime(0.01, t0 + 0.11);
-    ping.connect(gPing);
-    gPing.connect(ctx.destination);
-    ping.start(t0 + 0.04);
-    ping.stop(t0 + 0.12);
+    const dur = 0.64;
+    const len = Math.ceil(ctx.sampleRate * dur);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const samples = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) samples[i] = Math.random() * 2 - 1;
+
+    const hi = ctx.createBufferSource();
+    hi.buffer = buf;
+    const bpHi = ctx.createBiquadFilter();
+    bpHi.type = 'bandpass';
+    bpHi.Q.value = 3.4;
+    bpHi.frequency.setValueAtTime(3100, t0);
+    bpHi.frequency.exponentialRampToValueAtTime(680, t0 + 0.52);
+    const gHi = ctx.createGain();
+    gHi.gain.setValueAtTime(0.001, t0);
+    gHi.gain.linearRampToValueAtTime(g * 0.4, t0 + 0.038);
+    gHi.gain.exponentialRampToValueAtTime(0.01, t0 + 0.6);
+    hi.connect(bpHi);
+    bpHi.connect(gHi);
+    gHi.connect(ctx.destination);
+    hi.start(t0);
+    hi.stop(t0 + dur);
+
+    const lo = ctx.createBufferSource();
+    lo.buffer = buf;
+    const bpLo = ctx.createBiquadFilter();
+    bpLo.type = 'bandpass';
+    bpLo.Q.value = 2.2;
+    bpLo.frequency.setValueAtTime(520, t0 + 0.012);
+    bpLo.frequency.exponentialRampToValueAtTime(200, t0 + 0.5);
+    const gLo = ctx.createGain();
+    gLo.gain.setValueAtTime(0.001, t0 + 0.012);
+    gLo.gain.linearRampToValueAtTime(g * 0.22, t0 + 0.05);
+    gLo.gain.exponentialRampToValueAtTime(0.01, t0 + 0.58);
+    lo.connect(bpLo);
+    bpLo.connect(gLo);
+    gLo.connect(ctx.destination);
+    lo.start(t0 + 0.012);
+    lo.stop(t0 + dur);
+
+    const fold = ctx.createOscillator();
+    const lpFold = ctx.createBiquadFilter();
+    lpFold.type = 'lowpass';
+    lpFold.Q.value = 0.85;
+    lpFold.frequency.setValueAtTime(3800, t0 + 0.016);
+    lpFold.frequency.exponentialRampToValueAtTime(900, t0 + 0.5);
+    fold.type = 'sawtooth';
+    fold.frequency.setValueAtTime(410, t0 + 0.016);
+    fold.frequency.exponentialRampToValueAtTime(92, t0 + 0.52);
+    const gFold = ctx.createGain();
+    gFold.gain.setValueAtTime(0.001, t0 + 0.016);
+    gFold.gain.linearRampToValueAtTime(g * 0.13, t0 + 0.06);
+    gFold.gain.exponentialRampToValueAtTime(0.01, t0 + 0.58);
+    fold.connect(lpFold);
+    lpFold.connect(gFold);
+    gFold.connect(ctx.destination);
+    fold.start(t0 + 0.016);
+    fold.stop(t0 + 0.6);
   }
 
   /** Armadura inimiga quebrada (estilhaço / cristal). */
@@ -444,36 +494,60 @@ export class GameSfxPlayer {
   playLethalStrike(): void {
     const ctx = this.host.ensureContext();
     const t0 = ctx.currentTime;
-    const g = this.host.gain(0.055);
+    const g = this.host.gain(0.45);
     if (g <= 0) return;
+    const crack = ctx.createOscillator();
+    const gCrack = ctx.createGain();
+    crack.type = 'square';
+    crack.frequency.setValueAtTime(3200, t0);
+    crack.frequency.exponentialRampToValueAtTime(420, t0 + 0.038);
+    gCrack.gain.setValueAtTime(g * 0.34, t0);
+    gCrack.gain.exponentialRampToValueAtTime(0.01, t0 + 0.055);
+    crack.connect(gCrack);
+    gCrack.connect(ctx.destination);
+    crack.start(t0);
+    crack.stop(t0 + 0.06);
     const thud = ctx.createOscillator();
     const gThud = ctx.createGain();
     thud.type = 'sine';
-    thud.frequency.setValueAtTime(95, t0);
-    thud.frequency.exponentialRampToValueAtTime(38, t0 + 0.14);
-    gThud.gain.setValueAtTime(g * 0.75, t0);
-    gThud.gain.exponentialRampToValueAtTime(0.01, t0 + 0.2);
+    thud.frequency.setValueAtTime(82, t0);
+    thud.frequency.exponentialRampToValueAtTime(28, t0 + 0.18);
+    gThud.gain.setValueAtTime(g * 0.78, t0);
+    gThud.gain.exponentialRampToValueAtTime(0.01, t0 + 0.26);
     thud.connect(gThud);
     gThud.connect(ctx.destination);
     thud.start(t0);
-    thud.stop(t0 + 0.22);
-    const tail = ctx.createOscillator();
-    const gTail = ctx.createGain();
-    tail.type = 'triangle';
-    tail.frequency.value = 330;
-    gTail.gain.setValueAtTime(0.001, t0 + 0.04);
-    gTail.gain.exponentialRampToValueAtTime(g * 0.2, t0 + 0.055);
-    gTail.gain.exponentialRampToValueAtTime(0.01, t0 + 0.16);
-    tail.connect(gTail);
-    gTail.connect(ctx.destination);
-    tail.start(t0 + 0.04);
-    tail.stop(t0 + 0.17);
+    thud.stop(t0 + 0.28);
+    const knell = ctx.createOscillator();
+    const gKnell = ctx.createGain();
+    knell.type = 'triangle';
+    knell.frequency.setValueAtTime(147, t0 + 0.055);
+    knell.frequency.exponentialRampToValueAtTime(98, t0 + 0.38);
+    gKnell.gain.setValueAtTime(0.001, t0 + 0.055);
+    gKnell.gain.exponentialRampToValueAtTime(g * 0.32, t0 + 0.075);
+    gKnell.gain.exponentialRampToValueAtTime(0.01, t0 + 0.42);
+    knell.connect(gKnell);
+    gKnell.connect(ctx.destination);
+    knell.start(t0 + 0.055);
+    knell.stop(t0 + 0.44);
+    const snuff = ctx.createOscillator();
+    const gSnuff = ctx.createGain();
+    snuff.type = 'sine';
+    snuff.frequency.setValueAtTime(880, t0 + 0.028);
+    snuff.frequency.exponentialRampToValueAtTime(220, t0 + 0.14);
+    gSnuff.gain.setValueAtTime(0.001, t0 + 0.028);
+    gSnuff.gain.exponentialRampToValueAtTime(g * 0.12, t0 + 0.04);
+    gSnuff.gain.exponentialRampToValueAtTime(0.01, t0 + 0.16);
+    snuff.connect(gSnuff);
+    gSnuff.connect(ctx.destination);
+    snuff.start(t0 + 0.028);
+    snuff.stop(t0 + 0.17);
   }
 
   /** Erro / falha leve (ataque falha, sorte má) */
   playMiss(): void {
-    this.playTone(220, 0.08, 0.05, 'triangle');
-    this.playTone(140, 0.12, 0.04, 'sine');
+    this.playTone(220, 0.08, 0.15, 'triangle');
+    this.playTone(140, 0.12, 0.14, 'sine');
   }
 
   /** Dano recebido pelo herói */
@@ -515,8 +589,8 @@ export class GameSfxPlayer {
 
   /** Teste de sorte / perícia falhou */
   playCheckFail(): void {
-    this.playTone(100, 0.15, 0.07, 'sawtooth');
-    this.playTone(80, 0.2, 0.05, 'sine');
+    this.playTone(100, 0.25, 0.07, 'sawtooth');
+    this.playTone(80, 0.25, 0.05, 'sine');
   }
 
   /** Teste passou (leve) */
@@ -528,7 +602,7 @@ export class GameSfxPlayer {
   /** Descanso no acampamento — acorde suave (recuperação). */
   playCampRest(): void {
     const ctx = this.host.ensureContext();
-    const g = this.host.gain(0.08);
+    const g = this.host.gain(0.18);
     if (g <= 0) return;
     const t0 = ctx.currentTime;
     const freqs = [130.81, 261.63, 329.63, 392.0];
@@ -543,7 +617,7 @@ export class GameSfxPlayer {
       o.connect(gn);
       gn.connect(ctx.destination);
       o.start(t0);
-      o.stop(t0 + 0.55);
+      o.stop(t0 + 1.55);
     }
   }
 
@@ -577,7 +651,7 @@ export class GameSfxPlayer {
   /** Item novo no inventário (fanfarra curta em três notas). */
   playItemAcquire(): void {
     const ctx = this.host.ensureContext();
-    const g = this.host.gain(0.07);
+    const g = this.host.gain(0.17);
     if (g <= 0) return;
     [784, 988, 1175].forEach((freq, i) => {
       const o = ctx.createOscillator();
@@ -737,6 +811,47 @@ export class GameSfxPlayer {
     }
   }
 
+  /** Fuga bem-sucedida — passos rápidos ascendentes + ressonância curta (não é derrota). */
+  playFlee(): void {
+    const ctx = this.host.ensureContext();
+    const g = this.host.gain(0.12);
+    if (g <= 0) return;
+    const t0 = ctx.currentTime;
+    const steps: { f: number; t: number; dur: number }[] = [
+      { f: 220.0, t: 0, dur: 0.06 },
+      { f: 277.18, t: 0.07, dur: 0.06 },
+      { f: 349.23, t: 0.15, dur: 0.07 },
+      { f: 440.0, t: 0.25, dur: 0.08 },
+    ];
+    for (const { f, t, dur } of steps) {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'triangle';
+      o.frequency.value = f;
+      gn.gain.setValueAtTime(0.001, t0 + t);
+      gn.gain.exponentialRampToValueAtTime(g, t0 + t + 0.015);
+      gn.gain.exponentialRampToValueAtTime(0.001, t0 + t + dur);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(t0 + t);
+      o.stop(t0 + t + dur + 0.03);
+    }
+    const ringT = t0 + 0.38;
+    for (const f of [523.25, 659.25]) {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = f;
+      gn.gain.setValueAtTime(0.001, ringT);
+      gn.gain.exponentialRampToValueAtTime(g * 0.35, ringT + 0.04);
+      gn.gain.exponentialRampToValueAtTime(0.001, ringT + 0.35);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(ringT);
+      o.stop(ringT + 0.4);
+    }
+  }
+
   /**
    * Derrota / fim de combate mau — descida lenta em sol menor, com legato e sub-grave no fim.
    */
@@ -789,6 +904,87 @@ export class GameSfxPlayer {
       o.stop(t0 + t + dur + 0.06);
     }
   }
+
+  /** Twist de boss — abertura “sino” inharmónico (senos, sensação errada) + três acordes dissonantes. */
+  playBossTwistRevelation(): void {
+    const ctx = this.host.ensureContext();
+    const g = this.host.gain(0.32);
+    if (g <= 0) return;
+    const t0 = ctx.currentTime;
+
+    const openEnd = t0 + 0.34;
+    const unBell: { f: number; delay: number; w: number }[] = [
+      { f: 616.5, delay: 0, w: 0.26 },
+      { f: 971.2, delay: 0.01, w: 0.21 },
+      { f: 1290.0, delay: 0.019, w: 0.17 },
+      { f: 1744.0, delay: 0.028, w: 0.14 },
+    ];
+    for (const { f, delay, w } of unBell) {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = f;
+      const s = t0 + delay;
+      gn.gain.setValueAtTime(0.001, s);
+      gn.gain.exponentialRampToValueAtTime(g * w, s + 0.032);
+      gn.gain.exponentialRampToValueAtTime(0.001, openEnd);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(s);
+      o.stop(openEnd + 0.025);
+    }
+
+    const chordHits: { at: number; tail: number; freqs: { f: number; w: number }[] }[] = [
+      {
+        at: 0.09,
+        tail: 0.52,
+        freqs: [
+          { f: 311.13, w: 0.34 },
+          { f: 329.63, w: 0.34 },
+          { f: 392.0, w: 0.3 },
+          { f: 466.16, w: 0.26 },
+        ],
+      },
+      {
+        at: 0.38,
+        tail: 0.5,
+        freqs: [
+          { f: 293.66, w: 0.32 },
+          { f: 311.13, w: 0.32 },
+          { f: 369.99, w: 0.28 },
+          { f: 440.0, w: 0.24 },
+        ],
+      },
+      {
+        at: 0.7,
+        tail: 0.62,
+        freqs: [
+          { f: 277.18, w: 0.3 },
+          { f: 293.66, w: 0.3 },
+          { f: 349.23, w: 0.28 },
+          { f: 415.3, w: 0.26 },
+        ],
+      },
+    ];
+    for (const hit of chordHits) {
+      const ringT = t0 + hit.at;
+      const endT = ringT + hit.tail;
+      for (const { f, w } of hit.freqs) {
+        const o = ctx.createOscillator();
+        const gn = ctx.createGain();
+        o.type = 'triangle';
+        o.frequency.value = f;
+        gn.gain.setValueAtTime(0.001, ringT);
+        gn.gain.exponentialRampToValueAtTime(g * w, ringT + 0.04);
+        gn.gain.exponentialRampToValueAtTime(0.001, endT);
+        o.connect(gn);
+        gn.connect(ctx.destination);
+        o.start(ringT);
+        o.stop(endT + 0.04);
+      }
+    }
+  }
+
   private playTone(freq: number, dur: number, vol: number, type: OscillatorType = 'sine'): void {
     const ctx = this.host.ensureContext();
     const g = this.host.gain(vol);

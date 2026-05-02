@@ -220,6 +220,9 @@ function playCombatFxImpactSounds(
   audio: GameAudio,
   data: GameData
 ): void {
+  if (entries.some((e) => e.kind === 'boss_twist')) {
+    audio.playBossTwistRevelation();
+  }
   const hasPotionHeal = entries.some(
     (e) => e.kind === 'heal' && e.itemId != null && e.spellId == null
   );
@@ -585,6 +588,10 @@ export function combatLastResolvedDamageWasCrit(log: CombatLogEntry[]): boolean 
       i--;
       continue;
     }
+    if (e.kind === 'boss_twist') {
+      i--;
+      continue;
+    }
     break;
   }
   if (i < 0) return false;
@@ -608,6 +615,8 @@ export type CombatRenderContext = {
     stabilize: (s: GameState) => GameState;
     commitState: (s: GameState) => void;
   };
+  /** Chamado quando há novas linhas `boss_twist` no log (um lote por fatia). */
+  onBossTwistReveal?: (messages: string[]) => void;
 };
 
 export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): void {
@@ -653,6 +662,12 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
       const v = { encounterId: encId, index: c.log.length };
       ctx.combatLog.setSoundCursor(v);
     }
+  }
+  const twistMsgs = newLogEntries
+    .filter((e) => e.kind === 'boss_twist')
+    .map((e) => e.message);
+  if (twistMsgs.length > 0 && ctx.onBossTwistReveal) {
+    ctx.onBossTwistReveal(twistMsgs);
   }
   const combatFx: CombatLogFxResult =
     newLogEntries.length > 0

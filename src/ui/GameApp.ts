@@ -36,7 +36,7 @@ import {
   readRawSlot as readSaveSlotRaw,
   hasAnyStoredSaveForCampaign,
 } from './gameAppSaveSlots.ts';
-import { renderCombatInto } from './gameAppCombat.ts';
+import { appendCombatLogMessageWithBoldNames, renderCombatInto } from './gameAppCombat.ts';
 import {
   renderStoryInto,
   resolveSceneArt,
@@ -126,6 +126,11 @@ export class GameApp {
   private itemAcquireBannerExiting = false;
   /** Índice até onde som/FX do log de combate já foram consumidos (som e FX partilham o mesmo cursor). */
   private combatLogCursor: { encounterId: string; index: number } = { encounterId: '', index: 0 };
+  /** Filas de mensagens de twist de boss (cada entrada = um lote mostrado de uma vez). */
+  private bossTwistRevealQueue: string[][] = [];
+  private bossTwistLayer: HTMLElement | null = null;
+  private bossTwistFocusRelease: (() => void) | null = null;
+  private bossTwistKeydownHandler: ((e: KeyboardEvent) => void) | null = null;
   /** Rola teste de perícia/sorte: estado só aplica após o overlay (dados já resolvidos no motor). */
   private pendingStoryDiceRoll: {
     nextState: GameState;
@@ -162,6 +167,17 @@ export class GameApp {
             '.story-dice-banner button[data-quick-nav-continue]:not([disabled])'
           );
         } else {
+          // During status-banner exit, the dismiss control is removed from the DOM; a second
+          // Space would otherwise hit the next overlay (diary/item). Consume the key until clear.
+          if (
+            this.statusHighlightQueue.length > 0 &&
+            (this.statusHighlightDismissChainActive ||
+              this.statusHighlightDismissEndTimer != null ||
+              this.statusHighlightQueue.some((h) => h.exiting))
+          ) {
+            e.preventDefault();
+            return;
+          }
           btn = this.root.querySelector<HTMLButtonElement>(
             '.story-shell button[data-quick-nav-continue]:not([disabled])'
           );
@@ -205,6 +221,7 @@ export class GameApp {
       handleGameEvent(ev, {
         isStoryMode: this.state.mode === 'story',
         onCombatVictory: () => this.audio.playVictory(),
+        onCombatFlee: () => this.audio.playFlee(),
         onCombatDefeat: () => this.audio.playDefeat(),
         onFaithMiracle: () => {
           this.faithMiraclePending = true;
@@ -498,6 +515,112 @@ export class GameApp {
   private unlockAudio(): void {
     this.audio.startAmbientWhenReady();
     this.syncAmbientTheme();
+  }
+
+  private removeBossTwistOverlayListeners(): void {
+    if (this.bossTwistFocusRelease) {
+      this.bossTwistFocusRelease();
+      this.bossTwistFocusRelease = null;
+    }
+    if (this.bossTwistKeydownHandler) {
+      window.removeEventListener('keydown', this.bossTwistKeydownHandler, true);
+      this.bossTwistKeydownHandler = null;
+    }
+  }
+
+  private dismissBossTwistOverlay(): void {
+    this.audio.playUiClick();
+    this.removeBossTwistOverlayListeners();
+    if (this.bossTwistLayer) {
+      this.bossTwistLayer.remove();
+      this.bossTwistLayer = null;
+    }
+    this.tryShowNextBossTwistOverlay();
+  }
+
+  private tryShowNextBossTwistOverlay(): void {
+    if (typeof document === 'undefined') return;
+    if (this.bossTwistLayer != null || this.bossTwistRevealQueue.length === 0) return;
+    const batch = this.bossTwistRevealQueue.shift()!;
+    const c = this.state.combat;
+    const combatantNames =
+      c != null
+        ? [
+            ...this.state.party.map((m) => m.name),
+            ...c.enemies
+              .map((e) => this.registry.data.enemies[e.defId]?.name)
+              .filter((n): n is string => Boolean(n)),
+          ]
+        : this.state.party.map((m) => m.name);
+
+    const layer = document.createElement('div');
+    layer.className = 'combat-boss-twist-layer';
+    layer.setAttribute('role', 'dialog');
+    layer.setAttribute('aria-modal', 'true');
+    layer.setAttribute('aria-labelledby', 'combat-boss-twist-title');
+
+    const backdrop = document.createElement('button');
+    backdrop.type = 'button';
+    backdrop.className = 'combat-boss-twist-backdrop';
+    backdrop.setAttribute('aria-label', 'Fechar');
+
+    const panel = document.createElement('div');
+    panel.className = 'combat-boss-twist-panel';
+
+    const title = document.createElement('h2');
+    title.id = 'combat-boss-twist-title';
+    title.className = 'combat-boss-twist-title';
+    title.textContent = 'Viragem no combate';
+
+    const bodyWrap = document.createElement('div');
+    bodyWrap.className = 'combat-boss-twist-body';
+    for (const msg of batch) {
+      const p = document.createElement('p');
+      p.className = 'combat-boss-twist-para';
+      appendCombatLogMessageWithBoldNames(p, msg, combatantNames);
+      bodyWrap.appendChild(p);
+    }
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'combat-boss-twist-continue';
+    btn.textContent = '[Espaço] - Continuar';
+    btn.addEventListener('click', () => this.dismissBossTwistOverlay());
+    backdrop.addEventListener('click', () => this.dismissBossTwistOverlay());
+
+    this.bossTwistKeydownHandler = (e: KeyboardEvent) => {
+      const dismiss =
+        e.key === 'Escape' || e.key === ' ' || e.code === 'Space';
+      if (!dismiss) return;
+      e.preventDefault();
+      this.dismissBossTwistOverlay();
+    };
+    window.addEventListener('keydown', this.bossTwistKeydownHandler, true);
+
+    layer.appendChild(backdrop);
+    panel.appendChild(title);
+    panel.appendChild(bodyWrap);
+    panel.appendChild(btn);
+    layer.appendChild(panel);
+    this.root.appendChild(layer);
+    this.bossTwistLayer = layer;
+    this.bossTwistFocusRelease = attachFocusTrap(layer);
+    btn.focus();
+  }
+
+  private enqueueBossTwistReveal(messages: string[]): void {
+    if (!messages.length) return;
+    this.bossTwistRevealQueue.push([...messages]);
+    this.tryShowNextBossTwistOverlay();
+  }
+
+  private flushBossTwistOverlayOnLeaveCombat(): void {
+    this.bossTwistRevealQueue = [];
+    this.removeBossTwistOverlayListeners();
+    if (this.bossTwistLayer) {
+      this.bossTwistLayer.remove();
+      this.bossTwistLayer = null;
+    }
   }
 
   private resolveAmbientTheme(): AmbientTheme {
@@ -1175,6 +1298,7 @@ export class GameApp {
     this.syncSidebarDisclosureSections();
     if (this.state.mode !== 'combat') {
       this.combatLogCursor = { encounterId: '', index: 0 };
+      this.flushBossTwistOverlayOnLeaveCombat();
     }
 
     const headerTitle = formatCampaignHeaderTitle(this.registry.data.campaign, this.state.chapter);
@@ -1293,6 +1417,7 @@ export class GameApp {
                 this.render();
               },
             },
+            onBossTwistReveal: (messages) => this.enqueueBossTwistReveal(messages),
           });
         } else {
           const scene = this.registry.getScene(this.state.sceneId);

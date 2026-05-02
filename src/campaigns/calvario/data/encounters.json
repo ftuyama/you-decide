@@ -124,6 +124,10 @@
           {
             "op": "combatLog",
             "message": "O eco das catacumbas repete o teu nome uma vez a mais — como aviso, não como bênção."
+          },
+          {
+            "op": "buffBossAttackRoll",
+            "delta": 1
           }
         ]
       }
@@ -148,6 +152,10 @@
           {
             "op": "combatLog",
             "message": "O eco das catacumbas repete o teu nome uma vez a mais — como aviso, não como bênção."
+          },
+          {
+            "op": "buffBossAttackRoll",
+            "delta": 1
           }
         ]
       }
@@ -176,6 +184,10 @@
           {
             "op": "setEnemyAdvantage",
             "value": true
+          },
+          {
+            "op": "buffBossAttackRoll",
+            "delta": 1
           }
         ]
       },
@@ -188,6 +200,10 @@
           {
             "op": "combatLog",
             "message": "Cada respiração tua pesa; o osso aprendeu o teu ritmo."
+          },
+          {
+            "op": "buffBossArmorClass",
+            "delta": 1
           }
         ]
       }
@@ -216,6 +232,10 @@
           {
             "op": "setEnemyAdvantage",
             "value": true
+          },
+          {
+            "op": "buffBossAttackRoll",
+            "delta": 1
           }
         ]
       },
@@ -228,6 +248,10 @@
           {
             "op": "combatLog",
             "message": "Cada respiração tua pesa; o osso aprendeu o teu ritmo."
+          },
+          {
+            "op": "buffBossArmorClass",
+            "delta": 1
           }
         ]
       }

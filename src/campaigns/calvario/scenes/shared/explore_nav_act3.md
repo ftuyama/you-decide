@@ -14,9 +14,11 @@ choices:
     preview: "Voltar ao hub e manter o stress atual."
   - id: explore_patrol_random
     text: "Patrulhar ao acaso (encontro aleatório)"
-    next: act3/encounters/random_router
     uiSection: "No perímetro"
     preview: "Sem mover no mapa — as profundezas decidem na violência."
+    effects:
+      - op: startWildEncounterFromGraph
+        graphId: act3_depths
 onEnter: []
 ---
 Nas **profundezas**, o eco mastiga nomes antes de os devolver. O mapa não promete saída — só direção.

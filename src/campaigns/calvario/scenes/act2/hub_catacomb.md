@@ -104,10 +104,6 @@ choices:
     preview: "Voz seca no cruzeiro; registo no diário."
     effects:
       - { op: addDiary, text: "Uma voz presa ao teto: \"Já vais no dia {{day}}.\"" }
-  - text: "—"
-    uiSection: "Avançar"
-    next: act2/encounters/random_router
-    condition: { flag: __scenegraph_anchor_act2_random_router }
   - text: "Descer mais fundo"
     uiSection: "Avançar"
     next: act3/descent

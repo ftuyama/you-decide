@@ -14,8 +14,17 @@ export function setupTimedChoices(
   ctx: TimedChoicesContext
 ): void {
   if (!ctx.timedChoiceEnabled) return;
-  const timed = choices.find((c) => c.timedMs && c.fallbackNext);
-  if (!timed || !timed.timedMs || !timed.fallbackNext) return;
+  const timed = choices.find(
+    (c) =>
+      c.timedMs &&
+      ((c.fallbackNext !== undefined && c.fallbackNext.trim() !== '') ||
+        (c.fallbackEffects !== undefined && c.fallbackEffects.length > 0))
+  );
+  if (!timed?.timedMs) return;
+  const hasFallback =
+    (timed.fallbackNext !== undefined && timed.fallbackNext.trim() !== '') ||
+    (timed.fallbackEffects !== undefined && timed.fallbackEffects.length > 0);
+  if (!hasFallback) return;
   const now = Date.now();
   const d = ctx.state.timedChoiceDeadline;
   const resumeMs =
@@ -33,7 +42,7 @@ export function setupTimedChoices(
     ctx.navigation.applyChoice({
       text: '',
       next: timed.fallbackNext,
-      effects: [],
+      effects: timed.fallbackEffects ?? [],
     });
   }, resumeMs);
   ctx.setTimedChoiceTimer(t);

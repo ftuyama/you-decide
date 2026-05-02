@@ -12,9 +12,10 @@ import {
 import { applyEffects } from '../engine/core/index.ts';
 import {
   explorationMoveEffects,
-  pickWeightedEncounterId,
+  pickWildOutcome,
   shouldTriggerEncounter,
   startExplorationCombatEffects,
+  wildEncounterVictoryOverride,
 } from '../engine/world/index.ts';
 import {
   migrateLegacyKnownSpells,
@@ -580,12 +581,16 @@ export class GameApp {
       this.render();
       return;
     }
-    const pick = pickWeightedEncounterId(s.rngSeed, ex.graphId);
+    const pick = pickWildOutcome(s, ex.graphId);
     s = { ...s, rngSeed: pick.nextSeed };
-    const stoneVictory =
-      ex.graphId === 'act3_depths' && pick.encounterId === 'stone_guard_fight'
-        ? 'act3/stone_guard_victory'
-        : undefined;
+    if (pick.kind === 'scene') {
+      s = { ...s, sceneId: pick.sceneId };
+      s = tickActiveBuffs(s);
+      this.state = this.stabilize(s);
+      this.render();
+      return;
+    }
+    const stoneVictory = wildEncounterVictoryOverride(ex.graphId, pick.encounterId);
     s = applyEffects(
       s,
       startExplorationCombatEffects(pick.encounterId, this.state.sceneId, stoneVictory),

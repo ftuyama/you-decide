@@ -1,6 +1,7 @@
 import { loadCampaignContent } from '../../campaigns/registry.ts';
 import { parseSceneMarkdown, type LoadedScene } from '../core/sceneRuntime.ts';
 import type { Effect, SceneFrontmatter } from '../schema/index.ts';
+import { wildStaticSceneTargetsForGraph } from './exploration.ts';
 
 export type SceneGraphEdge = { from: string; to: string; kind: string };
 
@@ -44,6 +45,11 @@ function pushEffectEdges(effects: Effect[], from: string, prefix: string, out: S
       if (e.onFlee) out.push({ from, to: e.onFlee, kind: `${prefix}:fuga` });
       if (e.onDefeat) out.push({ from, to: e.onDefeat, kind: `${prefix}:derrota` });
     }
+    if (e.op === 'startWildEncounterFromGraph') {
+      for (const to of wildStaticSceneTargetsForGraph(e.graphId)) {
+        out.push({ from, to, kind: `${prefix}:wild` });
+      }
+    }
   }
 }
 
@@ -58,6 +64,14 @@ export function edgesFromFrontmatter(fromId: string, fm: SceneFrontmatter): Scen
       out.push({ from: fromId, to: ch.fallbackNext, kind: ch.id ? `tempo:${ch.id}` : 'tempo' });
     }
     pushEffectEdges(ch.effects, fromId, ch.id ? `fx:${ch.id}` : 'fx:escolha', out);
+    if (ch.fallbackEffects?.length) {
+      pushEffectEdges(
+        ch.fallbackEffects,
+        fromId,
+        ch.id ? `fx:${ch.id}:tempo` : 'fx:escolha:tempo',
+        out
+      );
+    }
   }
   pushEffectEdges(fm.onEnter, fromId, 'onEnter', out);
   if (fm.skillCheck) {

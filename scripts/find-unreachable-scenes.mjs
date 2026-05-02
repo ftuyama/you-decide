@@ -29,8 +29,56 @@ function pushEffectEdges(effects, from, out) {
       if (e.onFlee) out.push({ from, to: e.onFlee });
       if (e.onDefeat) out.push({ from, to: e.onDefeat });
     }
+    if (e.op === 'startWildEncounterFromGraph') {
+      if (e.returnSceneId) out.push({ from, to: e.returnSceneId });
+      const targets = WILD_GRAPH_STATIC_TARGETS[e.graphId];
+      if (Array.isArray(targets)) {
+        for (const to of targets) out.push({ from, to });
+      }
+    }
   }
 }
+
+/**
+ * Destinos possíveis de `startWildEncounterFromGraph` (aproximação para BFS).
+ * Manter alinhado a `src/engine/world/exploration.ts`.
+ */
+const WILD_GRAPH_STATIC_TARGETS = {
+  act2_catacomb: [
+    'act2/encounters/wild_encounter_rats',
+    'act2/encounters/wild_encounter_mixed',
+    'act2/encounters/wild_encounter_cultist',
+    'act2/encounters/wild_encounter_bones_rare',
+    'act2/encounters/wild_encounter_lone_swarm_rare',
+  ],
+  act3_depths: ['act3/encounters/cult_patrol_scene', 'act3/encounters/vigil_hunter_scene'],
+  act5_frost: [
+    'act5/encounters/frost_encounter_whelps',
+    'act5/encounters/frost_encounter_solo_whelp',
+    'act5/encounters/frost_encounter_cultist',
+    'act5/encounters/frost_encounter_hunt_party',
+    'act5/encounters/frost_encounter_howl_horde',
+    'act5/encounters/frost_stranded_traveler',
+    'act5/frost_hub',
+  ],
+  act6_fractured_nave: [
+    'act6/encounters/void_encounter_fragment_solo',
+    'act6/encounters/void_encounter_pair_fragments',
+    'act6/encounters/void_encounter_veil',
+    'act6/encounters/void_encounter_echo',
+    'act6/encounters/void_encounter_penitent',
+    'act6/encounters/void_encounter_veil_fragment',
+    'act6/encounters/void_encounter_echo_fragment',
+    'act6/encounters/void_encounter_triple_fragments',
+    'act6/encounters/void_encounter_shadow_rare',
+    'act6/encounters/void_encounter_corruption_horde',
+    'act6/hub_fractured_nave',
+  ],
+  act6_will_trial: [
+    'act6/encounters/will_trial_duel',
+    'act6/encounters/will_trial_horde',
+  ],
+};
 
 function edgesFromFm(fromId, fm) {
   const out = [];
@@ -38,6 +86,7 @@ function edgesFromFm(fromId, fm) {
     if (ch?.next) out.push({ from: fromId, to: ch.next });
     if (ch?.fallbackNext) out.push({ from: fromId, to: ch.fallbackNext });
     pushEffectEdges(ch?.effects, fromId, out);
+    pushEffectEdges(ch?.fallbackEffects, fromId, out);
   }
   pushEffectEdges(fm.onEnter, fromId, out);
   if (fm.skillCheck) {

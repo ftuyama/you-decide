@@ -3,6 +3,7 @@ import { GameStateSchema } from '../schema/index.ts';
 import type { EventBus } from './eventBus.ts';
 import { beginEncounter } from '../combat/encounter.ts';
 import type { GameData } from '../data/gameData.ts';
+import { pickWildOutcome, wildEncounterVictoryOverride } from '../world/exploration.ts';
 import { addXp } from '../progression/progression.ts';
 import { initialKnownSpellIds } from '../progression/spellsKnown.ts';
 import {
@@ -548,6 +549,27 @@ function applyOne(
         onVictory: e.onVictory,
         onFlee: e.onFlee,
         onDefeat: e.onDefeat,
+      });
+    }
+    case 'startWildEncounterFromGraph': {
+      const pick = pickWildOutcome(state, e.graphId);
+      let s: GameState = { ...state, rngSeed: pick.nextSeed };
+      const returnTo = e.returnSceneId ?? ctx.sceneId;
+      if (pick.kind === 'scene') {
+        return tickActiveBuffs({ ...s, sceneId: pick.sceneId, mode: 'story' });
+      }
+      const enc = ctx.data.encounters[pick.encounterId];
+      if (!enc) {
+        console.error(`Encounter not found: ${pick.encounterId} @ ${ctx.sceneId}`);
+        return s;
+      }
+      const onVictory = wildEncounterVictoryOverride(e.graphId, pick.encounterId) ?? returnTo;
+      bus.emit({ type: 'combat.start', encounterId: pick.encounterId });
+      return beginEncounter(s, enc, ctx.data, {
+        returnScene: returnTo,
+        onVictory,
+        onFlee: returnTo,
+        onDefeat: 'shared/game_over',
       });
     }
     case 'recruit': {

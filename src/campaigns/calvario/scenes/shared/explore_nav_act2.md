@@ -14,9 +14,11 @@ choices:
     preview: "Recuar, erguer abrigo e manter o stress atual."
   - id: explore_patrol_random
     text: "Patrulhar ao acaso (encontro aleatório)"
-    next: act2/encounters/random_router
     uiSection: "No perímetro"
     preview: "Sem mover no mapa — os túneis escolhem por ti."
+    effects:
+      - op: startWildEncounterFromGraph
+        graphId: act2_catacomb
 onEnter: []
 ---
 O **silêncio** não é ausência de som — é **decisão** da pedra. Cada passo **pergunta** se voltas ao fogo da Vigília ou se **ficas** com o eco.

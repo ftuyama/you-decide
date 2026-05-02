@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
   explorationMoveEffects,
-  pickWeightedEncounterId,
+  pickWildOutcome,
   startExplorationCombatEffects,
   shouldTriggerEncounter,
+  wildEncounterVictoryOverride,
+  wildStaticSceneTargetsForGraph,
   type ExplorationGraph,
 } from '../../src/engine/world/index.ts';
 import type { GameState } from '../../src/engine/schema/index.ts';
@@ -20,6 +22,39 @@ const miniGraph: ExplorationGraph = {
     { id: 'b', edges: [] },
   ],
 };
+
+/** Estado mínimo para `evaluateCondition` em picks wild. */
+function wildPickState(seed: number, overrides: Partial<GameState> = {}): GameState {
+  return {
+    rngSeed: seed,
+    chapter: 3,
+    level: 5,
+    day: 1,
+    sceneId: 'shared/explore_nav_act3',
+    mode: 'story',
+    flags: {},
+    marks: [],
+    reputation: { vigilia: 0, circulo: 0, culto: 0 },
+    resources: { supply: 5, faith: 2, corruption: 0, gold: 0 },
+    party: [
+      {
+        stress: 0,
+        class: 'knight',
+        path: null,
+        mana: 0,
+      } as GameState['party'][0],
+    ],
+    inventory: [],
+    leadStoryPassives: [],
+    diary: [],
+    companionsAvailable: [],
+    companionFriendship: {},
+    visitedScenes: {},
+    exploration: null,
+    timedChoiceDeadline: null,
+    ...overrides,
+  } as unknown as GameState;
+}
 
 describe('explorationMoveEffects', () => {
   it('resolves a valid edge', () => {
@@ -63,50 +98,112 @@ describe('shouldTriggerEncounter', () => {
   });
 });
 
-describe('pickWeightedEncounterId', () => {
-  it('returns known encounter ids', () => {
-    const p = pickWeightedEncounterId(999);
-    expect([
-      'rats_cellar_pair',
-      'cellar_mixed',
-      'cultist_patrol',
-      'act2_rare_bone_sentinel',
-      'act2_rare_lone_swarm',
-    ]).toContain(p.encounterId);
+describe('pickWildOutcome', () => {
+  it('returns act2 combat for default graph', () => {
+    const st = wildPickState(999);
+    const p = pickWildOutcome(st, undefined);
+    expect(p.kind).toBe('combat');
+    if (p.kind === 'combat') {
+      expect([
+        'rats_cellar_pair',
+        'cellar_mixed',
+        'cultist_patrol',
+        'act2_rare_bone_sentinel',
+        'act2_rare_lone_swarm',
+      ]).toContain(p.encounterId);
+    }
   });
 
   it('uses act6 encounter pool when graph id is act6_fractured_nave', () => {
-    const p = pickWeightedEncounterId(999, 'act6_fractured_nave');
-    expect([
-      'act6_wild_fragment_solo',
-      'act6_wild_fragments_pair',
-      'act6_wild_scribe_solo',
-      'act6_wild_murmur_solo',
-      'act6_wild_chain_solo',
-      'act6_wild_veil_fragment',
-      'act6_wild_echo_fragment',
-      'act6_wild_triple_fragments',
-      'act6_wild_regent_solo',
-      'act6_wild_stain_horde',
-    ]).toContain(p.encounterId);
+    const st = wildPickState(999, { resources: { supply: 5, faith: 2, corruption: 0, gold: 0 } });
+    const p = pickWildOutcome(st, 'act6_fractured_nave');
+    if (p.kind === 'combat') {
+      expect([
+        'act6_wild_fragment_solo',
+        'act6_wild_fragments_pair',
+        'act6_wild_scribe_solo',
+        'act6_wild_murmur_solo',
+        'act6_wild_chain_solo',
+        'act6_wild_veil_fragment',
+        'act6_wild_echo_fragment',
+        'act6_wild_triple_fragments',
+        'act6_wild_regent_solo',
+        'act6_wild_stain_horde',
+      ]).toContain(p.encounterId);
+    } else {
+      expect(p.sceneId).toBe('act6/hub_fractured_nave');
+    }
   });
 
-  it('uses act3 encounter pool when graph id is act3_depths', () => {
-    const p = pickWeightedEncounterId(999, 'act3_depths');
-    expect(['cult_ambush', 'stone_guard_fight', 'cultist_patrol', 'vigil_hunter_fight']).toContain(
-      p.encounterId
+  it('uses act3 combat pool when graph id is act3_depths', () => {
+    const st = wildPickState(999);
+    const p = pickWildOutcome(st, 'act3_depths');
+    expect(p.kind).toBe('combat');
+    if (p.kind === 'combat') {
+      expect(['cult_ambush', 'stone_guard_fight', 'cultist_patrol', 'vigil_hunter_fight']).toContain(
+        p.encounterId
+      );
+    }
+  });
+
+  it('act5 can yield combat or scene branch', () => {
+    const st = wildPickState(999, {
+      flags: { frost_stranded_traveler_done: true },
+    });
+    const p = pickWildOutcome(st, 'act5_frost');
+    if (p.kind === 'combat') {
+      expect([
+        'frost_whelps',
+        'frost_whelp_solo',
+        'cultist_patrol',
+        'frost_hunt_party',
+        'frost_howl_horde',
+      ]).toContain(p.encounterId);
+    } else {
+      expect(['act5/frost_hub', 'act5/encounters/frost_stranded_traveler']).toContain(p.sceneId);
+    }
+  });
+
+  it('act6_will_trial yields only duel when corruption is low', () => {
+    const st = wildPickState(42, {
+      resources: { supply: 5, faith: 2, corruption: 0, gold: 0 },
+    });
+    const p = pickWildOutcome(st, 'act6_will_trial');
+    expect(p.kind).toBe('scene');
+    if (p.kind === 'scene') {
+      expect(p.sceneId).toBe('act6/encounters/will_trial_duel');
+    }
+  });
+
+  it('act6_will_trial can yield horde when corruption is high', () => {
+    const st = wildPickState(42, {
+      resources: { supply: 5, faith: 2, corruption: 5, gold: 0 },
+    });
+    const p = pickWildOutcome(st, 'act6_will_trial');
+    expect(p.kind).toBe('scene');
+    if (p.kind === 'scene') {
+      expect(['act6/encounters/will_trial_duel', 'act6/encounters/will_trial_horde']).toContain(
+        p.sceneId
+      );
+    }
+  });
+});
+
+describe('wildStaticSceneTargetsForGraph', () => {
+  it('lists will trial duel and horde for act6_will_trial', () => {
+    expect(wildStaticSceneTargetsForGraph('act6_will_trial')).toEqual([
+      'act6/encounters/will_trial_duel',
+      'act6/encounters/will_trial_horde',
+    ]);
+  });
+});
+
+describe('wildEncounterVictoryOverride', () => {
+  it('routes stone guard in act3', () => {
+    expect(wildEncounterVictoryOverride('act3_depths', 'stone_guard_fight')).toBe(
+      'act3/stone_guard_victory'
     );
-  });
-
-  it('uses act5 encounter pool when graph id is act5_frost', () => {
-    const p = pickWeightedEncounterId(999, 'act5_frost');
-    expect([
-      'frost_whelps',
-      'frost_whelp_solo',
-      'cultist_patrol',
-      'frost_hunt_party',
-      'frost_howl_horde',
-    ]).toContain(p.encounterId);
+    expect(wildEncounterVictoryOverride('act3_depths', 'cult_ambush')).toBeUndefined();
   });
 });
 

@@ -98,7 +98,7 @@ export type SceneArtHighlightPayload = {
 export type StoryRenderContext = {
   campaignId: string;
   devMode: boolean;
-  /** Se true, escolhas com `timedMs` + `fallbackNext` disparam barra e auto-navegação. */
+  /** Se true, escolhas com `timedMs` + `fallbackNext` ou `fallbackEffects` disparam barra e auto-navegação. */
   timedChoiceEnabled: boolean;
   /** Grava `timedChoiceDeadline` ao agendar (para sobreviver a `render()` sem reiniciar o relógio). */
   onTimedChoiceScheduled: (deadlineEpochMs: number | null) => void;
@@ -585,7 +585,13 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
   inner.appendChild(chWrap);
 
   const hasTimedChoice =
-    ctx.timedChoiceEnabled && enabledChoices.some((c) => c.timedMs && c.fallbackNext);
+    ctx.timedChoiceEnabled &&
+    enabledChoices.some(
+      (c) =>
+        c.timedMs &&
+        ((c.fallbackNext !== undefined && c.fallbackNext.trim() !== '') ||
+          (c.fallbackEffects !== undefined && c.fallbackEffects.length > 0))
+    );
   setupTimedChoices(enabledChoices, inner, ctx);
   if (!hasTimedChoice) {
     ctx.onTimedChoiceScheduled(null);

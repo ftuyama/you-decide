@@ -1,4 +1,5 @@
-import type { Effect, GameState } from '../schema/index.ts';
+import type { Condition, Effect, GameState } from '../schema/index.ts';
+import { evaluateCondition } from '../core/conditions.ts';
 import { mulberry32 } from '../core/rng.ts';
 
 /** Grafo de navegação por área (dados em campanha). */
@@ -33,8 +34,17 @@ export type ExplorationGraphProvider = (graphId: string) => ExplorationGraph | n
 /** Flag definida ao chegar ao nó objetivo do grafo act2 (catacumba). */
 export const ACT2_EXPLORE_GOAL_FLAG = 'act2_explore_goal_reached';
 
-/** Mesmos pesos que `act2/encounters/random_router` → IDs de encontro. */
-const ACT2_WILD_WEIGHTS: { weight: number; encounterId: string }[] = [
+/** Ramo de tabela wild: combate (`encounterId`) ou salto narrativo (`nextSceneId`). */
+export type ExplorationWildBranch =
+  | { weight: number; encounterId: string; condition?: Condition }
+  | { weight: number; nextSceneId: string; condition?: Condition };
+
+export type WildPickResult =
+  | { kind: 'combat'; encounterId: string; nextSeed: number }
+  | { kind: 'scene'; sceneId: string; nextSeed: number };
+
+/** Tabela wild do act2 (`act2_catacomb` e fallback quando `graphId` não está no mapa). */
+const ACT2_WILD_BRANCHES: ExplorationWildBranch[] = [
   { weight: 1, encounterId: 'rats_cellar_pair' },
   { weight: 1, encounterId: 'cellar_mixed' },
   { weight: 1, encounterId: 'cultist_patrol' },
@@ -42,25 +52,40 @@ const ACT2_WILD_WEIGHTS: { weight: number; encounterId: string }[] = [
   { weight: 0.2, encounterId: 'act2_rare_lone_swarm' },
 ];
 
-/** Alinhado a `act3/encounters/random_router` (pesos e encounterId por ramo). */
-const ACT3_WILD_WEIGHTS: { weight: number; encounterId: string }[] = [
+const ACT3_WILD_BRANCHES: ExplorationWildBranch[] = [
   { weight: 1, encounterId: 'cult_ambush' },
   { weight: 1, encounterId: 'stone_guard_fight' },
   { weight: 1, encounterId: 'cultist_patrol' },
   { weight: 0.35, encounterId: 'vigil_hunter_fight' },
 ];
 
-/** Pesos dos encontros aleatórios de navegação do act5. */
-const ACT5_WILD_WEIGHTS: { weight: number; encounterId: string }[] = [
+/** Alinhado ao antigo `frost_random_router` (combates + viajante + hub). */
+const ACT5_WILD_BRANCHES: ExplorationWildBranch[] = [
   { weight: 1, encounterId: 'frost_whelps' },
   { weight: 1, encounterId: 'frost_whelp_solo' },
   { weight: 1, encounterId: 'cultist_patrol' },
   { weight: 0.25, encounterId: 'frost_hunt_party' },
   { weight: 0.1, encounterId: 'frost_howl_horde' },
+  {
+    weight: 0.35,
+    nextSceneId: 'act5/encounters/frost_stranded_traveler',
+    condition: { noFlag: 'frost_stranded_traveler_done' },
+  },
+  { weight: 1, nextSceneId: 'act5/frost_hub' },
 ];
 
-/** Pesos dos encontros aleatórios de navegação do act6. */
-const ACT6_WILD_WEIGHTS: { weight: number; encounterId: string }[] = [
+/** Prova da vontade (altar): duelo vs horda conforme corrupção — antigo `will_random_router`. */
+const ACT6_WILL_TRIAL_BRANCHES: ExplorationWildBranch[] = [
+  { weight: 1, nextSceneId: 'act6/encounters/will_trial_duel' },
+  {
+    weight: 0.6,
+    nextSceneId: 'act6/encounters/will_trial_horde',
+    condition: { resource: { corruption: { gte: 3 } } },
+  },
+];
+
+/** Alinhado ao antigo `fractured_void_router` (+ peso extra de mancha com corrupção alta). */
+const ACT6_WILD_BRANCHES: ExplorationWildBranch[] = [
   { weight: 1, encounterId: 'act6_wild_fragment_solo' },
   { weight: 1, encounterId: 'act6_wild_fragments_pair' },
   { weight: 1, encounterId: 'act6_wild_scribe_solo' },
@@ -71,13 +96,46 @@ const ACT6_WILD_WEIGHTS: { weight: number; encounterId: string }[] = [
   { weight: 0.2, encounterId: 'act6_wild_triple_fragments' },
   { weight: 0.08, encounterId: 'act6_wild_regent_solo' },
   { weight: 0.6, encounterId: 'act6_wild_stain_horde' },
+  {
+    weight: 0.6,
+    encounterId: 'act6_wild_stain_horde',
+    condition: { resource: { corruption: { gte: 4 } } },
+  },
+  { weight: 1, nextSceneId: 'act6/hub_fractured_nave' },
 ];
 
-const EXPLORATION_WILD_WEIGHTS_BY_GRAPH: Record<string, { weight: number; encounterId: string }[]> = {
-  act3_depths: ACT3_WILD_WEIGHTS,
-  act5_frost: ACT5_WILD_WEIGHTS,
-  act6_fractured_nave: ACT6_WILD_WEIGHTS,
+const EXPLORATION_WILD_BRANCHES_BY_GRAPH: Record<string, ExplorationWildBranch[]> = {
+  act3_depths: ACT3_WILD_BRANCHES,
+  act5_frost: ACT5_WILD_BRANCHES,
+  act6_fractured_nave: ACT6_WILD_BRANCHES,
+  /** Não é grafo de mapa; só `startWildEncounterFromGraph` na prova da vontade. */
+  act6_will_trial: ACT6_WILL_TRIAL_BRANCHES,
 };
+
+function wildBranchesForGraph(graphId?: string): ExplorationWildBranch[] {
+  if (graphId && EXPLORATION_WILD_BRANCHES_BY_GRAPH[graphId]) {
+    return EXPLORATION_WILD_BRANCHES_BY_GRAPH[graphId]!;
+  }
+  return ACT2_WILD_BRANCHES;
+}
+
+/** Destinos de cena referidos por ramos `nextSceneId` (ex.: grafo estático de campanha). */
+export function wildStaticSceneTargetsForGraph(graphId: string): string[] {
+  return wildBranchesForGraph(graphId)
+    .filter((b): b is ExplorationWildBranch & { nextSceneId: string } => 'nextSceneId' in b)
+    .map((b) => b.nextSceneId);
+}
+
+/** Vitória especial (loot/cena) para encontros wild ao mover no mapa ou patrulhar. */
+export function wildEncounterVictoryOverride(
+  graphId: string,
+  encounterId: string
+): string | undefined {
+  if (graphId === 'act3_depths' && encounterId === 'stone_guard_fight') {
+    return 'act3/stone_guard_victory';
+  }
+  return undefined;
+}
 
 export function validateExplorationGraphContract(graph: ExplorationGraph): void {
   const nodeById = new Map<string, ExplorationNode>();
@@ -130,28 +188,30 @@ export function getEdgeFromNode(
   return n?.edges.find((e) => e.id === edgeId);
 }
 
-/** Escolha pesada (mesma lógica que randomBranch de cena). */
-export function pickWeightedEncounterId(
-  seed: number,
-  graphId?: string
-): {
-  encounterId: string;
-  nextSeed: number;
-} {
-  const weights =
-    (graphId ? EXPLORATION_WILD_WEIGHTS_BY_GRAPH[graphId] : undefined) ?? ACT2_WILD_WEIGHTS;
-  const rng = mulberry32(seed ^ weights.length);
-  const w = weights.reduce((a, b) => a + b.weight, 0);
+/**
+ * Escolha pesada sobre a tabela wild do grafo (combate ou salto de cena).
+ * Condições são avaliadas como em `randomBranch`; se nenhuma ramo for elegível, usa a tabela completa.
+ */
+export function pickWildOutcome(state: GameState, graphId?: string): WildPickResult {
+  const branches = wildBranchesForGraph(graphId);
+  const eligible = branches.filter((b) => evaluateCondition(b.condition, state));
+  const pool = eligible.length > 0 ? eligible : branches;
+  const rng = mulberry32(state.rngSeed ^ pool.length);
+  const w = pool.reduce((a, b) => a + b.weight, 0);
   let t = rng() * w;
-  let pick = weights[0]!.encounterId;
-  for (const b of weights) {
+  let pick = pool[0]!;
+  for (const b of pool) {
     t -= b.weight;
     if (t <= 0) {
-      pick = b.encounterId;
+      pick = b;
       break;
     }
   }
-  return { encounterId: pick, nextSeed: (seed + 41) >>> 0 };
+  const nextSeed = (state.rngSeed + 41) >>> 0;
+  if ('nextSceneId' in pick) {
+    return { kind: 'scene', sceneId: pick.nextSceneId, nextSeed };
+  }
+  return { kind: 'combat', encounterId: pick.encounterId, nextSeed };
 }
 
 export function explorationMoveEffects(args: {

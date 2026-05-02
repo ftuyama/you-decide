@@ -147,6 +147,12 @@ export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
     onFlee: z.string().optional(),
     onDefeat: z.string().optional(),
   }),
+  z.object({
+    op: z.literal('startWildEncounterFromGraph'),
+    graphId: z.string(),
+    /** Se omitido, vitória/fuga regressam à cena atual (`ctx.sceneId`). */
+    returnSceneId: z.string().optional(),
+  }),
   z.object({ op: z.literal('recruit'), companionId: z.string() }),
   z.object({ op: z.literal('dismissCompanion'), companionId: z.string() }),
   z.object({ op: z.literal('setAsciiMap'), mapId: z.string() }),
@@ -222,6 +228,7 @@ export type Effect =
       onFlee?: string;
       onDefeat?: string;
     }
+  | { op: 'startWildEncounterFromGraph'; graphId: string; returnSceneId?: string }
   | { op: 'recruit'; companionId: string }
   | { op: 'dismissCompanion'; companionId: string }
   | { op: 'setAsciiMap'; mapId: string }
@@ -256,9 +263,11 @@ export const ChoiceSchema = z
     /** Texto de preview de consequência (1 linha) */
     preview: z.string().optional(),
     effects: z.array(EffectSchema).default([]),
-    /** Escolha com tempo: ms; se expirar, usa fallbackNext */
+    /** Escolha com tempo: ms; se expirar, usa `fallbackNext` e/ou `fallbackEffects` */
     timedMs: z.number().positive().optional(),
     fallbackNext: z.string().optional(),
+    /** Se o tempo expirar, estes efeitos aplicam-se em vez do clique (ex.: sorteio wild sem `fallbackNext`). */
+    fallbackEffects: z.array(EffectSchema).optional(),
     /**
      * Se a `condition` falhar, a UI ainda mostra a linha desabilitada (teaser).
      * Exige `condition` e `lockedHint` quando true.
@@ -287,6 +296,17 @@ export const ChoiceSchema = z
           code: 'custom',
           message: 'showWhenLocked exige lockedHint não vazio',
           path: ['lockedHint'],
+        });
+      }
+    }
+    if (data.timedMs !== undefined) {
+      const hasNext = data.fallbackNext !== undefined && data.fallbackNext.trim() !== '';
+      const hasFx = (data.fallbackEffects?.length ?? 0) > 0;
+      if (!hasNext && !hasFx) {
+        ctx.addIssue({
+          code: 'custom',
+          message: 'timedMs exige fallbackNext ou fallbackEffects',
+          path: ['timedMs'],
         });
       }
     }

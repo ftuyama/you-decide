@@ -471,6 +471,8 @@ function appendSceneChoicesSection(parent: HTMLElement, choices: Choice[]): void
     if (ch.preview) bits.push(`prévia: ${ch.preview}`);
     if (ch.timedMs != null) bits.push(`tempo: ${ch.timedMs}ms`);
     if (ch.fallbackNext) bits.push(`fallback: ${ch.fallbackNext}`);
+    if (ch.fallbackEffects?.length)
+      bits.push(`fallbackFx: ${ch.fallbackEffects.map((e) => e.op).join(', ')}`);
     meta.textContent = bits.join(' · ') || '—';
     li.appendChild(meta);
     if (ch.condition != null) {

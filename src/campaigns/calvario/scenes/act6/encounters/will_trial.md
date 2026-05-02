@@ -6,11 +6,15 @@ ambientTheme: void
 artKey: void_altar
 choices:
   - text: "Submeter o impulso ao acaso do altar"
-    next: act6/encounters/will_random_router
+    effects:
+      - op: startWildEncounterFromGraph
+        graphId: act6_will_trial
   - text: "Forcar confronto direto contra o penitente"
     preview: "Ferro imediato — ou hesitar e deixar o altar decidir."
     timedMs: 12000
-    fallbackNext: act6/encounters/will_random_router
+    fallbackEffects:
+      - op: startWildEncounterFromGraph
+        graphId: act6_will_trial
     effects:
       - { op: addMark, mark: act6_will_direct }
       - { op: addResource, resource: supply, delta: -1 }

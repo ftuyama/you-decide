@@ -39,8 +39,9 @@
 }
 
 .diary-entry-banner--exiting {
+  will-change: transform, opacity;
   animation: story-overlay-fade-out var(--story-banner-fade-duration)
-    var(--story-banner-fade-easing) forwards;
+    var(--story-banner-fade-easing) both;
   pointer-events: none;
 }
 

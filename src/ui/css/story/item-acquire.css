@@ -10,9 +10,30 @@
 }
 
 .item-acquire-banner--exiting {
+  will-change: transform, opacity;
   animation: story-overlay-fade-out var(--story-banner-fade-duration)
-    var(--story-banner-fade-easing) forwards;
+    var(--story-banner-fade-easing) both;
   pointer-events: none;
+}
+
+.item-acquire-banner .item-acquire-dismiss {
+  color: #e4dcc8;
+  background: #1e2420;
+  border: 1px solid #4a5a48;
+}
+
+.item-acquire-banner .item-acquire-dismiss:hover {
+  background: #283028;
+  border-color: #5a6a58;
+}
+
+.item-acquire-dismiss {
+  display: block;
+  margin: 0.85rem 0 0;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  border-radius: 2px;
 }
 
 .item-acquire-kicker {

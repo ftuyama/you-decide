@@ -87,9 +87,9 @@
   --map-char-goal: #e2c16a;
   --map-char-player: #7ad7d0;
   /** Banners de história (status / diário / item): espelhar `STORY_BANNER_*_MS` em `GameApp.ts`. */
-  --story-banner-hold-duration: 1s;
-  --story-banner-fade-duration: 2s;
-  --story-banner-fade-easing: ease-in-out;
+  --story-banner-fade-duration: 1s;
+  /** Deslize + fade: curva suave (evita “travões” de ease-in-out em keyframes densos). */
+  --story-banner-fade-easing: cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 html[data-theme='snow'] {

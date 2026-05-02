@@ -19,10 +19,8 @@ export type GameEvent =
       variant: 'good' | 'bad' | 'neutral' | 'debuff';
       title: string;
       subtitle?: string;
-      /** ms até a UI retirar o banner; omitido = TTL por defeito. `0` = não expira. */
+      /** Metadado do motor; a UI não usa para timers (fecho manual + mudança de cena). */
       autoDismissMs?: number;
-      /** Reservado à UI (`GameApp`) para corresponder timeouts a entradas da fila. */
-      dismissToken?: number;
     };
 
 type Listener = (e: GameEvent) => void;

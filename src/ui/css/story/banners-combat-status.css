@@ -376,29 +376,43 @@
   border-color: #7a8a72;
 }
 
-/* Fila de destaques: fade-out + deslize final (duração / easing nos tokens; sync com GameApp). */
+.status-highlight-dismiss {
+  display: block;
+  margin: 0.75rem 0 0;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  color: #dfe8d8;
+  background: #2a3028;
+  border: 1px solid #5a6252;
+  border-radius: 2px;
+}
+
+.status-highlight-dismiss:hover {
+  background: #343a32;
+}
+
+/* Fila de destaques: fade-out + deslize contínuo à direita (easing nos tokens; sync com GameApp). */
 @keyframes story-overlay-fade-out {
   from {
     opacity: 1;
     transform: translate3d(0, 0, 0);
   }
-  58% {
-    opacity: 0.42;
-    transform: translate3d(0, 0, 0);
-  }
   to {
     opacity: 0;
-    transform: translate3d(2.75rem, 0, 0);
+    transform: translate3d(4rem, 0, 0);
   }
 }
 
 .status-highlight-banner--exiting {
+  will-change: transform, opacity;
   animation: story-overlay-fade-out var(--story-banner-fade-duration)
-    var(--story-banner-fade-easing) forwards;
+    var(--story-banner-fade-easing) both;
   pointer-events: none;
 }
 
 .status-highlight-banner--debuff.status-highlight-banner--exiting {
+  will-change: transform, opacity;
   animation: story-overlay-fade-out var(--story-banner-fade-duration)
-    var(--story-banner-fade-easing) forwards;
+    var(--story-banner-fade-easing) both;
 }

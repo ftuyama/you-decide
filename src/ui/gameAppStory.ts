@@ -74,9 +74,8 @@ function buildExplorationMovementRows(
 export type { CampEquipmentCallbacks } from './story/storyCampEquipmentPanel.ts';
 export type { StoryDiceBannerHost } from './story/storyDiceBanner.ts';
 
-/** Fila de destaques na história: tokens TTL + fade geridos no `GameApp`. */
+/** Fila de destaques na história: fade ao fechar gerido no `GameApp`. */
 export type StoryStatusHighlightRow = Extract<GameEvent, { type: 'statusHighlight' }> & {
-  dismissToken?: number;
   exiting?: boolean;
 };
 
@@ -86,10 +85,15 @@ export type StoryOverlayState = {
   faithMiraclePending: boolean;
   setFaithMiraclePending: (v: boolean) => void;
   statusHighlightQueue: StoryStatusHighlightRow[];
+  /** Espaçamento em ms entre inícios da cascata (sync com `GameApp`). */
+  statusHighlightExitStaggerMs: number;
   setStatusHighlightQueue: (q: StoryStatusHighlightRow[]) => void;
+  requestStatusHighlightStackDismiss: () => void;
   itemAcquireQueue: string[];
   diaryEntryQueue: string[];
   setDiaryEntryQueue: (q: string[]) => void;
+  requestDiaryBannerDismiss: () => void;
+  requestItemAcquireBannerDismiss: () => void;
   diaryBannerExiting: boolean;
   itemAcquireBannerExiting: boolean;
 };
@@ -185,11 +189,14 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     if (ctx.overlay.statusHighlightQueue.some((h) => h.variant === 'debuff')) {
       wrap.classList.add('status-highlight-stack--debuff');
     }
-    for (const h of ctx.overlay.statusHighlightQueue) {
+    const stagger = ctx.overlay.statusHighlightExitStaggerMs;
+    for (let i = 0; i < ctx.overlay.statusHighlightQueue.length; i++) {
+      const h = ctx.overlay.statusHighlightQueue[i]!;
       const block = document.createElement('div');
       block.className = `status-highlight-banner status-highlight-banner--${h.variant}`;
       if (h.exiting) {
         block.classList.add('status-highlight-banner--exiting');
+        block.style.animationDelay = `${i * stagger}ms`;
       }
       if (h.variant === 'debuff') {
         const kicker = document.createElement('div');
@@ -208,6 +215,23 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
         block.appendChild(sub);
       }
       wrap.appendChild(block);
+    }
+    const statusDismissWave =
+      ctx.overlay.statusHighlightQueue.length > 0 &&
+      ctx.overlay.statusHighlightQueue.every((h) => h.exiting);
+    if (!statusDismissWave) {
+      const statusDismiss = document.createElement('button');
+      statusDismiss.type = 'button';
+      statusDismiss.className = 'status-highlight-dismiss';
+      statusDismiss.dataset.quickNavContinue = '';
+      statusDismiss.title = 'Barra de espaço';
+      statusDismiss.textContent = '[Espaço] — Continuar';
+      statusDismiss.addEventListener('click', () => {
+        ctx.overlay.requestStatusHighlightStackDismiss();
+        ctx.audio.playUiClick();
+        ctx.render();
+      });
+      wrap.appendChild(statusDismiss);
     }
     inner.appendChild(wrap);
   }
@@ -235,6 +259,18 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
       p.textContent = passage;
       wrap.appendChild(p);
     }
+    const diaryDismiss = document.createElement('button');
+    diaryDismiss.type = 'button';
+    diaryDismiss.className = 'diary-entry-dismiss';
+    diaryDismiss.dataset.quickNavContinue = '';
+    diaryDismiss.title = 'Barra de espaço';
+    diaryDismiss.textContent = '[Espaço] — Continuar';
+    diaryDismiss.addEventListener('click', () => {
+      ctx.overlay.requestDiaryBannerDismiss();
+      ctx.audio.playUiClick();
+      ctx.render();
+    });
+    wrap.appendChild(diaryDismiss);
     inner.appendChild(wrap);
   }
 
@@ -267,6 +303,18 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
       }
       wrap.appendChild(block);
     }
+    const itemDismiss = document.createElement('button');
+    itemDismiss.type = 'button';
+    itemDismiss.className = 'item-acquire-dismiss';
+    itemDismiss.dataset.quickNavContinue = '';
+    itemDismiss.title = 'Barra de espaço';
+    itemDismiss.textContent = '[Espaço] — Continuar';
+    itemDismiss.addEventListener('click', () => {
+      ctx.overlay.requestItemAcquireBannerDismiss();
+      ctx.audio.playUiClick();
+      ctx.render();
+    });
+    wrap.appendChild(itemDismiss);
     inner.appendChild(wrap);
   }
 

@@ -1,3 +1,4 @@
+export * from './companionFriendship.ts';
 export * from './consumables.ts';
 export * from './leadStats.ts';
 export * from './luck.ts';

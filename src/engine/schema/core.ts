@@ -126,7 +126,6 @@ export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
   }),
   z.object({ op: z.literal('campRest') }),
   z.object({ op: z.literal('setChapter'), chapter: z.number().int().min(1) }),
-  z.object({ op: z.literal('setNarrativeTier'), tier: z.number().int().min(1).max(4) }),
   z.object({ op: z.literal('grantItem'), itemId: z.string() }),
   z.object({ op: z.literal('removeItem'), itemId: z.string() }),
   z.object({
@@ -188,6 +187,13 @@ export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
     itemId: z.string(),
     targetIndex: z.number().int().min(0).max(2).optional(),
   }),
+  z.object({
+    op: z.literal('adjustCompanionFriendship'),
+    companionId: z.string(),
+    delta: z.number().int(),
+    /** Se definido, só aplica o delta uma vez (grava `flags[onceFlag] = true`). */
+    onceFlag: z.string().optional(),
+  }),
   z.object({ op: z.literal('advanceDay') }),
   z.object({ op: z.literal('resetRun') }),
 ]);
@@ -203,7 +209,6 @@ export type Effect =
   | { op: 'addResource'; resource: 'supply' | 'faith' | 'corruption' | 'gold'; delta: number }
   | { op: 'campRest' }
   | { op: 'setChapter'; chapter: number }
-  | { op: 'setNarrativeTier'; tier: number }
   | { op: 'grantItem'; itemId: string }
   | { op: 'removeItem'; itemId: string }
   | { op: 'equipItem'; itemId: string; partyIndex?: number }
@@ -238,6 +243,7 @@ export type Effect =
       remainingScenes: number;
     }
   | { op: 'useConsumable'; itemId: string; targetIndex?: number }
+  | { op: 'adjustCompanionFriendship'; companionId: string; delta: number; onceFlag?: string }
   | { op: 'advanceDay' }
   | { op: 'resetRun' };
 

@@ -277,3 +277,29 @@
   box-shadow: 0 0 8px rgba(201, 162, 39, 0.4);
   transition: width 0.2s ease;
 }
+
+/** Vínculo (companheiro) — ficha modal */
+.bond-bar-track {
+  height: 6px;
+  margin: 0.25rem 0 0.45rem;
+  background: color-mix(in srgb, var(--surface-inset) 88%, var(--accent) 12%);
+  border: 1px solid color-mix(in srgb, var(--border) 72%, var(--accent) 28%);
+  border-radius: 1px;
+  overflow: hidden;
+}
+
+.bond-bar-track.empty {
+  opacity: 0.45;
+}
+
+.bond-bar-fill {
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, #4a3560 85%, var(--accent) 15%) 0%,
+    color-mix(in srgb, #8a68a8 82%, var(--accent) 18%) 50%,
+    color-mix(in srgb, #c0a0d8 80%, var(--accent) 20%) 100%
+  );
+  box-shadow: 0 0 8px color-mix(in srgb, #a080c8 72%, var(--accent) 28%);
+  transition: width 0.2s ease;
+}

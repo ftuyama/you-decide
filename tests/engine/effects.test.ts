@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { applyEffects } from '../../src/engine/core/index.ts';
 import { EventBus } from '../../src/engine/core/index.ts';
 import { createInitialState, createPlayerCharacter } from '../../src/engine/core/index.ts';
+import type { Character } from '../../src/engine/schema/index.ts';
 import { createTestData, testCampaign } from '../helpers/engineTestData.ts';
 
 describe('applyEffects', () => {
@@ -150,5 +151,128 @@ describe('applyEffects', () => {
       { sceneId: 'test/scene', data, bus }
     );
     expect(next.exploration).toEqual({ graphId: 'act2_catacomb', nodeId: 'cross_north' });
+  });
+
+  it('adjustCompanionFriendship sincroniza stats do companheiro', () => {
+    const hero = createPlayerCharacter('H', 'knight');
+    const ally: Character = {
+      id: 'ally_test',
+      name: 'Ally',
+      class: 'knight',
+      str: 8,
+      agi: 8,
+      mind: 8,
+      luck: 8,
+      hp: 10,
+      maxHp: 10,
+      stress: 0,
+      mana: 0,
+      maxMana: 0,
+      weaponId: null,
+      armorId: null,
+      relicId: null,
+      critRatio: 0,
+      specialUsedThisCombat: false,
+      path: null,
+    };
+    let s = createInitialState(testCampaign, 1);
+    s = { ...s, party: [hero, ally], companionFriendship: { ally_test: 20 } };
+    const bus = new EventBus();
+    const data = {
+      ...createTestData(),
+      companions: {
+        ally_test: {
+          id: 'ally_test',
+          name: 'Ally',
+          str: 8,
+          agi: 8,
+          mind: 8,
+          luck: 8,
+          hp: 10,
+          maxHp: 10,
+        },
+      },
+    };
+    const next = applyEffects(
+      s,
+      [{ op: 'adjustCompanionFriendship', companionId: 'ally_test', delta: 25 }],
+      { sceneId: 'test/scene', data, bus }
+    );
+    expect(next.companionFriendship.ally_test).toBe(45);
+    expect(next.party[1]!.str).toBe(10);
+    expect(next.party[1]!.maxHp).toBe(16);
+  });
+
+  it('adjustCompanionFriendship com onceFlag só aplica uma vez', () => {
+    let s = createInitialState(testCampaign, 1);
+    s = {
+      ...s,
+      party: [createPlayerCharacter('H', 'knight')],
+      companionFriendship: { ally_test: 20 },
+      flags: { ff_cf_test_once: true },
+    };
+    const bus = new EventBus();
+    const data = {
+      ...createTestData(),
+      companions: {
+        ally_test: {
+          id: 'ally_test',
+          name: 'Ally',
+          str: 8,
+          agi: 8,
+          mind: 8,
+          luck: 8,
+          hp: 10,
+          maxHp: 10,
+        },
+      },
+    };
+    const ctx = { sceneId: 'test/scene', data, bus };
+    const blocked = applyEffects(
+      s,
+      [{ op: 'adjustCompanionFriendship', companionId: 'ally_test', delta: 5, onceFlag: 'ff_cf_test_once' }],
+      ctx
+    );
+    expect(blocked.companionFriendship.ally_test).toBe(20);
+    const fresh = applyEffects(
+      { ...s, flags: {} },
+      [{ op: 'adjustCompanionFriendship', companionId: 'ally_test', delta: 5, onceFlag: 'ff_cf_test_once' }],
+      ctx
+    );
+    expect(fresh.companionFriendship.ally_test).toBe(25);
+    expect(fresh.flags.ff_cf_test_once).toBe(true);
+  });
+
+  it('recruit preserva vínculo prévio quando abaixo do valor inicial', () => {
+    let s = createInitialState(testCampaign, 1);
+    s = {
+      ...s,
+      party: [createPlayerCharacter('H', 'knight')],
+      companionFriendship: { ally_test: 8 },
+      companionsAvailable: ['ally_test'],
+    };
+    const bus = new EventBus();
+    const data = {
+      ...createTestData(),
+      companions: {
+        ally_test: {
+          id: 'ally_test',
+          name: 'Ally',
+          str: 8,
+          agi: 8,
+          mind: 8,
+          luck: 8,
+          hp: 10,
+          maxHp: 10,
+        },
+      },
+    };
+    const next = applyEffects(s, [{ op: 'recruit', companionId: 'ally_test' }], {
+      sceneId: 'test/scene',
+      data,
+      bus,
+    });
+    expect(next.companionFriendship.ally_test).toBe(8);
+    expect(next.party).toHaveLength(2);
   });
 });

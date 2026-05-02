@@ -9,6 +9,7 @@ choices:
     next: act6/camp/void_mira_fireside
     effects:
       - { op: addDiary, text: "Mira falou do fim como de uma fresta — não de vitória. Guardo isto como quem guarda fósforo: pouco, mas suficiente para ver o próximo passo." }
+      - { op: adjustCompanionFriendship, companionId: rogue_mira, delta: 3, onceFlag: ff_cf_act6_void_mira_topic_end }
 onEnter: []
 ---
 > *"Porta fecha; poço **engole**",* murmura **Mira**. *"Prefiro porta. Becos eu conheço."*

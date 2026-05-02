@@ -105,7 +105,6 @@ choices:
     preview: "Capítulo 3 — a masmorra aperta o silêncio."
     effects:
       - { op: setChapter, chapter: 3 }
-      - { op: setNarrativeTier, tier: 3 }
 onEnter:
   - { op: addXp, amount: 8 }
 ---

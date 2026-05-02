@@ -10,7 +10,6 @@ choices:
     next: act6/nave_summons
 onEnter:
   - { op: setChapter, chapter: 6 }
-  - { op: setNarrativeTier, tier: 4 }
   - { op: addDiary, text: "No fundo do gelo havia uma porta sem dobradiça. Entrei e o mundo respondeu com a minha voz, mas sem a minha piedade." }
 ---
 O gelo **abre** sob as Cimeiras: **nave** sem altar, pendurada entre pedra e noite — catedral para uma pergunta.

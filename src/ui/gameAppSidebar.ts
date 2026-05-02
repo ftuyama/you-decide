@@ -1,6 +1,11 @@
-import type { Character, ClassId, GameState, SpellDef } from '../engine/schema/index.ts';
-import { effectiveLeadAttr } from '../engine/progression/index.ts';
-import { PASSIVE_UNLOCK_ITEM_ID } from '../engine/core/index.ts';
+import type { Character, ClassId, GameState, ItemDef, SpellDef } from '../engine/schema/index.ts';
+import {
+  effectiveLeadAttr,
+  friendshipTier,
+  friendshipTierLabelPt,
+  getCompanionFriendshipScore,
+} from '../engine/progression/index.ts';
+import { isLeadPassiveUnlocked } from '../engine/core/index.ts';
 import {
   getCharacterArmorClass,
   getEquippedArmorPoints,
@@ -12,6 +17,7 @@ import type { ContentRegistry } from '../content/registry.ts';
 import { displayTitleForMark } from '../engine/core/index.ts';
 import {
   escHtml,
+  friendshipBarMarkup,
   hpBarMarkup,
   manaBarMarkup,
   markBadgeIconSvg,
@@ -372,15 +378,6 @@ export function openCreditsModal({
   requestAnimationFrame(() => dismiss.focus());
 }
 
-function isPassiveUnlocked(state: GameState, leader: Character): boolean {
-  return (
-    state.inventory.includes(PASSIVE_UNLOCK_ITEM_ID) ||
-    leader.weaponId === PASSIVE_UNLOCK_ITEM_ID ||
-    leader.armorId === PASSIVE_UNLOCK_ITEM_ID ||
-    leader.relicId === PASSIVE_UNLOCK_ITEM_ID
-  );
-}
-
 function countEquippedSlots(c: Character): number {
   return [c.weaponId, c.armorId, c.relicId].filter(Boolean).length;
 }
@@ -563,7 +560,12 @@ function appendCharacterSheetSpellsSectionCompanion(scroll: HTMLElement): void {
   scroll.appendChild(sec);
 }
 
-function appendCharacterSheetLoreSection(scroll: HTMLElement, paragraphs: string[]): void {
+function appendCharacterSheetLoreSection(
+  scroll: HTMLElement,
+  paragraphs: string[],
+  storyProgress?: { unlocked: number; total: number },
+  storyProgressAriaLabel = 'Progresso da história'
+): void {
   const sec = document.createElement('section');
   sec.className = 'diary-modal-section';
   const h = document.createElement('h3');
@@ -585,6 +587,28 @@ function appendCharacterSheetLoreSection(scroll: HTMLElement, paragraphs: string
     }
   }
   sec.appendChild(h);
+  if (storyProgress != null && storyProgress.total > 0) {
+    const pct = Math.min(100, Math.round((100 * storyProgress.unlocked) / storyProgress.total));
+    const wrap = document.createElement('div');
+    wrap.className = 'character-sheet-lore-progress';
+    const meter = document.createElement('div');
+    meter.className = 'character-sheet-lore-progress-meter';
+    meter.setAttribute('role', 'progressbar');
+    meter.setAttribute('aria-valuenow', String(storyProgress.unlocked));
+    meter.setAttribute('aria-valuemin', '0');
+    meter.setAttribute('aria-valuemax', String(storyProgress.total));
+    meter.setAttribute('aria-label', storyProgressAriaLabel);
+    const fill = document.createElement('div');
+    fill.className = 'character-sheet-lore-progress-fill';
+    fill.style.width = `${pct}%`;
+    meter.appendChild(fill);
+    const cap = document.createElement('div');
+    cap.className = 'character-sheet-lore-progress-caption';
+    cap.textContent = `${storyProgress.unlocked} / ${storyProgress.total} fragmentos`;
+    wrap.appendChild(meter);
+    wrap.appendChild(cap);
+    sec.appendChild(wrap);
+  }
   sec.appendChild(body);
   scroll.appendChild(sec);
 }
@@ -628,8 +652,7 @@ function openCharacterSheetModal(params: CharacterSheetOpenParams, playUiClick?:
   appendCharacterSheetEquipSection(scroll, c, registry);
 
   if (params.kind === 'hero') {
-    const leader = state.party[0]!;
-    const pu = isPassiveUnlocked(state, leader);
+    const pu = isLeadPassiveUnlocked(state);
     const passiveDef = registry.data.passives[cid];
     const classPassive = pu
       ? {
@@ -655,11 +678,12 @@ function openCharacterSheetModal(params: CharacterSheetOpenParams, playUiClick?:
       storyPassives,
     });
     appendCharacterSheetSpellsSection(scroll, state, registry);
-    const loreParas = registry.ui.getHeroLore(cid, c.path).split('\n\n').filter(Boolean);
-    appendCharacterSheetLoreSection(scroll, loreParas);
+    const loreRaw = registry.ui.getHeroLore(state, cid, c.path);
+    const loreParas = loreRaw.split('\n\n').filter(Boolean);
+    const storyProgress = registry.ui.getHeroStoryProgress(state, cid, c.path);
+    appendCharacterSheetLoreSection(scroll, loreParas, storyProgress, 'Progresso da história do herói');
   } else {
-    const leader = state.party[0]!;
-    const pu = isPassiveUnlocked(state, leader);
+    const pu = isLeadPassiveUnlocked(state);
     const passiveDef = registry.data.passives[cid];
     const classPassive = pu
       ? {
@@ -674,10 +698,15 @@ function openCharacterSheetModal(params: CharacterSheetOpenParams, playUiClick?:
       storyPassives: [],
     });
     appendCharacterSheetSpellsSectionCompanion(scroll);
-    const def = registry.data.companions[c.id];
-    const loreRaw = def?.lorePt ?? '';
-    const loreParas = loreRaw ? loreRaw.split('\n\n').filter(Boolean) : [];
-    appendCharacterSheetLoreSection(scroll, loreParas);
+    const loreRaw = registry.ui.getCompanionLore(state, c.id);
+    const loreParas = loreRaw.split('\n\n').filter(Boolean);
+    const storyProgress = registry.ui.getCompanionStoryProgress(state, c.id);
+    appendCharacterSheetLoreSection(
+      scroll,
+      loreParas,
+      storyProgress,
+      'Progresso da história do companheiro'
+    );
   }
 
   document.body.appendChild(layer);
@@ -710,13 +739,71 @@ function statHint(label: string): string {
     SOR: 'Sorte: afeta bônus de sorte e alguns testes.',
     CRIT: 'Chance de crítico em ataques físicos.',
     XP: 'Experiência acumulada para subir de nível.',
-    Dia: 'Dia narrativo',
+    Dia: 'Dia narrativo da campanha; avança com descanso ou eventos e pode condicionar encontros.',
+    Vínculo: 'Confiança mútua com o companheiro. Sobe com conversas e cai se ele for derrubado em combate. Afecta atributos em patamares.',
   };
   return hints[label] ?? label;
 }
 
 function hintedLabel(label: string): string {
   return `<span class="sidebar-hint-label" title="${escHtml(statHint(label))}">${escHtml(label)}</span>`;
+}
+
+const RESOURCE_HOVER_PT: Record<'gold' | 'supply' | 'faith' | 'corruption' | 'extraLife', string> = {
+  gold: 'Moeda (0–999). Usada em compras e em algumas escolhas de cena.',
+  supply:
+    'Provisões (0–10). Podem ser gastas em viagem, descanso ou eventos; repõem-se pela narrativa e recompensas.',
+  faith:
+    'Convicção (0–5). Com fé 5, se o líder cair a 0 HP em combate, o milagre gasta 5 fé: sobrevives com metade do HP máximo e o encontro termina na cena de retorno (sem vitória nem derrota).',
+  corruption:
+    'Influência sombria (0–10). Marcas pactos e riscos; certas relíquias convertem corrupção em dano ao acertar.',
+  extraLife:
+    'Indica que o milagre está disponível (fé 5). Ao seres derrotado no combate, consome 5 fé e repõe o HP do líder a metade do máximo; o combate termina na cena de retorno.',
+};
+
+function progressChapterHoverTitle(): string {
+  return 'Fase principal da história. Novos atos, hubs e cenas podem depender do capítulo em que estás.';
+}
+
+function progressEchoesHoverTitle(): string {
+  return 'Ecos de campanhas anteriores; influenciam bónus e opções em novas jornadas (legado).';
+}
+
+function factionRepHoverTitle(label: string, value: number): string {
+  return `${label}: ${value}. Escala de −3 (hostil) a +3 (aliado). Altera diálogo, tratamento e alguns desbloqueios nas cenas.`;
+}
+
+function activeBuffsHoverTitle(state: GameState): string {
+  return (
+    state.activeBuffs
+      .map(
+        (b) =>
+          `${b.attr.toUpperCase()} ${b.delta >= 0 ? '+' : ''}${b.delta} por mais ${b.remainingScenes} cena(s).`
+      )
+      .join(' ') + ' Os bónus expiram ao contar cenas.'
+  );
+}
+
+function itemInventoryHoverTitle(def: ItemDef | undefined): string {
+  if (!def) return 'Item no inventário (definição em falta no dados da campanha).';
+  const slotPt: Record<ItemDef['slot'], string> = {
+    weapon: 'Arma',
+    armor: 'Armadura',
+    relic: 'Relíquia',
+    consumable: 'Consumível',
+  };
+  const parts: string[] = [slotPt[def.slot]];
+  parts.push(...formatItemEquipmentStatParts(def));
+  if (def.restoreHp) parts.push(`Ao usar: restaura até ${def.restoreHp} HP.`);
+  if (def.restoreMana) parts.push(`Ao usar: restaura até ${def.restoreMana} de mana.`);
+  if (def.stressRelief) parts.push(`Ao usar: alivia até ${def.stressRelief} de stress.`);
+  if (def.corruptionDrainOnHit) {
+    parts.push(
+      `Em combate: consome até ${def.corruptionDrainOnHit} de corrupção por acerto com dano para somar dano extra.`
+    );
+  }
+  if (def.rumor) parts.push('Ligado a rumores ou pistas na narrativa.');
+  return parts.join(' ');
 }
 
 function buildSidebarDisclosure(state: GameState): SidebarDisclosure {
@@ -817,10 +904,21 @@ function appendCharacterSheetStatsSection(
     `<div class="sidebar-line sidebar-stress-label character-sheet-stat-line">${hintedLabel('Stress')} <strong>${c.stress}</strong> / 4</div>${stressBarMarkup(c.stress)}`
   );
 
+  const compDef = registry.data.companions[c.id];
+  if (compDef) {
+    const score = getCompanionFriendshipScore(state, c.id);
+    const tier = friendshipTier(score);
+    const tierLabel = friendshipTierLabelPt(tier);
+    appendHtmlFragment(
+      body,
+      `<div class="sidebar-line sidebar-bond-label character-sheet-stat-line">${hintedLabel('Vínculo')} <strong>${score}</strong> / 100 · ${escHtml(tierLabel)} <span class="sidebar-muted">(${tier}/5)</span></div>${friendshipBarMarkup(score, 100)}`
+    );
+  }
+
   if (state.activeBuffs.length > 0) {
     appendHtmlFragment(
       body,
-      `<div class="sidebar-line sidebar-buffs character-sheet-stat-line">${state.activeBuffs
+      `<div class="sidebar-line sidebar-buffs character-sheet-stat-line sidebar-line--hint" title="${escHtml(activeBuffsHoverTitle(state))}">${state.activeBuffs
         .map((b) => `${b.attr.toUpperCase()} ${b.delta >= 0 ? '+' : ''}${b.delta} (${b.remainingScenes} cena(s))`)
         .join(' · ')}</div>`
     );
@@ -848,7 +946,7 @@ function inventoryMarkup(state: GameState, registry: ContentRegistry): string {
     const label = def?.name ?? id;
     const suffix = n > 1 ? ` ×${n}` : '';
     lines.push(
-      `<div class="sidebar-line sidebar-inventory-item sidebar-line--with-icon">${iconWrap(icons.item, 'ui-icon-wrap ui-icon-wrap--sm')}<span>${escHtml(label)}${escHtml(suffix)}</span></div>`
+      `<div class="sidebar-line sidebar-inventory-item sidebar-line--with-icon sidebar-line--hint" title="${escHtml(itemInventoryHoverTitle(def))}">${iconWrap(icons.item, 'ui-icon-wrap ui-icon-wrap--sm')}<span>${escHtml(label)}${escHtml(suffix)}</span></div>`
     );
   }
   return lines.join('');
@@ -895,9 +993,10 @@ function repBarMarkup(
   variant: 'vigilia' | 'circulo' | 'culto'
 ): string {
   const pct = Math.min(100, Math.max(0, Math.round(((value + 3) / 6) * 100)));
+  const repHint = escHtml(factionRepHoverTitle(label, value));
   return `<div class="faction-rep-row">
-    <div class="sidebar-line faction-rep-label sidebar-line--with-icon">${iconWrap(icons.factions)}<span>${escHtml(label)} <strong>${value}</strong></span></div>
-    <div class="faction-rep-track faction-rep-track--${variant}" title="${label}: ${value} (−3 a +3)">
+    <div class="sidebar-line faction-rep-label sidebar-line--with-icon sidebar-line--hint" title="${repHint}">${iconWrap(icons.factions)}<span>${escHtml(label)} <strong>${value}</strong></span></div>
+    <div class="faction-rep-track faction-rep-track--${variant} sidebar-line--hint" title="${repHint}">
       <div class="faction-rep-fill faction-rep-fill--${variant}" style="width:${pct}%"></div>
     </div>
   </div>`;
@@ -970,7 +1069,7 @@ export function buildGameSidebar({
         ${hpBarMarkup(state.xp, need)}`;
     const buffHint =
       state.activeBuffs.length > 0
-        ? `<div class="sidebar-line sidebar-buffs">${state.activeBuffs
+        ? `<div class="sidebar-line sidebar-buffs sidebar-line--hint" title="${escHtml(activeBuffsHoverTitle(state))}">${state.activeBuffs
             .map((b) => `${b.attr.toUpperCase()} ${b.delta >= 0 ? '+' : ''}${b.delta} (${b.remainingScenes} cena(s))`)
             .join(' · ')}</div>`
         : '';
@@ -1003,10 +1102,13 @@ export function buildGameSidebar({
       <div class="sidebar-static">
         <div class="sidebar-static-title sidebar-static-title--with-icon">${iconWrap(icons.progress)}<span>Progresso</span></div>
         <div class="sidebar-static-body">
-          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.progress)}<span>Capítulo <strong>${state.chapter}</strong></span></div>
-          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.memories)}<span>${hintedLabel('Dia')} <strong>${state.day}</strong></span></div>
-          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.tier)}<span>Tier <strong>${state.narrativeTier}</strong></span></div>
-          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.memories)}<span>Ecos herdados <strong>${state.legacy.echoes}</strong></span></div>
+          <div class="sidebar-line sidebar-line--with-icon sidebar-line--hint" title="${escHtml(progressChapterHoverTitle())}">${iconWrap(icons.progress)}<span>Capítulo <strong>${state.chapter}</strong></span></div>
+          <div class="sidebar-line sidebar-line--with-icon sidebar-line--hint" title="${escHtml(statHint('Dia'))}">${iconWrap(icons.memories)}<span>${hintedLabel('Dia')} <strong>${state.day}</strong></span></div>
+          ${
+            state.legacy.echoes > 0
+              ? `<div class="sidebar-line sidebar-line--with-icon sidebar-line--hint" title="${escHtml(progressEchoesHoverTitle())}">${iconWrap(icons.memories)}<span>Ecos herdados <strong>${state.legacy.echoes}</strong></span></div>`
+              : ''
+          }
           ${
             state.legacy.lastRunEchoGain > 0
               ? `<div class="sidebar-line sidebar-resource-hint">Último reinício: +${state.legacy.lastRunEchoGain} ecos.</div>`
@@ -1053,11 +1155,11 @@ export function buildGameSidebar({
       <details class="sidebar-collapse"${openRec} data-section="recursos">
         <summary class="sidebar-collapse-trigger">${collapseTriggerStart(icons.resources, 'Recursos')}</summary>
         <div class="sidebar-collapse-body">
-          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.gold)}<span>Gold <strong>${gold}</strong></span></div>
-          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.supply)}<span>Suprimento <strong>${r.supply}</strong> <span class="sidebar-resource-hint">(mapa, acampamento)</span></span></div>
-          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.faith)}<span>Fé <strong>${r.faith}</strong></span></div>
-          ${state.extraLifeReady ? `<div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.heart)}<span>Vida extra <strong>disponível</strong> <span class="sidebar-resource-hint">(5 fé)</span></span></div>` : ''}
-          <div class="sidebar-line sidebar-line--with-icon">${iconWrap(icons.corruption)}<span>Corrupção <strong>${r.corruption}</strong></span></div>
+          <div class="sidebar-line sidebar-line--with-icon sidebar-line--hint" title="${escHtml(RESOURCE_HOVER_PT.gold)}">${iconWrap(icons.gold)}<span>Gold <strong>${gold}</strong></span></div>
+          <div class="sidebar-line sidebar-line--with-icon sidebar-line--hint" title="${escHtml(RESOURCE_HOVER_PT.supply)}">${iconWrap(icons.supply)}<span>Suprimento <strong>${r.supply}</strong></span></div>
+          <div class="sidebar-line sidebar-line--with-icon sidebar-line--hint" title="${escHtml(RESOURCE_HOVER_PT.faith)}">${iconWrap(icons.faith)}<span>Fé <strong>${r.faith}</strong></span></div>
+          ${state.extraLifeReady ? `<div class="sidebar-line sidebar-line--with-icon sidebar-line--hint" title="${escHtml(RESOURCE_HOVER_PT.extraLife)}">${iconWrap(icons.heart)}<span>Vida extra <strong>disponível</strong> <span class="sidebar-resource-hint">(5 fé)</span></span></div>` : ''}
+          <div class="sidebar-line sidebar-line--with-icon sidebar-line--hint" title="${escHtml(RESOURCE_HOVER_PT.corruption)}">${iconWrap(icons.corruption)}<span>Corrupção <strong>${r.corruption}</strong></span></div>
         </div>
       </details>
       ${
@@ -1108,6 +1210,8 @@ export function buildGameSidebar({
     btn.className = 'sidebar-collapse-trigger diary-sidebar-open-btn';
     btn.setAttribute('aria-haspopup', 'dialog');
     btn.innerHTML = `${collapseTriggerStart(icons.diary, 'Diário')}<span class="diary-sidebar-open-meta">${escHtml(countLabel)}<span class="diary-sidebar-open-hint" aria-hidden="true">›</span></span>`;
+    btn.title =
+      'Abre o registo de campanha: entradas do diário e marcas de jornada desbloqueadas.';
     btn.addEventListener('click', () =>
       openDiaryModal({ diary: state.diary, marks: state.marks, registry }, playUiClick)
     );

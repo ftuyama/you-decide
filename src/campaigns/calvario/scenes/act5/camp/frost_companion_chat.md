@@ -16,6 +16,24 @@ choices:
       all:
         - { companionInParty: rogue_mira }
         - { companionInParty: squire_tomas }
+  - text: "Mira: «Ainda carregas a muralha nas costas — o frio não perdoa isso»"
+    next: act5/camp/frost_mira_fireside
+    condition: { all: [ { companionInParty: rogue_mira }, { class: knight } ] }
+  - text: "Mira: «Os teus símbolos derretem neve? Ou é o contrário?»"
+    next: act5/camp/frost_mira_fireside
+    condition: { all: [ { companionInParty: rogue_mira }, { class: mage } ] }
+  - text: "Mira: «Oras, clérigo — até aqui rezas ou apenas respiras?»"
+    next: act5/camp/frost_mira_fireside
+    condition: { all: [ { companionInParty: rogue_mira }, { class: cleric } ] }
+  - text: "Tomás: «O gelo gosta de quem já traz culpa no ferro»"
+    next: act5/camp/frost_tomas_fireside
+    condition: { all: [ { companionInParty: squire_tomas }, { class: knight } ] }
+  - text: "Tomás: «Mana não aquece; mas arde por dentro como fé torta»"
+    next: act5/camp/frost_tomas_fireside
+    condition: { all: [ { companionInParty: squire_tomas }, { class: mage } ] }
+  - text: "Tomás: «Se a Vigília te ouvisse agora, aprovaria o silêncio?»"
+    next: act5/camp/frost_tomas_fireside
+    condition: { all: [ { companionInParty: squire_tomas }, { class: cleric } ] }
   - text: "Voltar ao acampamento gelado"
     next: act5/camp/frost_camp
 onEnter: []

@@ -17,7 +17,6 @@ export function createInitialState(campaign: CampaignIndex, seed?: number): Game
     campaignId: campaign.id,
     rngSeed,
     chapter: 1,
-    narrativeTier: 1,
     sceneId: campaign.entryScene,
     playerName: 'Viajante',
     level: 1,
@@ -49,6 +48,7 @@ export function createInitialState(campaign: CampaignIndex, seed?: number): Game
     lastCombatLevelUps: null,
     lastCombatLootLines: null,
     activeBuffs: [],
+    companionFriendship: {},
   };
 }
 
@@ -233,6 +233,16 @@ export function deserializeState(json: string): GameState {
       ? { ...(rawHighlight as Record<string, boolean>) }
       : {};
 
+  const rawCf = (o as Partial<GameState>).companionFriendship;
+  const companionFriendship: GameState['companionFriendship'] =
+    rawCf && typeof rawCf === 'object' && !Array.isArray(rawCf)
+      ? Object.fromEntries(
+          Object.entries(rawCf as Record<string, unknown>)
+            .filter(([, v]) => typeof v === 'number' && Number.isFinite(v))
+            .map(([k, v]) => [k, Math.max(0, Math.min(100, Math.floor(v as number)))])
+        )
+      : {};
+
   const rawEx = (o as Partial<GameState>).exploration;
   const exploration: GameState['exploration'] =
     rawEx &&
@@ -252,6 +262,7 @@ export function deserializeState(json: string): GameState {
     flags,
     legacy,
     sceneArtHighlightShown,
+    companionFriendship,
     exploration,
     extraLifeReady: extraLifeReadyFromFaith(resources.faith),
     level: typeof (o as GameState).level === 'number' ? (o as GameState).level : 1,

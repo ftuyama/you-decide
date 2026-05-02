@@ -6,6 +6,8 @@ ambientTheme: camp
 choices:
   - text: "Aceitar o silêncio dele como resposta"
     next: act2/camp/camp_tomas_fireside
+    effects:
+      - { op: adjustCompanionFriendship, companionId: squire_tomas, delta: 2, onceFlag: ff_cf_act2_camp_tomas_topic_shield }
 onEnter: []
 ---
 Ele olha para as marcas no couro como quem lê uma genealogia torta.

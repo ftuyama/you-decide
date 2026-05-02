@@ -16,6 +16,15 @@
   margin-top: 0.2rem;
 }
 
+.character-sheet-stats-body .sidebar-bond-label {
+  margin-top: 0.2rem;
+}
+
+.character-sheet-stats-body .bond-bar-resource {
+  margin-top: 0.2rem;
+  margin-bottom: 0.15rem;
+}
+
 .character-sheet-stats-body .sidebar-line.attrs {
   margin-top: 0.35rem;
   flex-wrap: wrap;
@@ -170,6 +179,36 @@
   margin: 0.2rem 0 0;
   font-size: 0.68rem;
   line-height: 1.45;
+  color: var(--text-section);
+}
+
+.character-sheet-lore-progress {
+  margin: 0.35rem 0 0.65rem;
+}
+
+.character-sheet-lore-progress-meter {
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--border) 55%, var(--surface-drawer));
+  border: 1px solid color-mix(in srgb, var(--border) 70%, var(--accent) 12%);
+}
+
+.character-sheet-lore-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--accent) 72%, var(--fg)),
+    color-mix(in srgb, var(--accent) 45%, var(--text-strong))
+  );
+  transition: width 0.25s ease-out;
+}
+
+.character-sheet-lore-progress-caption {
+  margin: 0.28rem 0 0;
+  font-size: 0.65rem;
+  line-height: 1.4;
   color: var(--text-section);
 }
 

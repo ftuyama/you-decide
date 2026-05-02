@@ -7,6 +7,9 @@ artKey: fractured_nave
 choices:
   - text: "Não escolher entre eles — só continuar"
     next: act6/camp/void_companion_chat
+    effects:
+      - { op: adjustCompanionFriendship, companionId: rogue_mira, delta: 2, onceFlag: ff_cf_act6_void_duo_neither_mira }
+      - { op: adjustCompanionFriendship, companionId: squire_tomas, delta: 2, onceFlag: ff_cf_act6_void_duo_neither_tomas }
 onEnter: []
 ---
 **Mira** e **Tomás** medem-se no fogo; a verdade é só uma: ninguém quer morrer **sozinho** aqui.

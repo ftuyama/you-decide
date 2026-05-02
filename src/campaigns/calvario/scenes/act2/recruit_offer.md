@@ -30,8 +30,11 @@ choices:
       - { op: addRep, faction: circulo, delta: 1 }
       - { op: addRep, faction: vigilia, delta: -1, directGain: true }
       - { op: addDiary, text: "Mira riu baixinho: o Círculo gosta quando alguém assina em cinza." }
+      - { op: adjustCompanionFriendship, companionId: rogue_mira, delta: -4, onceFlag: ff_cf_act2_recruit_offer_circulo }
   - text: "Seguir sozinho"
     next: act2/hub_catacomb
+    effects:
+      - { op: adjustCompanionFriendship, companionId: rogue_mira, delta: -12, onceFlag: ff_cf_act2_recruit_offer_decline }
 onEnter: []
 ---
 **Mira** observa das sombras: "Preciso de alguém que não tema o silêncio."

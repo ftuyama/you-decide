@@ -16,9 +16,12 @@ import {
   shouldTriggerEncounter,
   startExplorationCombatEffects,
 } from '../engine/world/index.ts';
-import { tickActiveBuffs } from '../engine/progression/index.ts';
+import {
+  migrateLegacyKnownSpells,
+  syncCompanionPartyWithFriendship,
+  tickActiveBuffs,
+} from '../engine/progression/index.ts';
 import type { Choice, Effect, GameState } from '../engine/schema/index.ts';
-import { migrateLegacyKnownSpells } from '../engine/progression/index.ts';
 import { GameAudio, type AmbientTheme } from './sound/index.ts';
 import { buildDevToolsHref, buildScenesGraphHref } from './campaignUrl.ts';
 import { preserveExplorationNodeForChoiceEffects } from './gameAppUtils.ts';
@@ -491,6 +494,7 @@ export class GameApp {
   /** Não reentrar em cenas narrativas enquanto o combate está ativo (evita sobrescrever mode). */
   private stabilize(state: GameState): GameState {
     state = migrateLegacyKnownSpells(state, this.registry.data);
+    state = syncCompanionPartyWithFriendship(state, this.registry.data);
     if (state.mode === 'combat') return state;
     let s = state;
     for (let i = 0; i < 14; i++) {

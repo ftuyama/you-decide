@@ -26,6 +26,11 @@
   cursor: help;
 }
 
+/** Elemento com tooltip nativo (atributo title) */
+.sidebar-line--hint {
+  cursor: help;
+}
+
 .sidebar-inline-hint {
   margin-left: 0.25rem;
   color: var(--muted);

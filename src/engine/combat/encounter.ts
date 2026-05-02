@@ -94,10 +94,9 @@ function buildTurnOrder(
   rng: () => number
 ): string[] {
   const rolls: { id: string; score: number }[] = [];
-  const lead = state.party[0];
   for (const p of state.party) {
     const [d1, d2] = roll2d6(rng);
-    const agi = lead && p.id === lead.id ? effectiveLeadAttr(state, p, 'agi') : p.agi;
+    const agi = effectiveLeadAttr(state, p, 'agi');
     const score = d1 + d2 + agi;
     rolls.push({ id: `p:${p.id}`, score });
   }

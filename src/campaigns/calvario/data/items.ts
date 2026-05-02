@@ -85,6 +85,30 @@ export const items: Record<string, ItemDef> = {
     rumor: true,
     sprite: itemSprites.rumor_map,
   }),
+  /** Croqui tirado do guardião de pedra — alinha ao grid `act3_depths` / `depths6`. */
+  depths_chart: z({
+    id: 'depths_chart',
+    name: 'Croqui das Profundezas',
+    slot: 'relic',
+    rumor: true,
+    sprite: itemSprites.rumor_map,
+  }),
+  /** Tomás ou o gelo deixaram traços legíveis do desfiladeiro (`act5_frost`). */
+  frost_pass_map: z({
+    id: 'frost_pass_map',
+    name: 'Traçado do Desfiladeiro',
+    slot: 'relic',
+    rumor: true,
+    sprite: itemSprites.rumor_map,
+  }),
+  /** Vendido na banca da nave fraturada — alinha a `act6_fractured_nave`. */
+  fractured_nave_map: z({
+    id: 'fractured_nave_map',
+    name: 'Planta da Nave Partida',
+    slot: 'relic',
+    rumor: true,
+    sprite: itemSprites.rumor_map,
+  }),
   frost_wyrm_scale: z({
     id: 'frost_wyrm_scale',
     name: 'Escama de Vetrnax',

@@ -20,7 +20,8 @@ import { leadStoryPassives as leadStoryPassivesTs, passives as passivesTs } from
 import { calvarioHeroNarrative } from './heroNarrative.ts';
 import { renderMap } from './maps.ts';
 import { SCENE_ART } from './ascii/art.ts';
-import { getHeroClassLabel, getHeroLore } from './classHero.ts';
+import { getHeroClassLabel, getHeroLore, getHeroStoryProgress } from './classHero.ts';
+import { getCompanionLore, getCompanionStoryProgress } from './classCompanion.ts';
 import { EXPLORATION_GRAPHS } from './exploration/graphs.ts';
 
 validateExplorationGraphCatalog(EXPLORATION_GRAPHS);
@@ -36,6 +37,9 @@ export const calvarioUI: CampaignUIAdapter = {
   sceneArt: SCENE_ART,
   getHeroClassLabel,
   getHeroLore,
+  getHeroStoryProgress,
+  getCompanionLore,
+  getCompanionStoryProgress,
   getExplorationGraph: (id: string) => EXPLORATION_GRAPHS[id] ?? null,
 };
 

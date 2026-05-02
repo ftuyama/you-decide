@@ -1,4 +1,4 @@
-import type { ClassId } from '../../engine/schema/index.ts';
+import type { ClassId, GameState } from '../../engine/schema/index.ts';
 import type { PathUnlockBonus } from '../../engine/data/index.ts';
 
 const CLASS_LABEL: Record<ClassId, string> = {
@@ -25,8 +25,16 @@ export function getHeroClassLabel(classId: ClassId, _path: string | null | undef
   return CLASS_LABEL[classId];
 }
 
-export function getHeroLore(classId: ClassId, _path: string | null | undefined): string {
+export function getHeroLore(_state: GameState, classId: ClassId, _path: string | null | undefined): string {
   return LORE[classId];
+}
+
+export function getHeroStoryProgress(
+  _state: GameState,
+  _classId: ClassId,
+  _path: string | null | undefined
+): { unlocked: number; total: number } {
+  return { unlocked: 1, total: 1 };
 }
 
 export function getPathUnlockBonus(_classId: ClassId, _path: string | null | undefined): PathUnlockBonus | null {

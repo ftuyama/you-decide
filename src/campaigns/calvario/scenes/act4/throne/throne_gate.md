@@ -37,8 +37,6 @@ choices:
     next: act4/throne/throne_class_blessing
     condition: { noFlag: throne_acted_class_blessing }
     preview: "A tua classe abre um caminho ritual."
-onEnter:
-  - { op: setNarrativeTier, tier: 4 }
 ---
 O **Trono de Ossos** sobe em costelas entrelaçadas; **correntes** rangem sem vento.
 

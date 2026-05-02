@@ -325,6 +325,16 @@ export function stressBarMarkup(cur: number): string {
     </div>`;
 }
 
+/** Barra de vínculo com companheiro (0–100). */
+export function friendshipBarMarkup(cur: number, max: number = 100): string {
+  const trackCls = 'bond-bar-track bond-bar-resource';
+  if (max <= 0) return `<div class="${trackCls} empty"></div>`;
+  const pct = Math.min(100, Math.max(0, Math.round((cur / max) * 100)));
+  return `<div class="${trackCls}" role="img" aria-label="Vínculo ${cur} de ${max}">
+      <div class="bond-bar-fill" style="width:${pct}%"></div>
+    </div>`;
+}
+
 export function statBonusParen(n: number): string {
   if (n === 0) return '';
   const sign = n > 0 ? '+' : '';

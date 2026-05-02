@@ -6,6 +6,8 @@ ambientTheme: camp
 choices:
   - text: "Deixar o assunto morrer na brasa"
     next: act2/camp/camp_mira_fireside
+    effects:
+      - { op: adjustCompanionFriendship, companionId: rogue_mira, delta: 2, onceFlag: ff_cf_act2_camp_mira_topic_shadows }
 onEnter: []
 ---
 > *"Roubo o que me devolve o nome", diz ela, sem te olhar. "Medo, às vezes. Esperança, quando pesa pouco. O resto deixo **no chão** — alguém há-de achar que é tesouro."*

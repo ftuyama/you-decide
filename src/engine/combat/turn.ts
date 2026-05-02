@@ -18,6 +18,13 @@ import type {
 import type { GameData } from '../data/gameData.ts';
 import { isLeadPassiveUnlocked } from '../core/state.ts';
 import { effectiveLeadAttr, tickActiveBuffs } from '../progression/leadStats.ts';
+import {
+  adjustCompanionFriendshipScore,
+  getCompanionFriendshipScore,
+  KNOCKOUT_FRIENDSHIP_DELTA,
+  notifyCompanionFriendshipChange,
+  syncCompanionPartyWithFriendship,
+} from '../progression/companionFriendship.ts';
 import type { EventBus } from '../core/eventBus.ts';
 import { getArmorValue, getWeaponDamage, statMod } from '../combat/combatStats.ts';
 import { getEffectiveLuck } from '../progression/luck.ts';
@@ -493,6 +500,7 @@ export function advanceToEnemyTurn(
   ];
   const enemies = [...c.enemies];
   let party = state.party.map((p) => ({ ...p }));
+  let carryState = state;
 
   for (let i = 0; i < enemies.length; i++) {
     const inst = enemies[i]!;
@@ -590,6 +598,7 @@ export function advanceToEnemyTurn(
         ? Math.max(1, dDmg * 2 + strMod - reduc)
         : Math.max(1, dDmg + strMod - reduc);
       const nh = Math.max(0, target.hp - dmg);
+      const companionKnockout = targetIndex > 0 && target.hp > 0 && nh === 0;
       party[targetIndex] = { ...target, hp: nh };
       log.push({
         kind: 'damage',
@@ -604,12 +613,30 @@ export function advanceToEnemyTurn(
       let st = target.stress;
       st = Math.min(4, st + 1);
       party[targetIndex] = { ...party[targetIndex]!, stress: st };
+      if (companionKnockout) {
+        const pid = party[targetIndex]!.id;
+        const bondBefore = getCompanionFriendshipScore(carryState, pid);
+        carryState = adjustCompanionFriendshipScore(
+          { ...carryState, party },
+          pid,
+          KNOCKOUT_FRIENDSHIP_DELTA
+        );
+        carryState = syncCompanionPartyWithFriendship(carryState, data);
+        notifyCompanionFriendshipChange(
+          bus,
+          data,
+          pid,
+          bondBefore,
+          getCompanionFriendshipScore(carryState, pid)
+        );
+        party = carryState.party.map((p) => ({ ...p }));
+      }
     }
   }
 
   const leadDead = party[0]!.hp <= 0;
   if (leadDead) {
-    const sWithParty = { ...state, party };
+    const sWithParty = { ...carryState, party };
     if (sWithParty.resources.faith >= 5) {
       return finishCombatFaithRescue(sWithParty, { ...c, enemies, log, phase: 'ended' }, data, bus);
     }
@@ -629,7 +656,7 @@ export function advanceToEnemyTurn(
   ];
 
   return {
-    ...state,
+    ...carryState,
     party,
     combat: {
       ...c,
@@ -639,7 +666,7 @@ export function advanceToEnemyTurn(
       round: nextRound,
       pendingStance: undefined,
     },
-    rngSeed: (state.rngSeed + 17) >>> 0,
+    rngSeed: (carryState.rngSeed + 17) >>> 0,
   };
 }
 

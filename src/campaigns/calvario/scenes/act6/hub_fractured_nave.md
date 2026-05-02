@@ -63,7 +63,6 @@ choices:
     preview: "Pacto no vazio; exige corrupção alta e nível."
 onEnter:
   - { op: addXp, amount: 16 }
-  - { op: setNarrativeTier, tier: 4 }
 ---
 Três corredores mentem sobre o que é viver; o **Vazio** abre **um de cada vez** — **sentença**, não mapa, só **versões** em fila.
 

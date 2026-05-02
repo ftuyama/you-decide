@@ -17,7 +17,8 @@ import { spells as spellsTs } from './data/spells.ts';
 import { demoHeroNarrative } from './heroNarrative.ts';
 import { renderMap } from './maps.ts';
 import { SCENE_ART } from './ascii/art.ts';
-import { getHeroClassLabel, getHeroLore } from './classHero.ts';
+import { getHeroClassLabel, getHeroLore, getHeroStoryProgress } from './classHero.ts';
+import { getCompanionLore, getCompanionStoryProgress } from './classCompanion.ts';
 
 const sceneRaw = import.meta.glob<string>('./scenes/**/*.md', {
   query: '?raw',
@@ -30,6 +31,9 @@ export const demoUI: CampaignUIAdapter = {
   sceneArt: SCENE_ART,
   getHeroClassLabel,
   getHeroLore,
+  getHeroStoryProgress,
+  getCompanionLore,
+  getCompanionStoryProgress,
 };
 
 export function loadDemoContent() {

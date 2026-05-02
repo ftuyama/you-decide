@@ -272,7 +272,6 @@ export const GameStateSchema = z.object({
   campaignId: z.string().default('calvario'),
   rngSeed: z.number(),
   chapter: z.number().int().min(1),
-  narrativeTier: z.number().int().min(1).max(4).default(2),
   sceneId: z.string(),
   playerName: z.string().default('Herói'),
   /** Nível do líder (progressão) */
@@ -357,6 +356,8 @@ export const GameStateSchema = z.object({
   lastCombatLootLines: z.array(z.string()).nullable().default(null),
   /** Bónus temporários (poções); decrementa ao mudar de cena */
   activeBuffs: z.array(TemporaryBuffSchema).default([]),
+  /** Vínculo com companheiros (0–100 por id de `CompanionDef`); afecta stats via patamares. */
+  companionFriendship: z.record(z.string(), z.number().int().min(0).max(100)).default({}),
   /**
    * Vida extra por fé: disponível quando fé >= 5.
    * Mantido em sincronia com `resources.faith` (addResource, combate, load).

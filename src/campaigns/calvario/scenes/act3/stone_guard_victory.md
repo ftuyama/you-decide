@@ -6,6 +6,7 @@ ambientTheme: act3
 artKey: stone_guard_fallen
 onEnter:
   - { op: setFlag, key: stone_guard_defeated, value: true }
+  - { op: grantItem, itemId: depths_chart }
   - { op: addDiary, text: "O guardião tombou; as runas da passagem perderam o pulso." }
 choices:
   - text: "Voltar ao núcleo"

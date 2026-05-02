@@ -19,8 +19,9 @@ choices:
       all:
         - { level: { gte: 18 } }
         - { day: { lte: 10 } }
+        - { flag: act5_explore_goal_reached }
     showWhenLocked: true
-    lockedHint: "A neve só mantém o rasto legível com força (nível 18) e cedo no ciclo (até ao dia 10)."
+    lockedHint: "Precisas de nível 18, janela até ao dia 10 e de alcançar primeiro a trilha do templo no mapa do desfiladeiro (patrulha a partir do acampamento)."
     preview: "Rasto, emboscada ou caça — a neve não julga."
   - text: "Rumor do escudeiro — corda e ritual no gelo"
     next: act5/frost_tomas/intro
@@ -28,7 +29,7 @@ choices:
       all:
         - { noFlag: tomas_rescued }
         - { noFlag: tomas_rescue_missed }
-        - { level: { gte: 20 } }
+        - { level: { gte: 15 } }
         - { day: { lte: 15 } }
     preview: "História de Tomás; corda e gelo — mas o rumor esfria depois do dia 15."
   - text: "Rumor do escudeiro — só eco e corda vazia no gelo"
@@ -37,7 +38,7 @@ choices:
       all:
         - { noFlag: tomas_rescued }
         - { noFlag: tomas_rescue_missed }
-        - { level: { gte: 20 } }
+        - { level: { gte: 15 } }
         - { day: { gte: 16 } }
     preview: "Demasiado tarde; o desfiladeiro já aprendeu outro nome para justiça."
   - text: "Viver o acampamento no gelo"

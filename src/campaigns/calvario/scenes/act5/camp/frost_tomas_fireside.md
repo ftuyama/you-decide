@@ -11,6 +11,8 @@ choices:
     next: act5/camp/frost_tomas_topic_temple
   - text: "Voltar à roda da fogueira"
     next: act5/camp/frost_companion_chat
+    effects:
+      - { op: adjustCompanionFriendship, companionId: squire_tomas, delta: -3, onceFlag: ff_cf_act5_frost_tomas_fireside_leave }
 onEnter: []
 ---
 **Tomás** esfrega as mãos sem drama; o escudo perto, **segunda pele**. **Mesma** ferida, **outro** teto.

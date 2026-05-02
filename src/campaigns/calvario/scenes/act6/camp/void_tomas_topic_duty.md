@@ -9,6 +9,7 @@ choices:
     next: act6/camp/void_tomas_fireside
     effects:
       - { op: addMark, mark: tomas_void_duty }
+      - { op: adjustCompanionFriendship, companionId: squire_tomas, delta: 3, onceFlag: ff_cf_act6_void_tomas_topic_duty }
 onEnter: []
 ---
 > *"Dever não precisa de solo", murmura ele. "Precisa de **alguém** a quem não mentir. Eu escolhi esse alguém quando te segui."*

@@ -10,7 +10,6 @@ choices:
     next: act5/frost_hub
 onEnter:
   - { op: setChapter, chapter: 5 }
-  - { op: setNarrativeTier, tier: 4 }
   - { op: addResource, resource: supply, delta: -1 }
   - { op: addDiary, text: "Depois do trono: vão de gelo, ar de masmorra, céu mentiroso. Rumor de dragão nas Cimeiras — só o céu hesita." }
 ---

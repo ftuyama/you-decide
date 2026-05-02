@@ -34,5 +34,6 @@ export const leadStoryPassives: Record<string, LeadStoryPassiveDef> = {
   monk_inner_peace: {
     name: 'Paz interior',
     description: '+1 SOR permanente — bênção do monge da neve: sorte como disciplina, não como truque.',
+    heroLorePt: `A bênção do monge não apagou o medo; deu-lhe um sítio pequeno onde o silêncio não grita. O líder carrega isso como quem carrega uma pedra quente: incómodo, mas honesto.`,
   },
 };

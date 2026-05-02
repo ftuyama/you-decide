@@ -5,6 +5,15 @@ ambientTheme: merchant
 artKey: merchant
 title: Banca do último preço
 choices:
+  - text: "Comprar planta da nave (−4 ouro)"
+    next: act6/fractured_merchant
+    condition:
+      all:
+        - { resource: { gold: { gte: 4 } } }
+        - { noItem: fractured_nave_map }
+    effects:
+      - { op: grantItem, itemId: fractured_nave_map }
+      - { op: addResource, resource: gold, delta: -4 }
   - text: "Comprar Poção Rubra (8 ouro) (x2)"
     next: act6/fractured_merchant
     condition:

@@ -13,6 +13,8 @@ export type PathUnlockBonus = {
   stats?: Partial<Record<'str' | 'agi' | 'mind' | 'luck', number>>;
   addXp?: number;
   addResource?: { resource: 'faith' | 'corruption' | 'gold' | 'supply'; delta: number };
+  /** Parágrafo extra (vício/trauma) mostrado na ficha quando o path está ativo; não persiste no save. */
+  backstoryPt?: string;
 };
 
 /** Campaign-specific hero names and class labels for effects (no engine imports of campaigns). */
@@ -32,6 +34,8 @@ export type JourneyMarkDef = {
 export type LeadStoryPassiveDef = {
   name: string;
   description: string;
+  /** Texto só narrativo na secção História da ficha (opcional). */
+  heroLorePt?: string;
 };
 
 export type GameData = {

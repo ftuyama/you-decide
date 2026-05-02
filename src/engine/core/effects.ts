@@ -12,6 +12,13 @@ import {
   syncLeadPassiveStats,
 } from './state.ts';
 import { clampLeadStat, tickActiveBuffs, type LeadStatAttr } from '../progression/leadStats.ts';
+import {
+  adjustCompanionFriendshipScore,
+  FRIENDSHIP_INITIAL_RECRUIT,
+  getCompanionFriendshipScore,
+  notifyCompanionFriendshipChange,
+  syncCompanionPartyWithFriendship,
+} from '../progression/companionFriendship.ts';
 import { applyConsumableToCharacter, isConsumable, removeOneInventoryItem } from '../progression/consumables.ts';
 import { injectText } from './template.ts';
 import {
@@ -464,8 +471,6 @@ function applyOne(
     }
     case 'setChapter':
       return { ...state, chapter: e.chapter };
-    case 'setNarrativeTier':
-      return { ...state, narrativeTier: e.tier };
     case 'grantItem': {
       const def = ctx.data.items[e.itemId];
       if (!def) return state;
@@ -570,11 +575,19 @@ function applyOne(
         specialUsedThisCombat: false,
         path: null,
       };
-      return {
+      const priorFriend = state.companionFriendship[e.companionId];
+      const friendScore =
+        priorFriend !== undefined ? priorFriend : FRIENDSHIP_INITIAL_RECRUIT;
+      const withFriend: GameState = {
         ...state,
         party: [...state.party, companion],
         companionsAvailable: state.companionsAvailable.filter((c) => c !== e.companionId),
+        companionFriendship: {
+          ...state.companionFriendship,
+          [e.companionId]: friendScore,
+        },
       };
+      return syncCompanionPartyWithFriendship(withFriend, ctx.data);
     }
     case 'dismissCompanion':
       return {
@@ -770,6 +783,19 @@ function applyOne(
         subtitle: ti === 0 ? 'Usada' : `Usada em ${target.name}`,
       });
       return { ...state, inventory: inv, party };
+    }
+    case 'adjustCompanionFriendship': {
+      const key = e.onceFlag;
+      if (key && state.flags[key]) return state;
+      const before = getCompanionFriendshipScore(state, e.companionId);
+      let s = adjustCompanionFriendshipScore(state, e.companionId, e.delta);
+      const after = getCompanionFriendshipScore(s, e.companionId);
+      s = syncCompanionPartyWithFriendship(s, ctx.data);
+      if (key) {
+        s = { ...s, flags: { ...s.flags, [key]: true } };
+      }
+      notifyCompanionFriendshipChange(ctx.bus, ctx.data, e.companionId, before, after);
+      return s;
     }
     case 'resetRun': {
       const gain = computeLegacyEchoGain(state);

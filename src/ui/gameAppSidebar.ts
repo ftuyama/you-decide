@@ -390,6 +390,89 @@ export function openCreditsModal({
   });
 }
 
+export type OpenChronicleModalOpts = {
+  state: GameState;
+  playUiClick?: () => void;
+};
+
+/** Crónica: títulos do legado e dica de replay. */
+export function openChronicleModal({ state, playUiClick }: OpenChronicleModalOpts): void {
+  closeOverlayModal();
+  playUiClick?.();
+
+  const { layer, scroll, dismiss, wireClose } = createSheetModalShell({
+    layerClass: 'sheet-modal-layer credits-modal-layer',
+    titleId: 'chronicle-modal-title',
+    kicker: 'Ecos entre run',
+    title: 'Crónica',
+    sub: 'Finais e marcos gravados no legado',
+    backdropAriaLabel: 'Fechar crónica',
+  });
+
+  const pIntro = document.createElement('p');
+  pIntro.className = 'diary-modal-section-body';
+  pIntro.textContent =
+    'Outras classes mudam aliados, magias e a forma como certas cenas se abrem. Títulos acumulam-se entre partidas.';
+  scroll.appendChild(pIntro);
+
+  const lead = state.party[0];
+  if (lead) {
+    const pClass = document.createElement('p');
+    pClass.className = 'diary-modal-section-body';
+    pClass.textContent = `Nesta partida: ${lead.name} (${lead.class}).`;
+    scroll.appendChild(pClass);
+  }
+
+  if (state.legacy.titles.length === 0) {
+    const pEmpty = document.createElement('p');
+    pEmpty.className = 'diary-modal-section-body';
+    pEmpty.textContent =
+      'Ainda sem títulos de run gravados. Completa a campanha ou um final para o primeiro eco aparecer aqui.';
+    scroll.appendChild(pEmpty);
+  } else {
+    const sec = document.createElement('section');
+    sec.className = 'diary-modal-section';
+    const h = document.createElement('h3');
+    h.className = 'diary-modal-section-title';
+    h.textContent = 'Títulos / finais vistos';
+    sec.appendChild(h);
+    const ul = document.createElement('ul');
+    ul.className = 'credits-modal-about';
+    for (const t of state.legacy.titles) {
+      const li = document.createElement('li');
+      li.textContent = t;
+      ul.appendChild(li);
+    }
+    sec.appendChild(ul);
+    scroll.appendChild(sec);
+  }
+
+  if (state.legacy.echoes > 0) {
+    const pEcho = document.createElement('p');
+    pEcho.className = 'diary-modal-section-body';
+    pEcho.textContent = `Ecos herdados: ${state.legacy.echoes}${
+      state.legacy.lastRunSummary.trim() ? ` · ${state.legacy.lastRunSummary}` : ''
+    }`;
+    scroll.appendChild(pEcho);
+  }
+
+  document.body.appendChild(layer);
+  overlayModalLayer = layer;
+  const shut = (): void => {
+    playUiClick?.();
+    closeOverlayModal();
+  };
+  wireClose(shut);
+  overlayModalOnKey = (e: KeyboardEvent) => {
+    if (e.key === 'Escape') shut();
+  };
+  window.addEventListener('keydown', overlayModalOnKey);
+  requestAnimationFrame(() => {
+    dismiss.focus();
+    overlayModalFocusTrapRelease = attachFocusTrap(layer);
+  });
+}
+
 function countEquippedSlots(c: Character): number {
   return [c.weaponId, c.armorId, c.relicId].filter(Boolean).length;
 }
@@ -826,7 +909,8 @@ function buildSidebarDisclosure(state: GameState): SidebarDisclosure {
   const repTouched =
     state.reputation.vigilia !== 0 || state.reputation.circulo !== 0 || state.reputation.culto !== 0;
   const unlockInventory = state.chapter >= 2 || visitedCount >= 6 || state.day >= 4;
-  const unlockFactions = state.chapter >= 2 || visitedCount >= 10 || repTouched;
+  const addRepEver = state.flags['add_rep_ever'] === true;
+  const unlockFactions = state.chapter >= 2 || visitedCount >= 10 || repTouched || addRepEver;
   const unlockCompanions = state.chapter >= 2 || visitedCount >= 8 || state.party.length > 2;
   let nextHint: string | null = null;
   if (!unlockInventory) {

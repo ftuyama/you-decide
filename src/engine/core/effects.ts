@@ -140,15 +140,31 @@ function applyOne(
       }
 
       const isDirectPositiveGain = e.delta > 0 && e.directGain === true;
+      const nextFlags: Record<string, boolean> = {
+        ...state.flags,
+        add_rep_ever: true,
+      };
+      if (state.flags['ui_faccoes_intro_shown'] !== true) {
+        nextFlags['ui_faccoes_intro_shown'] = true;
+        bus.emit({
+          type: 'statusHighlight',
+          variant: 'good',
+          title: 'Facções desbloqueadas',
+          subtitle:
+            'Agora podes ver o tabuleiro de reputação na barra lateral (Vigília, Círculo, Culto).',
+        });
+      }
       if (isDirectPositiveGain) {
         return {
           ...state,
+          flags: nextFlags,
           reputation: { ...state.reputation, [faction]: rep },
         };
       }
 
       return {
         ...state,
+        flags: nextFlags,
         reputation: { ...state.reputation, [faction]: rep },
         factionGainPending: { ...fgp, [faction]: pending },
       };

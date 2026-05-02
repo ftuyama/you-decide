@@ -47,7 +47,7 @@ import { formatCampaignHeaderTitle } from './campaignHeaderTitle.ts';
 import { showAppToast } from './appToast.ts';
 import { attachFocusTrap, focusableElementsIn } from './focusTrap.ts';
 import { mountAppChrome, syncAppChrome, type AppChromeRefs } from './gameAppShell.ts';
-import { openCreditsModal } from './gameAppSidebar.ts';
+import { openChronicleModal, openCreditsModal } from './gameAppSidebar.ts';
 import { dayAdvanceSubtitle, handleGameEvent } from './gameAppEvents.ts';
 import {
   buildGameAppStorageKeys,
@@ -83,6 +83,8 @@ export class GameApp {
   private chromeRefs: AppChromeRefs | null = null;
   /** `mode:sceneId` após último `scrollTop = 0` em `main` — evita reset em re-render da mesma cena. */
   private lastMainScrollResetKey: string | null = null;
+  /** Após escolher uma opção em narrativa, força o scroll ao topo (mesmo se a cena não mudar). */
+  private pendingStoryMainScrollTop = false;
   private timedTimer: ReturnType<typeof setTimeout> | null = null;
   private menuOpen = false;
   private menuFocusTrapRelease: (() => void) | null = null;
@@ -463,6 +465,7 @@ export class GameApp {
     if (key === 'faccoes') {
       const rep = this.state.reputation;
       const repTouched = rep.vigilia !== 0 || rep.circulo !== 0 || rep.culto !== 0;
+      if (this.state.flags['add_rep_ever']) return true;
       return this.state.chapter >= 2 || visitedCount >= 10 || repTouched;
     }
     return true;
@@ -608,6 +611,7 @@ export class GameApp {
     }
     if (!roll.trigger) {
       this.state = this.stabilize(s);
+      this.pendingStoryMainScrollTop = true;
       this.render();
       return;
     }
@@ -617,6 +621,7 @@ export class GameApp {
       s = { ...s, sceneId: pick.sceneId };
       s = tickActiveBuffs(s);
       this.state = this.stabilize(s);
+      this.pendingStoryMainScrollTop = true;
       this.render();
       return;
     }
@@ -627,6 +632,7 @@ export class GameApp {
       this.ctx()
     );
     this.state = this.stabilize(s);
+    this.pendingStoryMainScrollTop = true;
     this.render();
   }
 
@@ -662,6 +668,7 @@ export class GameApp {
       prevStatusQueueLen,
       prevItemAcquireQueueLen
     );
+    this.pendingStoryMainScrollTop = true;
     this.render();
   }
 
@@ -1024,11 +1031,6 @@ export class GameApp {
       onTimedChoiceScheduled: (deadlineEpochMs) => {
         this.state = { ...this.state, timedChoiceDeadline: deadlineEpochMs };
       },
-      clearNarrativeOverlayQueues: () => {
-        this.statusHighlightQueue = [];
-        this.itemAcquireQueue = [];
-        this.diaryEntryQueue = [];
-      },
     };
   }
 
@@ -1105,6 +1107,14 @@ export class GameApp {
       onExportSave: () => this.exportSaveToClipboard(),
       onImportSave: () => this.importSaveFromClipboard(),
       onCredits: () => this.showCredits(),
+      onChronicle: () => {
+        this.unlockAudio();
+        openChronicleModal({
+          state: this.state,
+          playUiClick: () => this.audio.playUiClick(),
+        });
+        this.closeMenu();
+      },
       onDevTools: () => {
         window.location.href = buildDevToolsHref(this.campaignId, 'scenes');
       },
@@ -1167,9 +1177,19 @@ export class GameApp {
           }
         }
         const scrollKey = `${this.state.mode}:${this.state.sceneId}`;
-        if (scrollKey !== this.lastMainScrollResetKey) {
+        const storyScrollToTop =
+          this.state.mode === 'story' &&
+          (this.pendingStoryMainScrollTop || scrollKey !== this.lastMainScrollResetKey);
+        const nonStoryScrollToTop =
+          this.state.mode !== 'story' && scrollKey !== this.lastMainScrollResetKey;
+        if (storyScrollToTop || nonStoryScrollToTop) {
           main.scrollTop = 0;
           this.lastMainScrollResetKey = scrollKey;
+          this.pendingStoryMainScrollTop = false;
+        }
+        // `story-main` tem `tabIndex=-1` (atalho “Ir para a história”); ao substituir o DOM, o foco pode ficar no `<main>`.
+        if (document.activeElement === main) {
+          main.blur();
         }
       },
     };

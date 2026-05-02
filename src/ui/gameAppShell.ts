@@ -31,6 +31,8 @@ export type MountAppChromeOptions = {
   onExportSave: () => void;
   onImportSave: () => void;
   onCredits: () => void;
+  /** Finais / legado (Crónica). */
+  onChronicle: () => void;
   onDevTools: () => void;
   onScenesGraph: () => void;
   showImportInPartida: boolean;
@@ -263,6 +265,13 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
   importBtn.textContent = 'Importar gravação (clipboard)';
   importBtn.addEventListener('click', () => opts.onImportSave());
 
+  const chronicleBtn = document.createElement('button');
+  chronicleBtn.type = 'button';
+  chronicleBtn.className = 'menu-item';
+  chronicleBtn.textContent = 'Crónica';
+  chronicleBtn.title = 'Títulos e finais vistos no legado; dicas de replay.';
+  chronicleBtn.addEventListener('click', () => opts.onChronicle());
+
   const creditsBtn = document.createElement('button');
   creditsBtn.type = 'button';
   creditsBtn.className = 'menu-item';
@@ -320,6 +329,7 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
   }
 
   const aboutSection = createMenuSection('Sobre');
+  aboutSection.appendChild(chronicleBtn);
   aboutSection.appendChild(creditsBtn);
 
   const kofiLink = document.createElement('a');

@@ -699,10 +699,6 @@ button.camp-equip-candidate {
   color: var(--text);
 }
 
-.story-overlay-dismiss-wrap {
-  margin: 0.35rem 0 0.75rem;
-}
-
 .timed-bar {
   height: 3px;
   background: #222;

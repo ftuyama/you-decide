@@ -129,16 +129,11 @@ main.main--combat {
   border-bottom: 1px solid var(--combat-actions-hdr-border);
 }
 
-.combat-active-buffs-hint,
-.combat-target-hint {
+.combat-active-buffs-hint {
   font-size: 0.72rem;
   line-height: 1.35;
   color: var(--muted);
   margin: 0 0 0.4rem;
-}
-
-.combat-target-hint {
-  margin-top: 0.15rem;
 }
 
 .combat-actions-panel .combat-attack-bar {
@@ -159,6 +154,29 @@ main.main--combat {
   margin: 0.35rem 0 0.35rem;
 }
 
+.combat-actions-panel .combat-flee-bar {
+  margin: 0.45rem 0 0.35rem;
+}
+
+.combat-flee-bar {
+  margin: 0.5rem 0 0.75rem;
+  padding: 0.5rem 0.55rem;
+  border: 1px dashed color-mix(in srgb, var(--combat-flee-border) 75%, transparent);
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--combat-flee-bg) 55%, transparent);
+}
+
+.combat-flee-hdr {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
+}
+
 button.combat-flee-btn {
   font: inherit;
   font-size: 0.78rem;
@@ -170,7 +188,7 @@ button.combat-flee-btn {
   border: 1px solid var(--combat-flee-border);
   display: block;
   width: 100%;
-  margin-top: 0.55rem;
+  margin-top: 0;
   box-sizing: border-box;
 }
 
@@ -302,6 +320,80 @@ button.combat-flee-btn:hover {
   pointer-events: none;
   overflow: hidden;
   border-radius: 2px;
+}
+
+/** Números de dano: fora do `enemy-fx-layer` (overflow:hidden recortava o texto ao subir). */
+.enemy-dmg-float-root {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.combat-floating-dmg {
+  position: absolute;
+  left: 50%;
+  top: 28%;
+  transform: translateX(-50%);
+  font-size: 1.38rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--danger) 38%, #f2f4ff 62%);
+  text-shadow:
+    0 0 2px var(--bg, #0a0a0c),
+    0 0 10px var(--bg, #0a0a0c),
+    0 0 18px var(--bg, #0a0a0c),
+    0 2px 3px rgba(0, 0, 0, 0.95);
+  z-index: 4;
+  pointer-events: none;
+  animation: combatFloatDmgRise 2.25s cubic-bezier(0.22, 0.65, 0.25, 1) forwards;
+}
+
+.combat-floating-dmg--crit {
+  font-size: 1.68rem;
+  color: color-mix(in srgb, var(--accent) 35%, #fff8e8 65%);
+  text-shadow:
+    0 0 2px var(--bg, #0a0a0c),
+    0 0 12px var(--bg, #0a0a0c),
+    0 0 22px var(--bg, #0a0a0c),
+    0 2px 4px rgba(0, 0, 0, 0.95);
+}
+
+.combat-floating-dmg--reduced {
+  animation: none;
+  opacity: 0.95;
+  top: 22%;
+}
+
+@keyframes combatFloatDmgRise {
+  0% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px) scale(0.92);
+  }
+  7% {
+    opacity: 0.6;
+    transform: translateX(-50%) translateY(4px) scale(0.96);
+  }
+  14% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-4px) scale(1);
+  }
+  58% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-4px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-9px) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .combat-floating-dmg {
+    animation: none;
+  }
 }
 
 /** Golpes corpo a corpo / raios: pseudo-elementos podem ultrapassar ligeiramente o recorte */
@@ -1462,6 +1554,25 @@ button.combat-flee-btn:hover {
   margin-bottom: 0;
 }
 
+.combat-log-entry--stagger-reveal {
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.combat-log-entry--stagger-reveal.is-revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .combat-log-entry--stagger-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
 .combat-log-msg {
   font-size: 0.78rem;
   line-height: 1.35;
@@ -1676,6 +1787,9 @@ button.special {
 }
 
 .combat-attack-hdr {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -1692,11 +1806,39 @@ button.special {
 }
 
 .combat-spell-hdr {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--muted);
   margin-bottom: 0.4rem;
+}
+
+button.combat-hdr-help {
+  flex-shrink: 0;
+  margin-left: auto;
+  font: inherit;
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1;
+  width: 1.15rem;
+  height: 1.15rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--muted) 55%, transparent);
+  background: color-mix(in srgb, var(--muted) 12%, transparent);
+  color: var(--muted);
+  cursor: help;
+}
+
+button.combat-hdr-help:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 button.combat-spell {
@@ -1731,6 +1873,9 @@ button.combat-spell:disabled {
 }
 
 .combat-potion-hdr {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;

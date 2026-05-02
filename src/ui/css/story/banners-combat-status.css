@@ -314,22 +314,6 @@
   color: #a8a090;
 }
 
-.status-highlight-dismiss {
-  display: block;
-  margin: 0.75rem 0 0;
-  padding: 0.4rem 0.9rem;
-  font-size: 0.78rem;
-  cursor: pointer;
-  color: #dfe8d8;
-  background: #2a3028;
-  border: 1px solid #5a6252;
-  border-radius: 2px;
-}
-
-.status-highlight-dismiss:hover {
-  background: #343a32;
-}
-
 /** Milagre de fé — quase-morte evitada no combate */
 .faith-miracle-banner {
   margin: 0 0 1rem;

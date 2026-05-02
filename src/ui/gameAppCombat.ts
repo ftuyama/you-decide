@@ -42,6 +42,74 @@ import {
 /** Atalhos no combate: 1–9, depois letras (ordem QWERTY). */
 const COMBAT_QUICK_KEYS_AFTER_9 = 'qwertyuiopasdfghjklzxcvbnm';
 
+const ENEMY_TURN_BANNER = /inimigos\s*$/i;
+
+/** Alinhado à duração de `combatFloatDmgRise` em combat.css — o `main` é recriado a cada render, sem isto o número some no próximo frame. */
+type PendingEnemyFloatingDamage = {
+  encId: string;
+  enemyIndex: number;
+  amount: number;
+  kind: 'crit' | 'normal';
+  startMs: number;
+  anchorLeftPct: number;
+  anchorTopPct: number;
+};
+
+let pendingEnemyFloatingDamage: PendingEnemyFloatingDamage[] = [];
+
+function rollFloatingDmgAnchor(reducedMotion: boolean): { leftPct: number; topPct: number } {
+  const leftPct = Math.round((28 + Math.random() * 44) * 10) / 10;
+  const topMin = reducedMotion ? 12 : 14;
+  const topSpan = reducedMotion ? 16 : 20;
+  const topPct = Math.round((topMin + Math.random() * topSpan) * 10) / 10;
+  return { leftPct, topPct };
+}
+
+function floatingEnemyDamageDurationMs(): number {
+  if (typeof document === 'undefined') return 2250;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1200 : 2250;
+}
+
+function splitNewLogForEnemyTurnStagger(
+  entries: CombatLogEntry[]
+): { pre: CombatLogEntry[]; enemy: CombatLogEntry[] } {
+  const idx = entries.findIndex(
+    (e) => e.kind === 'turn_banner' && e.message != null && ENEMY_TURN_BANNER.test(e.message)
+  );
+  if (idx < 0) {
+    return { pre: entries, enemy: [] };
+  }
+  return { pre: entries.slice(0, idx), enemy: entries.slice(idx) };
+}
+
+function appendEnemyFloatingDamage(
+  fxLayer: HTMLElement,
+  amount: number,
+  damageKind: 'crit' | 'normal' | undefined,
+  elapsedMs: number,
+  anchor: { leftPct: number; topPct: number }
+): void {
+  if (typeof document === 'undefined') return;
+  const el = document.createElement('div');
+  el.className = 'combat-floating-dmg';
+  if (damageKind === 'crit') {
+    el.classList.add('combat-floating-dmg--crit');
+  }
+  el.setAttribute('aria-hidden', 'true');
+  el.style.left = `${anchor.leftPct}%`;
+  el.style.top = `${anchor.topPct}%`;
+  const n = Math.max(0, Math.round(Math.abs(amount)));
+  el.textContent = `−${n}`;
+  const reduced =
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+  if (reduced) {
+    el.classList.add('combat-floating-dmg--reduced');
+  } else if (elapsedMs > 0) {
+    el.style.animationDelay = `${-(elapsedMs / 1000)}s`;
+  }
+  fxLayer.appendChild(el);
+}
+
 export function combatQuickKeyAt(index: number): string | null {
   if (index < 9) return String(index + 1);
   const j = index - 9;
@@ -59,6 +127,40 @@ function combatShortcutTitle(btn: HTMLButtonElement): string {
 function joinCombatActionHint(description: string, btn: HTMLButtonElement): string {
   const shortcut = combatShortcutTitle(btn);
   return shortcut ? `${description} ${shortcut}` : description;
+}
+
+const COMBAT_ATTACK_SECTION_HINT_PT =
+  'Corpo a corpo e magias ofensivas atingem o primeiro inimigo vivo na lista.';
+
+const COMBAT_SPELL_SECTION_HINT_PT =
+  'Cada magia consome o turno e a mana indicada no botão. Magias de dano atingem o primeiro inimigo com vida; curas e buffs seguem cada magia — passe o cursor no botão para o efeito exato.';
+
+const COMBAT_FLEE_SECTION_HINT_PT =
+  'Consome o teu turno. Rola 2d6 + mod(Agilidade) e compara com o alvo da fuga deste encontro (encontros mais perigosos exigem rolagem mais alta). Se passares, sais do combate sem vitória por eliminação. Se falhares, a vez passa aos inimigos. O número exato aparece na dica do botão.';
+
+const COMBAT_CONSUMABLES_SECTION_HINT_PT =
+  'Cada uso gasta o turno. Consumíveis aplicam-se ao líder do grupo. Quantidade no inventário aparece no botão quando há mais de uma unidade. Passe o cursor em cada item para ver HP, mana, Stress e restrições.';
+
+function appendCombatSectionHeader(
+  parent: HTMLElement,
+  className: string,
+  label: string,
+  hintTitle: string,
+  ariaLabel: string
+): void {
+  const hdr = document.createElement('div');
+  hdr.className = className;
+  const title = document.createElement('span');
+  title.textContent = label;
+  hdr.appendChild(title);
+  const help = document.createElement('button');
+  help.type = 'button';
+  help.className = 'combat-hdr-help';
+  help.textContent = '?';
+  help.title = hintTitle;
+  help.setAttribute('aria-label', ariaLabel);
+  hdr.appendChild(help);
+  parent.appendChild(hdr);
 }
 
 const STANCE_COMBAT_HINT: Record<Stance, string> = {
@@ -283,6 +385,11 @@ type CombatLogRenderCtx = {
   combatantNames: readonly string[];
 };
 
+type CombatLogEnemyTurnReveal = {
+  /** Só entradas novas do bloco “inimigos” (mesma ordem que o som). */
+  batch: CombatLogEntry[];
+};
+
 /** Physical attack log row: actor in party → player/companion; otherwise enemy. */
 function combatAttackOriginClass(
   entry: { actor?: string; target?: string },
@@ -297,10 +404,43 @@ function combatAttackOriginClass(
   return 'combat-attack-by-party';
 }
 
+function applyEnemyTurnLogReveal(
+  wrap: HTMLElement,
+  item: CombatLogDisplayItem,
+  reveal: CombatLogEnemyTurnReveal
+): void {
+  const b =
+    item.mode === 'merged_hit'
+      ? [item.attack, item.quaseCritico, item.damage]
+      : [item.entry];
+  const steps = b
+    .filter((e): e is CombatLogEntry => e != null)
+    .map((e) => reveal.batch.findIndex((x) => x === e))
+    .filter((s) => s >= 0);
+  if (!steps.length) {
+    return;
+  }
+  const step = Math.max(...steps);
+  wrap.classList.add('combat-log-entry--stagger-reveal');
+  if (step === 0) {
+    requestAnimationFrame(() => {
+      wrap.classList.add('is-revealed');
+    });
+  } else {
+    window.setTimeout(
+      () => {
+        wrap.classList.add('is-revealed');
+      },
+      step * 150
+    );
+  }
+}
+
 function appendCombatLogDisplayItems(
   parent: HTMLElement,
   items: CombatLogDisplayItem[],
-  ctx: CombatLogRenderCtx
+  ctx: CombatLogRenderCtx,
+  reveal: CombatLogEnemyTurnReveal | null
 ): void {
   const { partyNames, combatantNames } = ctx;
 
@@ -349,6 +489,9 @@ function appendCombatLogDisplayItems(
 
       appendCombatLogMergedHitMeta(wrap, attack, damage);
       parent.appendChild(wrap);
+      if (reveal) {
+        applyEnemyTurnLogReveal(wrap, item, reveal);
+      }
       continue;
     }
 
@@ -385,6 +528,9 @@ function appendCombatLogDisplayItems(
 
     appendCombatLogMeta(wrap, entry);
     parent.appendChild(wrap);
+    if (reveal) {
+      applyEnemyTurnLogReveal(wrap, item, reveal);
+    }
   }
 }
 
@@ -469,21 +615,45 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
   if (!c) return;
 
   const encId = c.encounterId;
+  const fxI = ctx.combatLog.fxCursor.index;
   const partyMemberNames = new Set(ctx.state.party.map((m) => m.name));
   let newLogEntries: CombatLogEntry[] = [];
+  let logReveal: CombatLogEnemyTurnReveal | null = null;
   if (ctx.combatLog.soundCursor.encounterId !== encId) {
     const v = { encounterId: encId, index: c.log.length };
     ctx.combatLog.setSoundCursor(v);
   } else {
-    newLogEntries = c.log.slice(ctx.combatLog.fxCursor.index);
-    for (const entry of newLogEntries) {
-      playCombatLogSound(entry, partyMemberNames, ctx.audio);
+    newLogEntries = c.log.slice(fxI);
+    const { pre, enemy: enemyLog } = splitNewLogForEnemyTurnStagger(newLogEntries);
+    const reducedMotion =
+      typeof document === 'undefined' ||
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const stagger = enemyLog.length > 0 && !reducedMotion;
+    if (stagger) {
+      logReveal = { batch: enemyLog };
     }
-    playCombatFxImpactSounds(newLogEntries, ctx.state.party, ctx.audio, ctx.registry.data);
-    const v = { encounterId: encId, index: c.log.length };
-    ctx.combatLog.setSoundCursor(v);
-  }
 
+    if (stagger) {
+      for (const e of pre) {
+        playCombatLogSound(e, partyMemberNames, ctx.audio);
+      }
+      playCombatFxImpactSounds(newLogEntries, ctx.state.party, ctx.audio, ctx.registry.data);
+      const v = { encounterId: encId, index: c.log.length };
+      ctx.combatLog.setSoundCursor(v);
+      enemyLog.forEach((e, i) => {
+        window.setTimeout(() => {
+          playCombatLogSound(e, partyMemberNames, ctx.audio);
+        }, i * 150);
+      });
+    } else {
+      for (const entry of newLogEntries) {
+        playCombatLogSound(entry, partyMemberNames, ctx.audio);
+      }
+      playCombatFxImpactSounds(newLogEntries, ctx.state.party, ctx.audio, ctx.registry.data);
+      const v = { encounterId: encId, index: c.log.length };
+      ctx.combatLog.setSoundCursor(v);
+    }
+  }
   const combatFx: CombatLogFxResult =
     newLogEntries.length > 0
       ? resolveCombatLogFx(newLogEntries, ctx.state.party, ctx.registry.data)
@@ -492,6 +662,29 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     newLogEntries.length > 0
       ? extractLethalGhosts(newLogEntries, c, ctx.registry.data)
       : [];
+
+  const floatNow = Date.now();
+  const floatDurMs = floatingEnemyDamageDurationMs();
+  pendingEnemyFloatingDamage = pendingEnemyFloatingDamage.filter(
+    (p) => p.encId === encId && floatNow - p.startMs < floatDurMs
+  );
+  const reducedMotionFloat =
+    typeof document !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  for (const logEntry of newLogEntries) {
+    if (logEntry.kind === 'damage' && logEntry.enemyIndex != null && logEntry.final != null) {
+      const anchor = rollFloatingDmgAnchor(reducedMotionFloat);
+      pendingEnemyFloatingDamage.push({
+        encId,
+        enemyIndex: logEntry.enemyIndex,
+        amount: logEntry.final,
+        kind: logEntry.damageKind === 'crit' ? 'crit' : 'normal',
+        startMs: floatNow,
+        anchorLeftPct: anchor.leftPct,
+        anchorTopPct: anchor.topPct,
+      });
+    }
+  }
 
   const inner = document.createElement('div');
   inner.className = 'shell combat-shell';
@@ -548,6 +741,19 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     }
     stack.appendChild(pre);
     stack.appendChild(fxLayer);
+    const dmgFloatRoot = document.createElement('div');
+    dmgFloatRoot.className = 'enemy-dmg-float-root';
+    dmgFloatRoot.setAttribute('aria-hidden', 'true');
+    stack.appendChild(dmgFloatRoot);
+    for (const p of pendingEnemyFloatingDamage) {
+      if (p.enemyIndex !== enemyIdx) continue;
+      const elapsed = floatNow - p.startMs;
+      if (elapsed >= floatDurMs) continue;
+      appendEnemyFloatingDamage(dmgFloatRoot, p.amount, p.kind, elapsed, {
+        leftPct: p.anchorLeftPct,
+        topPct: p.anchorTopPct,
+      });
+    }
     const hpPct = Math.max(0, Math.min(100, Math.round((inst.hp / inst.maxHp) * 100)));
     panel.innerHTML = `<div class="enemy-panel-header"><strong>${escHtml(def.name)}</strong><span class="enemy-hp-text">${inst.hp}/${inst.maxHp}</span></div>
       <div class="enemy-hp-track" title="HP ${inst.hp}/${inst.maxHp}">
@@ -648,15 +854,13 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
   if (c.phase === 'choose_stance' && lead) {
     const attackBar = document.createElement('div');
     attackBar.className = 'combat-attack-bar';
-    const attackHdr = document.createElement('div');
-    attackHdr.className = 'combat-attack-hdr';
-    attackHdr.textContent = 'Ataques';
-    attackBar.appendChild(attackHdr);
-    const targetHint = document.createElement('div');
-    targetHint.className = 'combat-target-hint';
-    targetHint.textContent =
-      'Corpo a corpo e magias ofensivas atingem o primeiro inimigo vivo na lista.';
-    attackBar.appendChild(targetHint);
+    appendCombatSectionHeader(
+      attackBar,
+      'combat-attack-hdr',
+      'Ataques',
+      COMBAT_ATTACK_SECTION_HINT_PT,
+      'Ajuda: alvos dos ataques corpo a corpo'
+    );
     const bar = document.createElement('div');
     bar.className = 'stance-bar';
     const stances: Stance[] = ['aggressive', 'defensive', 'focus'];
@@ -738,10 +942,13 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     if (lead.maxMana > 0) {
       const spellBar = document.createElement('div');
       spellBar.className = 'combat-spell-bar';
-      const spellHdr = document.createElement('div');
-      spellHdr.className = 'combat-spell-hdr';
-      spellHdr.textContent = 'Magias';
-      spellBar.appendChild(spellHdr);
+      appendCombatSectionHeader(
+        spellBar,
+        'combat-spell-hdr',
+        'Magias',
+        COMBAT_SPELL_SECTION_HINT_PT,
+        'Ajuda: magias em combate'
+      );
       const spells = ctx.registry.data.spells;
       for (const spellId of ctx.state.knownSpells) {
         const spellDef = spells[spellId];
@@ -781,10 +988,13 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     if (potionIds.length) {
       const potionBar = document.createElement('div');
       potionBar.className = 'combat-potion-bar';
-      const potionHdr = document.createElement('div');
-      potionHdr.className = 'combat-potion-hdr';
-      potionHdr.textContent = 'Itens';
-      potionBar.appendChild(potionHdr);
+      appendCombatSectionHeader(
+        potionBar,
+        'combat-potion-hdr',
+        'Consumíveis',
+        COMBAT_CONSUMABLES_SECTION_HINT_PT,
+        'Ajuda: consumíveis em combate'
+      );
       for (const itemId of potionIds) {
         const def = ctx.registry.data.items[itemId];
         if (!def) continue;
@@ -813,6 +1023,15 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     }
   }
 
+  const fleeBar = document.createElement('div');
+  fleeBar.className = 'combat-flee-bar';
+  appendCombatSectionHeader(
+    fleeBar,
+    'combat-flee-hdr',
+    'Fuga',
+    COMBAT_FLEE_SECTION_HINT_PT,
+    'Ajuda: fugir do combate'
+  );
   const flee = document.createElement('button');
   flee.className = 'combat-flee-btn';
   const canFlee = c.phase === 'choose_stance' && lead != null && lead.hp > 0;
@@ -833,7 +1052,8 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
       ctx.lifecycle.stabilize(fleeCombat(ctx.state, ctx.registry.data, ctx.bus))
     );
   });
-  actionsPanel.appendChild(flee);
+  fleeBar.appendChild(flee);
+  actionsPanel.appendChild(fleeBar);
 
   left.appendChild(actionsPanel);
   layout.appendChild(left);
@@ -882,7 +1102,8 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     appendCombatLogDisplayItems(
       preBody,
       buildCombatLogDisplayItems(preamble),
-      logRenderCtx
+      logRenderCtx,
+      null
     );
     pre.appendChild(preBody);
     stack.appendChild(pre);
@@ -908,7 +1129,8 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
       appendCombatLogDisplayItems(
         body,
         buildCombatLogDisplayItems(section.body),
-        logRenderCtx
+        logRenderCtx,
+        logReveal
       );
       phase.appendChild(body);
       roundEl.appendChild(phase);

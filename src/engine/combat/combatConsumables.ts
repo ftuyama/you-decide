@@ -95,7 +95,14 @@ export function useCombatConsumable(
       rngSeed: (state.rngSeed + 31) >>> 0,
       inventory: inv,
     },
-    { ...c, enemies: c.enemies, log, phase: 'enemy', pendingStance: undefined },
+    {
+      ...c,
+      enemies: c.enemies,
+      log,
+      phase: 'enemy',
+      pendingStance: undefined,
+      defenseStanceForEnemyTurn: undefined,
+    },
     data,
     bus
   );

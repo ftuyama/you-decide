@@ -94,14 +94,14 @@ function consumableCombatHover(def: ItemDef): string {
 
 export function playCombatLogSound(
   entry: CombatLogEntry,
-  leadName: string | undefined,
+  partyMemberNames: ReadonlySet<string>,
   audio: GameAudio
 ): void {
   if (entry.kind === 'attack' && entry.outcome === 'miss') {
     audio.playMiss();
     return;
   }
-  if (entry.kind === 'damage' && leadName && entry.target === leadName) {
+  if (entry.kind === 'damage' && entry.target && partyMemberNames.has(entry.target)) {
     audio.playDamageTaken();
     return;
   }
@@ -469,7 +469,7 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
   if (!c) return;
 
   const encId = c.encounterId;
-  const leadName = ctx.state.party[0]?.name;
+  const partyMemberNames = new Set(ctx.state.party.map((m) => m.name));
   let newLogEntries: CombatLogEntry[] = [];
   if (ctx.combatLog.soundCursor.encounterId !== encId) {
     const v = { encounterId: encId, index: c.log.length };
@@ -477,7 +477,7 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
   } else {
     newLogEntries = c.log.slice(ctx.combatLog.fxCursor.index);
     for (const entry of newLogEntries) {
-      playCombatLogSound(entry, leadName, ctx.audio);
+      playCombatLogSound(entry, partyMemberNames, ctx.audio);
     }
     playCombatFxImpactSounds(newLogEntries, ctx.state.party, ctx.audio, ctx.registry.data);
     const v = { encounterId: encId, index: c.log.length };
@@ -611,6 +611,19 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
   actionsHdr.className = 'combat-actions-panel-hdr';
   actionsHdr.textContent = 'Ações';
   actionsPanel.appendChild(actionsHdr);
+  const buffParts: string[] = [];
+  if ((c.buffAttackRoll ?? 0) > 0) {
+    buffParts.push(`+${c.buffAttackRoll} acerto`);
+  }
+  if ((c.buffArmorClass ?? 0) > 0) {
+    buffParts.push(`+${c.buffArmorClass} CA`);
+  }
+  if (buffParts.length > 0) {
+    const buffHint = document.createElement('div');
+    buffHint.className = 'combat-active-buffs-hint';
+    buffHint.textContent = `Buffs ativos: ${buffParts.join(' · ')}.`;
+    actionsPanel.appendChild(buffHint);
+  }
   let combatQuickNavIndex = 0;
   const decorateCombatQuickNav = (
     btn: HTMLButtonElement,
@@ -639,6 +652,11 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
     attackHdr.className = 'combat-attack-hdr';
     attackHdr.textContent = 'Ataques';
     attackBar.appendChild(attackHdr);
+    const targetHint = document.createElement('div');
+    targetHint.className = 'combat-target-hint';
+    targetHint.textContent =
+      'Corpo a corpo e magias ofensivas atingem o primeiro inimigo vivo na lista.';
+    attackBar.appendChild(targetHint);
     const bar = document.createElement('div');
     bar.className = 'stance-bar';
     const stances: Stance[] = ['aggressive', 'defensive', 'focus'];

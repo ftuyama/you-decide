@@ -128,6 +128,8 @@ export type StoryRenderContext = {
   };
   campCallbacks: CampEquipmentCallbacks;
   setTimedChoiceTimer: (t: ReturnType<typeof setTimeout> | null) => void;
+  /** Limpa filas de destaque / diário / itens no topo da coluna da história. */
+  clearNarrativeOverlayQueues: () => void;
 };
 
 const SCENE_ART_HIGHLIGHT_HOLD_MS = 1000;
@@ -253,6 +255,26 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     inner.appendChild(wrap);
   }
 
+  const hasNarrativeOverlays =
+    ctx.overlay.statusHighlightQueue.length > 0 ||
+    ctx.overlay.diaryEntryQueue.length > 0 ||
+    ctx.overlay.itemAcquireQueue.length > 0;
+  if (hasNarrativeOverlays) {
+    const dismissWrap = document.createElement('div');
+    dismissWrap.className = 'story-overlay-dismiss-wrap';
+    const dismissBtn = document.createElement('button');
+    dismissBtn.type = 'button';
+    dismissBtn.className = 'status-highlight-dismiss';
+    dismissBtn.textContent = 'Continuar';
+    dismissBtn.addEventListener('click', () => {
+      ctx.clearNarrativeOverlayQueues();
+      ctx.audio.playUiClick();
+      ctx.render();
+    });
+    dismissWrap.appendChild(dismissBtn);
+    inner.appendChild(dismissWrap);
+  }
+
   if (ctx.onboardingPrimer) {
     const primer = document.createElement('section');
     primer.className = 'session-primer';
@@ -264,7 +286,8 @@ export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): vo
     list.className = 'session-primer-list';
     const tips = [
       '[1-9] ativa escolhas sem clicar.',
-      '[Espaço] continua banners e avisos.',
+      '[Espaço] continua rolagens de dados e diálogos com botão “Continuar”.',
+      '“Continuar” abaixo dos avisos no topo limpa suprimento, itens e diário.',
       'Menu (☰) para salvar/carregar, ajustar texto e áudio.',
     ];
     for (const tip of tips) {

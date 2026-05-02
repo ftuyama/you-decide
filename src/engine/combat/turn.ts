@@ -478,6 +478,7 @@ export function playerAttack(
       pendingStance: undefined,
       pendingSacrificeDamage: 0,
       pendingSacrificeCost: 0,
+      defenseStanceForEnemyTurn: c.pendingStance,
     },
     data,
     bus
@@ -534,11 +535,14 @@ export function advanceToEnemyTurn(
       atk = d1 + d2 + statMod(def.str);
       special = attackRollSpecial2d6(d1, d2);
     }
+    const panicPenalty =
+      targetIndex === 0 && party[0] && party[0].stress >= 4 ? 2 : 0;
     const defScore =
       7 +
       statMod(effectiveLeadAttr(state, target, 'agi')) +
       getArmorValue(data, target) +
-      (c.pendingStance === 'defensive' ? 2 : 0) +
+      (c.defenseStanceForEnemyTurn === 'defensive' ? 2 : 0) -
+      panicPenalty +
       (targetIndex === 0 ? (c.buffArmorClass ?? 0) : 0);
 
     const critConfirm = def.critConfirm ?? DEFAULT_ENEMY_CRIT_CONFIRM;
@@ -665,6 +669,7 @@ export function advanceToEnemyTurn(
       phase: 'choose_stance',
       round: nextRound,
       pendingStance: undefined,
+      defenseStanceForEnemyTurn: undefined,
     },
     rngSeed: (carryState.rngSeed + 17) >>> 0,
   };
@@ -748,6 +753,7 @@ export function fleeCombat(state: GameState, data: GameData, bus?: EventBus): Ga
       pendingStance: undefined,
       pendingSacrificeDamage: 0,
       pendingSacrificeCost: 0,
+      defenseStanceForEnemyTurn: undefined,
     },
     data,
     bus

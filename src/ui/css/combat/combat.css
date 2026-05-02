@@ -129,6 +129,18 @@ main.main--combat {
   border-bottom: 1px solid var(--combat-actions-hdr-border);
 }
 
+.combat-active-buffs-hint,
+.combat-target-hint {
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: var(--muted);
+  margin: 0 0 0.4rem;
+}
+
+.combat-target-hint {
+  margin-top: 0.15rem;
+}
+
 .combat-actions-panel .combat-attack-bar {
   margin: 0 0 0.35rem;
 }

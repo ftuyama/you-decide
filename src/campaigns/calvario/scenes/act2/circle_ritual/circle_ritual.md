@@ -8,8 +8,6 @@ choices:
     next: act2/hub_catacomb
     condition: { noFlag: act2_circle_ritual_tribute_done }
     preview: "Aceitar o cinza — ou hesitar e recuar."
-    timedMs: 12000
-    fallbackNext: act2/circle_ritual/circle_ritual_refuse_mind
     effects:
       - { op: setFlag, key: act2_circle_ritual_tribute_done, value: true }
       - { op: addResource, resource: corruption, delta: 1 }

@@ -14,8 +14,6 @@ choices:
     uiSection: "Confronto"
     next: act4/encounters/fight_morvayn
     preview: "Ferro já — ou hesitação que vira conversa."
-    timedMs: 10000
-    fallbackNext: act4/morvayn_parley
   - text: "Observar o trono: ossos, runas, correntes"
     uiSection: "Olhos postos"
     next: act4/throne/throne_observe

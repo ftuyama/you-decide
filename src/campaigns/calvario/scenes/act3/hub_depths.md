@@ -25,8 +25,6 @@ choices:
     showWhenLocked: true
     lockedHint: "Precisas de nível 10, de derrotar o guardião de pedra e de alcançar o portão nas profundezas."
     preview: "Capítulo 4 — confronto com Morvayn; o trono espera."
-    timedMs: 15000
-    fallbackNext: act3/stone_corridor
     effects:
       - { op: setChapter, chapter: 4 }
       - { op: addDiary, text: "O trono chama." }

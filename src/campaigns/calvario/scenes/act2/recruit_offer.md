@@ -12,8 +12,6 @@ choices:
     showWhenLocked: true
     lockedHint: "Com o Círculo demasiado dentro de ti (rep ≥2), este convite fecha-se — usa a outra linha."
     preview: "Compromisso na sombra — ou o silêncio decide."
-    timedMs: 12000
-    fallbackNext: act2/hub_catacomb
     effects:
       - { op: recruit, companionId: rogue_mira }
       - { op: addRep, faction: circulo, delta: 1 }
@@ -23,8 +21,6 @@ choices:
     showWhenLocked: true
     lockedHint: "Só quando o Círculo confia em ti o suficiente (rep ≥2) podes assinar com testemunhas."
     preview: "A rede cobra visibilidade — a Vigília desconfia."
-    timedMs: 12000
-    fallbackNext: act2/hub_catacomb
     effects:
       - { op: recruit, companionId: rogue_mira }
       - { op: addRep, faction: circulo, delta: 1 }

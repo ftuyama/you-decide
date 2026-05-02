@@ -25,6 +25,7 @@ export type GameEventHandlers = {
   onCampRest: () => void;
   onTimeDayAdvanced: (day: number) => void;
   onStatusHighlight: (event: Extract<GameEvent, { type: 'statusHighlight' }>) => void;
+  onLevelUp?: (level: number) => void;
 };
 
 export function handleGameEvent(ev: GameEvent, h: GameEventHandlers): void {
@@ -37,4 +38,5 @@ export function handleGameEvent(ev: GameEvent, h: GameEventHandlers): void {
   if (ev.type === 'camp.rest') h.onCampRest();
   if (ev.type === 'time.dayAdvanced') h.onTimeDayAdvanced(ev.day);
   if (ev.type === 'statusHighlight') h.onStatusHighlight(ev);
+  if (ev.type === 'level.up') h.onLevelUp?.(ev.level);
 }

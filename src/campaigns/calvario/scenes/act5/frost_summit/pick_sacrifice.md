@@ -8,16 +8,12 @@ choices:
   - text: "Oferecer Mira ao altar — sem teatro, sem volta"
     condition: { companionInParty: rogue_mira }
     preview: "Sem carregar o gesto a tempo, recuas ao umbral."
-    timedMs: 12000
-    fallbackNext: act5/frost_summit/temple_gate
     effects:
       - { op: dismissCompanion, companionId: rogue_mira }
     next: act5/frost_summit/ritual_blood
   - text: "Oferecer Tomás ao altar — juramento quebrado em sangue"
     condition: { companionInParty: squire_tomas }
     preview: "Sem carregar o gesto a tempo, recuas ao umbral."
-    timedMs: 12000
-    fallbackNext: act5/frost_summit/temple_gate
     effects:
       - { op: dismissCompanion, companionId: squire_tomas }
     next: act5/frost_summit/ritual_blood

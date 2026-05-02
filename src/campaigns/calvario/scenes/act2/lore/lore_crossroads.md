@@ -27,8 +27,6 @@ choices:
     uiSection: "Sorte"
     next: act2/luck_mire
     preview: Sorte — 2d6 + SOR · sem decidir, recuas ao cruzeiro.
-    timedMs: 12000
-    fallbackNext: act2/hub_catacomb
   - text: "Recordar o cavaleiro caído (eco do path)"
     uiSection: "Memória"
     next: act2/hub_catacomb

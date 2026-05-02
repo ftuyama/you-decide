@@ -162,6 +162,7 @@ export function castSpell(
       log,
       phase: 'enemy',
       pendingStance: undefined,
+      defenseStanceForEnemyTurn: undefined,
     },
     data,
     bus

@@ -233,6 +233,11 @@ export const CombatStateSchema = z.object({
   buffAttackRoll: z.number().int().min(0).default(0),
   /** Bónus de magia do líder: somado à CA vs inimigos (resto do combate). */
   buffArmorClass: z.number().int().min(0).default(0),
+  /**
+   * Postura do líder no turno de ataque recém-resolvido, usada só na fase inimiga seguinte
+   * (+2 CA se defensiva). Evita perder `pendingStance` ao limpar o estado antes dos ataques inimigos.
+   */
+  defenseStanceForEnemyTurn: StanceSchema.optional(),
   playerAdvantage: z.boolean().optional(),
   enemyAdvantage: z.boolean().optional(),
   /** Cópia do encontro; se omitido (save antigo), usa 0,5 na resolução de fuga. */

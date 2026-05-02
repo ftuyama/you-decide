@@ -37,6 +37,22 @@ export function readRawSlot(campaignId: string, slot: number): string | null {
   }
 }
 
+/** True se já existir gravação legada ou em qualquer slot (primeira visita = false). */
+export function hasAnyStoredSaveForCampaign(
+  campaignId: string,
+  legacySaveKey: string
+): boolean {
+  try {
+    if (localStorage.getItem(legacySaveKey)?.trim()) return true;
+    for (let s = 1; s <= SAVE_SLOT_COUNT_DEV; s++) {
+      if (localStorage.getItem(slotStorageKey(campaignId, s))?.trim()) return true;
+    }
+  } catch {
+    /* noop */
+  }
+  return false;
+}
+
 export type SlotPreview =
   | { kind: 'empty' }
   | { kind: 'invalid' }

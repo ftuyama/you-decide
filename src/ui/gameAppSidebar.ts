@@ -1062,6 +1062,10 @@ export function buildGameSidebar({
   const p = state.party[0];
   const rep = state.reputation;
   const disclosure = buildSidebarDisclosure(state);
+  const chapterPoetic = registry.data.campaign.chapterTitles?.[String(state.chapter)]?.trim();
+  const chapterProgressLine = chapterPoetic
+    ? `Capítulo <strong>${state.chapter}</strong> — <em>${escHtml(chapterPoetic)}</em>`
+    : `Capítulo <strong>${state.chapter}</strong>`;
 
   const openRec = sidebarSections['recursos'] ? ' open' : '';
   const openInv = disclosure.unlockInventory && sidebarSections['inventario'] ? ' open' : '';
@@ -1117,7 +1121,7 @@ export function buildGameSidebar({
       <div class="sidebar-static">
         <div class="sidebar-static-title sidebar-static-title--with-icon">${iconWrap(icons.progress)}<span>Progresso</span></div>
         <div class="sidebar-static-body">
-          <div class="sidebar-line sidebar-line--with-icon sidebar-line--hint" title="${escHtml(progressChapterHoverTitle())}">${iconWrap(icons.progress)}<span>Capítulo <strong>${state.chapter}</strong></span></div>
+          <div class="sidebar-line sidebar-line--with-icon sidebar-line--hint" title="${escHtml(progressChapterHoverTitle())}">${iconWrap(icons.progress)}<span>${chapterProgressLine}</span></div>
           <div class="sidebar-line sidebar-line--with-icon sidebar-line--hint" title="${escHtml(statHint('Dia'))}">${iconWrap(icons.memories)}<span>${hintedLabel('Dia')} <strong>${state.day}</strong></span></div>
           ${
             state.legacy.echoes > 0

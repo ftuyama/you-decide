@@ -9,8 +9,6 @@ choices:
   - text: "Descer os degraus rumo ao texto gravado na pedra"
     next: act1/crawl_entrada
     preview: "O primeiro passo firme — ou hesitar e olhar antes."
-    timedMs: 12000
-    fallbackNext: act1/title_examine
   - text: "Examinar os símbolos na entrada (antes de descer)"
     next: act1/title_examine
   - text: "Respirar fundo e ajustar o equipamento"

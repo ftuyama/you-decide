@@ -34,6 +34,7 @@ import {
   migrateLegacySaveIfNeeded as migrateLegacySaveSlot,
   saveStateToSlot,
   readRawSlot as readSaveSlotRaw,
+  hasAnyStoredSaveForCampaign,
 } from './gameAppSaveSlots.ts';
 import { renderCombatInto } from './gameAppCombat.ts';
 import {
@@ -230,6 +231,17 @@ export class GameApp {
         onStatusHighlight: (event) => {
           this.statusHighlightQueue.push(event);
         },
+        onLevelUp: (level) => {
+          if (this.state.mode !== 'story') return;
+          this.unlockAudio();
+          this.audio.playLevelUpCelebration();
+          this.statusHighlightQueue.push({
+            type: 'statusHighlight',
+            variant: 'good',
+            title: `Nível ${level}`,
+            subtitle: 'Subiste de nível.',
+          });
+        },
       })
     );
     this.state = createInitialState(this.registry.data.campaign);
@@ -261,6 +273,7 @@ export class GameApp {
   private applyReturnRewardIfNeeded(): void {
     const today = new Date().toISOString().slice(0, 10);
     try {
+      if (!hasAnyStoredSaveForCampaign(this.campaignId, this.legacySaveKey)) return;
       if (localStorage.getItem(this.storageKeys.returnRewardDateKey) === today) return;
       this.state = this.stabilize(
         applyEffects(
@@ -1010,6 +1023,11 @@ export class GameApp {
       },
       onTimedChoiceScheduled: (deadlineEpochMs) => {
         this.state = { ...this.state, timedChoiceDeadline: deadlineEpochMs };
+      },
+      clearNarrativeOverlayQueues: () => {
+        this.statusHighlightQueue = [];
+        this.itemAcquireQueue = [];
+        this.diaryEntryQueue = [];
       },
     };
   }

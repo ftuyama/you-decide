@@ -55,7 +55,7 @@ const ACT2_WILD_BRANCHES: ExplorationWildBranch[] = [
 const ACT3_WILD_BRANCHES: ExplorationWildBranch[] = [
   { weight: 1, encounterId: 'cult_ambush' },
   { weight: 1, encounterId: 'cultist_patrol' },
-  { weight: 0.7, encounterId: 'cultist_horde' },
+  { weight: 0.7, encounterId: 'cult_horde' },
   { weight: 0.2, encounterId: 'act2_rare_bone_sentinel' },
   { weight: 0.35, encounterId: 'vigil_hunter_fight' },
   { weight: 0.05, encounterId: 'stone_guard_fight' },
@@ -106,7 +106,8 @@ const ACT6_WILD_BRANCHES: ExplorationWildBranch[] = [
   { weight: 1, nextSceneId: 'act6/hub_fractured_nave' },
 ];
 
-const EXPLORATION_WILD_BRANCHES_BY_GRAPH: Record<string, ExplorationWildBranch[]> = {
+export const EXPLORATION_WILD_BRANCHES_BY_GRAPH: Record<string, ExplorationWildBranch[]> = {
+  act2_catacomb: ACT2_WILD_BRANCHES,
   act3_depths: ACT3_WILD_BRANCHES,
   act5_frost: ACT5_WILD_BRANCHES,
   act6_fractured_nave: ACT6_WILD_BRANCHES,

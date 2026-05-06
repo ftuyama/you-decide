@@ -6,6 +6,13 @@
  *   npx tsx scripts/balance-estimate.ts
  *   npx tsx scripts/balance-estimate.ts --ref-level 12 --class knight
  *   npx tsx scripts/balance-estimate.ts --levels 1,5,10,15 --json
+ *
+ * TODO: `enemies.ts` e `items.ts` carregam sprites via `import.meta.glob` (Vite-only),
+ * o que impede o script de rodar sob Node/tsx puro. Os imports abaixo já apontam para
+ * os caminhos corretos pós-reorganização do motor (src/engine/{core,combat,data,...}),
+ * mas a execução continua bloqueada até refatorar enemies/items para separar dados de
+ * sprites. Ver `scripts/progression-report.ts` para o padrão de parsing por texto que
+ * evita essa dependência (`parseEnemies()`).
  */
 
 import campaignIndex from '../src/campaigns/calvario/index.json';
@@ -18,17 +25,17 @@ import {
   getCharacterArmorClass,
   getWeaponDamage,
   statMod,
-} from '../src/engine/combatStats.ts';
-import { attackRollSpecial2d6 } from '../src/engine/rng.ts';
-import { emptyGameData, type GameData } from '../src/engine/gameData.ts';
-import { projectCharacterToLevel } from '../src/engine/progression.ts';
+} from '../src/engine/combat/combatStats.ts';
+import { attackRollSpecial2d6 } from '../src/engine/core/rng.ts';
+import { emptyGameData, type GameData } from '../src/engine/data/gameData.ts';
+import { projectCharacterToLevel } from '../src/engine/progression/progression.ts';
 import {
   CampaignIndexSchema,
   type Character,
   type ClassId,
   type EnemyDef,
-} from '../src/engine/schema.ts';
-import { createPlayerCharacter } from '../src/engine/state.ts';
+} from '../src/engine/schema/index.ts';
+import { createPlayerCharacter } from '../src/engine/core/state.ts';
 
 const idx = CampaignIndexSchema.parse(campaignIndex);
 const data: GameData = emptyGameData(idx, calvarioHeroNarrative);

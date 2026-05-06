@@ -32,6 +32,7 @@ import campaignIndex from '../src/campaigns/calvario/index.json';
 import encountersJson from '../src/campaigns/calvario/data/encounters.json';
 import { xpToNextLevel, projectCharacterToLevel } from '../src/engine/progression/progression.ts';
 import { createPlayerCharacter } from '../src/engine/core/state.ts';
+import { EXPLORATION_WILD_BRANCHES_BY_GRAPH } from '../src/engine/world/exploration.ts';
 import type { ClassId } from '../src/engine/schema/index.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -68,46 +69,6 @@ const enemies = parseEnemies();
 
 // --------- Config: per-act curated metadata (sync com `exploration.ts` e cenas) ---------
 
-type WildBranch = { weight: number; encounterId: string };
-
-/** Pools wild por grafo, espelhando `src/engine/world/exploration.ts`. */
-const WILD_POOLS: Record<string, WildBranch[]> = {
-  act2_catacomb: [
-    { weight: 1, encounterId: 'rats_cellar_pair' },
-    { weight: 1, encounterId: 'cellar_mixed' },
-    { weight: 1, encounterId: 'cultist_patrol' },
-    { weight: 0.2, encounterId: 'act2_rare_bone_sentinel' },
-    { weight: 0.2, encounterId: 'act2_rare_lone_swarm' },
-  ],
-  act3_depths: [
-    { weight: 1, encounterId: 'cult_ambush' },
-    { weight: 1, encounterId: 'cultist_patrol' },
-    { weight: 0.7, encounterId: 'cultist_horde' },
-    { weight: 0.2, encounterId: 'act2_rare_bone_sentinel' },
-    { weight: 0.35, encounterId: 'vigil_hunter_fight' },
-    { weight: 0.05, encounterId: 'stone_guard_fight' },
-  ],
-  act5_frost: [
-    { weight: 1, encounterId: 'frost_whelps' },
-    { weight: 1, encounterId: 'frost_whelp_solo' },
-    { weight: 1, encounterId: 'cultist_patrol' },
-    { weight: 0.25, encounterId: 'frost_hunt_party' },
-    { weight: 0.1, encounterId: 'frost_howl_horde' },
-  ],
-  act6_fractured_nave: [
-    { weight: 1, encounterId: 'act6_wild_fragment_solo' },
-    { weight: 1, encounterId: 'act6_wild_fragments_pair' },
-    { weight: 1, encounterId: 'act6_wild_scribe_solo' },
-    { weight: 1, encounterId: 'act6_wild_murmur_solo' },
-    { weight: 1, encounterId: 'act6_wild_chain_solo' },
-    { weight: 0.35, encounterId: 'act6_wild_veil_fragment' },
-    { weight: 0.35, encounterId: 'act6_wild_echo_fragment' },
-    { weight: 0.2, encounterId: 'act6_wild_triple_fragments' },
-    { weight: 0.08, encounterId: 'act6_wild_regent_solo' },
-    { weight: 0.6, encounterId: 'act6_wild_stain_horde' },
-  ],
-};
-
 type ActConfig = {
   id: string;
   chapter: number;
@@ -117,7 +78,7 @@ type ActConfig = {
   exitLevel: number;
   /** Encontros do caminho crítico — lista curada (não automática). */
   mandatoryEncounterIds: string[];
-  /** Grafo wild (chave em `WILD_POOLS`); `null` se o ato não tem mapa. */
+  /** Grafo wild (chave em `EXPLORATION_WILD_BRANCHES_BY_GRAPH`); `null` se o ato não tem mapa. */
   wildPoolKey: string | null;
 };
 
@@ -135,7 +96,7 @@ const ACTS: ActConfig[] = [
   { id: 'act2', chapter: 2, entryLevel: 1, exitLevel: 5, mandatoryEncounterIds: ['rats_cellar', 'skeleton_hall'], wildPoolKey: 'act2_catacomb' },
   { id: 'act3', chapter: 3, entryLevel: 5, exitLevel: 10, mandatoryEncounterIds: ['stone_guard_fight'], wildPoolKey: 'act3_depths' },
   { id: 'act4', chapter: 4, entryLevel: 10, exitLevel: 11, mandatoryEncounterIds: ['boss_morvayn_1', 'boss_morvayn_2'], wildPoolKey: null },
-  { id: 'act5', chapter: 5, entryLevel: 11, exitLevel: 25, mandatoryEncounterIds: ['boss_ice_dragon_1', 'boss_ice_dragon_2'], wildPoolKey: 'act5_frost' },
+  { id: 'act5', chapter: 5, entryLevel: 11, exitLevel: 22, mandatoryEncounterIds: ['boss_ice_dragon_1', 'boss_ice_dragon_2'], wildPoolKey: 'act5_frost' },
   { id: 'act6', chapter: 6, entryLevel: 25, exitLevel: 30, mandatoryEncounterIds: ['act6_veil_herald', 'act6_echo_chorus', 'act6_penitent_blade', 'act6_shadow_self'], wildPoolKey: 'act6_fractured_nave' },
   { id: 'act7', chapter: 7, entryLevel: 30, exitLevel: 30, mandatoryEncounterIds: [], wildPoolKey: null },
 ];
@@ -165,12 +126,13 @@ function totalXpToReachLevel(level: number): number {
 
 function avgWildXp(poolKey: string | null): { avg: number; samples: { encId: string; xp: number; weight: number }[] } | null {
   if (!poolKey) return null;
-  const pool = WILD_POOLS[poolKey];
+  const pool = EXPLORATION_WILD_BRANCHES_BY_GRAPH[poolKey];
   if (!pool) return null;
   let totalW = 0;
   let totalXpW = 0;
   const samples: { encId: string; xp: number; weight: number }[] = [];
   for (const branch of pool) {
+    if (!('encounterId' in branch)) continue;
     const xp = encounterXp(branch.encounterId);
     if (xp == null) {
       samples.push({ encId: branch.encounterId, xp: 0, weight: branch.weight });
@@ -276,7 +238,8 @@ function difficultyLabel(act: ActConfig, refClass: ClassId): { label: string; he
     for (const e of (encounters[id]?.enemies ?? [])) candidateIds.add(e);
   }
   if (act.wildPoolKey) {
-    for (const b of WILD_POOLS[act.wildPoolKey] ?? []) {
+    for (const b of EXPLORATION_WILD_BRANCHES_BY_GRAPH[act.wildPoolKey] ?? []) {
+      if (!('encounterId' in b)) continue;
       for (const e of (encounters[b.encounterId]?.enemies ?? [])) candidateIds.add(e);
     }
   }

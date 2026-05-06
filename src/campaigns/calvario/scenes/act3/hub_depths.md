@@ -54,6 +54,26 @@ choices:
         - { level: { gte: 7 } }
         - { noFlag: act3_pipes_done }
     preview: "Sorte; sucesso dá pista, falha gasta suprimento."
+  - text: "Descer ao santuário esquecido (selo de pedra)"
+    uiSection: "Rumores"
+    next: act3/secret/forgotten_shrine
+    condition:
+      all:
+        - { level: { gte: 7 } }
+        - { noFlag: act3_shrine_done }
+    showWhenLocked: true
+    lockedHint: "Precisas de nível 7 para localizar o véu de pedra rachada — antes disso, o santuário continua só rumor."
+    preview: "Selo antigo; classe define o caminho de abertura."
+  - text: "Falar com o cultista que atravessa o corredor"
+    uiSection: "Rumores"
+    next: act3/lore/cult_negotiate
+    condition:
+      all:
+        - { level: { gte: 9 } }
+        - { noFlag: act3_negotiate_done }
+    showWhenLocked: true
+    lockedHint: "O cultista só aborda quem pesa o suficiente nas profundezas — nível 9."
+    preview: "Pacto, recusa ou ferro; reputação muda em qualquer caso."
   - text: "Voltar ao Cruzeiro — hub"
     uiSection: "Regresso"
     next: act2/hub_catacomb

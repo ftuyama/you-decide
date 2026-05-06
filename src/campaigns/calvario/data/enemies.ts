@@ -300,7 +300,7 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 3,
     type: 'armored',
     armorChips: 1,
-    xp: 115,
+    xp: 160,
     sprite: E.act5_ice_dragon_p1.sprite,
     attackStrategy: 'focus_leader',
     lootDrops: [
@@ -328,7 +328,7 @@ export const enemies: Record<string, EnemyDef> = {
     armor: 4,
     type: 'armored',
     armorChips: 3,
-    xp: 145,
+    xp: 200,
     sprite: E.act5_ice_dragon_p2.sprite,
     attackStrategy: 'focus_leader',
     lootDrops: [

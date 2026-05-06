@@ -19,11 +19,10 @@ choices:
     next: act5/frost_ridgeline
     condition:
       all:
-        - { level: { gte: 18 } }
-        - { day: { lte: 10 } }
+        - { level: { gte: 20 } }
         - { flag: act5_explore_goal_reached }
     showWhenLocked: true
-    lockedHint: "Precisas de nível 18, janela até ao dia 10 e de alcançar primeiro a trilha do templo no mapa do desfiladeiro (patrulha a partir do acampamento)."
+    lockedHint: "Precisas de nível 18 e de alcançar primeiro a trilha do templo no mapa do desfiladeiro (patrulha a partir do acampamento)."
     preview: "Rasto, emboscada ou caça — a neve não julga."
   - text: "Rumor do escudeiro — corda e ritual no gelo"
     uiSection: "Missões"
@@ -42,7 +41,6 @@ choices:
       all:
         - { noFlag: tomas_rescued }
         - { noFlag: tomas_rescue_missed }
-        - { level: { gte: 15 } }
         - { day: { gte: 16 } }
     preview: "Demasiado tarde; o desfiladeiro já aprendeu outro nome para justiça."
   - text: "Viver o acampamento no gelo"
@@ -60,19 +58,17 @@ choices:
       all:
         - { noFlag: monk_cave_banished }
         - { noFlag: frost_monk_blessing_done }
-        - { level: { gte: 22 } }
-        - { day: { lte: 10 } }
+        - { level: { gte: 18 } }
     preview: "Gruta e provas do monge; paz ou banimento."
   - text: "Rumo ao cume — templo de pedra negra (caminho perigoso)"
     uiSection: "Cume e gruta"
     next: act5/frost_summit/ascend
     condition:
       all:
-        - { level: { gte: 25 } }
-        - { day: { lte: 10 } }
+        - { level: { gte: 22 } }
         - { flag: act5_explore_goal_reached }
     showWhenLocked: true
-    lockedHint: "O cume exige nível 25, janela até ao dia 10 e encontrar primeiro a trilha do templo no mapa."
+    lockedHint: "O cume exige nível 22 e encontrar primeiro a trilha do templo no mapa."
     preview: "Ascensão perigosa ao templo e ao que dorme no cume."
 onEnter:
   - { op: addXp, amount: 14 }

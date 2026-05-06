@@ -7,7 +7,8 @@ artKey: frost_monk_path
 choices:
   - text: "Seguir o rumor — subir até onde o vento fica quieto"
     next: act5/encounters/frost_snow_mountains_combat
-onEnter: []
+onEnter:
+  - { op: addXp, amount: 14 }
 ---
 Acima da linha onde a **tempestade** cala, dizem que uma **gruta** respira — rastro só em **sussurro** e em quem voltou **meio** de lá.
 

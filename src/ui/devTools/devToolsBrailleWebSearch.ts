@@ -122,14 +122,14 @@ export function mountBrailleWebSearchPanel(parent: HTMLElement): void {
   widthNum.type = 'number';
   widthNum.min = '20';
   widthNum.max = '200';
-  widthNum.value = '72';
+  widthNum.value = '108';
   widthNum.className = 'dev-tools-braille-num';
   widthNum.setAttribute('aria-label', 'Largura numérica');
   const widthRange = document.createElement('input');
   widthRange.type = 'range';
   widthRange.min = '20';
   widthRange.max = '200';
-  widthRange.value = '72';
+  widthRange.value = '108';
   widthRange.className = 'dev-tools-braille-range dev-tools-braille-range--grow';
   widthInner.appendChild(widthNum);
   widthInner.appendChild(widthRange);

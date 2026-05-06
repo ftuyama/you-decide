@@ -3,7 +3,7 @@ id: act5/frost_summit/ritual_blood
 title: Invocação no sangue
 chapter: 5
 ambientTheme: ancient_macabre
-artKey: frost_summit_ritual
+artKey: frost_summit_ritual_ritual_blood
 dualAttrSkillCheck:
   id: summit_triple_seal
   attrs: [mind, str]

@@ -12,6 +12,7 @@
     "validate:scenes": "node scripts/validate-scenes.mjs",
     "validate:unreachable": "node scripts/find-unreachable-scenes.mjs",
     "check:ascii-art": "node scripts/check-pending-ascii-art.mjs",
+    "check:ascii-art:relevance": "node scripts/report-ascii-art-relevance.mjs",
     "estimate:balance": "tsx scripts/balance-estimate.ts",
     "report:progression": "tsx scripts/progression-report.ts",
     "test": "vitest run",

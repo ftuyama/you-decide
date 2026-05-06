@@ -2,6 +2,7 @@
 id: act1/encounters/risk_bell
 chapter: 1
 ambientTheme: explore
+artKey: dungeon_mouth_bell
 title: Sino cego
 choices:
   - text: "Sangrar na borda do sino para pactuar passagem"

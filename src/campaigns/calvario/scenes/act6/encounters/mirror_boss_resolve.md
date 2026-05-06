@@ -3,7 +3,7 @@ id: act6/encounters/mirror_boss_resolve
 title: Costura da Sombra
 chapter: 6
 ambientTheme: void
-artKey: act6_mirror_final
+artKey: act6_mirror_final_resolved
 highlight: true
 choices:
   - text: "Aceitar a fissura e seguir"

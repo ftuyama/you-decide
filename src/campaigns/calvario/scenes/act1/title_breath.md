@@ -3,6 +3,7 @@ id: act1/title_breath
 title: Um instante
 chapter: 1
 ambientTheme: explore
+artKey: title_breath
 choices:
   - text: "Está pronto. Descer."
     next: act1/crawl_entrada

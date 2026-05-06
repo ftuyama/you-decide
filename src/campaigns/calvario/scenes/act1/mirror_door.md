@@ -3,7 +3,6 @@ id: act1/mirror_door
 title: Bronze nos batentes
 chapter: 1
 ambientTheme: explore
-artKey: dungeon_mouth
 choices:
   - text: "Desviar o olhar e voltar aos batentes"
     next: act1/dungeon_door

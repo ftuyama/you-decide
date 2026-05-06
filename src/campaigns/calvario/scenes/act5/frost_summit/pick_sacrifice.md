@@ -3,7 +3,7 @@ id: act5/frost_summit/pick_sacrifice
 title: Quem paga o preço
 chapter: 5
 ambientTheme: ancient_macabre
-artKey: frost_summit_ritual
+artKey: frost_summit_ritual_pick_sacrifice
 choices:
   - text: "Oferecer Mira ao altar — sem teatro, sem volta"
     condition: { companionInParty: rogue_mira }

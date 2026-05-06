@@ -3,7 +3,7 @@ id: act4/throne/throne_observe
 title: O trono
 chapter: 4
 ambientTheme: explore
-artKey: morvayn
+artKey: morvayn_throne
 highlight: true
 choices:
   - text: "Tentar ler um nome completo (teste de Mente)"

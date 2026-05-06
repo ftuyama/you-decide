@@ -467,7 +467,11 @@ function mountMusicPanel(
   parent.appendChild(sfxTable);
 }
 
-function appendSceneChoicesSection(parent: HTMLElement, choices: Choice[]): void {
+function appendSceneChoicesSection(
+  parent: HTMLElement,
+  choices: Choice[],
+  onNavigate: (sceneId: string) => void
+): void {
   const h = document.createElement('h3');
   h.className = 'dev-tools-scene-section-title';
   h.textContent = 'Decisões';
@@ -485,34 +489,61 @@ function appendSceneChoicesSection(parent: HTMLElement, choices: Choice[]): void
     const ch = choices[i]!;
     const li = document.createElement('li');
     li.className = 'dev-tools-choice-item';
+
+    const card: HTMLAnchorElement | HTMLDivElement = ch.next
+      ? document.createElement('a')
+      : document.createElement('div');
+    card.className = 'dev-tools-choice-card';
+    if (card instanceof HTMLAnchorElement) {
+      card.href = '#';
+      card.addEventListener('click', (event) => {
+        event.preventDefault();
+        onNavigate(ch.next!);
+      });
+    } else {
+      card.classList.add('dev-tools-choice-card--static');
+    }
+
     const main = document.createElement('div');
     main.className = 'dev-tools-choice-text';
     main.textContent = ch.text;
-    li.appendChild(main);
+    card.appendChild(main);
+
     const meta = document.createElement('div');
     meta.className = 'dev-tools-choice-meta';
     const bits: string[] = [];
     if (ch.id) bits.push(`id: ${ch.id}`);
-    if (ch.next) bits.push(`→ ${ch.next}`);
     if (ch.preview) bits.push(`prévia: ${ch.preview}`);
     if (ch.timedMs != null) bits.push(`tempo: ${ch.timedMs}ms`);
     if (ch.fallbackNext) bits.push(`fallback: ${ch.fallbackNext}`);
     if (ch.fallbackEffects?.length)
       bits.push(`fallbackFx: ${ch.fallbackEffects.map((e) => e.op).join(', ')}`);
     meta.textContent = bits.join(' · ') || '—';
-    li.appendChild(meta);
+    card.appendChild(meta);
+
     if (ch.condition != null) {
+      const condLabel = document.createElement('div');
+      condLabel.className = 'dev-tools-choice-effects';
+      condLabel.textContent = 'Condição';
+      card.appendChild(condLabel);
       const cond = document.createElement('pre');
       cond.className = 'dev-tools-choice-json';
       cond.textContent = JSON.stringify(ch.condition, null, 2);
-      li.appendChild(cond);
+      card.appendChild(cond);
     }
     if (ch.effects.length > 0) {
       const fx = document.createElement('div');
       fx.className = 'dev-tools-choice-effects';
       fx.textContent = `Efeitos (${ch.effects.length}): ${ch.effects.map((e) => e.op).join(', ')}`;
-      li.appendChild(fx);
+      card.appendChild(fx);
     }
+    if (ch.next) {
+      const target = document.createElement('div');
+      target.className = 'dev-tools-choice-target';
+      target.textContent = `Ir para: ${ch.next}`;
+      card.appendChild(target);
+    }
+    li.appendChild(card);
     list.appendChild(li);
   }
   parent.appendChild(list);
@@ -676,7 +707,17 @@ function mountScenesPanel(
       detail.appendChild(p);
     }
 
-    appendSceneChoicesSection(detail, fm.choices);
+    appendSceneChoicesSection(detail, fm.choices, (targetSceneId) => {
+      if (!scenes.has(targetSceneId)) return;
+      selectedId = targetSceneId;
+      window.history.pushState(
+        {},
+        '',
+        buildDevToolsHref(campaignId, 'scenes', { sceneId: targetSceneId })
+      );
+      renderList();
+      showDetail(targetSceneId);
+    });
     appendSceneMarkdownSections(detail, sc.bodyRaw);
   }
 

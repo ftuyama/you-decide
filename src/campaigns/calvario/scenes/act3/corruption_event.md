@@ -3,6 +3,7 @@ id: act3/corruption_event
 title: Pulso de Corrupção
 chapter: 3
 ambientTheme: act3
+artKey: corruption_event
 choices:
   - text: "Tocar o cristal"
     preview: "Deixar o pulso entrar — a masmorra assina em ti."

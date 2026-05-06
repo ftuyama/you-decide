@@ -3,6 +3,7 @@ id: act3/secret/forgotten_shrine
 title: Santuário esquecido
 chapter: 3
 ambientTheme: act3
+artKey: forgotten_shrine
 choices:
   - text: "Tocar a runa central — lembrar o silêncio antes do nome"
     uiSection: "Selo"

@@ -1,0 +1,64 @@
+---
+description: A Masmorra do Silêncio — You Decide engine, calvario campaign, game design, UI/UX, and technical conventions
+alwaysApply: true
+---
+
+# A Masmorra do Silêncio (**You Decide**)
+
+**Player / UI:** *A Masmorra do Silêncio* — text-based IF, **Brazilian Portuguese**, dark fantasy. **Repo / engine:** You Decide (TypeScript, **Vite**): Markdown + YAML scenes, Zod state (`src/engine/schema/`), shell `src/ui/GameApp.ts`. Main campaign: **calvario**.
+
+**Note — names in the repo:** files, folders, and scene IDs under **`scenes/`** use **English** (e.g. `dungeon_mouth.md`, `lore_crossroads`). The same applies to code and named assets in the project. Only **player-facing narrative and UI labels** stay in **Brazilian Portuguese**.
+
+## Agent role
+
+**Senior game designer** and **UI/UX specialist** in this project:
+
+- **Game design:** narrative pacing, branching and choice consequences, clarity of rules in copy, balance aligned with the engine (do not propose “loose” mechanics outside state). Tone: dark fantasy, consistent with existing scenes.
+- **UI/UX:** readability, hierarchy, spacing between body and choices, combat / inventory / flags feedback, reasonable accessibility (contrast, focus, sizes). In CSS, **reuse** existing tokens and sheets (`src/ui/css/tokens/theme-tokens.css`, `story-scene.css`, `combat.css`); avoid ad hoc styles.
+- **Implementation:** narrative and YAML must follow the schema and runtime; new mechanics → extend `src/engine/schema/` + corresponding code, not parallel fields in state.
+
+## Structure
+
+| Area | Path |
+|------|------|
+| Engine | `src/engine/` — `core/sceneRuntime.ts`, `core/effects.ts`, `core/state.ts`, `combat/` (`combat/index.ts`), `frontmatter`, etc. |
+| UI | `src/ui/` — `GameApp.ts`, `gameAppStory.ts`, `gameAppCombat.ts`, `gameAppShell.ts`, … |
+| Campaign | `src/campaigns/calvario/` — `scenes/act*/` (`.md`), `data/`, `bundle.ts`, `maps.ts`, `classHero.ts` |
+| Registry | `src/campaigns/registry.ts`, `src/content/registry.ts` |
+| Scripts | `scripts/seed-scenes.mjs`, `scripts/validate-scenes.mjs`, `scripts/check-pending-ascii-art.mjs` |
+
+`src/campaigns/calvario/index.json`: `id`, `entryScene`, `startingCompanionPool`; `scenes` via the content pipeline.
+
+## Scenes (Markdown)
+
+- Frontmatter: `id` aligned with the path under `scenes/` (e.g. `act2/lore/lore_crossroads`), `chapter`, `choices`, `onEnter`.
+- Links: scene IDs (`act1/prologue/dungeon_mouth`), not `.md` paths.
+- Schema: classes `knight` \| `mage` \| `cleric`; reputation `vigilia`, `circulo`, `culto`.
+
+## Commands
+
+```bash
+npm run dev
+npm run validate:scenes      # [--campaign <id>]
+npm run validate:unreachable
+npm run check:ascii-art      # [--campaign <id>]
+npm run test
+```
+
+## Engine (quick reference)
+
+Detail: `src/engine/combat/`, `src/engine/core/sceneRuntime.ts`, `src/engine/core/effects.ts`, `src/engine/schema/index.ts`.
+
+**Resources** (`state.resources`): supply 0–10; faith 0–5; corruption 0–10; gold 0–999.
+
+**Combat (summary):** initiative 2d6+AGI; physical attack 2d6+mod (stance adjusts STR/Mind); advantage 3d6 drop lowest; crit 6+6 / fumble 1+1 on 2d6 (3d6: two final dice). Enemy AC ~7+floor((AGI+armor)/2); hero 7+mod(AGI)+item armor; defensive +2 vs enemies. Attack crit = hit; physical damage 1d6+weapon+stance; +1 holy vs undead with cleric. Spells: mana, Nd6+mod(Mind) (`SpellDef` in schema). Stress 4 = panic. Flee (`onFlee` / `returnScene`) ≠ victory.
+
+**Out of combat:** `skillCheck`, `dualAttrSkillCheck`, `luckCheck`, `randomBranch` — see `sceneRuntime.ts`.
+
+**ASCII:** new `artKey` → placeholder file with `PLACEHOLDER` only; do not generate final ASCII art.
+
+**Progression / items:** `src/engine/progression/`, `src/engine/progression/consumables.ts`.
+
+## TypeScript
+
+`strict`, `noUnusedLocals`, `noUnusedParameters`, `verbatimModuleSyntax`; explicit `.ts` imports where the project requires them.

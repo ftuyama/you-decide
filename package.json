@@ -13,6 +13,7 @@
     "validate:unreachable": "node scripts/find-unreachable-scenes.mjs",
     "check:ascii-art": "node scripts/check-pending-ascii-art.mjs",
     "estimate:balance": "tsx scripts/balance-estimate.ts",
+    "report:progression": "tsx scripts/progression-report.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "release:itch": "bash scripts/release-itch.sh",

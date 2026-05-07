@@ -238,7 +238,12 @@ function applyOne(
         mana: p.maxMana,
         stress: 0,
       }));
-      return { ...state, resources: res, party };
+      return GameStateSchema.parse({
+        ...state,
+        resources: res,
+        party,
+        circuloSkillRerollReady: true,
+      });
     }
     case 'setChapter':
       return { ...state, chapter: e.chapter };

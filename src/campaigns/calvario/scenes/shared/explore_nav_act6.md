@@ -12,6 +12,16 @@ choices:
     effects:
       - op: startWildEncounterFromGraph
         graphId: act6_fractured_nave
+  - id: explore_dimensional_smith_route
+    text: "Seguir o som do martelo sem forja"
+    uiSection: "No perímetro"
+    next: act6/dimensional_smith/entry
+    condition:
+      all:
+        - { flag: act6_reality_done }
+        - { level: { gte: 27 } }
+        - { noFlag: act6_dimensional_smith_unlocked }
+    preview: "Uma rota lateral; o eco bate no osso."
   - id: explore_leave
     text: "Recuar para a nave fraturada"
     next: act6/hub_fractured_nave

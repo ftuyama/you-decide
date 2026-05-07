@@ -59,6 +59,14 @@ choices:
     uiSection: "Refúgio e troca"
     next: act6/fractured_merchant
     preview: "Remédios e preços em ouro ou em promessa."
+  - text: "Buscar o Ferreiro Dimensional"
+    uiSection: "Refúgio e troca"
+    next: act6/dimensional_smith/forge
+    condition:
+      all:
+        - { flag: act6_reality_done }
+        - { flag: act6_dimensional_smith_unlocked }
+    preview: "Poucas palavras, muito metal e cobrança exata."
   - text: "Ouvir o sussurro sob as colunas (rota de corrupção)"
     uiSection: "Vazio"
     next: act6/void_secret_entry

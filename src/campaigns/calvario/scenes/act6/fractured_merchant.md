@@ -97,6 +97,20 @@ choices:
       - { op: addResource, resource: gold, delta: -10 }
       - { op: addResource, resource: supply, delta: 1 }
       - { op: setFlag, key: act6_merch_supply_3, value: true }
+  - text: "Kit de campo da Vigília (−7 ouro)"
+    uiSection: "À venda"
+    next: act6/fractured_merchant
+    condition:
+      all:
+        - { rep: { faction: vigilia, gte: 5 } }
+        - { resource: { gold: { gte: 7 } } }
+        - { resource: { supply: { lte: 7 } } }
+        - { noFlag: act6_merch_vigilia_field_kit }
+    effects:
+      - { op: addResource, resource: gold, delta: -7 }
+      - { op: addResource, resource: supply, delta: 3 }
+      - { op: setFlag, key: act6_merch_vigilia_field_kit, value: true }
+    preview: "Suprimento · selo da Vigília (uma vez nesta banca)"
   - text: "Afastar-me da banca"
     uiSection: "Conversa"
     next: act6/hub_fractured_nave

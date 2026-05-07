@@ -102,6 +102,20 @@ choices:
       - { op: addResource, resource: gold, delta: -15 }
       - { op: addResource, resource: supply, delta: 1 }
       - { op: setFlag, key: act5_merch_supply_4, value: true }
+  - text: "Kit de campo da Vigília (−7 ouro)"
+    uiSection: "À venda"
+    next: act5/frost_merchant
+    condition:
+      all:
+        - { rep: { faction: vigilia, gte: 5 } }
+        - { resource: { gold: { gte: 7 } } }
+        - { resource: { supply: { lte: 7 } } }
+        - { noFlag: act5_merch_vigilia_field_kit }
+    effects:
+      - { op: addResource, resource: gold, delta: -7 }
+      - { op: addResource, resource: supply, delta: 3 }
+      - { op: setFlag, key: act5_merch_vigilia_field_kit, value: true }
+    preview: "Suprimento · selo da Vigília (uma vez nesta banca)"
   - text: "Afastar-me da tenda"
     uiSection: "Conversa"
     next: act5/frost_hub

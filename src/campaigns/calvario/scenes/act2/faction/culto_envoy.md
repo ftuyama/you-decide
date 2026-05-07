@@ -4,6 +4,19 @@ title: Carne de sino — Culto
 chapter: 2
 ambientTheme: act2
 choices:
+  - text: "Confessar devedor de alto grau — o sino cobra e paga"
+    condition:
+      all:
+        - { rep: { faction: culto, gte: 5 } }
+        - { noFlag: act2_culto_envoy_high_favor }
+    next: act2/hub_catacomb
+    effects:
+      - { op: setFlag, key: act2_culto_envoy_high_favor, value: true }
+      - { op: addResource, resource: gold, delta: 5 }
+      - { op: addXp, amount: 20 }
+      - { op: addResource, resource: corruption, delta: 1 }
+      - { op: addDiary, text: "O enviado contou até dez em silêncio e devolveu-me o juro em moeda e em sombra." }
+    preview: "Ouro, XP e corrupção · favor do culto (uma vez)"
   - text: "Aceitar o preço do Terceiro Sino"
     condition: { rep: { faction: culto, gte: 2 } }
     next: act2/hub_catacomb

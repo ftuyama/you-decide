@@ -340,7 +340,7 @@ export const GameStateSchema = z.object({
   party: z.array(CharacterSchema),
   companionsAvailable: z.array(z.string()).default([]),
   inventory: z.array(z.string()),
-  reputation: z.record(FactionIdSchema, z.number().int().min(-3).max(3)),
+  reputation: z.record(FactionIdSchema, z.number().int().min(-10).max(10)),
   /**
    * Progresso parcial ao ganhar reputação (modo “lento” sem directGain).
    * 0 = nada pendente; 1 = um ganho positivo já “contou” e falta outro para +1 em reputation.
@@ -352,6 +352,10 @@ export const GameStateSchema = z.object({
       culto: z.union([z.literal(0), z.literal(1)]),
     })
     .default({ vigilia: 0, circulo: 0, culto: 0 }),
+  /**
+   * Círculo: após descanso de acampamento, permite uma rerrolagem de teste de perícia (falha) pagando reputação.
+   */
+  circuloSkillRerollReady: z.boolean().default(false),
   flags: z.record(z.string(), z.boolean()),
   marks: z.array(z.string()),
   /** Meta-progresso persistente entre runs (não reseta com `resetRun`). */

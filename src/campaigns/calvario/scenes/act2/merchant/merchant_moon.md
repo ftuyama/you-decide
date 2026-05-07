@@ -78,6 +78,20 @@ choices:
       - { op: addResource, resource: supply, delta: 1 }
       - { op: setFlag, key: act2_merch_moon_supply_3, value: true }
     preview: "Um verdadeiro achado"
+  - text: "Kit de campo da Vigília (−7 ouro)"
+    uiSection: "À venda"
+    next: act2/hub_catacomb
+    condition:
+      all:
+        - { rep: { faction: vigilia, gte: 5 } }
+        - { resource: { gold: { gte: 7 } } }
+        - { resource: { supply: { lte: 7 } } }
+        - { noFlag: act2_merch_vigilia_field_kit }
+    effects:
+      - { op: addResource, resource: gold, delta: -7 }
+      - { op: addResource, resource: supply, delta: 3 }
+      - { op: setFlag, key: act2_merch_vigilia_field_kit, value: true }
+    preview: "Suprimento · selo da Vigília (uma vez nesta banca)"
   - text: "Recusar educadamente"
     uiSection: "Conversa"
     next: act2/hub_catacomb

@@ -1,5 +1,6 @@
-import type { FactionId, GameState } from '../schema/index.ts';
+import type { GameState } from '../schema/index.ts';
 import { MAX_LEVEL, xpToNextLevel } from '../progression/progression.ts';
+import { factionRepTier } from '../progression/reputation.ts';
 
 /** Resumo humano do desfecho do trono (Act 4) para epílogo e abertura do gelo. */
 function throneOutcomeLine(state: GameState): string {
@@ -45,16 +46,6 @@ function factionThroneEcho(state: GameState): string {
   return '';
 }
 
-function repTier(f: FactionId, state: GameState): string {
-  const v = state.reputation[f] ?? 0;
-  if (v <= -2) return 'hostil';
-  if (v === -1) return 'frio';
-  if (v === 0) return 'neutro';
-  if (v === 1) return 'cordial';
-  if (v === 2) return 'aliado';
-  return 'devoto';
-}
-
 export function injectText(text: string, state: GameState): string {
   const lead = state.party[0];
   const companions = state.party.slice(1);
@@ -76,9 +67,9 @@ export function injectText(text: string, state: GameState): string {
     .replace(/\{\{level\}\}/g, String(state.level))
     .replace(/\{\{xp\}\}/g, String(state.xp))
     .replace(/\{\{xpToNext\}\}/g, String(xpNext))
-    .replace(/\{\{faction\.vigiliaTier\}\}/g, repTier('vigilia', state))
-    .replace(/\{\{faction\.circuloTier\}\}/g, repTier('circulo', state))
-    .replace(/\{\{faction\.cultoTier\}\}/g, repTier('culto', state))
+    .replace(/\{\{faction\.vigiliaTier\}\}/g, factionRepTier(state.reputation, 'vigilia'))
+    .replace(/\{\{faction\.circuloTier\}\}/g, factionRepTier(state.reputation, 'circulo'))
+    .replace(/\{\{faction\.cultoTier\}\}/g, factionRepTier(state.reputation, 'culto'))
     .replace(/\{\{companionLine\}\}/g, companionLine)
     .replace(/\{\{companionCount\}\}/g, String(companions.length))
     .replace(/\{\{throneOutcomeLine\}\}/g, throneOutcomeLine(state))

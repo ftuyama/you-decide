@@ -161,7 +161,7 @@
   font-style: italic;
 }
 
-/** Facções: filiação −3…+3 */
+/** Facções: filiação −10…+10 */
 .sidebar-faccoes .faction-rep-label {
   margin: 0.35rem 0 0.2rem;
 }
@@ -205,10 +205,25 @@
 }
 
 .sidebar-faccoes .faction-lore-blurb {
-  margin: 0 0 0.65rem;
+  margin: 0 0 0.35rem;
   font-size: 0.72rem;
   line-height: 1.45;
   color: var(--sidebar-muted);
+}
+
+.sidebar-faccoes .faction-perk-list {
+  margin: 0 0 0.65rem;
+  padding: 0 0 0 1rem;
+  list-style: disc;
+}
+
+.sidebar-faccoes .faction-perk-item {
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--sidebar-lore, var(--muted));
+  border-left: 2px solid var(--faction-rep-track-border);
+  padding-left: 0.45rem;
+  margin-left: -0.15rem;
 }
 
 .sidebar-lore {

@@ -1,6 +1,17 @@
 import type { GameState } from '../../engine/schema/index.ts';
-import type { StoryDiceRollBreakdown } from '../../engine/core/index.ts';
+import type { LoadedScene, StoryDiceRollBreakdown } from '../../engine/core/index.ts';
+import { CIRCULO_SKILL_REROLL_REP_COST } from '../../engine/progression/reputation.ts';
 import { formatDiceAscii } from '../diceAscii.ts';
+
+export type StoryDiceRollPendingPayload = {
+  nextState: GameState;
+  breakdown: StoryDiceRollBreakdown;
+  reroll?: {
+    preRollState: GameState;
+    rolledScene: LoadedScene;
+    rollKind: 'skill' | 'dualSkill';
+  };
+};
 
 export type StoryDiceBannerHost = {
   clearDiceRollTimers(): void;
@@ -10,6 +21,8 @@ export type StoryDiceBannerHost = {
   dismissStoryDiceRoll: (nextState: GameState) => void;
   playCheckSuccess(): void;
   playCheckFail(): void;
+  /** Rerrolagem paga do Círculo após falha em teste de perícia (quando `pending.reroll` existe). */
+  onCirculoDiceReroll?: () => void;
 };
 
 const STORY_DICE_ROLL_TICK_MS = 128;
@@ -229,9 +242,9 @@ function populateStoryDiceRollResult(region: HTMLElement, breakdown: StoryDiceRo
 export function appendStoryDiceRollBanner(
   inner: HTMLElement,
   host: StoryDiceBannerHost,
-  pending: { nextState: GameState; breakdown: StoryDiceRollBreakdown }
+  pending: StoryDiceRollPendingPayload
 ): void {
-  const { nextState, breakdown } = pending;
+  const { nextState, breakdown, reroll } = pending;
 
   const wrap = document.createElement('div');
   wrap.className = 'story-dice-banner';
@@ -296,6 +309,9 @@ export function appendStoryDiceRollBanner(
 
   panel.appendChild(rollCard);
 
+  const btnRow = document.createElement('div');
+  btnRow.className = 'story-dice-banner-actions';
+
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'story-dice-banner-dismiss';
@@ -303,7 +319,28 @@ export function appendStoryDiceRollBanner(
   btn.title = 'Barra de espaço';
   btn.textContent = '[Espaço] — Continuar';
   btn.disabled = true;
-  panel.appendChild(btn);
+  btnRow.appendChild(btn);
+
+  let circuloRerollBtn: HTMLButtonElement | null = null;
+  if (reroll && host.onCirculoDiceReroll) {
+    const rerollBtn = document.createElement('button');
+    rerollBtn.type = 'button';
+    rerollBtn.className = 'story-dice-banner-reroll';
+    const costLabel =
+      CIRCULO_SKILL_REROLL_REP_COST < 0
+        ? `−${Math.abs(CIRCULO_SKILL_REROLL_REP_COST)}`
+        : String(CIRCULO_SKILL_REROLL_REP_COST);
+    rerollBtn.textContent = `Segunda leitura do Círculo (${costLabel} reputação)`;
+    rerollBtn.title = 'Gasta a carga do descanso e paga reputação ao Círculo por nova rolagem.';
+    rerollBtn.disabled = true;
+    rerollBtn.addEventListener('click', () => {
+      host.onCirculoDiceReroll?.();
+    });
+    btnRow.appendChild(rerollBtn);
+    circuloRerollBtn = rerollBtn;
+  }
+
+  panel.appendChild(btnRow);
 
   wrap.appendChild(panel);
   inner.appendChild(wrap);
@@ -342,6 +379,7 @@ export function appendStoryDiceRollBanner(
       });
     });
     btn.disabled = false;
+    if (circuloRerollBtn) circuloRerollBtn.disabled = false;
     btn.focus();
 
     const onEnter = (e: KeyboardEvent): void => {

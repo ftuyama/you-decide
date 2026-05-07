@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const SCHEMA_VERSION = '1.0.0';
 
-/** Facções com reputação -3..+3 */
+/** Facções com reputação -10..+10 */
 export const FactionIdSchema = z.enum(['vigilia', 'circulo', 'culto']);
 export type FactionId = z.infer<typeof FactionIdSchema>;
 
@@ -117,7 +117,7 @@ export const EffectSchema: z.ZodType<Effect> = z.discriminatedUnion('op', [
   z.object({
     op: z.literal('setRep'),
     faction: FactionIdSchema,
-    value: z.number().int().min(-3).max(3),
+    value: z.number().int().min(-10).max(10),
   }),
   z.object({
     op: z.literal('addResource'),

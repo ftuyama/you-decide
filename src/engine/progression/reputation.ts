@@ -1,8 +1,52 @@
 import type { FactionId } from '../schema/index.ts';
 
-/** Limita reputação de facção ao intervalo do jogo (−3..+3). */
+/** Limite inferior/superior da reputação por facção (jogo). */
+export const REPUTATION_MIN = -10;
+export const REPUTATION_MAX = 10;
+export const FACTION_IDS: readonly FactionId[] = ['vigilia', 'circulo', 'culto'] as const;
+
+/** Reputação mínima para desbloquear bónus de facção (kits, rerrol, favores). */
+export const FACTION_PERK_REP_THRESHOLD = 5;
+
+/** Custo em reputação ao pedir rerrolagem de perícia ao Círculo (uma vez por descanso). */
+export const CIRCULO_SKILL_REROLL_REP_COST = -4;
+
+type ReputationTierRule = { max: number; tier: string };
+const REPUTATION_TIER_RULES: readonly ReputationTierRule[] = [
+  { max: -8, tier: 'hostil' },
+  { max: -6, tier: 'renitente' },
+  { max: -3, tier: 'desconfiado' },
+  { max: -1, tier: 'frio' },
+  { max: 0, tier: 'neutro' },
+  { max: 1, tier: 'cordial' },
+  { max: 3, tier: 'aliado' },
+  { max: 6, tier: 'devoto' },
+  { max: 8, tier: 'eminente' },
+  { max: REPUTATION_MAX, tier: 'testemunha' },
+] as const;
+
+/** Limita reputação de facção ao intervalo do jogo. */
 export function clampReputation(n: number): number {
-  return Math.max(-3, Math.min(3, n));
+  return Math.max(REPUTATION_MIN, Math.min(REPUTATION_MAX, n));
+}
+
+/** Tier textual usado por templates e UI para reputação de facção. */
+export function reputationTier(value: number): string {
+  const v = clampReputation(value);
+  for (const r of REPUTATION_TIER_RULES) {
+    if (v <= r.max) return r.tier;
+  }
+  return 'neutro';
+}
+
+/** Tier textual para uma facção específica no estado atual. */
+export function factionRepTier(stateRep: Partial<Record<FactionId, number>>, faction: FactionId): string {
+  return reputationTier(stateRep[faction] ?? 0);
+}
+
+/** Se a reputação atual já desbloqueia os bônus de facção. */
+export function hasFactionPerkUnlocked(repValue: number): boolean {
+  return repValue >= FACTION_PERK_REP_THRESHOLD;
 }
 
 export type ComputeAddRepArgs = {

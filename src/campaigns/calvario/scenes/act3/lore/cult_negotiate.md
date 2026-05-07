@@ -6,6 +6,20 @@ ambientTheme: act3
 artKey: cult_negotiate
 highlight: true
 choices:
+  - text: "Mostrar o sinete do Terceiro Sino — pedir favor à margem do contrato"
+    uiSection: "Pacto"
+    next: act3/hub_depths
+    condition:
+      all:
+        - { rep: { faction: culto, gte: 5 } }
+        - { noFlag: act3_negotiate_done }
+        - { noFlag: act3_negotiate_culto_favor }
+    preview: "Ouro e experiência · reconhecimento do culto (uma vez)."
+    effects:
+      - { op: setFlag, key: act3_negotiate_culto_favor, value: true }
+      - { op: addResource, resource: gold, delta: 8 }
+      - { op: addXp, amount: 22 }
+      - { op: addDiary, text: "O encarregado inclinou a cabeça como quem confirma saldo: o Sino lembra quem paga duas vezes." }
   - text: "Aceitar a oferta: dor por sussurro"
     uiSection: "Pacto"
     next: act3/hub_depths

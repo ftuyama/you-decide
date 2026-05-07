@@ -134,6 +134,7 @@ describe('applyEffects', () => {
     expect(next.party[1]!.hp).toBe(next.party[1]!.maxHp);
     expect(next.party[1]!.mana).toBe(next.party[1]!.maxMana);
     expect(next.party[1]!.stress).toBe(0);
+    expect(next.circuloSkillRerollReady).toBe(true);
   });
 
   it('setExploration atualiza nodeId no mesmo graphId', () => {

@@ -634,7 +634,8 @@ export const enemies: Record<string, EnemyDef> = {
     lootDrops: [
       { chance: 0.65, resource: 'gold', amount: 2 },
       { chance: 0.25, resource: 'gold', amount: 2 },
-      { chance: 0.15, resource: 'supply', amount: 1 }
+      { chance: 0.15, resource: 'supply', amount: 1 },
+      { chance: 0.35, itemId: 'act6_fracture_iron' }
     ],
   },
   act6_wild_veil_scribe: {
@@ -661,7 +662,8 @@ export const enemies: Record<string, EnemyDef> = {
     lootDrops: [
       { chance: 0.8, resource: 'gold', amount: 3 },
       { chance: 0.3, resource: 'gold', amount: 1 },
-      { chance: 0.2, resource: 'supply', amount: 1 }
+      { chance: 0.2, resource: 'supply', amount: 1 },
+      { chance: 0.2, itemId: 'act6_void_slag' }
     ],
   },
   act6_wild_murmur_host: {
@@ -688,7 +690,8 @@ export const enemies: Record<string, EnemyDef> = {
     lootDrops: [
       { chance: 0.8, resource: 'gold', amount: 3 },
       { chance: 0.3, resource: 'gold', amount: 1 },
-      { chance: 0.2, resource: 'supply', amount: 1 }
+      { chance: 0.2, resource: 'supply', amount: 1 },
+      { chance: 0.2, itemId: 'act6_void_slag' }
     ],
   },
   act6_wild_chain_penitent: {
@@ -715,7 +718,8 @@ export const enemies: Record<string, EnemyDef> = {
     lootDrops: [
       { chance: 0.8, resource: 'gold', amount: 3 },
       { chance: 0.3, resource: 'gold', amount: 1 },
-      { chance: 0.2, resource: 'supply', amount: 1 }
+      { chance: 0.2, resource: 'supply', amount: 1 },
+      { chance: 0.45, itemId: 'act6_fracture_iron' }
     ],
   },
   act6_wild_glass_regent: {
@@ -742,7 +746,9 @@ export const enemies: Record<string, EnemyDef> = {
     lootDrops: [
       { chance: 0.8, resource: 'gold', amount: 3 },
       { chance: 0.3, resource: 'gold', amount: 1 },
-      { chance: 0.25, resource: 'corruption', amount: 2 }
+      { chance: 0.25, resource: 'corruption', amount: 2 },
+      { chance: 0.45, itemId: 'act6_fracture_iron' },
+      { chance: 0.35, itemId: 'act6_void_slag' }
     ],
   },
   act6_wild_stain_preacher: {
@@ -769,7 +775,8 @@ export const enemies: Record<string, EnemyDef> = {
     lootDrops: [
       { chance: 0.8, resource: 'gold', amount: 3 },
       { chance: 0.3, resource: 'gold', amount: 1 },
-      { chance: 0.2, resource: 'corruption', amount: 1 }
+      { chance: 0.2, resource: 'corruption', amount: 1 },
+      { chance: 0.35, itemId: 'act6_void_slag' }
     ],
   },
 };

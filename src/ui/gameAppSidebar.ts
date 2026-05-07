@@ -12,6 +12,13 @@ import {
   friendshipTierLabelPt,
   getCompanionFriendshipScore,
 } from '../engine/progression/index.ts';
+import {
+  CIRCULO_SKILL_REROLL_REP_COST,
+  FACTION_IDS,
+  REPUTATION_MAX,
+  REPUTATION_MIN,
+  hasFactionPerkUnlocked,
+} from '../engine/progression/reputation.ts';
 import { isLeadPassiveUnlocked } from '../engine/core/index.ts';
 import {
   getCharacterArmorClass,
@@ -910,7 +917,7 @@ function progressEchoesHoverTitle(): string {
 }
 
 function factionRepHoverTitle(label: string, value: number): string {
-  return `${label}: ${value}. Escala de −3 (hostil) a +3 (aliado). Altera diálogo, tratamento e alguns desbloqueios nas cenas.`;
+  return `${label}: ${value}. Escala de ${REPUTATION_MIN} (hostil) a ${REPUTATION_MAX} (pico de confiança). Altera diálogo, tratamento e desbloqueios nas cenas.`;
 }
 
 function activeBuffsHoverTitle(state: GameState): string {
@@ -948,8 +955,7 @@ function itemInventoryHoverTitle(def: ItemDef | undefined): string {
 
 function buildSidebarDisclosure(state: GameState): SidebarDisclosure {
   const visitedCount = Object.keys(state.visitedScenes).length;
-  const repTouched =
-    state.reputation.vigilia !== 0 || state.reputation.circulo !== 0 || state.reputation.culto !== 0;
+  const repTouched = FACTION_IDS.some((f) => (state.reputation[f] ?? 0) !== 0);
   const unlockInventory = state.chapter >= 2 || visitedCount >= 6 || state.day >= 4;
   const addRepEver = state.flags['add_rep_ever'] === true;
   const unlockFactions = state.chapter >= 2 || visitedCount >= 10 || repTouched || addRepEver;
@@ -1133,7 +1139,8 @@ function repBarMarkup(
   value: number,
   variant: 'vigilia' | 'circulo' | 'culto'
 ): string {
-  const pct = Math.min(100, Math.max(0, Math.round(((value + 3) / 6) * 100)));
+  const span = REPUTATION_MAX - REPUTATION_MIN;
+  const pct = Math.min(100, Math.max(0, Math.round(((value - REPUTATION_MIN) / span) * 100)));
   const repHint = escHtml(factionRepHoverTitle(label, value));
   return `<div class="faction-rep-row">
     <div class="sidebar-line faction-rep-label sidebar-line--with-icon sidebar-line--hint" title="${repHint}">${iconWrap(icons.factions)}<span>${escHtml(label)} <strong>${value}</strong></span></div>
@@ -1154,6 +1161,25 @@ const FACTION_LORE_PT: Record<'vigilia' | 'circulo' | 'culto', string> = {
 
 function factionLoreBlurb(variant: 'vigilia' | 'circulo' | 'culto'): string {
   return `<p class="faction-lore-blurb">${escHtml(FACTION_LORE_PT[variant])}</p>`;
+}
+
+/** Bónus ativo na reputação máxima de facção (texto fixo; alinhar com escolhas de cena). */
+const FACTION_PERK_LINE_PT: Record<'vigilia' | 'circulo' | 'culto', string> = {
+  vigilia:
+    'Canal da Vigília: mercadores aliados vendem um kit de campo (+3 suprimentos, uma vez por banca, com ouro).',
+  circulo: `Canal do Círculo: após descansar no acampamento, podes pedir uma segunda leitura num teste de perícia falhado (${CIRCULO_SKILL_REROLL_REP_COST} reputação com o Círculo, uma vez até ao próximo descanso).`,
+  culto:
+    'Canal do Terceiro Sino: em encontros com culto, abre-se opção de favores discretos (ouro e experiência, uma vez por cena).',
+};
+
+function factionPerkBulletMarkup(
+  state: GameState,
+  variant: 'vigilia' | 'circulo' | 'culto'
+): string {
+  const v = state.reputation[variant] ?? 0;
+  if (!hasFactionPerkUnlocked(v)) return '';
+  const line = FACTION_PERK_LINE_PT[variant];
+  return `<ul class="faction-perk-list" aria-label="Bónus de facção ativo"><li class="faction-perk-item">${escHtml(line)}</li></ul>`;
 }
 
 function wireSidebarDetails(
@@ -1324,10 +1350,13 @@ export function buildGameSidebar({
         <div class="sidebar-collapse-body sidebar-faccoes">
           ${repBarMarkup('Vigília', rep.vigilia, 'vigilia')}
           ${factionLoreBlurb('vigilia')}
+          ${factionPerkBulletMarkup(state, 'vigilia')}
           ${repBarMarkup('Círculo', rep.circulo, 'circulo')}
           ${factionLoreBlurb('circulo')}
+          ${factionPerkBulletMarkup(state, 'circulo')}
           ${repBarMarkup('Culto', rep.culto, 'culto')}
           ${factionLoreBlurb('culto')}
+          ${factionPerkBulletMarkup(state, 'culto')}
         </div>
       </details>`
           : ''

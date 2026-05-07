@@ -25,6 +25,10 @@ import {
   syncCompanionPartyWithFriendship,
   tickActiveBuffs,
 } from '../engine/progression/index.ts';
+import {
+  CIRCULO_SKILL_REROLL_REP_COST,
+  hasFactionPerkUnlocked,
+} from '../engine/progression/reputation.ts';
 import type { Choice, Effect, GameState } from '../engine/schema/index.ts';
 import { GameAudio, type AmbientTheme } from './sound/index.ts';
 import { buildDevToolsHref, buildScenesGraphHref } from './campaignUrl.ts';
@@ -137,6 +141,11 @@ export class GameApp {
   private pendingStoryDiceRoll: {
     nextState: GameState;
     breakdown: StoryDiceRollBreakdown;
+    reroll?: {
+      preRollState: GameState;
+      rolledScene: LoadedScene;
+      rollKind: 'skill' | 'dualSkill';
+    };
   } | null = null;
   private diceRollIntervalTimer: ReturnType<typeof setInterval> | null = null;
   private diceRollEnterHandler: ((e: KeyboardEvent) => void) | null = null;
@@ -961,7 +970,18 @@ export class GameApp {
     this.audio.playDice();
     const r = resolveSkillCheck(this.state, scene);
     if (!r.breakdown) return;
-    this.pendingStoryDiceRoll = { nextState: r.state, breakdown: r.breakdown };
+    const fail = !r.breakdown.success;
+    const circulo = this.state.reputation.circulo ?? 0;
+    const canReroll =
+      fail &&
+      hasFactionPerkUnlocked(circulo) &&
+      this.state.circuloSkillRerollReady &&
+      !!scene.frontmatter.skillCheck;
+    const preRollState: GameState = { ...r.state, sceneId: scene.id };
+    const reroll = canReroll
+      ? { preRollState, rolledScene: scene, rollKind: 'skill' as const }
+      : undefined;
+    this.pendingStoryDiceRoll = { nextState: r.state, breakdown: r.breakdown, reroll };
     this.render();
   }
 
@@ -980,7 +1000,59 @@ export class GameApp {
       ...r.state,
       visitedScenes: { ...r.state.visitedScenes, [scene.id]: true },
     };
-    this.pendingStoryDiceRoll = { nextState: afterRoll, breakdown: r.breakdown };
+    const fail = !r.breakdown.success;
+    const circulo = this.state.reputation.circulo ?? 0;
+    const canReroll =
+      fail &&
+      hasFactionPerkUnlocked(circulo) &&
+      this.state.circuloSkillRerollReady &&
+      !!scene.frontmatter.dualAttrSkillCheck;
+    const preRollState: GameState = { ...r.state, sceneId: scene.id };
+    const reroll = canReroll
+      ? { preRollState, rolledScene: scene, rollKind: 'dualSkill' as const }
+      : undefined;
+    this.pendingStoryDiceRoll = { nextState: afterRoll, breakdown: r.breakdown, reroll };
+    this.render();
+  }
+
+  private onCirculoSkillDiceReroll(): void {
+    const p = this.pendingStoryDiceRoll;
+    if (!p?.reroll) return;
+    this.clearDiceRollTimers();
+    if (this.diceRollEnterHandler) {
+      window.removeEventListener('keydown', this.diceRollEnterHandler);
+      this.diceRollEnterHandler = null;
+    }
+    this.unlockAudio();
+    this.audio.playUiClick();
+    this.audio.playDice();
+    const ctx = this.ctx();
+    const { preRollState, rolledScene, rollKind } = p.reroll;
+    let s = applyEffects(preRollState, [{ op: 'addRep', faction: 'circulo', delta: CIRCULO_SKILL_REROLL_REP_COST }], ctx);
+    s = { ...s, circuloSkillRerollReady: false };
+    if (rollKind === 'skill') {
+      const r = resolveSkillCheck(s, rolledScene);
+      if (!r.breakdown) {
+        this.pendingStoryDiceRoll = null;
+        this.state = this.stabilize(s);
+        this.render();
+        return;
+      }
+      this.pendingStoryDiceRoll = { nextState: r.state, breakdown: r.breakdown };
+    } else {
+      const r = resolveDualAttrSkillCheck(s, rolledScene);
+      if (!r.breakdown) {
+        this.pendingStoryDiceRoll = null;
+        this.state = this.stabilize(s);
+        this.render();
+        return;
+      }
+      const afterRoll: GameState = {
+        ...r.state,
+        visitedScenes: { ...r.state.visitedScenes, [rolledScene.id]: true },
+      };
+      this.pendingStoryDiceRoll = { nextState: afterRoll, breakdown: r.breakdown };
+    }
     this.render();
   }
 
@@ -1210,6 +1282,7 @@ export class GameApp {
       },
       playCheckSuccess: () => this.audio.playCheckSuccess(),
       playCheckFail: () => this.audio.playCheckFail(),
+      onCirculoDiceReroll: () => this.onCirculoSkillDiceReroll(),
     };
   }
 

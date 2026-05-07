@@ -4,7 +4,6 @@ import {
   type GameEvent,
   type LoadedScene,
   type StoryChoiceRow,
-  type StoryDiceRollBreakdown,
 } from '../engine/core/index.ts';
 import type { Choice, GameState } from '../engine/schema/index.ts';
 import type { ContentRegistry } from '../content/registry.ts';
@@ -14,7 +13,11 @@ import {
   appendCampEquipmentPanel,
   type CampEquipmentCallbacks,
 } from './story/storyCampEquipmentPanel.ts';
-import { appendStoryDiceRollBanner, type StoryDiceBannerHost } from './story/storyDiceBanner.ts';
+import {
+  appendStoryDiceRollBanner,
+  type StoryDiceBannerHost,
+  type StoryDiceRollPendingPayload,
+} from './story/storyDiceBanner.ts';
 import { resolveSceneArt } from './story/storyArt.ts';
 import { appendFaithMiracleBanner } from './story/storyFaithMiracleBanner.ts';
 import { setupTimedChoices } from './story/storyTimedChoices.ts';
@@ -79,8 +82,10 @@ export type StoryStatusHighlightRow = Extract<GameEvent, { type: 'statusHighligh
   exiting?: boolean;
 };
 
+export type PendingStoryDiceRoll = StoryDiceRollPendingPayload;
+
 export type StoryOverlayState = {
-  pendingStoryDiceRoll: { nextState: GameState; breakdown: StoryDiceRollBreakdown } | null;
+  pendingStoryDiceRoll: StoryDiceRollPendingPayload | null;
   storyDiceHost: StoryDiceBannerHost;
   faithMiraclePending: boolean;
   setFaithMiraclePending: (v: boolean) => void;

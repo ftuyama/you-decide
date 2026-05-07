@@ -50,6 +50,20 @@ choices:
       - { op: addResource, resource: gold, delta: -12 }
       - { op: grantItem, itemId: potion_stress }
       - { op: setFlag, key: act4_merch_stress_1, value: true }
+  - text: "Kit de campo da Vigília (−7 ouro)"
+    uiSection: "À venda"
+    next: act4/late_merchant
+    condition:
+      all:
+        - { rep: { faction: vigilia, gte: 5 } }
+        - { resource: { gold: { gte: 7 } } }
+        - { resource: { supply: { lte: 7 } } }
+        - { noFlag: act4_merch_vigilia_field_kit }
+    effects:
+      - { op: addResource, resource: gold, delta: -7 }
+      - { op: addResource, resource: supply, delta: 3 }
+      - { op: setFlag, key: act4_merch_vigilia_field_kit, value: true }
+    preview: "Suprimento · selo da Vigília (uma vez nesta banca)"
   - text: "Afastar-me do mercador"
     uiSection: "Conversa"
     next: act4/throne/throne_gate

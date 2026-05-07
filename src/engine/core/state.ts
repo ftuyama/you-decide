@@ -1,4 +1,5 @@
 import { SCHEMA_VERSION, type CampaignIndex, type ClassId, type GameState } from '../schema/index.ts';
+import { clampReputation } from '../progression/reputation.ts';
 import { parseSeedFromSearch } from './rng.ts';
 
 const defaultRep = { vigilia: 0, circulo: 0, culto: 0 } as GameState['reputation'];
@@ -27,6 +28,7 @@ export function createInitialState(campaign: CampaignIndex, seed?: number): Game
     inventory: [],
     reputation: { ...defaultRep },
     factionGainPending: { vigilia: 0, circulo: 0, culto: 0 },
+    circuloSkillRerollReady: false,
     flags: {},
     marks: [],
     legacy: { echoes: 0, titles: [], discoveredEndings: [], lastRunSummary: '', lastRunEchoGain: 0 },
@@ -259,10 +261,22 @@ export function deserializeState(json: string): GameState {
       ? { graphId: rawEx.graphId, nodeId: rawEx.nodeId }
       : null;
 
+  const rawRep = (o as GameState).reputation;
+  const reputation: GameState['reputation'] = {
+    vigilia: clampReputation(typeof rawRep?.vigilia === 'number' ? rawRep.vigilia : 0),
+    circulo: clampReputation(typeof rawRep?.circulo === 'number' ? rawRep.circulo : 0),
+    culto: clampReputation(typeof rawRep?.culto === 'number' ? rawRep.culto : 0),
+  };
+
   const merged: GameState = {
     ...(o as GameState),
     campaignId,
     factionGainPending,
+    reputation,
+    circuloSkillRerollReady:
+      typeof (o as Partial<GameState>).circuloSkillRerollReady === 'boolean'
+        ? (o as Partial<GameState>).circuloSkillRerollReady!
+        : false,
     resources,
     marks,
     leadStoryPassives,

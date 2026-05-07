@@ -8,6 +8,18 @@ highlight: true
 choices:
   - text: "Entrar na câmara do hálito branco"
     next: act5/encounters/fight_ice_dragon
+  - text: "Voltar o rosto ao vento — o rasto cinzento espera"
+    condition:
+      all:
+        - { noFlag: kaelsworn_recruited }
+        - { noFlag: kr_won_act5 }
+    preview: "Encontro especial: Kael, o Rastreador Cinzento."
+    effects:
+      - op: startCombat
+        encounterId: kael_rival_act5
+        onVictory: shared/kaelsworn_post_act5
+        onFlee: act5/frost_lair_approach
+        onDefeat: shared/game_over
   - text: "Retornar ao acampamento"
     next: act5/frost_hub
 onEnter:

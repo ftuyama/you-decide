@@ -2,6 +2,7 @@ export type AmbientTheme =
   | 'explore'
   | 'act2'
   | 'combat'
+  | 'combat_rival'
   | 'camp'
   | 'boss'
   | 'act3'
@@ -17,6 +18,7 @@ export const AMBIENT_THEMES: readonly AmbientTheme[] = [
   'explore',
   'act2',
   'combat',
+  'combat_rival',
   'camp',
   'boss',
   'act3',

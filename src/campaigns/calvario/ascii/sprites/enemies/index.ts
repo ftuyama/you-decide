@@ -14,6 +14,7 @@ export const act3_stone_guard = { sprite: S('act3_stone_guard') };
 export const act4_morvayn_p1 = { sprite: S('act4_morvayn_p1') };
 export const act4_morvayn_p2 = { sprite: S('act4_morvayn_p2') };
 export const act4_vigil_hunter = { sprite: S('act4_vigil_hunter') };
+export const rival_kael = { sprite: S('rival_kael') };
 export const act5_frost_whelp = { sprite: S('act5_frost_whelp') };
 export const act5_frost_reaver = { sprite: S('act5_frost_reaver') };
 export const act5_ice_dragon_p1 = { sprite: S('act5_ice_dragon_p1') };

@@ -374,7 +374,7 @@ function mountMusicPanel(
   const note = document.createElement('p');
   note.className = 'dev-tools-note';
   note.textContent =
-    'Os temas "combat" e "boss" são escolhidos em combate pelo jogo (não vêm do YAML das cenas). As contagens abaixo são só de cenas com ambientTheme explícito.';
+    'Os temas "combat", "combat_rival" (encontros kael_rival_*) e "boss" são escolhidos em combate pelo jogo (não vêm do YAML das cenas). As contagens abaixo são só de cenas com ambientTheme explícito.';
 
   const table = document.createElement('table');
   table.className = 'dev-tools-table';

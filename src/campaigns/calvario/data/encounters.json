@@ -578,5 +578,41 @@
     "enemyAdvantage": true,
     "xpReward": 6,
     "fleeRate": 0.61
+  },
+  "kael_rival_act2": {
+    "id": "kael_rival_act2",
+    "enemies": [
+      "rival_kael_i"
+    ],
+    "playerAdvantage": false,
+    "enemyAdvantage": false,
+    "fleeRate": 0.62
+  },
+  "kael_rival_act4": {
+    "id": "kael_rival_act4",
+    "enemies": [
+      "rival_kael_ii"
+    ],
+    "playerAdvantage": false,
+    "enemyAdvantage": false,
+    "fleeRate": 0.6
+  },
+  "kael_rival_act5": {
+    "id": "kael_rival_act5",
+    "enemies": [
+      "rival_kael_iii"
+    ],
+    "playerAdvantage": false,
+    "enemyAdvantage": false,
+    "fleeRate": 0.58
+  },
+  "kael_rival_act6": {
+    "id": "kael_rival_act6",
+    "enemies": [
+      "rival_kael_iv"
+    ],
+    "playerAdvantage": false,
+    "enemyAdvantage": false,
+    "fleeRate": 0.56
   }
 }

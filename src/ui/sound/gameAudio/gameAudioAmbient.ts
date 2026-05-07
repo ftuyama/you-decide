@@ -56,6 +56,9 @@ export class GameAmbientPlayer {
       case 'combat':
         this.playAmbientCombat();
         break;
+      case 'combat_rival':
+        this.playAmbientCombatRival();
+        break;
       case 'camp':
         this.playAmbientCamp();
         break;
@@ -427,6 +430,117 @@ export class GameAmbientPlayer {
       try {
         bass.stop();
         master.disconnect();
+      } catch {
+        /* noop */
+      }
+    };
+  }
+
+  /**
+   * Combate contra rival (Kael): andamento grave e marcial, menos arcade e mais tensão de duelo.
+   */
+  private playAmbientCombatRival(): void {
+    if (this.bgCleanup) return;
+    const ctx = this.host.ensureContext();
+    const master = ctx.createGain();
+    master.gain.value = this.host.gain(0.22);
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -24;
+    comp.knee.value = 14;
+    comp.ratio.value = 3.8;
+    comp.attack.value = 0.01;
+    comp.release.value = 0.22;
+    comp.connect(master);
+    master.connect(ctx.destination);
+
+    const lowDrone = ctx.createOscillator();
+    const lowDroneGain = ctx.createGain();
+    lowDrone.type = 'triangle';
+    lowDrone.frequency.value = 55;
+    lowDroneGain.gain.value = this.host.gain(0.072);
+    lowDrone.connect(lowDroneGain);
+    lowDroneGain.connect(comp);
+    lowDrone.start();
+
+    const highDrone = ctx.createOscillator();
+    const highDroneGain = ctx.createGain();
+    highDrone.type = 'sine';
+    highDrone.frequency.value = 110;
+    highDroneGain.gain.value = this.host.gain(0.032);
+    highDrone.connect(highDroneGain);
+    highDroneGain.connect(comp);
+    highDrone.start();
+
+    const bass = ctx.createOscillator();
+    const bassGain = ctx.createGain();
+    bass.type = 'sawtooth';
+    bass.frequency.value = 82.41;
+    bassGain.gain.value = 0;
+    bass.connect(bassGain);
+    bassGain.connect(comp);
+    bass.start();
+
+    const stabs = [146.83, 155.56, 174.61, 164.81];
+    let stabIx = 0;
+    let step = 0;
+    const eighth = 152;
+    this.bgRhythmTimer = setInterval(() => {
+      const ac = this.host.getAudioContext();
+      if (!ac) return;
+      const tNow = ctx.currentTime;
+      const s = step % 16;
+
+      if (s === 0 || s === 8 || s === 12) {
+        triggerKick(ctx, comp, tNow, this.host.gain(s === 0 ? 0.14 : 0.1));
+        bassGain.gain.setTargetAtTime(this.host.gain(s === 0 ? 0.13 : 0.1), tNow, 0.018);
+        bassGain.gain.setTargetAtTime(0, tNow + 0.16, 0.06);
+      }
+      if (s === 4 || s === 14) {
+        triggerSnare(ctx, comp, tNow, this.host.gain(0.11));
+      }
+      if (s % 2 === 0) {
+        triggerHat(ctx, comp, tNow, this.host.gain(s % 8 === 0 ? 0.02 : 0.014));
+      }
+      if (s === 6 || s === 10) {
+        triggerPluck(
+          ctx,
+          comp,
+          tNow + 0.03,
+          stabs[stabIx % stabs.length]!,
+          this.host.gain(0.068),
+          'triangle',
+          0.34,
+        );
+        stabIx++;
+      }
+      if (s === 0 || s === 8) {
+        triggerPluck(
+          ctx,
+          comp,
+          tNow + 0.02,
+          73.42,
+          this.host.gain(0.056),
+          'sawtooth',
+          0.18,
+        );
+      }
+      if (s === 15) {
+        triggerArp(ctx, comp, tNow + 0.015, this.host.gain(0.016));
+      }
+      step++;
+    }, eighth);
+
+    this.bgCleanup = () => {
+      if (this.bgRhythmTimer) {
+        clearInterval(this.bgRhythmTimer);
+        this.bgRhythmTimer = null;
+      }
+      try {
+        lowDrone.stop();
+        highDrone.stop();
+        bass.stop();
+        master.disconnect();
+        comp.disconnect();
       } catch {
         /* noop */
       }

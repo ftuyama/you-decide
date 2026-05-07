@@ -670,6 +670,7 @@ export class GameApp {
     if (this.state.mode === 'combat' && this.state.combat) {
       const id = this.state.combat.encounterId;
       if (id.startsWith('boss_') || id.includes('boss')) return 'boss';
+      if (id.startsWith('kael_rival')) return 'combat_rival';
       return 'combat';
     }
     const sceneTheme = this.registry.getScene(this.state.sceneId)?.frontmatter.ambientTheme;

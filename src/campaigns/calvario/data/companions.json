@@ -22,5 +22,17 @@
     "maxHp": 16,
     "leaveFlag": "tomas_left",
     "lorePt": "Filho de ferreiros, jurou espada a uma ordem que já não existe. Carrega o escudo com vergonha e orgulho — e espera que alguém digno o mande levantar de novo."
+  },
+  "rival_kael": {
+    "id": "rival_kael",
+    "name": "Kael, o Rastreador Cinzento",
+    "str": 11,
+    "agi": 9,
+    "mind": 7,
+    "luck": 8,
+    "hp": 18,
+    "maxHp": 18,
+    "leaveFlag": "kael_left",
+    "lorePt": "Não serve facção nem templo: serve o rasto que sobrevive. Aprendeu a cair e a levantar na mesma respiração — e só jurou a quem o venceu três vezes sem mentir no golpe."
   }
 }

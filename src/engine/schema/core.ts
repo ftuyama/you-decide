@@ -394,6 +394,7 @@ export const SceneFrontmatterSchema = z.object({
       'explore',
       'act2',
       'combat',
+      'combat_rival',
       'camp',
       'boss',
       'act3',

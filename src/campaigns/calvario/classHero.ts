@@ -19,17 +19,17 @@ export const DEFAULT_HERO_NAME: Record<ClassId, string> = {
 
 /** Pequena lore por classe (expandível na UI). */
 export const CLASS_LORE_PT: Record<ClassId, string> = {
-  knight: `Galen jurou a espada às muralhas do sul. Desceu à Masmorra do Silêncio por dívida de honra — e porque, nas galerias, ainda há linhas a segurar e portas a fechar.
+  knight: `Galen cresceu onde o vento corta os muros e os homens aprendem cedo que promessa quebrada mata mais do que lâmina cega. Jurou proteger a fronteira; falhou uma noite, e bastou uma noite para enterrar nomes que ainda o acordam.
 
-Quem o vê de armadura gasta pensa em bravura barata; ele sabe que cada camada de ferro é uma promessa que não se desdiz.`,
+Desceu à Masmorra do Silêncio não para glória, mas para cobrar de si a dívida que ninguém exigiu em voz alta. Cada placa da armadura pesa como testemunha: ele avança porque recuar seria admitir que os mortos ficaram para trás em vão.`,
 
-  mage: `Ysara deixou o scriptorium e o silêncio regulado da Torre pelo eco húmido das caves. Cada símbolo que desenha no ar é uma aposta: o conhecimento mora onde a luz não chega.
+  mage: `Ysara foi moldada pela Torre para recitar verdades limpas, em salas secas, entre mestres que só aceitavam o risco quando ele cabia no pergaminho. Ela acreditou nisso até ouvir, sob a pedra da cidade, uma pergunta que os livros não respondiam.
 
-Os colegas chamam-lhe imprudente. Ela chama-lhes cobardes — e carrega o caderno como quem carrega uma última vela.`,
+Na masmorra, estudo e culpa andam juntos: cada sigilo que traça aproxima-a de respostas e de uma versão de si que talvez a Torre chamasse de heresia. Ainda assim, segue — porque ignorância, para ela, sempre foi um pecado mais útil aos monstros.`,
 
-  cleric: `Oris leva o incenso e o silêncio com o mesmo peso. A Vigília mandou-o medir a profundidade do mal — não para o julgar de imediato, mas para dar nome ao que geme sob a cidade e não pode subir sozinho.
+  cleric: `Oris vestiu a Vigília quando ainda acreditava que fé era muralha: oração certa, gesto certo, noite vencida. Depois viu gente boa afundar em silêncio sem milagre nenhum, e aprendeu que doutrina não aquece mão gelada.
 
-Há quem o confunda com confessor; no fundo, é enfermeiro de almas em sítios onde nem Deus responde à primeira chamada.`,
+Desceu para medir o mal, sim — mas também para não abandonar quem já não consegue pedir socorro. Carrega incenso, salmos e vergonha antiga; quando Deus cala, ele responde do jeito que pode, ficando.`,
 };
 
 /** Rótulos por arquétipo narrativo (`path`). Chave: `classId:path`. */
@@ -42,63 +42,63 @@ const PATH_LABEL_PT: Partial<Record<string, string>> = {
 /** Texto do banner de promoção (`setPath`) — tom narrativo curto por arquétipo. */
 const PATH_PROMOTION_NARRATIVE_PT: Partial<Record<string, string>> = {
   'knight:fallen':
-    'O ferro não te largou: mudou o que escreves por cima da armadura — promessa partida que ainda corta, sem ilusão de honra que lave o que viste nas galerias.',
+    'O ferro não te largou; foi a inocência que ficou para trás. A armadura agora veste um nome novo: aquele que sobreviveu quando devia ter caído, e aprendeu a lutar sem esperar absolvição.',
   'mage:dark':
-    'Os símbolos seguros ficaram pequenos no véu. A partir daqui carregas outros no sangue e no silêncio — e cada traço sabe a que preço abriu a porta.',
+    'Os símbolos seguros já não bastam para abrir as portas que escolheste atravessar. Daqui em diante, o véu responde ao teu pulso e à tua fome de verdade, e cada traço cobra um pedaço de quem o desenha.',
   'cleric:penitent':
-    'A fé não te soltou; o corpo é que aprendeu outro idioma de contrato — marcas que a Vigília não precisa abençoar para doer, e orações renegociadas com o silêncio.',
+    'A fé não te deixou; foi a paz que desertou primeiro. O corpo virou liturgia de cicatrizes, e cada oração agora soa menos como conforto e mais como juramento de continuar de pé apesar do silêncio.',
 };
 
 /** Bónus de jogo ao desbloquear arquétipo (`classId:path`). Mago/clérigo já recebem magia nas cenas de path. */
 const PATH_UNLOCK_BONUS: Partial<Record<string, PathUnlockBonus>> = {
   'knight:fallen': {
     stats: { str: 1, luck: 1 },
-    backstoryPt: `O que viu nas galerias deixou-no com noites em claro: a mão a fechar no punho sem ferro, o corpo a lembrar o golpe que não deu. Não é medo — é o hábito de estar sempre um passo atrasado em relação à própria culpa.`,
+    backstoryPt: `Desde as galerias, dorme com a sensação de ter chegado tarde ao golpe que importava. Não chama isso de medo; chama de disciplina amarga — a de nunca mais permitir que alguém morra por causa de um segundo de hesitação.`,
   },
   'mage:dark': {
     stats: { mind: 1 },
-    backstoryPt: `Há noites em que desenha um símbolo no ar e hesita entre apagar ou completar — como se o vício fosse curiosidade com dentes. A Torre chamaria-lhe corrupção; ela chama necessidade, e odeia ter razão.`,
+    backstoryPt: `Há noites em que começa um símbolo e para no último traço, como quem encara um precipício familiar. A Torre chamaria de corrupção; ela chama de necessidade — e odeia perceber que ambas as palavras podem ser verdade ao mesmo tempo.`,
   },
   'cleric:penitent': {
     stats: { mind: 1 },
     addResource: { resource: 'faith', delta: 1 },
-    backstoryPt: `As marcas do ritual não sangram, mas doem quando ninguém vê. O hábito de se castigar tornou-se mais voz interior do que liturgia — e a Vigília, por vezes, parece tão distante como o céu tapado.`,
+    backstoryPt: `As marcas do ritual não sangram, mas ardem nos dias em que a culpa encontra silêncio. A penitência já não é cerimônia: virou idioma íntimo, lembrando-o de que fé também é permanecer humano quando o céu parece fechado.`,
   },
 };
 
 const PATH_LORE_PT: Partial<Record<string, string>> = {
-  'knight:fallen': `O juramento quebrou-se antes da espada. Não foi cobardia — foi o peso de ver o que não devia ser visto nas galerias. Ainda carrega o ferro; já não carrega a ilusão de que a honra lava o que a escuridão mancha.
+  'knight:fallen': `O juramento não partiu num grito; partiu em pequenas omissões, numa noite em que Galen escolheu errado e ouviu o preço dessa escolha ecoar nos corredores. Desde então, luta como quem presta depoimento ao próprio passado.
 
-Quem o chama de caído não sabe o que é levantar outra vez só para não deixar ninguém atrás.`,
+Chamam-no de caído porque não entendem: cair foi fácil; difícil é continuar carregando os vivos sem fingir que os mortos deixaram de pesar.`,
 
-  'mage:dark': `A Torre ensinou símbolos seguros; a masmorra ensinou os outros. Ysara escolheu a segunda lição de propósito — não por sede de poder, mas porque certas portas só abrem com sombras honestas.
+  'mage:dark': `A Torre ensinou limites; a masmorra ensinou necessidade. Ysara atravessou essa fronteira sabendo que conhecimento sem custo era conforto de superfície, e que o fundo exigia mãos sujas de sombra.
 
-O caderno tem páginas que ela não mostra ao scriptorium.`,
+No caderno, há páginas que ela esconde não por vergonha do poder, mas por medo de reconhecer, em letra limpa, o quanto já mudou para consegui-lo.`,
 
-  'cleric:penitent': `Oris marca o corpo para lembrar o que a alma esqueceu. A Vigília ainda o reconhece; ele já não tem a certeza se isso é misericórdia ou sentença.
+  'cleric:penitent': `Oris transformou culpa em rito para não deixá-la apodrecer em silêncio. A Vigília ainda o chama de irmão; ele responde, mas já sabe que algumas respostas vêm da carne ferida, não do altar.
 
-Cada oração é um contrato renegociado com o silêncio.`,
+Cada prece é renegociação: entre misericórdia e disciplina, entre o homem que era e o que precisa ser para atravessar a escuridão sem negar o próprio coração.`,
 };
 
 /** Revelação na História quando o passivo de classe desbloqueia (fragmento de Morvayn). */
 const CLASS_PASSIVE_LORE_PT: Record<ClassId, string> = {
-  knight: `O que lhe deram nos subníveis não é só sorte: é memória no corpo de que o golpe decisivo nasce quando já não há margem para meias-medidas — e de que isso tem custo.`,
-  mage: `O fio que sente na mana não é conforto; é lembrete de que aprendeu a beber o poço devagar o bastante para não se afogar de uma vez — e devagar o bastante para não parar.`,
-  cleric: `O pulso devoto não apaga o medo; ensina-o a respirar por baixo da pele. Oris descobriu que fé, aqui em baixo, é menos claridade e mais hábito de não desistir da carne quando o espírito vacila.`,
+  knight: `O instinto que desperta em Galen não é sorte de batalha; é memória muscular de perdas que ele se recusou a repetir. Quando o momento fecha, o corpo decide antes da dúvida — e cobra depois, em silêncio.`,
+  mage: `O fio na mana deixou de ser técnica e virou pacto íntimo. Ysara aprendeu a tocar o abismo sem se entregar inteiro a ele: sorve o bastante para avançar, recua o bastante para ainda se reconhecer.`,
+  cleric: `O pulso de Oris não elimina o medo; ensina convivência. A fé dele, aqui embaixo, não é clarão repentino: é repetição teimosa de cuidado, mesmo quando a alma fraqueja e nenhuma voz do alto responde.`,
 };
 
 const CHAPTER_LORE_PT: Record<ClassId, { mid: string; late: string }> = {
   knight: {
-    mid: `Nas profundezas, a honra deixou de ser discurso de muralha. Tornou-se pergunta feita a cada passo: a quem estás a salvar — e quanto de ti ficas a dever ao silêncio?`,
-    late: `Galen já não distingue bem fronteira de masmorra: ambas cobram testemunhas. O ferro pesa o mesmo; muda o nome do inimigo que imagina quando fecha os olhos.`,
+    mid: `Nas profundezas, honra já não é lema de estandarte: é decisão repetida quando ninguém está olhando. Galen aprende que proteger alguém quase sempre significa sacrificar a versão de si que ainda queria ser inocente.`,
+    late: `Chegando ao fim, fronteira e masmorra se confundem no mesmo tribunal interior. O aço pesa igual, mas agora ele sabe: o inimigo mais persistente é a voz que pergunta se desta vez ele chegou a tempo.`,
   },
   mage: {
-    mid: `Cada camada da dungeon arranha a certeza da Torre. Ysara sente o caderno mais pesado — não de páginas, de promessas que fez a si mesma para continuar a subir (ou a descer) sem mentir por completo.`,
-    late: `Os símbolos que usa já não parecem empréstimos: parecem hábito. A pergunta deixa de ser “é seguro?” e passa a ser “ainda és tu a escolher o risco?”`,
+    mid: `Cada nível desmente uma certeza ensinada pela Torre. O caderno de Ysara pesa mais não pelo papel, mas pelo número de promessas que ela precisa fazer a si mesma para continuar buscando verdade sem se perder por completo.`,
+    late: `No limiar, os símbolos sombrios já soam naturais em suas mãos. A pergunta deixa de ser "funciona?" e vira "quanto de mim ainda escolhe, e quanto já apenas responde ao que foi despertado?"`,
   },
   cleric: {
-    mid: `Oris aprendeu a medir o mal em respirações, não só em dogma. O incenso não esconde o cheiro da verdade; ajuda a aguentar o tempo suficiente para a nomear sem desfalecer.`,
-    late: `A Vigília mandou-o medir profundidade; a masmorra ensinou-lhe profundidade humana. Entre oração e silêncio, ficou um terceiro lugar: o de quem carrega o peso sem pedir permissão ao céu.`,
+    mid: `Oris aprende a medir o mal em respirações curtas, febres, olhos que evitam a luz. O incenso já não mascara nada; serve apenas para dar alguns segundos de coragem antes de nomear a ferida como ela é.`,
+    late: `Perto do fim, ele entende que a Vigília o enviou para medir abismos, mas foi ele quem acabou sendo medido. Entre oração e silêncio, encontra um terceiro ofício: carregar gente quebrada sem esperar autorização do céu.`,
   },
 };
 

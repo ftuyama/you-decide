@@ -14,6 +14,11 @@ export function slotStorageKey(campaignId: string, slot: number): string {
   return `${campaignId}_save_v1_s${slot}`;
 }
 
+/** localStorage: último dia (YYYY-MM-DD) em que o bônus de retorno foi aplicado neste slot. */
+export function slotReturnRewardDateKey(campaignId: string, slot: number): string {
+  return `${campaignId}_return_reward_date_v2_s${slot}`;
+}
+
 /** Copia a gravação legada para o slot 1 se o slot 1 ainda estiver vazio. */
 export function migrateLegacySaveIfNeeded(campaignId: string, legacySaveKey: string): void {
   try {

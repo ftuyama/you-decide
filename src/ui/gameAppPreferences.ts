@@ -5,7 +5,6 @@ export type GameAppStorageKeys = {
   sceneArtHighlightKey: string;
   devModeKey: string;
   onboardingPrimerKey: string;
-  returnRewardDateKey: string;
   legacyBriefingKey: string;
 };
 
@@ -17,7 +16,6 @@ export function buildGameAppStorageKeys(campaignId: string): GameAppStorageKeys 
     sceneArtHighlightKey: `${campaignId}_scene_art_highlight_v1`,
     devModeKey: `${campaignId}_dev_mode`,
     onboardingPrimerKey: `${campaignId}_onboarding_primer_v1`,
-    returnRewardDateKey: `${campaignId}_return_reward_date_v1`,
     legacyBriefingKey: `${campaignId}_legacy_briefing_v1`,
   };
 }

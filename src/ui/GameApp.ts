@@ -34,7 +34,7 @@ import {
   migrateLegacySaveIfNeeded as migrateLegacySaveSlot,
   saveStateToSlot,
   readRawSlot as readSaveSlotRaw,
-  hasAnyStoredSaveForCampaign,
+  slotReturnRewardDateKey,
 } from './gameAppSaveSlots.ts';
 import { appendCombatLogMessageWithBoldNames, renderCombatInto } from './gameAppCombat.ts';
 import {
@@ -278,7 +278,6 @@ export class GameApp {
     );
     this.state = createInitialState(this.registry.data.campaign);
     this.state = this.stabilize(this.state);
-    this.applyReturnRewardIfNeeded();
     this.applyLegacyBriefingIfNeeded();
     this.sidebarSections = loadSidebarSections(this.storageKeys.sidebarKey);
     this.migrateLegacySaveIfNeeded();
@@ -302,11 +301,12 @@ export class GameApp {
     this.render();
   }
 
-  private applyReturnRewardIfNeeded(): void {
+  /** Bônus diário de retorno: primeira carga de cada slot no dia (gravação existente). */
+  private applyReturnRewardIfNeededForLoadedSlot(slot: number): void {
     const today = new Date().toISOString().slice(0, 10);
+    const key = slotReturnRewardDateKey(this.campaignId, slot);
     try {
-      if (!hasAnyStoredSaveForCampaign(this.campaignId, this.legacySaveKey)) return;
-      if (localStorage.getItem(this.storageKeys.returnRewardDateKey) === today) return;
+      if (localStorage.getItem(key) === today) return;
       this.state = this.stabilize(
         applyEffects(
           this.state,
@@ -317,7 +317,7 @@ export class GameApp {
           this.ctx()
         )
       );
-      localStorage.setItem(this.storageKeys.returnRewardDateKey, today);
+      localStorage.setItem(key, today);
       this.enqueueStatusHighlight({
         type: 'statusHighlight',
         variant: 'good',
@@ -1002,6 +1002,7 @@ export class GameApp {
       }
       this.state = parsed;
       this.state = this.stabilize(this.state);
+      this.applyReturnRewardIfNeededForLoadedSlot(slot);
       this.render();
     } catch {
       this.showToast('Não foi possível carregar esta gravação.', 'error');

@@ -13,6 +13,7 @@ choices:
       - { op: addDiary, text: "A gota solidificou-se entre os dedos — pequena moeda de gelo e sorte." }
   - text: "Voltar ao momento da decisão"
     next: act4/throne/throne_gate
-onEnter: []
+onEnter:
+  - { op: addXp, amount: 10 }
 ---
 No instante certo, a **memória** engana-se e pensa que és dono dela. Aproveita: o trono ainda não percebeu.

@@ -10,6 +10,7 @@ choices:
       - { op: addDiary, text: "Um nome cedeu — não o meu, mas um que me serve de espelho torto." }
   - text: "Voltar ao momento da decisão"
     next: act4/throne/throne_gate
-onEnter: []
+onEnter:
+  - { op: addXp, amount: 10 }
 ---
 Encontras uma **linha** que não te pertence — e mesmo assim **alinha** o teu medo como régua.

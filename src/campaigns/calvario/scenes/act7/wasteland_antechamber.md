@@ -4,6 +4,7 @@ title: Antecâmara da cinza
 chapter: 7
 ambientTheme: ash_sky
 artKey: wasteland_dust
+highlight: true
 choices:
   - text: "Deixar o vento decidir o próximo sacrifício"
     next: act7/wasteland_router

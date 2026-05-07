@@ -8,5 +8,6 @@ choices:
     next: act2/hub_catacomb
 onEnter:
   - { op: addResource, resource: faith, delta: 1 }
+  - { op: addXp, amount: 12 }
 ---
 A cinza **para** aos teus pés — não fica nada escrito em ti. O silêncio, desta vez, é **teu**.

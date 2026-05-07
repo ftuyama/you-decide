@@ -6,7 +6,8 @@ ambientTheme: explore
 choices:
   - text: "Atravessar a praça sem vacilar"
     next: act4/encounters/pact_vigil_skirmish
-onEnter: []
+onEnter:
+  - { op: addXp, amount: 10 }
 ---
 O eco **assenta**. Não desaparece — aprende o teu nome e cala-se por educação.
 

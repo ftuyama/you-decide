@@ -4,6 +4,7 @@ title: Epílogo — cinzas com nome
 chapter: 7
 ambientTheme: ash_sky
 artKey: last_horizon
+highlight: true
 choices:
   - text: "Fechar o diário — o fim também cansa"
     next: endings/epilogue_depths

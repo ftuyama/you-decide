@@ -51,6 +51,12 @@ export type MountAppChromeOptions = {
 /** Referências estáveis ao chrome montado uma vez (menu + layout). */
 export type AppChromeRefs = {
   frame: HTMLElement;
+  topBarEl: HTMLElement;
+  collapseTopBtn: HTMLButtonElement;
+  fullscreenTopBtn: HTMLButtonElement;
+  edgeRail: HTMLElement;
+  edgeRailRestoreBtn: HTMLButtonElement;
+  edgeRailMenuBtn: HTMLButtonElement;
   titleEl: HTMLElement;
   sidebarEl: HTMLElement;
   mainEl: HTMLElement;
@@ -108,11 +114,50 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
   toastRegion.setAttribute('aria-atomic', 'true');
   frame.appendChild(toastRegion);
 
+  const edgeRail = document.createElement('nav');
+  edgeRail.className = 'app-edge-rail';
+  edgeRail.setAttribute('aria-label', 'Controles compactos');
+  edgeRail.hidden = true;
+  const edgeRailRestoreBtn = document.createElement('button');
+  edgeRailRestoreBtn.type = 'button';
+  edgeRailRestoreBtn.className = 'app-edge-rail-btn';
+  edgeRailRestoreBtn.setAttribute('aria-label', 'Mostrar barra superior');
+  edgeRailRestoreBtn.setAttribute('data-app-edge-restore', '');
+  edgeRailRestoreBtn.innerHTML = '\u25BC';
+  const edgeRailMenuBtn = document.createElement('button');
+  edgeRailMenuBtn.type = 'button';
+  edgeRailMenuBtn.className = 'app-edge-rail-btn';
+  edgeRailMenuBtn.setAttribute('aria-label', 'Menu');
+  edgeRailMenuBtn.setAttribute('data-app-edge-menu', '');
+  edgeRailMenuBtn.innerHTML = '\u2630';
+  edgeRail.appendChild(edgeRailRestoreBtn);
+  edgeRail.appendChild(edgeRailMenuBtn);
+
   const header = document.createElement('header');
   header.className = 'app-top';
   const title = document.createElement('div');
   title.className = 'game-title';
   title.textContent = opts.headerTitle;
+  const topActions = document.createElement('div');
+  topActions.className = 'app-top-actions';
+  const collapseTopBtn = document.createElement('button');
+  collapseTopBtn.type = 'button';
+  collapseTopBtn.className = 'app-top-collapse';
+  collapseTopBtn.setAttribute('aria-label', 'Ocultar barra superior');
+  collapseTopBtn.innerHTML = '\u25B2';
+  const fullscreenSupported = opts.fullscreenSupported;
+  const fullscreenTopBtn = document.createElement('button');
+  fullscreenTopBtn.type = 'button';
+  fullscreenTopBtn.className = 'app-top-fullscreen';
+  fullscreenTopBtn.innerHTML = '\u2922';
+  fullscreenTopBtn.disabled = !fullscreenSupported;
+  if (!fullscreenSupported) {
+    fullscreenTopBtn.title = 'Ecrã inteiro não está disponível neste navegador.';
+    fullscreenTopBtn.setAttribute('aria-label', 'Ecrã inteiro (indisponível)');
+  } else {
+    fullscreenTopBtn.setAttribute('aria-label', 'Ecrã inteiro');
+    fullscreenTopBtn.title = 'Ecrã inteiro';
+  }
   const hBtn = document.createElement('button');
   hBtn.type = 'button';
   hBtn.className = 'hamburger';
@@ -120,8 +165,11 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
   hBtn.setAttribute('aria-expanded', 'false');
   hBtn.innerHTML = '\u2630';
   hBtn.addEventListener('click', () => opts.onMenuHamburgerClick(hBtn));
+  topActions.appendChild(collapseTopBtn);
+  topActions.appendChild(fullscreenTopBtn);
+  topActions.appendChild(hBtn);
   header.appendChild(title);
-  header.appendChild(hBtn);
+  header.appendChild(topActions);
   frame.appendChild(header);
 
   const backdrop = document.createElement('div');
@@ -214,7 +262,6 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
   fontBtn.textContent = `Tamanho do texto (${100 + opts.fontStep * 10}%)`;
   fontBtn.addEventListener('click', () => opts.onCycleFont());
 
-  const fullscreenSupported = opts.fullscreenSupported;
   const fullscreenRow = document.createElement('label');
   fullscreenRow.className = 'menu-item menu-sound';
   if (!fullscreenSupported) {
@@ -375,6 +422,12 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
 
   return {
     frame,
+    topBarEl: header,
+    collapseTopBtn,
+    fullscreenTopBtn,
+    edgeRail,
+    edgeRailRestoreBtn,
+    edgeRailMenuBtn,
     titleEl: title,
     sidebarEl,
     mainEl,
@@ -397,6 +450,7 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
 /** Monta frame, menu, sidebar e `main` uma vez; anexa a `root`. */
 export function mountAppChrome(root: HTMLElement, opts: MountAppChromeOptions): AppChromeRefs {
   const refs = buildChromeDom(opts);
+  root.appendChild(refs.edgeRail);
   root.appendChild(refs.frame);
   return refs;
 }
@@ -419,6 +473,11 @@ export function syncAppChrome(refs: AppChromeRefs, opts: MountAppChromeOptions):
   refs.sceneArtHighlightCb.checked = opts.sceneArtHighlightEnabled;
   refs.fontBtn.textContent = `Tamanho do texto (${100 + opts.fontStep * 10}%)`;
   refs.fullscreenCb.checked = opts.getFullscreenActive();
+  refs.fullscreenTopBtn.disabled = !opts.fullscreenSupported;
+  if (!opts.fullscreenSupported) {
+    refs.fullscreenTopBtn.title = 'Ecrã inteiro não está disponível neste navegador.';
+    refs.fullscreenTopBtn.setAttribute('aria-label', 'Ecrã inteiro (indisponível)');
+  }
 
   while (refs.sidebarEl.firstChild) {
     refs.sidebarEl.removeChild(refs.sidebarEl.firstChild);

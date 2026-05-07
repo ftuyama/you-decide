@@ -9,6 +9,7 @@ choices:
     effects:
       - { op: addResource, resource: faith, delta: 1 }
       - { op: addDiary, text: "O medo veio — e passou sem me roubar o nome." }
-onEnter: []
+onEnter:
+  - { op: addXp, amount: 12 }
 ---
 O teu corpo **acredita** em ti por uma vez. Não é heroísmo — é **contrato** mínimo com o chão.

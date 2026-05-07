@@ -4,6 +4,7 @@ title: Aproximação ao Covil de Gelo
 chapter: 5
 ambientTheme: act5
 artKey: ice_dragon
+highlight: true
 choices:
   - text: "Entrar na câmara do hálito branco"
     next: act5/encounters/fight_ice_dragon

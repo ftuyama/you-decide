@@ -4,6 +4,7 @@ title: O Outro Nome
 chapter: 6
 ambientTheme: void
 artKey: act6_mirror_final
+highlight: true
 choices:
   - text: "Lutar contra o meu reflexo soberano"
     effects:

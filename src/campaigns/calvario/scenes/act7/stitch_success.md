@@ -10,6 +10,7 @@ choices:
 onEnter:
   - { op: addMark, mark: act7_sky_stitch_true }
   - { op: addResource, resource: faith, delta: 1 }
+  - { op: addXp, amount: 18 }
   - { op: addDiary, text: "Vi o céu como diagrama — por um instante, obedeceu. Paguei com suor frio, não com mentira." }
 ---
 O horizonte **estremece** e recua meio tom: não é milagre de praça — é **trégua** de laboratório. Sentes **fé** não como regra, mas como **músculo** que aguentou o peso sem partir.

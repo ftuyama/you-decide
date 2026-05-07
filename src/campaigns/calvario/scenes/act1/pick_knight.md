@@ -4,6 +4,7 @@ title: Juramento do Cavaleiro
 chapter: 1
 ambientTheme: explore
 artKey: pick_knight
+highlight: true
 choices:
   - text: "Avançar para a boca da masmorra"
     next: act1/dungeon_mouth

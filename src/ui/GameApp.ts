@@ -106,6 +106,8 @@ export class GameApp {
   private onboardingPrimerVisible = false;
   /** Meta da sessão aparece apenas até a primeira mudança de cena. */
   private sessionObjectiveVisible = true;
+  /** Barra superior oculta — trilho compacto à esquerda do `#app`. */
+  private topBarCollapsed = false;
   private readonly choiceHotkeyHandler: (e: KeyboardEvent) => void;
   /** Secções colapsáveis (recursos, inventário, facções, personagem…) — persistido em sessionStorage */
   private sidebarSections: Record<string, boolean> = {};
@@ -287,7 +289,7 @@ export class GameApp {
       }
     });
     document.addEventListener('fullscreenchange', () => {
-      this.syncFullscreenCheckbox();
+      this.syncFullscreenUi();
       this.syncAppFullscreenLayout();
     });
     /** Primeiro gesto (toque ou tecla) desbloqueia AudioContext (política dos browsers). */
@@ -298,8 +300,49 @@ export class GameApp {
     };
     document.addEventListener('pointerdown', unlockOnce, true);
     document.addEventListener('keydown', unlockOnce, true);
+    this.root.addEventListener('click', this.onAppChromeDelegatedClick);
     this.render();
   }
+
+  /** Controlo da barra superior / trilho — delegado em `#app` para evitar cliques bloqueados por camadas. */
+  private onAppChromeDelegatedClick = (e: MouseEvent): void => {
+    const t = e.target;
+    if (!(t instanceof Element)) return;
+    if (t.closest('.app-top-collapse')) {
+      this.topBarCollapsed = true;
+      this.syncTopBarCollapsePresentation();
+      this.audio.playUiClick();
+      return;
+    }
+    if (t.closest('[data-app-edge-restore]')) {
+      this.topBarCollapsed = false;
+      this.syncTopBarCollapsePresentation();
+      this.audio.playUiClick();
+      this.chromeRefs?.collapseTopBtn.focus();
+      return;
+    }
+    if (t.closest('[data-app-edge-menu]')) {
+      const hBtn = this.chromeRefs?.hamburgerBtn;
+      if (!hBtn) return;
+      this.toggleMenu();
+      hBtn.setAttribute('aria-expanded', this.menuOpen ? 'true' : 'false');
+      return;
+    }
+    if (t.closest('.app-top-fullscreen')) {
+      const btn = t.closest('.app-top-fullscreen');
+      if (!(btn instanceof HTMLButtonElement) || btn.disabled || !this.isFullscreenSupported()) return;
+      const want = this.getFullscreenElement() == null;
+      void (async () => {
+        try {
+          if (want) await this.requestGameFullscreen();
+          else await this.exitGameFullscreen();
+        } catch {
+          /* mantém checkbox / botão alinhados ao estado real */
+        }
+        this.syncFullscreenUi();
+      })();
+    }
+  };
 
   /** Bônus diário de retorno: primeira carga de cada slot no dia (gravação existente). */
   private applyReturnRewardIfNeededForLoadedSlot(slot: number): void {
@@ -1038,6 +1081,13 @@ export class GameApp {
     document.documentElement.style.overflow = lock ? 'hidden' : '';
   }
 
+  private syncTopBarCollapsePresentation(): void {
+    const refs = this.chromeRefs;
+    if (!refs) return;
+    refs.topBarEl.hidden = this.topBarCollapsed;
+    refs.edgeRail.hidden = !this.topBarCollapsed;
+  }
+
   private toggleMenu(): void {
     if (this.menuOpen) {
       this.closeMenu();
@@ -1079,6 +1129,24 @@ export class GameApp {
   private syncFullscreenCheckbox(): void {
     const cb = this.root.querySelector<HTMLInputElement>('[data-menu-fullscreen-cb]');
     if (cb) cb.checked = this.getFullscreenElement() != null;
+  }
+
+  private syncFullscreenTopBarButton(): void {
+    const btn = this.chromeRefs?.fullscreenTopBtn;
+    if (!btn) return;
+    if (btn.disabled || !this.isFullscreenSupported()) {
+      btn.removeAttribute('aria-pressed');
+      return;
+    }
+    const active = this.getFullscreenElement() != null;
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    btn.setAttribute('aria-label', active ? 'Sair do ecrã inteiro' : 'Ecrã inteiro');
+    btn.title = active ? 'Sair do ecrã inteiro (Esc)' : 'Ecrã inteiro';
+  }
+
+  private syncFullscreenUi(): void {
+    this.syncFullscreenCheckbox();
+    this.syncFullscreenTopBarButton();
   }
 
   private syncAppFullscreenLayout(): void {
@@ -1451,6 +1519,7 @@ export class GameApp {
     } else {
       syncAppChrome(this.chromeRefs, chromeOpts);
     }
+    this.syncTopBarCollapsePresentation();
 
     if (
       this.state.lastCombatXpGain != null ||
@@ -1468,6 +1537,7 @@ export class GameApp {
     }
     this.syncAmbientTheme();
     this.syncAppFullscreenLayout();
+    this.syncFullscreenUi();
     this.syncVisualTheme();
   }
 

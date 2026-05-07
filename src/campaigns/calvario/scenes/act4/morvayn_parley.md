@@ -4,6 +4,7 @@ title: Parlamento com Morvayn
 chapter: 4
 ambientTheme: explore
 artKey: morvayn
+highlight: true
 choices:
   - text: "Recusar o pacto e lutar"
     next: act4/encounters/fight_morvayn

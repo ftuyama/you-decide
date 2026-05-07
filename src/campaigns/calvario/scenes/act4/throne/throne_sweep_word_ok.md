@@ -10,6 +10,7 @@ choices:
     effects:
       - { op: addResource, resource: gold, delta: 2 }
       - { op: addDiary, text: "A sílaba caiu como moeda — o vácuo aceitou o pagamento." }
-onEnter: []
+onEnter:
+  - { op: addXp, amount: 10 }
 ---
 Por um instante, o salão **esquece-te**. É tudo o que precisas: não ser **matéria** do trono.

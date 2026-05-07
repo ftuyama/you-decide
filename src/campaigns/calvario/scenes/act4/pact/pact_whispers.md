@@ -7,6 +7,7 @@ choices:
   - text: "Deixar o sussurro completar-se"
     next: act4/pact/pact_trial_mind
 onEnter:
+  - { op: addXp, amount: 14 }
   - { op: addDiary, text: "Na cidade, as janelas fecham cedo. O silêncio não é paz — é fila." }
 ---
 Entre **vigias** que fingem não ver e mercadores que desviam o olhar, uma voz — não a tua — descreve o que vais fazer antes de pensares.

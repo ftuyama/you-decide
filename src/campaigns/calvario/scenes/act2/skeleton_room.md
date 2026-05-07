@@ -4,6 +4,7 @@ title: Sala dos Ossos Armados
 chapter: 2
 ambientTheme: act2
 artKey: skeleton
+highlight: true
 choices:
   - text: "Forçar a porta"
     next: act2/encounters/skeleton_combat_intro

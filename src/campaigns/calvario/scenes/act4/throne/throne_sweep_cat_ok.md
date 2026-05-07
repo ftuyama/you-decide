@@ -10,6 +10,7 @@ choices:
     effects:
       - { op: grantTemporaryBuff, attr: agi, delta: 1, remainingScenes: 2 }
       - { op: addDiary, text: "Contei até o salão ficar pequeno — espaço é mentira quando sabes onde pisa." }
-onEnter: []
+onEnter:
+  - { op: addXp, amount: 10 }
 ---
 O número **fecha** um círculo: não és mais visitante — és **medida** dentro da sala.

@@ -25,6 +25,7 @@ body {
 }
 
 #app {
+  position: relative;
   max-width: 100rem;
   margin: 0 auto;
   padding: 0.75rem 2rem 1rem;

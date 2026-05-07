@@ -9,6 +9,7 @@ choices:
     preview: "Capítulo 5. Longe do trono, o frio ainda pergunta quem manda no silêncio."
 onEnter:
   - { op: registerEnding, endingId: passage_graywind_heights }
+  - { op: addXp, amount: 16 }
 ---
 ## Passagem
 

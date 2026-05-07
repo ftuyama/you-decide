@@ -4,6 +4,7 @@ title: Epílogo do Espelho Quebrado
 chapter: 6
 ambientTheme: void
 artKey: act6_epilogue_crossing
+highlight: true
 choices:
   - text: "Levantar os olhos — o céu já não pede desculpa"
     next: act7/opening_terminal_glow

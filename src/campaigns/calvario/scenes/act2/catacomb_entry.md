@@ -3,6 +3,7 @@ id: act2/catacomb_entry
 chapter: 2
 ambientTheme: act2
 artKey: catacomb
+highlight: true
 title: Cruzeiro de ossos
 choices:
   - text: "Explorar o corredor lateral (chiar)"

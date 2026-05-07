@@ -4,6 +4,7 @@ title: Pacto sem altar
 chapter: 3
 ambientTheme: act3
 artKey: cult_negotiate
+highlight: true
 choices:
   - text: "Aceitar a oferta: dor por sussurro"
     uiSection: "Pacto"

@@ -4,6 +4,7 @@ title: Fim de Jornada
 chapter: 4
 ambientTheme: explore
 artKey: game_over
+highlight: true
 choices:
   - text: "Recomeçar"
     effects:

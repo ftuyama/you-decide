@@ -64,3 +64,12 @@ export function parseSeedFromSearch(): number | null {
   const n = Number.parseInt(s, 10);
   return Number.isFinite(n) ? n : null;
 }
+
+export function randomSeed(): number {
+  if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+    const buf = new Uint32Array(1);
+    crypto.getRandomValues(buf);
+    return buf[0] ?? 0;
+  }
+  return ((Date.now() ^ Math.floor(Math.random() * 0x100000000)) >>> 0);
+}

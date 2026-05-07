@@ -51,15 +51,17 @@ const WILD_GRAPH_STATIC_TARGETS = {
     'act2/encounters/wild_encounter_bones_rare',
     'act2/encounters/wild_encounter_lone_swarm_rare',
   ],
-  act3_depths: ['act3/encounters/cult_patrol_scene', 'act3/encounters/vigil_hunter_scene'],
+  act3_depths: [
+    'act3/encounters/cult_patrol_scene',
+    'act3/encounters/vigil_hunter_scene'
+  ],
   act5_frost: [
     'act5/encounters/frost_encounter_whelps',
     'act5/encounters/frost_encounter_solo_whelp',
     'act5/encounters/frost_encounter_cultist',
     'act5/encounters/frost_encounter_hunt_party',
     'act5/encounters/frost_encounter_howl_horde',
-    'act5/encounters/frost_stranded_traveler',
-    'act5/frost_hub',
+    'act5/encounters/frost_stranded_traveler'
   ],
   act6_fractured_nave: [
     'act6/encounters/void_encounter_fragment_solo',
@@ -71,8 +73,7 @@ const WILD_GRAPH_STATIC_TARGETS = {
     'act6/encounters/void_encounter_echo_fragment',
     'act6/encounters/void_encounter_triple_fragments',
     'act6/encounters/void_encounter_shadow_rare',
-    'act6/encounters/void_encounter_corruption_horde',
-    'act6/hub_fractured_nave',
+    'act6/encounters/void_encounter_corruption_horde'
   ],
   act6_will_trial: [
     'act6/encounters/will_trial_duel',

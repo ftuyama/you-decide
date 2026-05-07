@@ -1,6 +1,6 @@
 import { SCHEMA_VERSION, type CampaignIndex, type ClassId, type GameState } from '../schema/index.ts';
 import { clampReputation } from '../progression/reputation.ts';
-import { parseSeedFromSearch } from './rng.ts';
+import { parseSeedFromSearch, randomSeed } from './rng.ts';
 
 const defaultRep = { vigilia: 0, circulo: 0, culto: 0 } as GameState['reputation'];
 export const PASSIVE_UNLOCK_ITEM_ID = 'morvayn_heart_shard';
@@ -12,7 +12,7 @@ export function extraLifeReadyFromFaith(faith: number): boolean {
 }
 
 export function createInitialState(campaign: CampaignIndex, seed?: number): GameState {
-  const rngSeed = (seed ?? parseSeedFromSearch() ?? Date.now()) >>> 0;
+  const rngSeed = (seed ?? parseSeedFromSearch() ?? randomSeed()) >>> 0;
   return {
     schemaVersion: SCHEMA_VERSION,
     campaignId: campaign.id,
@@ -271,6 +271,7 @@ export function deserializeState(json: string): GameState {
   const merged: GameState = {
     ...(o as GameState),
     campaignId,
+    rngSeed: randomSeed(),
     factionGainPending,
     reputation,
     circuloSkillRerollReady:

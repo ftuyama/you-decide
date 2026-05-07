@@ -2,11 +2,15 @@ import { describe, expect, it } from 'vitest';
 import {
   attackRollSpecial2d6,
   attackRollSpecial3d6dl,
+  deserializeState,
+  serializeState,
   mulberry32,
   nextRngSeed,
   roll2d6,
   rollD6,
+  createInitialState,
 } from '../../src/engine/core/index.ts';
+import { testCampaign } from '../helpers/engineTestData.ts';
 
 describe('mulberry32', () => {
   it('is deterministic for a fixed seed', () => {
@@ -59,5 +63,13 @@ describe('attackRollSpecial3d6dl', () => {
     expect(attackRollSpecial3d6dl([1, 6, 6])).toBe('crit');
     expect(attackRollSpecial3d6dl([1, 1, 1])).toBe('fumble');
     expect(attackRollSpecial3d6dl([2, 3, 4])).toBe('normal');
+  });
+});
+
+describe('save/load rng seed', () => {
+  it('does not keep the exact same rng seed after loading', () => {
+    const state = createInitialState(testCampaign, 123456);
+    const loaded = deserializeState(serializeState(state));
+    expect(loaded.rngSeed).not.toBe(state.rngSeed);
   });
 });

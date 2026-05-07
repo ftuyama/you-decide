@@ -226,6 +226,22 @@
   margin-left: -0.15rem;
 }
 
+.sidebar-faccoes .faction-perk-bonus {
+  display: inline-block;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--text-strong);
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 2px;
+  padding: 0.03rem 0.32rem;
+  margin-bottom: 0.18rem;
+}
+
+.sidebar-faccoes .faction-perk-explainer {
+  display: block;
+}
+
 .sidebar-lore {
   margin: 0.35rem 0 0.5rem;
 }

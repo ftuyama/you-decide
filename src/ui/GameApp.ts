@@ -144,7 +144,7 @@ export class GameApp {
     reroll?: {
       preRollState: GameState;
       rolledScene: LoadedScene;
-      rollKind: 'skill' | 'dualSkill';
+      rollKind: 'skill' | 'dualSkill' | 'luck';
     };
   } | null = null;
   private diceRollIntervalTimer: ReturnType<typeof setInterval> | null = null;
@@ -1039,8 +1039,21 @@ export class GameApp {
         return;
       }
       this.pendingStoryDiceRoll = { nextState: r.state, breakdown: r.breakdown };
-    } else {
+    } else if (rollKind === 'dualSkill') {
       const r = resolveDualAttrSkillCheck(s, rolledScene);
+      if (!r.breakdown) {
+        this.pendingStoryDiceRoll = null;
+        this.state = this.stabilize(s);
+        this.render();
+        return;
+      }
+      const afterRoll: GameState = {
+        ...r.state,
+        visitedScenes: { ...r.state.visitedScenes, [rolledScene.id]: true },
+      };
+      this.pendingStoryDiceRoll = { nextState: afterRoll, breakdown: r.breakdown };
+    } else {
+      const r = resolveLuckCheck(s, rolledScene, this.registry.data);
       if (!r.breakdown) {
         this.pendingStoryDiceRoll = null;
         this.state = this.stabilize(s);
@@ -1067,11 +1080,22 @@ export class GameApp {
     this.audio.playDice();
     const r = resolveLuckCheck(this.state, scene, this.registry.data);
     if (!r.breakdown) return;
+    const fail = !r.breakdown.success;
+    const circulo = this.state.reputation.circulo ?? 0;
+    const canReroll =
+      fail &&
+      hasFactionPerkUnlocked(circulo) &&
+      this.state.circuloSkillRerollReady &&
+      !!scene.frontmatter.luckCheck;
+    const preRollState: GameState = { ...r.state, sceneId: scene.id };
+    const reroll = canReroll
+      ? { preRollState, rolledScene: scene, rollKind: 'luck' as const }
+      : undefined;
     const afterRoll: GameState = {
       ...r.state,
       visitedScenes: { ...r.state.visitedScenes, [scene.id]: true },
     };
-    this.pendingStoryDiceRoll = { nextState: afterRoll, breakdown: r.breakdown };
+    this.pendingStoryDiceRoll = { nextState: afterRoll, breakdown: r.breakdown, reroll };
     this.render();
   }
 

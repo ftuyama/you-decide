@@ -9,7 +9,7 @@ export type StoryDiceRollPendingPayload = {
   reroll?: {
     preRollState: GameState;
     rolledScene: LoadedScene;
-    rollKind: 'skill' | 'dualSkill';
+    rollKind: 'skill' | 'dualSkill' | 'luck';
   };
 };
 
@@ -21,7 +21,7 @@ export type StoryDiceBannerHost = {
   dismissStoryDiceRoll: (nextState: GameState) => void;
   playCheckSuccess(): void;
   playCheckFail(): void;
-  /** Rerrolagem paga do Círculo após falha em teste de perícia (quando `pending.reroll` existe). */
+  /** Rerrolagem paga do Círculo após falha em teste elegível (quando `pending.reroll` existe). */
   onCirculoDiceReroll?: () => void;
 };
 
@@ -331,7 +331,7 @@ export function appendStoryDiceRollBanner(
         ? `−${Math.abs(CIRCULO_SKILL_REROLL_REP_COST)}`
         : String(CIRCULO_SKILL_REROLL_REP_COST);
     rerollBtn.textContent = `Segunda leitura do Círculo (${costLabel} reputação)`;
-    rerollBtn.title = 'Gasta a carga do descanso e paga reputação ao Círculo por nova rolagem.';
+    rerollBtn.title = 'Gasta a carga do descanso e paga reputação ao Círculo por nova rolagem de teste.';
     rerollBtn.disabled = true;
     rerollBtn.addEventListener('click', () => {
       host.onCirculoDiceReroll?.();

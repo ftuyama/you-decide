@@ -137,6 +137,25 @@ describe('applyEffects', () => {
     expect(next.circuloSkillRerollReady).toBe(true);
   });
 
+  it('desbloquear Canal do Círculo prepara relançar sem exigir descanso extra', () => {
+    let s = createInitialState(testCampaign, 1);
+    s = {
+      ...s,
+      party: [createPlayerCharacter('H', 'knight')],
+      reputation: { ...s.reputation, circulo: 4 },
+      circuloSkillRerollReady: false,
+    };
+    const bus = new EventBus();
+    const data = createTestData();
+    const next = applyEffects(
+      s,
+      [{ op: 'addRep', faction: 'circulo', delta: 1, directGain: true }],
+      { sceneId: 'test/scene', data, bus }
+    );
+    expect(next.reputation.circulo).toBe(5);
+    expect(next.circuloSkillRerollReady).toBe(true);
+  });
+
   it('setExploration atualiza nodeId no mesmo graphId', () => {
     let s = createInitialState(testCampaign, 1);
     s = {

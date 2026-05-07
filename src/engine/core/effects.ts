@@ -26,6 +26,7 @@ import {
   clampReputation,
   computeAddRepResult,
   defaultFactionGainPending,
+  hasFactionPerkUnlocked,
 } from '../progression/reputation.ts';
 
 export { tickActiveBuffs };
@@ -141,6 +142,8 @@ function applyOne(
       }
 
       const isDirectPositiveGain = e.delta > 0 && e.directGain === true;
+      const unlockedCirculoPerkNow =
+        faction === 'circulo' && !hasFactionPerkUnlocked(prev) && hasFactionPerkUnlocked(rep);
       const nextFlags: Record<string, boolean> = {
         ...state.flags,
         add_rep_ever: true,
@@ -160,6 +163,7 @@ function applyOne(
           ...state,
           flags: nextFlags,
           reputation: { ...state.reputation, [faction]: rep },
+          ...(unlockedCirculoPerkNow ? { circuloSkillRerollReady: true } : {}),
         };
       }
 
@@ -168,6 +172,7 @@ function applyOne(
         flags: nextFlags,
         reputation: { ...state.reputation, [faction]: rep },
         factionGainPending: { ...fgp, [faction]: pending },
+        ...(unlockedCirculoPerkNow ? { circuloSkillRerollReady: true } : {}),
       };
     }
     case 'setRep': {

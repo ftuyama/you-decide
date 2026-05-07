@@ -1163,13 +1163,22 @@ function factionLoreBlurb(variant: 'vigilia' | 'circulo' | 'culto'): string {
   return `<p class="faction-lore-blurb">${escHtml(FACTION_LORE_PT[variant])}</p>`;
 }
 
+type FactionPerkCopy = { bonus: string; details: string };
+
 /** Bónus ativo na reputação máxima de facção (texto fixo; alinhar com escolhas de cena). */
-const FACTION_PERK_LINE_PT: Record<'vigilia' | 'circulo' | 'culto', string> = {
-  vigilia:
-    'Canal da Vigília: mercadores aliados vendem um kit de campo (+3 suprimentos, uma vez por banca, com ouro).',
-  circulo: `Canal do Círculo: após descansar no acampamento, podes pedir uma segunda leitura num teste de perícia falhado (${CIRCULO_SKILL_REROLL_REP_COST} reputação com o Círculo, uma vez até ao próximo descanso).`,
-  culto:
-    'Canal do Terceiro Sino: em encontros com culto, abre-se opção de favores discretos (ouro e experiência, uma vez por cena).',
+const FACTION_PERK_LINE_PT: Record<'vigilia' | 'circulo' | 'culto', FactionPerkCopy> = {
+  vigilia: {
+    bonus: 'Canal da Vigília',
+    details: 'Mercadores aliados vendem um kit de campo (+3 suprimentos, uma vez por banca, com ouro).',
+  },
+  circulo: {
+    bonus: 'Canal do Círculo',
+    details: `Após descansar no acampamento, podes pedir uma segunda leitura num teste falhado (${CIRCULO_SKILL_REROLL_REP_COST} reputação com o Círculo, permanente).`,
+  },
+  culto: {
+    bonus: 'Canal do Terceiro Sino',
+    details: 'Em encontros com culto, abre-se opção de favores discretos (ouro e experiência, uma vez por cena).',
+  },
 };
 
 function factionPerkBulletMarkup(
@@ -1179,7 +1188,7 @@ function factionPerkBulletMarkup(
   const v = state.reputation[variant] ?? 0;
   if (!hasFactionPerkUnlocked(v)) return '';
   const line = FACTION_PERK_LINE_PT[variant];
-  return `<ul class="faction-perk-list" aria-label="Bónus de facção ativo"><li class="faction-perk-item">${escHtml(line)}</li></ul>`;
+  return `<ul class="faction-perk-list" aria-label="Bónus de facção ativo"><li class="faction-perk-item"><span class="faction-perk-bonus">${escHtml(line.bonus)}</span><span class="faction-perk-explainer">${escHtml(line.details)}</span></li></ul>`;
 }
 
 function wireSidebarDetails(

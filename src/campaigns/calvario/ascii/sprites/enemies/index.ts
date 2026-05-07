@@ -11,6 +11,7 @@ export const act2_skeleton = { sprite: S('act2_skeleton') };
 export const act2_cultist = { sprite: S('act2_cultist') };
 export const act2_fallen_angel = { sprite: S('act2_fallen_angel') };
 export const act3_stone_guard = { sprite: S('act3_stone_guard') };
+export const elemental_golem = { sprite: S('elemental_golem') };
 export const act4_morvayn_p1 = { sprite: S('act4_morvayn_p1') };
 export const act4_morvayn_p2 = { sprite: S('act4_morvayn_p2') };
 export const act4_vigil_hunter = { sprite: S('act4_vigil_hunter') };

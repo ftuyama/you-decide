@@ -36,8 +36,8 @@ export const ACT2_EXPLORE_GOAL_FLAG = 'act2_explore_goal_reached';
 
 /** Ramo de tabela wild: combate (`encounterId`) ou salto narrativo (`nextSceneId`). */
 export type ExplorationWildBranch =
-  | { weight: number; encounterId: string; condition?: Condition }
-  | { weight: number; nextSceneId: string; condition?: Condition };
+  | { weight: number; encounterId: string; condition?: Condition; staticSceneId?: string }
+  | { weight: number; nextSceneId: string; condition?: Condition; staticSceneId?: string };
 
 export type WildPickResult =
   | { kind: 'combat'; encounterId: string; nextSeed: number }
@@ -45,65 +45,101 @@ export type WildPickResult =
 
 /** Tabela wild do act2 (`act2_catacomb` e fallback quando `graphId` não está no mapa). */
 const ACT2_WILD_BRANCHES: ExplorationWildBranch[] = [
-  { weight: 1, encounterId: 'rats_cellar_pair' },
-  { weight: 1, encounterId: 'cellar_mixed' },
-  { weight: 1, encounterId: 'cultist_patrol' },
-  { weight: 0.2, encounterId: 'act2_rare_bone_sentinel' },
-  { weight: 0.2, encounterId: 'act2_rare_lone_swarm' },
+  {
+    weight: 1,
+    encounterId: 'rats_cellar_pair',
+    staticSceneId: 'act2/encounters/wild_encounter_rats',
+  },
+  {
+    weight: 1,
+    encounterId: 'cellar_mixed',
+    staticSceneId: 'act2/encounters/wild_encounter_mixed',
+  },
+  {
+    weight: 1,
+    encounterId: 'cultist_patrol',
+    staticSceneId: 'act2/encounters/wild_encounter_cultist',
+  },
+  {
+    weight: 0.2,
+    encounterId: 'act2_rare_bone_sentinel',
+    staticSceneId: 'act2/encounters/wild_encounter_bones_rare',
+  },
+  {
+    weight: 0.2,
+    encounterId: 'act2_rare_lone_swarm',
+    staticSceneId: 'act2/encounters/wild_encounter_lone_swarm_rare',
+  },
 ];
 
 const ACT3_WILD_BRANCHES: ExplorationWildBranch[] = [
   { weight: 1, encounterId: 'cult_ambush' },
-  { weight: 1, encounterId: 'cultist_patrol' },
+  { weight: 1, encounterId: 'cultist_patrol', staticSceneId: 'act3/encounters/cult_patrol_scene' },
   { weight: 0.7, encounterId: 'cult_horde' },
+  { weight: 0.7, encounterId: 'act3_depths_cultist_quartet' },
+  { weight: 0.6, encounterId: 'act3_depths_lone_skeleton' },
+  { weight: 0.75, encounterId: 'act3_depths_rat_and_cultist' },
+  { weight: 0.14, encounterId: 'act3_depths_elemental_golem' },
   { weight: 0.2, encounterId: 'act2_rare_bone_sentinel' },
-  { weight: 0.35, encounterId: 'vigil_hunter_fight' },
+  { weight: 0.35, encounterId: 'vigil_hunter_fight', staticSceneId: 'act3/encounters/vigil_hunter_scene' },
   { weight: 0.05, encounterId: 'stone_guard_fight' },
 ];
 
 /** Alinhado ao antigo `frost_random_router` (combates + viajante + hub). */
 const ACT5_WILD_BRANCHES: ExplorationWildBranch[] = [
-  { weight: 1, encounterId: 'frost_whelps' },
-  { weight: 1, encounterId: 'frost_whelp_solo' },
-  { weight: 1, encounterId: 'cultist_patrol' },
-  { weight: 0.25, encounterId: 'frost_hunt_party' },
-  { weight: 0.1, encounterId: 'frost_howl_horde' },
+  { weight: 1, encounterId: 'frost_whelps', staticSceneId: 'act5/encounters/frost_encounter_whelps' },
+  { weight: 1, encounterId: 'frost_whelp_solo', staticSceneId: 'act5/encounters/frost_encounter_solo_whelp' },
+  { weight: 1, encounterId: 'cultist_patrol', staticSceneId: 'act5/encounters/frost_encounter_cultist' },
+  { weight: 0.25, encounterId: 'frost_hunt_party', staticSceneId: 'act5/encounters/frost_encounter_hunt_party' },
+  { weight: 0.1, encounterId: 'frost_howl_horde', staticSceneId: 'act5/encounters/frost_encounter_howl_horde' },
   {
     weight: 0.35,
     nextSceneId: 'act5/encounters/frost_stranded_traveler',
+    staticSceneId: 'act5/encounters/frost_stranded_traveler',
     condition: { noFlag: 'frost_stranded_traveler_done' },
-  },
-  { weight: 1, nextSceneId: 'act5/frost_hub' },
+  }
 ];
 
 /** Prova da vontade (altar): duelo vs horda conforme corrupção — antigo `will_random_router`. */
 const ACT6_WILL_TRIAL_BRANCHES: ExplorationWildBranch[] = [
-  { weight: 1, nextSceneId: 'act6/encounters/will_trial_duel' },
+  {
+    weight: 1,
+    nextSceneId: 'act6/encounters/will_trial_duel',
+    staticSceneId: 'act6/encounters/will_trial_duel',
+  },
   {
     weight: 0.6,
     nextSceneId: 'act6/encounters/will_trial_horde',
+    staticSceneId: 'act6/encounters/will_trial_horde',
     condition: { resource: { corruption: { gte: 3 } } },
   },
 ];
 
 /** Alinhado ao antigo `fractured_void_router` (+ peso extra de mancha com corrupção alta). */
 const ACT6_WILD_BRANCHES: ExplorationWildBranch[] = [
-  { weight: 1, encounterId: 'act6_wild_fragment_solo' },
-  { weight: 1, encounterId: 'act6_wild_fragments_pair' },
-  { weight: 1, encounterId: 'act6_wild_scribe_solo' },
-  { weight: 1, encounterId: 'act6_wild_murmur_solo' },
-  { weight: 1, encounterId: 'act6_wild_chain_solo' },
-  { weight: 0.35, encounterId: 'act6_wild_veil_fragment' },
-  { weight: 0.35, encounterId: 'act6_wild_echo_fragment' },
-  { weight: 0.2, encounterId: 'act6_wild_triple_fragments' },
-  { weight: 0.08, encounterId: 'act6_wild_regent_solo' },
-  { weight: 0.6, encounterId: 'act6_wild_stain_horde' },
+  {
+    weight: 1,
+    encounterId: 'act6_wild_fragment_solo',
+    staticSceneId: 'act6/encounters/void_encounter_fragment_solo',
+  },
+  {
+    weight: 1,
+    encounterId: 'act6_wild_fragments_pair',
+    staticSceneId: 'act6/encounters/void_encounter_pair_fragments',
+  },
+  { weight: 1, encounterId: 'act6_wild_scribe_solo', staticSceneId: 'act6/encounters/void_encounter_veil' },
+  { weight: 1, encounterId: 'act6_wild_murmur_solo', staticSceneId: 'act6/encounters/void_encounter_echo' },
+  { weight: 1, encounterId: 'act6_wild_chain_solo', staticSceneId: 'act6/encounters/void_encounter_penitent' },
+  { weight: 0.35, encounterId: 'act6_wild_veil_fragment', staticSceneId: 'act6/encounters/void_encounter_veil_fragment' },
+  { weight: 0.35, encounterId: 'act6_wild_echo_fragment', staticSceneId: 'act6/encounters/void_encounter_echo_fragment' },
+  { weight: 0.2, encounterId: 'act6_wild_triple_fragments', staticSceneId: 'act6/encounters/void_encounter_triple_fragments' },
+  { weight: 0.08, encounterId: 'act6_wild_regent_solo', staticSceneId: 'act6/encounters/void_encounter_shadow_rare' },
+  { weight: 0.6, encounterId: 'act6_wild_stain_horde', staticSceneId: 'act6/encounters/void_encounter_corruption_horde' },
   {
     weight: 0.6,
     encounterId: 'act6_wild_stain_horde',
     condition: { resource: { corruption: { gte: 4 } } },
-  },
-  { weight: 1, nextSceneId: 'act6/hub_fractured_nave' },
+  }
 ];
 
 export const EXPLORATION_WILD_BRANCHES_BY_GRAPH: Record<string, ExplorationWildBranch[]> = {
@@ -124,9 +160,11 @@ function wildBranchesForGraph(graphId?: string): ExplorationWildBranch[] {
 
 /** Destinos de cena referidos por ramos `nextSceneId` (ex.: grafo estático de campanha). */
 export function wildStaticSceneTargetsForGraph(graphId: string): string[] {
-  return wildBranchesForGraph(graphId)
-    .filter((b): b is ExplorationWildBranch & { nextSceneId: string } => 'nextSceneId' in b)
-    .map((b) => b.nextSceneId);
+  const out: string[] = [];
+  for (const branch of wildBranchesForGraph(graphId)) {
+    if ('staticSceneId' in branch && branch.staticSceneId) out.push(branch.staticSceneId);
+  }
+  return out;
 }
 
 /** Vitória especial (loot/cena) para encontros wild ao mover no mapa ou patrulhar. */

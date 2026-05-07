@@ -96,6 +96,49 @@
     "xpReward": 5,
     "fleeRate": 0.54
   },
+  "act3_depths_cultist_quartet": {
+    "id": "act3_depths_cultist_quartet",
+    "enemies": [
+      "cultist",
+      "cultist",
+      "cultist",
+      "cultist"
+    ],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 6,
+    "fleeRate": 0.5
+  },
+  "act3_depths_lone_skeleton": {
+    "id": "act3_depths_lone_skeleton",
+    "enemies": [
+      "skeleton"
+    ],
+    "playerAdvantage": false,
+    "enemyAdvantage": false,
+    "fleeRate": 0.75
+  },
+  "act3_depths_rat_and_cultist": {
+    "id": "act3_depths_rat_and_cultist",
+    "enemies": [
+      "rat_swarm",
+      "cultist"
+    ],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 4,
+    "fleeRate": 0.62
+  },
+  "act3_depths_elemental_golem": {
+    "id": "act3_depths_elemental_golem",
+    "enemies": [
+      "elemental_golem"
+    ],
+    "playerAdvantage": false,
+    "enemyAdvantage": true,
+    "xpReward": 8,
+    "fleeRate": 0.47
+  },
   "stone_guard_fight": {
     "id": "stone_guard_fight",
     "enemies": [

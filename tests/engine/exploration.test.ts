@@ -140,9 +140,18 @@ describe('pickWildOutcome', () => {
     const p = pickWildOutcome(st, 'act3_depths');
     expect(p.kind).toBe('combat');
     if (p.kind === 'combat') {
-      expect(['cult_ambush', 'stone_guard_fight', 'cultist_patrol', 'vigil_hunter_fight']).toContain(
-        p.encounterId
-      );
+      expect([
+        'cult_ambush',
+        'cultist_patrol',
+        'cult_horde',
+        'act3_depths_cultist_quartet',
+        'act3_depths_lone_skeleton',
+        'act3_depths_rat_and_cultist',
+        'act3_depths_elemental_golem',
+        'act2_rare_bone_sentinel',
+        'vigil_hunter_fight',
+        'stone_guard_fight',
+      ]).toContain(p.encounterId);
     }
   });
 

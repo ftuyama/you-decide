@@ -40,8 +40,16 @@ Gerar cenas `.md` prontas para `src/campaigns/calvario/scenes/...`, válidas no 
 - **Entrada:** `onEnter`, `repeatOnEnter`
 - **Checks:** `skillCheck`, `dualAttrSkillCheck`, `luckCheck`
 - **Ramo/gate:** `randomBranch`, `chapterGate`
-- **Arte/UI:** `art`, `artKey`, `highlight`, `campCombatHint`
+- **Arte/UI:** `art`, `artKey`, `highlight`, `artHighlightFrames`, `highlightHoldMs`, `campCombatHint`
 - **Combate:** `encounterId`, `onVictory`, `onFlee`, `onDefeat`, `interleaveAfterCombat`
+
+### Overlay `highlight` com animação (ASCII)
+
+- Com `highlight: true` e `artHighlightFrames` com **duas ou mais** chaves válidas em `sceneArt`, o overlay em tela cheia **cicla** esses ficheiros durante o hold.
+- `highlightHoldMs` (opcional, 400–8000): duração total do hold em ms antes do fade (omissão = 1000). O tempo divide-se em partes iguais entre quadros.
+- Sem `artHighlightFrames` ou com menos de duas chaves resolvidas: comportamento de um único quadro (`art` / `artKey`).
+- Cada chave = basename de `ascii/scenes/**/*.txt`; convém o primeiro quadro coincidir com a arte do corpo da cena.
+- Workflow de criação dos `.txt` de variação: comando Cursor `ascii-highlight-frames`. Novo ficheiro pode começar com `PLACEHOLDER` até arte final (`npm run check:ascii-art`).
 
 ## Campos de `choices`
 

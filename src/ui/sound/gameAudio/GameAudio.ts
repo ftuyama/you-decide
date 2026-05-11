@@ -209,6 +209,11 @@ export class GameAudio {
     this.sfx.playBossTwistRevelation();
   }
 
+  /** Clique de ferrolho e rangido de porta — highlight de cena. */
+  playDoorOpen(): void {
+    this.sfx.playDoorOpen();
+  }
+
   private gain(base: number): number {
     return base * this.volume;
   }

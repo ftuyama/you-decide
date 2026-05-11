@@ -44,6 +44,8 @@ import { appendCombatLogMessageWithBoldNames, renderCombatInto } from './gameApp
 import {
   renderStoryInto,
   resolveSceneArt,
+  resolveSceneArtHighlightFrames,
+  SCENE_ART_HIGHLIGHT_HOLD_MS_DEFAULT,
   type StoryDiceBannerHost,
   type StoryRenderContext,
   type StoryStatusHighlightRow,
@@ -1335,11 +1337,23 @@ export class GameApp {
       };
       return null;
     }
+    const multi = resolveSceneArtHighlightFrames(scene.frontmatter, this.registry.ui.sceneArt);
+    const frames = multi ?? [artText];
+    const holdMs = fm.highlightHoldMs ?? SCENE_ART_HIGHLIGHT_HOLD_MS_DEFAULT;
     const gen = this.sceneArtHighlightGen;
     const sid = scene.id;
+    const onHighlightSfx =
+      fm.artHighlightSfx === 'door_open'
+        ? () => {
+            this.unlockAudio();
+            this.audio.playDoorOpen();
+          }
+        : undefined;
     return {
       sceneId: sid,
-      artText,
+      frames,
+      holdMs,
+      onHighlightSfx,
       onBegin: () => {
         this.activeSceneArtHighlight = sid;
       },

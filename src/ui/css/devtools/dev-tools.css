@@ -386,6 +386,11 @@
   font-size: 0.85em;
 }
 
+.dev-tools-detail-meta--accent {
+  color: var(--link);
+  opacity: 1;
+}
+
 .dev-tools-scene-section-title {
   font-size: 0.95rem;
   font-weight: 600;
@@ -1186,6 +1191,75 @@
   font-size: 0.9rem;
   opacity: 0.85;
   padding: 0.25rem 0;
+}
+
+/** Pré-visualização do overlay highlight (mesmas classes base que o jogo + ações clicáveis). */
+.dev-tools-ascii-highlight-overlay {
+  pointer-events: none;
+}
+
+.dev-tools-ascii-highlight-overlay__actions {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10060;
+  pointer-events: auto;
+}
+
+.dev-tools-ascii-highlight-preview-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.dev-tools-ascii-highlight-preview-hint {
+  font-size: 0.82rem;
+  opacity: 0.75;
+}
+
+.dev-tools-ascii-hl-stack-toggle-row {
+  margin-top: 0.75rem;
+}
+
+.dev-tools-ascii-hl-stack {
+  margin-top: 0.75rem;
+}
+
+.dev-tools-ascii-hl-stack:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.dev-tools-ascii-hl-stack[hidden] {
+  display: none !important;
+}
+
+.dev-tools-ascii-hl-stack__caption {
+  font-size: 0.82rem;
+  margin-bottom: 0.35rem;
+  opacity: 0.9;
+}
+
+.dev-tools-ascii-hl-stack__caption code {
+  font-size: 0.9em;
+}
+
+.dev-tools-ascii-hl-stack__frame .scene-art {
+  margin-bottom: 0;
+}
+
+/**
+ * No navegador ASCII, o fundo retangular de `.scene-art` (story-scene) cobre a silhueta
+ * da porta na arte Braille — fundo transparente para o desenho ler pelo contorno.
+ */
+.dev-tools-scene-detail--ascii-browser > .scene-art,
+.dev-tools-scene-detail--ascii-browser .dev-tools-ascii-hl-stack__frame .scene-art {
+  background: transparent;
+  padding: 0;
 }
 
 .dev-tools-braille-pre--hidden {

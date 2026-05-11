@@ -424,9 +424,22 @@ export const SceneFrontmatterSchema = z.object({
   artKey: z.string().optional(),
   /**
    * Se true, na primeira visita com arte resolvida (`art` / `artKey`), mostra a arte em overlay
-   * em tela cheia (~1s) com fade-out (UI).
+   * em tela cheia (hold configurável via `highlightHoldMs`, default ~1s) com fade-out (UI).
+   * Com `artHighlightFrames` (2+ chaves), cicla quadros durante o hold.
    */
   highlight: z.boolean().optional(),
+  /**
+   * Chaves em `sceneArt` (como `artKey`) para ciclar no overlay quando `highlight: true`.
+   * Omitido ou menos de 2 chaves resolvidas: usa só a arte da cena (`art` / `artKey`).
+   */
+  artHighlightFrames: z.array(z.string()).optional(),
+  /** Duração do hold do overlay highlight em ms (default 1000). Só relevante com `highlight: true`. */
+  highlightHoldMs: z.number().int().min(400).max(8000).optional(),
+  /**
+   * Efeito sonoro ao iniciar o overlay de highlight (primeira visita).
+   * Implementação em `GameAudio` / UI — alinhar chaves ao runtime.
+   */
+  artHighlightSfx: z.enum(['door_open']).optional(),
   /** Combate embutido: após texto, se encounterId presente */
   encounterId: z.string().optional(),
   onVictory: z.string().optional(),

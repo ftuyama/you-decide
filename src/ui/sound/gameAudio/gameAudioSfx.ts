@@ -905,6 +905,95 @@ export class GameSfxPlayer {
     }
   }
 
+  /**
+   * Clique seco de ferrolho/chave, pausa curta, rangido de porta (triângulo + atrito).
+   * Overlay `artHighlightSfx: door_open`.
+   */
+  playDoorOpen(): void {
+    const ctx = this.host.ensureContext();
+    const t0 = ctx.currentTime;
+    const g = this.host.gain(0.17);
+    if (g <= 0) return;
+
+    const click = ctx.createOscillator();
+    const gClick = ctx.createGain();
+    click.type = 'square';
+    click.frequency.value = 540;
+    gClick.gain.setValueAtTime(0.001, t0);
+    gClick.gain.linearRampToValueAtTime(g * 0.52, t0 + 0.002);
+    gClick.gain.exponentialRampToValueAtTime(0.01, t0 + 0.016);
+    click.connect(gClick);
+    gClick.connect(ctx.destination);
+    click.start(t0);
+    click.stop(t0 + 0.02);
+
+    const clickHi = ctx.createOscillator();
+    const gHi = ctx.createGain();
+    clickHi.type = 'sine';
+    clickHi.frequency.value = 2260;
+    gHi.gain.setValueAtTime(0.001, t0);
+    gHi.gain.linearRampToValueAtTime(g * 0.14, t0 + 0.0015);
+    gHi.gain.exponentialRampToValueAtTime(0.01, t0 + 0.008);
+    clickHi.connect(gHi);
+    gHi.connect(ctx.destination);
+    clickHi.start(t0);
+    clickHi.stop(t0 + 0.012);
+
+    const creakStart = t0 + 0.052;
+    const creakEnd = creakStart + 0.78;
+    const door = ctx.createOscillator();
+    const gDoor = ctx.createGain();
+    door.type = 'triangle';
+    door.frequency.setValueAtTime(128, creakStart);
+    door.frequency.exponentialRampToValueAtTime(54, creakEnd);
+    gDoor.gain.setValueAtTime(0.001, creakStart);
+    gDoor.gain.linearRampToValueAtTime(g * 0.48, creakStart + 0.1);
+    gDoor.gain.linearRampToValueAtTime(g * 0.34, creakStart + 0.26);
+    gDoor.gain.linearRampToValueAtTime(g * 0.58, creakStart + 0.44);
+    gDoor.gain.linearRampToValueAtTime(g * 0.3, creakStart + 0.62);
+    gDoor.gain.exponentialRampToValueAtTime(0.01, creakEnd + 0.08);
+    door.connect(gDoor);
+    gDoor.connect(ctx.destination);
+    door.start(creakStart);
+    door.stop(creakEnd + 0.1);
+
+    const hinge = ctx.createOscillator();
+    const gHg = ctx.createGain();
+    hinge.type = 'triangle';
+    hinge.frequency.setValueAtTime(248, creakStart + 0.03);
+    hinge.frequency.exponentialRampToValueAtTime(108, creakEnd - 0.04);
+    gHg.gain.setValueAtTime(0.001, creakStart + 0.03);
+    gHg.gain.linearRampToValueAtTime(g * 0.16, creakStart + 0.12);
+    gHg.gain.exponentialRampToValueAtTime(0.01, creakEnd + 0.02);
+    hinge.connect(gHg);
+    gHg.connect(ctx.destination);
+    hinge.start(creakStart + 0.03);
+    hinge.stop(creakEnd + 0.05);
+
+    const scrapeDur = 0.72;
+    const scrapeLen = Math.ceil(ctx.sampleRate * scrapeDur);
+    const scrapeBuf = ctx.createBuffer(1, scrapeLen, ctx.sampleRate);
+    const sc = scrapeBuf.getChannelData(0);
+    for (let i = 0; i < scrapeLen; i++) sc[i] = Math.random() * 2 - 1;
+    const scrape = ctx.createBufferSource();
+    scrape.buffer = scrapeBuf;
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.Q.value = 1.15;
+    bp.frequency.setValueAtTime(420, creakStart + 0.04);
+    bp.frequency.exponentialRampToValueAtTime(130, creakEnd - 0.02);
+    const gSc = ctx.createGain();
+    gSc.gain.setValueAtTime(0.001, creakStart + 0.04);
+    gSc.gain.linearRampToValueAtTime(g * 0.28, creakStart + 0.14);
+    gSc.gain.linearRampToValueAtTime(g * 0.36, creakStart + 0.38);
+    gSc.gain.exponentialRampToValueAtTime(0.01, creakEnd + 0.04);
+    scrape.connect(bp);
+    bp.connect(gSc);
+    gSc.connect(ctx.destination);
+    scrape.start(creakStart + 0.04);
+    scrape.stop(creakEnd + 0.06);
+  }
+
   /** Twist de boss — abertura “sino” inharmónico (senos, sensação errada) + três acordes dissonantes. */
   playBossTwistRevelation(): void {
     const ctx = this.host.ensureContext();

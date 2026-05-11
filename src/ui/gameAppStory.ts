@@ -28,7 +28,13 @@ import {
 } from './story/choiceSections.ts';
 
 export { isCampEquipmentScene } from './story/storyCampEquipmentPanel.ts';
-export { resolveSceneArtFromFrontmatter, resolveSceneArt } from './story/storyArt.ts';
+export {
+  resolveSceneArtFromFrontmatter,
+  resolveSceneArt,
+  resolveSceneArtHighlightFrames,
+  collectArtKeysFromAnimatedHighlightScenes,
+  collectHighlightHoldMsByAnimatedHighlightBase,
+} from './story/storyArt.ts';
 
 function buildExplorationMovementRows(
   state: GameState,
@@ -103,12 +109,17 @@ export type StoryOverlayState = {
   itemAcquireBannerExiting: boolean;
 };
 
-/** Overlay automático: arte em tela cheia (~1s + fade); `onBegin`/`onEnd` ligam ao ciclo de vida no GameApp. */
+/** Overlay automático: arte em tela cheia (hold + fade); `onBegin`/`onEnd` ligam ao ciclo de vida no GameApp. */
 export type SceneArtHighlightPayload = {
   sceneId: string;
-  artText: string;
+  /** Quadros do overlay (mínimo 1). */
+  frames: string[];
+  /** Duração em ms antes do fade-out. */
+  holdMs: number;
   onBegin: () => void;
   onEnd: () => void;
+  /** Opcional: ao montar o overlay (após `onBegin`), ex.: desbloquear áudio + SFX da cena. */
+  onHighlightSfx?: () => void;
   /** Invalida timeouts se `render()` voltar a correr (novo valor de `sceneArtHighlightGen`). */
   isCurrentGeneration: () => boolean;
 };
@@ -123,7 +134,7 @@ export type StoryRenderContext = {
   state: GameState;
   registry: ContentRegistry;
   scene: LoadedScene;
-  /** Primeira visita + `highlight` no frontmatter + arte resolvida (overlay por cima de diário, facções, itens, dados, etc.). */
+  /** Primeira visita + `highlight` no frontmatter + arte resolvida (overlay; opcional ciclo `artHighlightFrames`). */
   sceneArtHighlight: SceneArtHighlightPayload | null;
   /** Meta curta para orientar a sessão atual. */
   sessionObjective: string | null;
@@ -147,29 +158,139 @@ export type StoryRenderContext = {
   setTimedChoiceTimer: (t: ReturnType<typeof setTimeout> | null) => void;
 };
 
-const SCENE_ART_HIGHLIGHT_HOLD_MS = 1000;
+/** Default do hold do overlay highlight (ms); alinhar com `highlightHoldMs` omitido no frontmatter. */
+export const SCENE_ART_HIGHLIGHT_HOLD_MS_DEFAULT = 1000;
 const SCENE_ART_HIGHLIGHT_FADE_MS = 350;
+
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
+}
+
+/** Quadros efetivos do ciclo (respeita reduced-motion e fallback de um quadro). */
+export function resolveSceneArtHighlightCycleFrames(frames: string[]): string[] {
+  const reduced = prefersReducedMotion();
+  const raw = frames.length > 0 ? frames : [''];
+  return reduced || raw.length < 2 ? [raw[0] ?? ''] : raw;
+}
+
+/**
+ * Pré-visualização do overlay highlight (dev tools): mesmo timing/CSS que no jogo.
+ * Devolve `cancel` para fechar de imediato (remove listeners e o nó).
+ */
+export function mountSceneArtHighlightPreview(opts: {
+  frames: string[];
+  holdMs: number;
+  attachTo?: HTMLElement;
+}): () => void {
+  const shell = opts.attachTo ?? document.body;
+  const cycleFrames = resolveSceneArtHighlightCycleFrames(opts.frames);
+  const holdMs = opts.holdMs;
+  let alive = true;
+  const isAlive = () => alive;
+  const tids: number[] = [];
+
+  const layer = document.createElement('div');
+  layer.className = 'scene-art-highlight-layer dev-tools-ascii-highlight-overlay';
+  layer.setAttribute('aria-hidden', 'true');
+  const pre = document.createElement('pre');
+  pre.className = 'scene-art-highlight-pre';
+  pre.textContent = cycleFrames[0] ?? '';
+  layer.appendChild(pre);
+
+  const actions = document.createElement('div');
+  actions.className = 'dev-tools-ascii-highlight-overlay__actions';
+  const closeBtn = document.createElement('button');
+  closeBtn.type = 'button';
+  closeBtn.className = 'dev-tools-btn dev-tools-btn--secondary';
+  closeBtn.textContent = 'Fechar';
+  actions.appendChild(closeBtn);
+  layer.appendChild(actions);
+
+  shell.appendChild(layer);
+
+  const cleanup = (): void => {
+    if (!alive) return;
+    alive = false;
+    for (const id of tids) window.clearTimeout(id);
+    tids.length = 0;
+    window.removeEventListener('keydown', onKeyDown);
+    layer.remove();
+  };
+
+  const onKeyDown = (e: KeyboardEvent): void => {
+    if (e.key === 'Escape') cleanup();
+  };
+  window.addEventListener('keydown', onKeyDown);
+  closeBtn.addEventListener('click', cleanup);
+
+  if (cycleFrames.length > 1) {
+    const n = cycleFrames.length;
+    const step = holdMs / n;
+    for (let i = 1; i < n; i++) {
+      tids.push(
+        window.setTimeout(() => {
+          if (!isAlive()) return;
+          pre.textContent = cycleFrames[i]!;
+        }, step * i)
+      );
+    }
+  }
+
+  tids.push(
+    window.setTimeout(() => {
+      if (!isAlive()) return;
+      layer.classList.add('scene-art-highlight-layer--out');
+    }, holdMs)
+  );
+
+  tids.push(
+    window.setTimeout(() => {
+      if (!isAlive()) return;
+      cleanup();
+    }, holdMs + SCENE_ART_HIGHLIGHT_FADE_MS)
+  );
+
+  return cleanup;
+}
 
 function mountSceneArtHighlight(shell: HTMLElement, payload: SceneArtHighlightPayload): void {
   payload.onBegin();
+  payload.onHighlightSfx?.();
   const layer = document.createElement('div');
   layer.className = 'scene-art-highlight-layer';
   layer.setAttribute('aria-hidden', 'true');
   const pre = document.createElement('pre');
   pre.className = 'scene-art-highlight-pre';
-  pre.textContent = payload.artText;
+
+  const cycleFrames = resolveSceneArtHighlightCycleFrames(payload.frames);
+  pre.textContent = cycleFrames[0] ?? '';
   layer.appendChild(pre);
   shell.appendChild(layer);
+
+  const holdMs = payload.holdMs;
+  if (cycleFrames.length > 1) {
+    const n = cycleFrames.length;
+    const step = holdMs / n;
+    for (let i = 1; i < n; i++) {
+      window.setTimeout(() => {
+        if (!payload.isCurrentGeneration()) return;
+        pre.textContent = cycleFrames[i]!;
+      }, step * i);
+    }
+  }
 
   window.setTimeout(() => {
     if (!payload.isCurrentGeneration()) return;
     layer.classList.add('scene-art-highlight-layer--out');
-  }, SCENE_ART_HIGHLIGHT_HOLD_MS);
+  }, holdMs);
 
   window.setTimeout(() => {
     if (!payload.isCurrentGeneration()) return;
     payload.onEnd();
-  }, SCENE_ART_HIGHLIGHT_HOLD_MS + SCENE_ART_HIGHLIGHT_FADE_MS);
+  }, holdMs + SCENE_ART_HIGHLIGHT_FADE_MS);
 }
 
 export function renderStoryInto(shell: HTMLElement, ctx: StoryRenderContext): void {

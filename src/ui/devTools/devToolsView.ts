@@ -6,7 +6,12 @@ import { parseSceneMarkdown, type LoadedScene } from '../../engine/core/index.ts
 import type { Choice } from '../../engine/schema/index.ts';
 import { sceneActId, sortedSceneActsFromNodes, type SceneGraphNode } from '../../engine/world/index.ts';
 import type { ItemDef, EnemyDef } from '../../engine/schema/index.ts';
-import { resolveSceneArtFromFrontmatter } from '../gameAppStory.ts';
+import {
+  collectArtKeysFromAnimatedHighlightScenes,
+  collectHighlightHoldMsByAnimatedHighlightBase,
+  resolveSceneArtFromFrontmatter,
+  SCENE_ART_HIGHLIGHT_HOLD_MS_DEFAULT,
+} from '../gameAppStory.ts';
 import { GameAudio, AMBIENT_THEMES, type AmbientTheme } from '../sound/index.ts';
 import {
   buildGameHref,
@@ -190,6 +195,7 @@ const DEV_TOOLS_SFX_BY_CATEGORY: readonly DevToolsSfxCategory[] = [
       { label: 'Dados', play: (a) => a.playDice() },
       { label: 'Teste falhou', play: (a) => a.playCheckFail() },
       { label: 'Teste passou', play: (a) => a.playCheckSuccess() },
+      { label: 'Highlight — porta (door_open)', play: (a) => a.playDoorOpen() },
     ],
   },
   {
@@ -870,9 +876,26 @@ export function mountDevToolsView(root: HTMLElement, campaignId: string): void {
     case 'ascii-bejamas':
       mountBejamasAsciiPanel(main);
       break;
-    case 'ascii-browser':
-      mountAsciiBrowserPanel(main, campaignId, bundle.ui.sceneArt);
+    case 'ascii-browser': {
+      const sceneList = scenes.values();
+      const animatedHighlightKeys = collectArtKeysFromAnimatedHighlightScenes(
+        sceneList,
+        bundle.ui.sceneArt
+      );
+      const highlightHoldMsByBase = collectHighlightHoldMsByAnimatedHighlightBase(
+        sceneList,
+        bundle.ui.sceneArt,
+        SCENE_ART_HIGHLIGHT_HOLD_MS_DEFAULT
+      );
+      mountAsciiBrowserPanel(
+        main,
+        campaignId,
+        bundle.ui.sceneArt,
+        animatedHighlightKeys,
+        highlightHoldMsByBase
+      );
       break;
+    }
     case 'scenes':
     default:
       mountScenesPanel(main, campaignId, scenes, bundle.ui.sceneArt, sceneParam);

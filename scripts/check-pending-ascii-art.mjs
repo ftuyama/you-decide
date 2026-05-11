@@ -1,5 +1,6 @@
 /**
  * Lista arte ASCII de cena pendente: `artKey` sem ficheiro `.txt` correspondente,
+ * chaves em `artHighlightFrames` em falta / placeholder,
  * ficheiro vazio/só espaços, conteúdo só "PLACEHOLDER", ou `art` inline declarado mas em branco / placeholder.
  *
  * Alinha-se ao carregamento em `ascii/art.ts` (chave = basename do `.txt` em `ascii/scenes/**`).
@@ -78,6 +79,49 @@ for (const f of files) {
   const { data: fm } = splitFrontmatter(raw);
   const sceneId = pathToSceneIdFromScenesDir(scenesDir, f);
   const rel = path.relative(repoRoot, f);
+
+  const framesRaw = fm.artHighlightFrames;
+  if (Array.isArray(framesRaw) && framesRaw.length > 0) {
+    if (framesRaw.length === 1) {
+      console.warn(
+        `[check:ascii-art] ${sceneId} (${rel}): artHighlightFrames tem apenas 1 chave — o overlay não anima.`
+      );
+    }
+    for (const fr of framesRaw) {
+      const fk = typeof fr === 'string' && fr.trim() !== '' ? fr.trim() : null;
+      if (!fk) continue;
+      const paths = byKey.get(fk);
+      if (!paths || paths.length === 0) {
+        pending.push({
+          sceneId,
+          file: rel,
+          reason: 'missing_highlight_frame',
+          artKey: fk,
+          detail: `nenhum ascii/scenes/**/${fk}.txt`,
+        });
+        continue;
+      }
+      const meaningful = paths.find((p) => {
+        const full = path.join(repoRoot, p);
+        const rawFr = fs.readFileSync(full, 'utf8');
+        const t = rawFr.trim();
+        return t !== '' && !isPlaceholderAsciiContent(rawFr);
+      });
+      if (!meaningful) {
+        const anyNonEmpty = paths.some((p) => {
+          const full = path.join(repoRoot, p);
+          return fs.readFileSync(full, 'utf8').trim() !== '';
+        });
+        pending.push({
+          sceneId,
+          file: rel,
+          reason: anyNonEmpty ? 'placeholder_file' : 'blank_file',
+          artKey: fk,
+          detail: `(highlight) ${paths.join(', ')}`,
+        });
+      }
+    }
+  }
 
   const artKeyRaw = fm.artKey;
   const artKey =

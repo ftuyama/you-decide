@@ -3,6 +3,15 @@ id: act1/dungeon_door
 title: Batentes
 chapter: 1
 ambientTheme: explore
+artKey: dungeon_mouth
+highlight: true
+artHighlightFrames:
+  - dungeon_mouth_hl0
+  - dungeon_mouth_hl1
+  - dungeon_mouth_hl2
+  - dungeon_mouth_hl3
+  - dungeon_mouth_hl4
+highlightHoldMs: 4000
 choices:
   - text: "Entrar na catacumba"
     next: act2/catacomb_entry

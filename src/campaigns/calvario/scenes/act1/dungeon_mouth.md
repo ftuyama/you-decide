@@ -5,6 +5,14 @@ chapter: 1
 ambientTheme: explore
 artKey: dungeon_mouth
 highlight: true
+artHighlightSfx: door_open
+artHighlightFrames:
+  - dungeon_mouth_hl0
+  - dungeon_mouth_hl1
+  - dungeon_mouth_hl2
+  - dungeon_mouth_hl3
+  - dungeon_mouth_hl4
+highlightHoldMs: 4000
 choices:
   - text: "Braseiro rachado — arrancar o selo (risco/recompensa)"
     next: act1/encounters/risk_brazier

@@ -1348,7 +1348,12 @@ export class GameApp {
             this.unlockAudio();
             this.audio.playDoorOpen();
           }
-        : undefined;
+        : fm.artHighlightSfx === 'mysterious'
+          ? () => {
+              this.unlockAudio();
+              this.audio.playMysteriousHighlight();
+            }
+          : undefined;
     return {
       sceneId: sid,
       frames,

@@ -214,6 +214,11 @@ export class GameAudio {
     this.sfx.playDoorOpen();
   }
 
+  /** Sussurro grave + harmónicos discretos — highlight de cena (`artHighlightSfx: mysterious`). */
+  playMysteriousHighlight(): void {
+    this.sfx.playMysteriousHighlight();
+  }
+
   private gain(base: number): number {
     return base * this.volume;
   }

@@ -6,6 +6,7 @@ ambientTheme: explore
 artKey: title
 highlight: true
 artHighlightFrames: [title_hl0, title_hl1, title_hl2, title_hl3, title_hl4, title_hl5]
+artHighlightSfx: mysterious
 highlightHoldMs: 3200
 choices:
   - text: "Descer os degraus rumo ao texto gravado na pedra"

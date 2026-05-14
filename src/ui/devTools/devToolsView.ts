@@ -196,6 +196,7 @@ const DEV_TOOLS_SFX_BY_CATEGORY: readonly DevToolsSfxCategory[] = [
       { label: 'Teste falhou', play: (a) => a.playCheckFail() },
       { label: 'Teste passou', play: (a) => a.playCheckSuccess() },
       { label: 'Highlight — porta (door_open)', play: (a) => a.playDoorOpen() },
+      { label: 'Highlight — misterioso (mysterious)', play: (a) => a.playMysteriousHighlight() },
     ],
   },
   {

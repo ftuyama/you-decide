@@ -439,7 +439,7 @@ export const SceneFrontmatterSchema = z.object({
    * Efeito sonoro ao iniciar o overlay de highlight (primeira visita).
    * Implementação em `GameAudio` / UI — alinhar chaves ao runtime.
    */
-  artHighlightSfx: z.enum(['door_open']).optional(),
+  artHighlightSfx: z.enum(['door_open', 'mysterious']).optional(),
   /** Combate embutido: após texto, se encounterId presente */
   encounterId: z.string().optional(),
   onVictory: z.string().optional(),

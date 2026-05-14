@@ -994,6 +994,113 @@ export class GameSfxPlayer {
     scrape.stop(creakEnd + 0.06);
   }
 
+  /**
+   * Grave com subida lenta, par de batimento suave e “sino” abafado.
+   * Overlay `artHighlightSfx: mysterious`.
+   */
+  playMysteriousHighlight(): void {
+    const ctx = this.host.ensureContext();
+    const t0 = ctx.currentTime;
+    const g = this.host.gain(0.14);
+    if (g <= 0) return;
+    const end = t0 + 1.85;
+
+    const hum = ctx.createOscillator();
+    const gHum = ctx.createGain();
+    hum.type = 'sine';
+    hum.frequency.setValueAtTime(52, t0);
+    hum.frequency.exponentialRampToValueAtTime(61, t0 + 0.55);
+    hum.frequency.exponentialRampToValueAtTime(48, end - 0.12);
+    gHum.gain.setValueAtTime(0.001, t0);
+    gHum.gain.exponentialRampToValueAtTime(g * 0.38, t0 + 0.42);
+    gHum.gain.exponentialRampToValueAtTime(g * 0.44, t0 + 0.72);
+    gHum.gain.exponentialRampToValueAtTime(0.001, end);
+    hum.connect(gHum);
+    gHum.connect(ctx.destination);
+    hum.start(t0);
+    hum.stop(end + 0.04);
+
+    const humBeat = ctx.createOscillator();
+    const gBeat = ctx.createGain();
+    humBeat.type = 'sine';
+    humBeat.frequency.setValueAtTime(52.6, t0);
+    humBeat.frequency.exponentialRampToValueAtTime(61.7, t0 + 0.55);
+    humBeat.frequency.exponentialRampToValueAtTime(48.6, end - 0.12);
+    gBeat.gain.setValueAtTime(0.001, t0);
+    gBeat.gain.exponentialRampToValueAtTime(g * 0.22, t0 + 0.45);
+    gBeat.gain.exponentialRampToValueAtTime(g * 0.26, t0 + 0.78);
+    gBeat.gain.exponentialRampToValueAtTime(0.001, end);
+    humBeat.connect(gBeat);
+    gBeat.connect(ctx.destination);
+    humBeat.start(t0);
+    humBeat.stop(end + 0.04);
+
+    const sub = ctx.createOscillator();
+    const gSub = ctx.createGain();
+    sub.type = 'sine';
+    sub.frequency.setValueAtTime(26, t0);
+    sub.frequency.exponentialRampToValueAtTime(30.5, t0 + 0.55);
+    sub.frequency.exponentialRampToValueAtTime(24, end - 0.15);
+    gSub.gain.setValueAtTime(0.001, t0);
+    gSub.gain.exponentialRampToValueAtTime(g * 0.2, t0 + 0.5);
+    gSub.gain.exponentialRampToValueAtTime(0.001, end);
+    sub.connect(gSub);
+    gSub.connect(ctx.destination);
+    sub.start(t0);
+    sub.stop(end + 0.04);
+
+    const chimeT = t0 + 0.08;
+    const chimeEnd = chimeT + 1.08;
+    const partials: { f: number; w: number; at: number }[] = [
+      { f: 523.25, w: 0.11, at: 0 },
+      { f: 783.99, w: 0.08, at: 0.012 },
+      { f: 1046.5, w: 0.055, at: 0.022 },
+      { f: 1318.51, w: 0.038, at: 0.03 },
+      { f: 622.26, w: 0.058, at: 0.11 },
+      { f: 392.0, w: 0.045, at: 0.26 },
+    ];
+    for (const { f, w, at } of partials) {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = f;
+      const s = chimeT + at;
+      gn.gain.setValueAtTime(0.001, s);
+      gn.gain.exponentialRampToValueAtTime(g * w, s + 0.028);
+      gn.gain.exponentialRampToValueAtTime(g * w * 0.35, s + 0.22);
+      gn.gain.exponentialRampToValueAtTime(0.001, chimeEnd);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(s);
+      o.stop(chimeEnd + 0.02);
+    }
+
+    const airDur = 0.38;
+    const airLen = Math.ceil(ctx.sampleRate * airDur);
+    const airBuf = ctx.createBuffer(1, airLen, ctx.sampleRate);
+    const air = airBuf.getChannelData(0);
+    for (let i = 0; i < airLen; i++) air[i] = Math.random() * 2 - 1;
+    const airSrc = ctx.createBufferSource();
+    airSrc.buffer = airBuf;
+    const hp = ctx.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.value = 900;
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    lp.frequency.setValueAtTime(4200, t0);
+    lp.frequency.exponentialRampToValueAtTime(1100, t0 + airDur);
+    const gAir = ctx.createGain();
+    gAir.gain.setValueAtTime(0.001, t0);
+    gAir.gain.linearRampToValueAtTime(g * 0.07, t0 + 0.06);
+    gAir.gain.exponentialRampToValueAtTime(0.001, t0 + airDur);
+    airSrc.connect(hp);
+    hp.connect(lp);
+    lp.connect(gAir);
+    gAir.connect(ctx.destination);
+    airSrc.start(t0);
+    airSrc.stop(t0 + airDur + 0.02);
+  }
+
   /** Twist de boss — abertura “sino” inharmónico (senos, sensação errada) + três acordes dissonantes. */
   playBossTwistRevelation(): void {
     const ctx = this.host.ensureContext();

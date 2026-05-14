@@ -183,10 +183,26 @@ function aggregateAmbientCounts(scenes: Map<string, LoadedScene>): Map<AmbientTh
 
 type DevToolsSfxPreviewRow = { label: string; play: (audio: GameAudio) => void };
 
-type DevToolsSfxCategory = { category: string; rows: readonly DevToolsSfxPreviewRow[] };
+type DevToolsSfxCategory = {
+  category: string;
+  rows: readonly DevToolsSfxPreviewRow[];
+  /** Aba Música: secção Highlight (overlay); omitido = "Demais efeitos". */
+  musicTabSection?: 'highlight';
+};
 
 /** Pré-escuta na aba Música (`?view=dev&tab=music`) — espelha `GameAudio` + `GameSfxPlayer`. */
 const DEV_TOOLS_SFX_BY_CATEGORY: readonly DevToolsSfxCategory[] = [
+  {
+    category: 'Highlight',
+    musicTabSection: 'highlight',
+    rows: [
+      { label: 'Porta (door_open)', play: (a) => a.playDoorOpen() },
+      { label: 'Misterioso (mysterious)', play: (a) => a.playMysteriousHighlight() },
+      { label: 'Classe — Cavaleiro (class_knight)', play: (a) => a.playClassCommitKnight() },
+      { label: 'Classe — Clériga (class_cleric)', play: (a) => a.playClassCommitCleric() },
+      { label: 'Classe — Mago (class_mage)', play: (a) => a.playClassCommitMage() },
+    ],
+  },
   {
     category: 'Interface e testes',
     rows: [
@@ -195,8 +211,6 @@ const DEV_TOOLS_SFX_BY_CATEGORY: readonly DevToolsSfxCategory[] = [
       { label: 'Dados', play: (a) => a.playDice() },
       { label: 'Teste falhou', play: (a) => a.playCheckFail() },
       { label: 'Teste passou', play: (a) => a.playCheckSuccess() },
-      { label: 'Highlight — porta (door_open)', play: (a) => a.playDoorOpen() },
-      { label: 'Highlight — misterioso (mysterious)', play: (a) => a.playMysteriousHighlight() },
     ],
   },
   {
@@ -252,6 +266,51 @@ const DEV_TOOLS_SFX_BY_CATEGORY: readonly DevToolsSfxCategory[] = [
     ],
   },
 ];
+
+function appendDevToolsSfxPreviewTable(
+  parent: HTMLElement,
+  audio: GameAudio,
+  categories: readonly DevToolsSfxCategory[]
+): void {
+  const sfxTable = document.createElement('table');
+  sfxTable.className = 'dev-tools-table dev-tools-table--sfx';
+  const sfxThead = document.createElement('thead');
+  sfxThead.innerHTML = '<tr><th>Categoria</th><th>Efeito</th><th>Pré-escuta</th></tr>';
+  sfxTable.appendChild(sfxThead);
+  const sfxTbody = document.createElement('tbody');
+  for (const cat of categories) {
+    const n = cat.rows.length;
+    for (let i = 0; i < n; i++) {
+      const row = cat.rows[i]!;
+      const tr = document.createElement('tr');
+      if (i === 0) {
+        const tdCat = document.createElement('td');
+        tdCat.className = 'dev-tools-sfx-category';
+        tdCat.rowSpan = n;
+        tdCat.textContent = cat.category;
+        tr.appendChild(tdCat);
+      }
+      const tdLabel = document.createElement('td');
+      tdLabel.textContent = row.label;
+      const tdPlay = document.createElement('td');
+      tdPlay.className = 'dev-tools-music-actions';
+      const playSfx = document.createElement('button');
+      playSfx.type = 'button';
+      playSfx.className = 'dev-tools-btn';
+      playSfx.textContent = 'Ouvir';
+      playSfx.addEventListener('click', () => {
+        audio.ensureContext();
+        row.play(audio);
+      });
+      tdPlay.appendChild(playSfx);
+      tr.appendChild(tdLabel);
+      tr.appendChild(tdPlay);
+      sfxTbody.appendChild(tr);
+    }
+  }
+  sfxTable.appendChild(sfxTbody);
+  parent.appendChild(sfxTable);
+}
 
 /** Alinhado a `GameApp.resolveVisualTheme` — paleta CSS (`html[data-theme]`). */
 type DevToolsVisualThemeId = 'default' | 'snow' | 'void' | 'ash';
@@ -431,47 +490,30 @@ function mountMusicPanel(
   const sfxNote = document.createElement('p');
   sfxNote.className = 'dev-tools-note';
   sfxNote.textContent =
-    'Tons curtos por síntese (Web Audio), mesmos métodos do jogo. Cada botão toca uma vez; o volume segue a preferência guardada da campanha.';
+    'Tons curtos por síntese (Web Audio), mesmos métodos do jogo. Cada botão toca uma vez; o volume segue a preferência guardada da campanha. O highlight do overlay de arte está na secção abaixo.';
   parent.appendChild(sfxNote);
 
-  const sfxTable = document.createElement('table');
-  sfxTable.className = 'dev-tools-table dev-tools-table--sfx';
-  const sfxThead = document.createElement('thead');
-  sfxThead.innerHTML = '<tr><th>Categoria</th><th>Efeito</th><th>Pré-escuta</th></tr>';
-  sfxTable.appendChild(sfxThead);
-  const sfxTbody = document.createElement('tbody');
-  for (const cat of DEV_TOOLS_SFX_BY_CATEGORY) {
-    const n = cat.rows.length;
-    for (let i = 0; i < n; i++) {
-      const row = cat.rows[i]!;
-      const tr = document.createElement('tr');
-      if (i === 0) {
-        const tdCat = document.createElement('td');
-        tdCat.className = 'dev-tools-sfx-category';
-        tdCat.rowSpan = n;
-        tdCat.textContent = cat.category;
-        tr.appendChild(tdCat);
-      }
-      const tdLabel = document.createElement('td');
-      tdLabel.textContent = row.label;
-      const tdPlay = document.createElement('td');
-      tdPlay.className = 'dev-tools-music-actions';
-      const playSfx = document.createElement('button');
-      playSfx.type = 'button';
-      playSfx.className = 'dev-tools-btn';
-      playSfx.textContent = 'Ouvir';
-      playSfx.addEventListener('click', () => {
-        audio.ensureContext();
-        row.play(audio);
-      });
-      tdPlay.appendChild(playSfx);
-      tr.appendChild(tdLabel);
-      tr.appendChild(tdPlay);
-      sfxTbody.appendChild(tr);
-    }
-  }
-  sfxTable.appendChild(sfxTbody);
-  parent.appendChild(sfxTable);
+  const hlHdr = document.createElement('div');
+  hlHdr.className = 'dev-tools-subhdr dev-tools-subhdr--music-sfx-highlight';
+  hlHdr.textContent = 'Highlight';
+  parent.appendChild(hlHdr);
+
+  const hlNote = document.createElement('p');
+  hlNote.className = 'dev-tools-note';
+  hlNote.textContent =
+    'Sons ao montar o overlay de arte na primeira visita (`highlight: true`), conforme `artHighlightSfx` no YAML da cena.';
+  parent.appendChild(hlNote);
+
+  const sfxHighlight = DEV_TOOLS_SFX_BY_CATEGORY.filter((c) => c.musicTabSection === 'highlight');
+  appendDevToolsSfxPreviewTable(parent, audio, sfxHighlight);
+
+  const sfxRestHdr = document.createElement('div');
+  sfxRestHdr.className = 'dev-tools-subhdr dev-tools-subhdr--music-sfx-rest';
+  sfxRestHdr.textContent = 'Demais efeitos';
+  parent.appendChild(sfxRestHdr);
+
+  const sfxRest = DEV_TOOLS_SFX_BY_CATEGORY.filter((c) => c.musicTabSection !== 'highlight');
+  appendDevToolsSfxPreviewTable(parent, audio, sfxRest);
 }
 
 function appendSceneChoicesSection(

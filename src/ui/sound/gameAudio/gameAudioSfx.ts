@@ -13,6 +13,113 @@ export class GameSfxPlayer {
     this.playTone(520, 0.04, 0.06, 'square');
   }
 
+  /** Confirmação de classe — Cavaleiro: choque metálico + acorde grave heroico. */
+  playClassCommitKnight(): void {
+    const ctx = this.host.ensureContext();
+    const t0 = ctx.currentTime;
+    const g = this.host.gain(0.13);
+    if (g <= 0) return;
+    const clang = ctx.createOscillator();
+    const gClang = ctx.createGain();
+    clang.type = 'square';
+    clang.frequency.setValueAtTime(420, t0);
+    clang.frequency.exponentialRampToValueAtTime(110, t0 + 0.06);
+    gClang.gain.setValueAtTime(g * 0.42, t0);
+    gClang.gain.exponentialRampToValueAtTime(0.01, t0 + 0.1);
+    clang.connect(gClang);
+    gClang.connect(ctx.destination);
+    clang.start(t0);
+    clang.stop(t0 + 0.11);
+    const ringT = t0 + 0.04;
+    for (const f of [146.83, 220.0, 293.66]) {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'triangle';
+      o.frequency.value = f;
+      gn.gain.setValueAtTime(0.001, ringT);
+      gn.gain.exponentialRampToValueAtTime(g * 0.52, ringT + 0.035);
+      gn.gain.exponentialRampToValueAtTime(0.001, ringT + 0.52);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(ringT);
+      o.stop(ringT + 0.55);
+    }
+  }
+
+  /** Confirmação de classe — Clériga: sinos graves ascendentes + halo curto. */
+  playClassCommitCleric(): void {
+    const ctx = this.host.ensureContext();
+    const t0 = ctx.currentTime;
+    const g = this.host.gain(0.12);
+    if (g <= 0) return;
+    const bells = [
+      { f: 392.0, t: 0, dur: 0.55 },
+      { f: 523.25, t: 0.14, dur: 0.62 },
+      { f: 659.25, t: 0.3, dur: 0.7 },
+    ];
+    for (const { f, t, dur } of bells) {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = f;
+      const st = t0 + t;
+      gn.gain.setValueAtTime(0.001, st);
+      gn.gain.exponentialRampToValueAtTime(g * 0.72, st + 0.028);
+      gn.gain.exponentialRampToValueAtTime(0.001, st + dur);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(st);
+      o.stop(st + dur + 0.04);
+    }
+    const haloT = t0 + 0.38;
+    for (const f of [329.63, 493.88]) {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'triangle';
+      o.frequency.value = f;
+      gn.gain.setValueAtTime(0.001, haloT);
+      gn.gain.exponentialRampToValueAtTime(g * 0.22, haloT + 0.12);
+      gn.gain.exponentialRampToValueAtTime(0.001, haloT + 0.85);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(haloT);
+      o.stop(haloT + 0.9);
+    }
+  }
+
+  /** Confirmação de classe — Mago: subida arcana + cristais agudos. */
+  playClassCommitMage(): void {
+    const ctx = this.host.ensureContext();
+    const t0 = ctx.currentTime;
+    const g = this.host.gain(0.11);
+    if (g <= 0) return;
+    const sweep = ctx.createOscillator();
+    const gSw = ctx.createGain();
+    sweep.type = 'sawtooth';
+    sweep.frequency.setValueAtTime(220, t0);
+    sweep.frequency.exponentialRampToValueAtTime(1680, t0 + 0.09);
+    gSw.gain.setValueAtTime(g * 0.28, t0);
+    gSw.gain.exponentialRampToValueAtTime(0.01, t0 + 0.14);
+    sweep.connect(gSw);
+    gSw.connect(ctx.destination);
+    sweep.start(t0);
+    sweep.stop(t0 + 0.15);
+    [2200, 2800, 1900].forEach((freq, i) => {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = freq;
+      const st = t0 + 0.05 + i * 0.04;
+      gn.gain.setValueAtTime(0.001, st);
+      gn.gain.exponentialRampToValueAtTime(g * 0.26, st + 0.006);
+      gn.gain.exponentialRampToValueAtTime(0.01, st + 0.09);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(st);
+      o.stop(st + 0.1);
+    });
+  }
+
   playBlocked(): void {
     this.playTone(90, 0.06, 0.45, 'sine');
   }
@@ -995,7 +1102,7 @@ export class GameSfxPlayer {
   }
 
   /**
-   * Grave com subida lenta, par de batimento suave e “sino” abafado.
+   * Grave com subida lenta, par de batimento suave e linha de sinos ao longo da cauda (~3s).
    * Overlay `artHighlightSfx: mysterious`.
    */
   playMysteriousHighlight(): void {
@@ -1003,17 +1110,17 @@ export class GameSfxPlayer {
     const t0 = ctx.currentTime;
     const g = this.host.gain(0.14);
     if (g <= 0) return;
-    const end = t0 + 1.85;
+    const end = t0 + 3.05;
 
     const hum = ctx.createOscillator();
     const gHum = ctx.createGain();
     hum.type = 'sine';
     hum.frequency.setValueAtTime(52, t0);
-    hum.frequency.exponentialRampToValueAtTime(61, t0 + 0.55);
-    hum.frequency.exponentialRampToValueAtTime(48, end - 0.12);
+    hum.frequency.exponentialRampToValueAtTime(61, t0 + 0.78);
+    hum.frequency.exponentialRampToValueAtTime(48, end - 0.22);
     gHum.gain.setValueAtTime(0.001, t0);
-    gHum.gain.exponentialRampToValueAtTime(g * 0.38, t0 + 0.42);
-    gHum.gain.exponentialRampToValueAtTime(g * 0.44, t0 + 0.72);
+    gHum.gain.exponentialRampToValueAtTime(g * 0.38, t0 + 0.55);
+    gHum.gain.exponentialRampToValueAtTime(g * 0.44, t0 + 1.35);
     gHum.gain.exponentialRampToValueAtTime(0.001, end);
     hum.connect(gHum);
     gHum.connect(ctx.destination);
@@ -1024,11 +1131,11 @@ export class GameSfxPlayer {
     const gBeat = ctx.createGain();
     humBeat.type = 'sine';
     humBeat.frequency.setValueAtTime(52.6, t0);
-    humBeat.frequency.exponentialRampToValueAtTime(61.7, t0 + 0.55);
-    humBeat.frequency.exponentialRampToValueAtTime(48.6, end - 0.12);
+    humBeat.frequency.exponentialRampToValueAtTime(61.7, t0 + 0.78);
+    humBeat.frequency.exponentialRampToValueAtTime(48.6, end - 0.22);
     gBeat.gain.setValueAtTime(0.001, t0);
-    gBeat.gain.exponentialRampToValueAtTime(g * 0.22, t0 + 0.45);
-    gBeat.gain.exponentialRampToValueAtTime(g * 0.26, t0 + 0.78);
+    gBeat.gain.exponentialRampToValueAtTime(g * 0.22, t0 + 0.58);
+    gBeat.gain.exponentialRampToValueAtTime(g * 0.26, t0 + 1.42);
     gBeat.gain.exponentialRampToValueAtTime(0.001, end);
     humBeat.connect(gBeat);
     gBeat.connect(ctx.destination);
@@ -1039,10 +1146,10 @@ export class GameSfxPlayer {
     const gSub = ctx.createGain();
     sub.type = 'sine';
     sub.frequency.setValueAtTime(26, t0);
-    sub.frequency.exponentialRampToValueAtTime(30.5, t0 + 0.55);
-    sub.frequency.exponentialRampToValueAtTime(24, end - 0.15);
+    sub.frequency.exponentialRampToValueAtTime(30.5, t0 + 0.78);
+    sub.frequency.exponentialRampToValueAtTime(24, end - 0.28);
     gSub.gain.setValueAtTime(0.001, t0);
-    gSub.gain.exponentialRampToValueAtTime(g * 0.2, t0 + 0.5);
+    gSub.gain.exponentialRampToValueAtTime(g * 0.2, t0 + 0.62);
     gSub.gain.exponentialRampToValueAtTime(0.001, end);
     sub.connect(gSub);
     gSub.connect(ctx.destination);
@@ -1050,14 +1157,21 @@ export class GameSfxPlayer {
     sub.stop(end + 0.04);
 
     const chimeT = t0 + 0.08;
-    const chimeEnd = chimeT + 1.08;
+    const chimeEnd = chimeT + 2.52;
     const partials: { f: number; w: number; at: number }[] = [
       { f: 523.25, w: 0.11, at: 0 },
       { f: 783.99, w: 0.08, at: 0.012 },
       { f: 1046.5, w: 0.055, at: 0.022 },
       { f: 1318.51, w: 0.038, at: 0.03 },
-      { f: 622.26, w: 0.058, at: 0.11 },
-      { f: 392.0, w: 0.045, at: 0.26 },
+      { f: 622.26, w: 0.058, at: 0.14 },
+      { f: 392.0, w: 0.045, at: 0.34 },
+      { f: 349.23, w: 0.038, at: 0.52 },
+      { f: 698.46, w: 0.032, at: 0.7 },
+      { f: 466.16, w: 0.033, at: 0.9 },
+      { f: 587.33, w: 0.028, at: 1.12 },
+      { f: 440.0, w: 0.026, at: 1.34 },
+      { f: 493.88, w: 0.023, at: 1.58 },
+      { f: 523.25, w: 0.02, at: 1.82 },
     ];
     for (const { f, w, at } of partials) {
       const o = ctx.createOscillator();
@@ -1066,8 +1180,8 @@ export class GameSfxPlayer {
       o.frequency.value = f;
       const s = chimeT + at;
       gn.gain.setValueAtTime(0.001, s);
-      gn.gain.exponentialRampToValueAtTime(g * w, s + 0.028);
-      gn.gain.exponentialRampToValueAtTime(g * w * 0.35, s + 0.22);
+      gn.gain.exponentialRampToValueAtTime(g * w, s + 0.034);
+      gn.gain.exponentialRampToValueAtTime(g * w * 0.38, s + 0.42);
       gn.gain.exponentialRampToValueAtTime(0.001, chimeEnd);
       o.connect(gn);
       gn.connect(ctx.destination);
@@ -1075,7 +1189,7 @@ export class GameSfxPlayer {
       o.stop(chimeEnd + 0.02);
     }
 
-    const airDur = 0.38;
+    const airDur = 0.48;
     const airLen = Math.ceil(ctx.sampleRate * airDur);
     const airBuf = ctx.createBuffer(1, airLen, ctx.sampleRate);
     const air = airBuf.getChannelData(0);

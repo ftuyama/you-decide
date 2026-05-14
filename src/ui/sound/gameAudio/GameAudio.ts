@@ -84,6 +84,18 @@ export class GameAudio {
     this.sfx.playUiClick();
   }
 
+  playClassCommitKnight(): void {
+    this.sfx.playClassCommitKnight();
+  }
+
+  playClassCommitCleric(): void {
+    this.sfx.playClassCommitCleric();
+  }
+
+  playClassCommitMage(): void {
+    this.sfx.playClassCommitMage();
+  }
+
   playBlocked(): void {
     this.sfx.playBlocked();
   }

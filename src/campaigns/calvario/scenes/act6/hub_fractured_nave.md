@@ -6,6 +6,7 @@ type: hub
 ambientTheme: void
 artKey: fractured_nave
 highlight: true
+artHighlightSfx: mysterious
 choices:
   - text: "Patrulhar a nave fraturada (explorar mapa)"
     uiSection: "Explorar"

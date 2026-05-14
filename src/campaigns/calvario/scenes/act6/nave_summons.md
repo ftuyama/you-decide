@@ -5,6 +5,7 @@ chapter: 6
 ambientTheme: void
 artKey: act6_veil_ingress
 highlight: true
+artHighlightSfx: mysterious
 choices:
   - text: "Subir à esplanada onde só uma prova respira de cada vez"
     next: act6/hub_fractured_nave

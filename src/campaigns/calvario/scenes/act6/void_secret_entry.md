@@ -5,6 +5,7 @@ chapter: 6
 ambientTheme: void
 artKey: act6_secret_maw
 highlight: true
+artHighlightSfx: mysterious
 choices:
   - text: "Seguir o corredor que nao existe no mapa"
     next: act6/void_secret_pact

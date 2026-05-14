@@ -5,6 +5,7 @@ chapter: 6
 ambientTheme: void
 artKey: mirror_chamber
 highlight: true
+artHighlightSfx: mysterious
 choices:
   - text: "Entrar e encarar quem me habita"
     next: act6/encounters/mirror_boss_intro

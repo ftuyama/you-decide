@@ -5,6 +5,7 @@ chapter: 6
 ambientTheme: void
 artKey: void_threshold
 highlight: true
+artHighlightSfx: mysterious
 choices:
   - text: "Entrar na nave fraturada e ouvir o que resta do mundo"
     next: act6/nave_summons

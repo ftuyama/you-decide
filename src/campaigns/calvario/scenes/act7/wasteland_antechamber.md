@@ -5,6 +5,7 @@ chapter: 7
 ambientTheme: ash_sky
 artKey: wasteland_dust
 highlight: true
+artHighlightSfx: mysterious
 choices:
   - text: "Deixar o vento decidir o próximo sacrifício"
     next: act7/wasteland_router

@@ -5,6 +5,7 @@ chapter: 4
 ambientTheme: explore
 artKey: morvayn_throne
 highlight: true
+artHighlightSfx: mysterious
 choices:
   - text: "Tentar ler um nome completo (teste de Mente)"
     next: act4/throne/throne_observe_mind

@@ -5,6 +5,7 @@ chapter: 6
 ambientTheme: void
 artKey: act6_mirror_final_resolved
 highlight: true
+artHighlightSfx: mysterious
 choices:
   - text: "Aceitar a fissura e seguir"
     next: act6/epilogue

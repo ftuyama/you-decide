@@ -1342,18 +1342,30 @@ export class GameApp {
     const holdMs = fm.highlightHoldMs ?? SCENE_ART_HIGHLIGHT_HOLD_MS_DEFAULT;
     const gen = this.sceneArtHighlightGen;
     const sid = scene.id;
-    const onHighlightSfx =
-      fm.artHighlightSfx === 'door_open'
-        ? () => {
-            this.unlockAudio();
-            this.audio.playDoorOpen();
-          }
-        : fm.artHighlightSfx === 'mysterious'
-          ? () => {
-              this.unlockAudio();
-              this.audio.playMysteriousHighlight();
-            }
-          : undefined;
+    const unlockAnd = (play: () => void): (() => void) => () => {
+      this.unlockAudio();
+      play();
+    };
+    let onHighlightSfx: (() => void) | undefined;
+    switch (fm.artHighlightSfx) {
+      case 'door_open':
+        onHighlightSfx = unlockAnd(() => this.audio.playDoorOpen());
+        break;
+      case 'mysterious':
+        onHighlightSfx = unlockAnd(() => this.audio.playMysteriousHighlight());
+        break;
+      case 'class_knight':
+        onHighlightSfx = unlockAnd(() => this.audio.playClassCommitKnight());
+        break;
+      case 'class_cleric':
+        onHighlightSfx = unlockAnd(() => this.audio.playClassCommitCleric());
+        break;
+      case 'class_mage':
+        onHighlightSfx = unlockAnd(() => this.audio.playClassCommitMage());
+        break;
+      default:
+        onHighlightSfx = undefined;
+    }
     return {
       sceneId: sid,
       frames,

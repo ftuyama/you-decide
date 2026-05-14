@@ -5,6 +5,7 @@ chapter: 1
 ambientTheme: explore
 artKey: pick_knight
 highlight: true
+artHighlightSfx: class_knight
 choices:
   - text: "Avançar para a boca da masmorra"
     next: act1/dungeon_mouth

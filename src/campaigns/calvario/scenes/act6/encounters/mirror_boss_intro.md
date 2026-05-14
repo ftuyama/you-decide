@@ -5,6 +5,7 @@ chapter: 6
 ambientTheme: void
 artKey: act6_mirror_final
 highlight: true
+artHighlightSfx: mysterious
 choices:
   - text: "Lutar contra o meu reflexo soberano"
     effects:

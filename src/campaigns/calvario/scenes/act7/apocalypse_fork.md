@@ -5,6 +5,7 @@ chapter: 7
 ambientTheme: ash_sky
 artKey: ashen_fork
 highlight: true
+artHighlightSfx: mysterious
 choices:
   - text: "Tentar coser o firmamento com pensamento e prece — um fio de cada vez"
     next: act7/path_stitch_sky

@@ -5,6 +5,7 @@ chapter: 3
 ambientTheme: act3
 artKey: cult_negotiate
 highlight: true
+artHighlightSfx: mysterious
 choices:
   - text: "Mostrar o sinete do Terceiro Sino — pedir favor à margem do contrato"
     uiSection: "Pacto"

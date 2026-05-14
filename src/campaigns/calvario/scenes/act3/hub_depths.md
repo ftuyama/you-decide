@@ -6,6 +6,7 @@ type: hub
 ambientTheme: act3
 artKey: depths
 highlight: true
+artHighlightSfx: mysterious
 choices:
   - text: "Patrulhar as profundezas (explorar mapa)"
     uiSection: "Explorar"

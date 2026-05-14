@@ -5,6 +5,7 @@ chapter: 2
 ambientTheme: act2
 artKey: skeleton
 highlight: true
+artHighlightSfx: mysterious
 choices:
   - text: "Rasto de ferro na penumbra — um silhueta observa, imóvel"
     condition:

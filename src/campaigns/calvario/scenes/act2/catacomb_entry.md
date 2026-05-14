@@ -4,6 +4,7 @@ chapter: 2
 ambientTheme: act2
 artKey: catacomb
 highlight: true
+artHighlightSfx: mysterious
 title: Cruzeiro de ossos
 choices:
   - text: "Explorar o corredor lateral (chiar)"

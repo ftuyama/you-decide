@@ -5,6 +5,11 @@ chapter: 2
 ambientTheme: act2
 artKey: mira_offer
 highlight: true
+artHighlightFrames:
+  - mira_offer_hl0
+  - mira_offer_hl1
+  - mira_offer_hl2
+highlightHoldMs: 2200
 choices:
   - text: "Recrutar Mira"
     next: act2/recruit_mira

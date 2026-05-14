@@ -717,19 +717,27 @@ function appendCharacterSheetLoreSection(
   h.textContent = 'História';
   const body = document.createElement('div');
   body.className = 'character-sheet-lore-body';
+  const panel = document.createElement('div');
+  panel.className = 'character-sheet-lore-panel';
+  const loreScroll = document.createElement('div');
+  loreScroll.className = 'character-sheet-lore-scroll';
+  loreScroll.setAttribute('lang', 'pt');
   if (paragraphs.length === 0) {
     const empty = document.createElement('p');
     empty.className = 'diary-modal-empty';
     empty.textContent = 'Sem texto gravado.';
-    body.appendChild(empty);
+    loreScroll.appendChild(empty);
   } else {
-    for (const para of paragraphs) {
+    paragraphs.forEach((para, i) => {
       const p = document.createElement('p');
-      p.className = 'character-sheet-lore-p';
+      p.className =
+        i === 0 ? 'character-sheet-lore-p character-sheet-lore-p--lead' : 'character-sheet-lore-p';
       p.textContent = para;
-      body.appendChild(p);
-    }
+      loreScroll.appendChild(p);
+    });
   }
+  panel.appendChild(loreScroll);
+  body.appendChild(panel);
   sec.appendChild(h);
   if (storyProgress != null && storyProgress.total > 0) {
     const pct = Math.min(100, Math.round((100 * storyProgress.unlocked) / storyProgress.total));

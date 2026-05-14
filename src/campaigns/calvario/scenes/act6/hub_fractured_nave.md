@@ -22,6 +22,8 @@ choices:
       all:
         - { noFlag: act6_reality_done }
         - { level: { gte: 25 } }
+    showWhenLocked: true
+    lockedHint: "Precisas de nível 25 para o primeiro cordão; uma vez concluída a prova, o corredor deixa de abrir por aqui."
     preview: "Primeiro cordão: realidade; marca permanente conforme o desfecho."
   - text: "Descer ao poço de memórias sem fundo (Prova da Memória)"
     uiSection: "Provas"

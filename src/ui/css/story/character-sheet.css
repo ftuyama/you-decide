@@ -216,13 +216,67 @@
   padding: 0.05rem 0;
 }
 
-.character-sheet-lore-p {
-  margin: 0 0 0.75rem;
-  font-size: 0.78rem;
-  line-height: 1.65;
-  color: var(--sidebar-lore);
+.character-sheet-lore-panel {
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--border) 78%, var(--accent) 16%);
+  background:
+    linear-gradient(
+      165deg,
+      color-mix(in srgb, var(--surface-raised) 94%, var(--accent) 6%) 0%,
+      color-mix(in srgb, var(--surface-inset) 92%, var(--accent) 5%) 100%
+    );
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--fg) 8%, transparent),
+    0 2px 12px color-mix(in srgb, var(--bg) 70%, black);
 }
 
-.character-sheet-lore-p:last-child {
-  margin-bottom: 0;
+.character-sheet-lore-scroll {
+  max-height: min(42vh, 21rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  padding: 0.65rem 0.55rem 0.72rem 0.72rem;
+  scrollbar-color: color-mix(in srgb, var(--accent) 45%, var(--border)) color-mix(in srgb, var(--surface-drawer) 88%, transparent);
+}
+
+.character-sheet-lore-scroll::-webkit-scrollbar {
+  width: 7px;
+}
+
+.character-sheet-lore-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 42%, var(--border));
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.character-sheet-lore-scroll::-webkit-scrollbar-track {
+  margin: 4px 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-drawer) 90%, transparent);
+}
+
+.character-sheet-lore-p {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.68;
+  color: var(--sidebar-lore);
+  text-wrap: pretty;
+}
+
+.character-sheet-lore-p + .character-sheet-lore-p {
+  margin-top: 0.75rem;
+  padding-top: 0.78rem;
+  border-top: 1px solid color-mix(in srgb, var(--border) 55%, var(--accent) 12%);
+}
+
+.character-sheet-lore-p--lead {
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.62;
+  letter-spacing: 0.01em;
+  color: color-mix(in srgb, var(--sidebar-lore) 72%, var(--text-strong));
+  border-left: 3px solid color-mix(in srgb, var(--accent) 62%, var(--border));
+  padding-left: 0.65rem;
+  margin-left: 0.02rem;
 }

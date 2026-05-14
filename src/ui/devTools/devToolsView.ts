@@ -263,6 +263,10 @@ const DEV_TOOLS_SFX_BY_CATEGORY: readonly DevToolsSfxCategory[] = [
       { label: 'Derrota', play: (a) => a.playDefeat() },
       { label: 'Fuga', play: (a) => a.playFlee() },
       { label: 'Revelação (boss twist)', play: (a) => a.playBossTwistRevelation() },
+      {
+        label: 'Sacrifício ritual (`commitSfx: horrific_sacrifice`)',
+        play: (a) => a.playHorrificSacrificeCommit(),
+      },
     ],
   },
 ];

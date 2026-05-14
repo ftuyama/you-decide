@@ -1295,6 +1295,230 @@ export class GameSfxPlayer {
     }
   }
 
+  /**
+   * Sacrifício / ritual abominável — confirmação de escolha (`commitSfx: horrific_sacrifice`).
+   * Peça longa (~6,8s): drone grave com batimento, tensão, clímax dissonante e cauda assombrada.
+   */
+  playHorrificSacrificeCommit(): void {
+    const ctx = this.host.ensureContext();
+    const t0 = ctx.currentTime;
+    const g = this.host.gain(0.17);
+    if (g <= 0) return;
+
+    const end = t0 + 6.85;
+    const climax = t0 + 3.05;
+
+    // --- Drone grave com batimento (quase todo o gesto) ---
+    for (const freq of [34.2, 35.65]) {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = freq;
+      gn.gain.setValueAtTime(0.001, t0);
+      gn.gain.exponentialRampToValueAtTime(g * 0.2, t0 + 2.35);
+      gn.gain.linearRampToValueAtTime(g * 0.26, t0 + 3.8);
+      gn.gain.exponentialRampToValueAtTime(g * 0.14, climax + 0.45);
+      gn.gain.exponentialRampToValueAtTime(0.001, end);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(t0);
+      o.stop(end + 0.06);
+    }
+
+    // --- Sub que desce e volta a subir na cauda (pressão no peito) ---
+    const sub = ctx.createOscillator();
+    const gSub = ctx.createGain();
+    sub.type = 'sine';
+    sub.frequency.setValueAtTime(58, t0 + 0.15);
+    sub.frequency.exponentialRampToValueAtTime(24, t0 + 2.65);
+    sub.frequency.exponentialRampToValueAtTime(31, climax + 1.1);
+    sub.frequency.exponentialRampToValueAtTime(26.5, end - 0.35);
+    gSub.gain.setValueAtTime(0.001, t0 + 0.12);
+    gSub.gain.exponentialRampToValueAtTime(g * 0.38, t0 + 0.55);
+    gSub.gain.linearRampToValueAtTime(g * 0.44, t0 + 2.1);
+    gSub.gain.exponentialRampToValueAtTime(g * 0.52, climax);
+    gSub.gain.exponentialRampToValueAtTime(g * 0.22, climax + 1.35);
+    gSub.gain.exponentialRampToValueAtTime(0.001, end);
+    sub.connect(gSub);
+    gSub.connect(ctx.destination);
+    sub.start(t0 + 0.12);
+    sub.stop(end + 0.05);
+
+    // --- Pulsações graves (ritmo funesto até o clímax) ---
+    const thumpTimes = [0.42, 1.05, 1.72, 2.38, 2.95];
+    for (let i = 0; i < thumpTimes.length; i++) {
+      const st = t0 + thumpTimes[i]!;
+      const w = g * (0.09 + i * 0.028);
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(52, st);
+      o.frequency.exponentialRampToValueAtTime(28, st + 0.22);
+      gn.gain.setValueAtTime(0.001, st);
+      gn.gain.exponentialRampToValueAtTime(w, st + 0.035);
+      gn.gain.exponentialRampToValueAtTime(0.001, st + 0.48);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(st);
+      o.stop(st + 0.52);
+    }
+
+    // --- Camada “serrilhada” que cresce até o clímax ---
+    const clusterFreqs = [
+      { f0: 174.61, f1: 246.94, tOff: 0 },
+      { f0: 196.0, f1: 277.18, tOff: 0.06 },
+      { f0: 207.65, f1: 293.66, tOff: 0.12 },
+    ];
+    const sawStart = t0 + 1.05;
+    const sawEnd = climax + 1.05;
+    for (const { f0, f1, tOff } of clusterFreqs) {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'sawtooth';
+      const st = sawStart + tOff;
+      o.frequency.setValueAtTime(f0 * 0.92, st);
+      o.frequency.exponentialRampToValueAtTime(f1 * 0.55, climax + 0.35);
+      o.frequency.exponentialRampToValueAtTime(f0 * 0.78, sawEnd);
+      gn.gain.setValueAtTime(0.001, st);
+      gn.gain.exponentialRampToValueAtTime(g * 0.04, st + 0.5);
+      gn.gain.linearRampToValueAtTime(g * 0.11, climax - 0.15);
+      gn.gain.exponentialRampToValueAtTime(g * 0.14, climax + 0.12);
+      gn.gain.exponentialRampToValueAtTime(0.001, sawEnd + 0.15);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(st);
+      o.stop(sawEnd + 0.2);
+    }
+
+    // --- Parciais agudos inarmónicos (aparecem e persistem na cauda) ---
+    const wrongPartials: { f: number; at: number; w: number; tail: number }[] = [
+      { f: 583.5, at: 1.35, w: 0.05, tail: 2.1 },
+      { f: 741.2, at: 1.62, w: 0.042, tail: 2.35 },
+      { f: 991.0, at: 1.88, w: 0.036, tail: 2.55 },
+      { f: 622.0, at: 2.45, w: 0.048, tail: 2.85 },
+      { f: 466.5, at: 3.95, w: 0.055, tail: 2.4 },
+      { f: 349.8, at: 4.55, w: 0.04, tail: 2.0 },
+    ];
+    for (const { f, at, w, tail } of wrongPartials) {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.value = f;
+      const s = t0 + at;
+      const e = s + tail;
+      gn.gain.setValueAtTime(0.001, s);
+      gn.gain.exponentialRampToValueAtTime(g * w, s + 0.08);
+      gn.gain.linearRampToValueAtTime(g * w * 0.75, s + tail * 0.45);
+      gn.gain.exponentialRampToValueAtTime(0.001, e);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(s);
+      o.stop(e + 0.04);
+    }
+
+    // --- Agudos “rasgados” no clímax ---
+    for (const { f, d } of [
+      { f: 1320, d: 0 },
+      { f: 1588, d: 0.03 },
+      { f: 1890, d: 0.058 },
+      { f: 2140, d: 0.09 },
+    ]) {
+      const o = ctx.createOscillator();
+      const gn = ctx.createGain();
+      o.type = 'square';
+      const s = climax - 0.08 + d;
+      o.frequency.setValueAtTime(f, s);
+      o.frequency.exponentialRampToValueAtTime(f * 0.42, s + 0.55);
+      gn.gain.setValueAtTime(0.001, s);
+      gn.gain.exponentialRampToValueAtTime(g * 0.07, s + 0.02);
+      gn.gain.linearRampToValueAtTime(g * 0.055, s + 0.35);
+      gn.gain.exponentialRampToValueAtTime(0.001, s + 0.95);
+      o.connect(gn);
+      gn.connect(ctx.destination);
+      o.start(s);
+      o.stop(s + 1.02);
+    }
+
+    // --- Ruído atmosférico longo (corrente / caverna) ---
+    const windDur = 6.2;
+    const windLen = Math.ceil(ctx.sampleRate * windDur);
+    const windBuf = ctx.createBuffer(1, windLen, ctx.sampleRate);
+    const wind = windBuf.getChannelData(0);
+    for (let i = 0; i < windLen; i++) wind[i] = Math.random() * 2 - 1;
+    const windSrc = ctx.createBufferSource();
+    windSrc.buffer = windBuf;
+    const windLp = ctx.createBiquadFilter();
+    windLp.type = 'lowpass';
+    windLp.frequency.setValueAtTime(380, t0 + 0.2);
+    windLp.frequency.exponentialRampToValueAtTime(950, climax);
+    windLp.frequency.exponentialRampToValueAtTime(220, t0 + windDur);
+    const gWind = ctx.createGain();
+    gWind.gain.setValueAtTime(0.001, t0 + 0.25);
+    gWind.gain.exponentialRampToValueAtTime(g * 0.055, t0 + 1.8);
+    gWind.gain.linearRampToValueAtTime(g * 0.09, climax + 0.2);
+    gWind.gain.exponentialRampToValueAtTime(g * 0.035, t0 + windDur - 0.4);
+    gWind.gain.exponentialRampToValueAtTime(0.001, t0 + windDur);
+    windSrc.connect(windLp);
+    windLp.connect(gWind);
+    gWind.connect(ctx.destination);
+    windSrc.start(t0 + 0.2);
+    windSrc.stop(t0 + windDur + 0.05);
+
+    // --- Sucção / vórtice no clímax (bandpass longo) ---
+    const suckDur = 2.15;
+    const suckLen = Math.ceil(ctx.sampleRate * suckDur);
+    const suckBuf = ctx.createBuffer(1, suckLen, ctx.sampleRate);
+    const suck = suckBuf.getChannelData(0);
+    for (let i = 0; i < suckLen; i++) suck[i] = Math.random() * 2 - 1;
+    const suckSrc = ctx.createBufferSource();
+    suckSrc.buffer = suckBuf;
+    const suckBp = ctx.createBiquadFilter();
+    suckBp.type = 'bandpass';
+    suckBp.Q.value = 2.35;
+    const suckT0 = climax - 0.35;
+    suckBp.frequency.setValueAtTime(2800, suckT0);
+    suckBp.frequency.exponentialRampToValueAtTime(95, suckT0 + suckDur);
+    const gSuck = ctx.createGain();
+    gSuck.gain.setValueAtTime(0.001, suckT0);
+    gSuck.gain.exponentialRampToValueAtTime(g * 0.24, suckT0 + 0.45);
+    gSuck.gain.linearRampToValueAtTime(g * 0.18, suckT0 + 1.1);
+    gSuck.gain.exponentialRampToValueAtTime(0.001, suckT0 + suckDur);
+    suckSrc.connect(suckBp);
+    suckBp.connect(gSuck);
+    gSuck.connect(ctx.destination);
+    suckSrc.start(suckT0);
+    suckSrc.stop(suckT0 + suckDur + 0.06);
+
+    // --- Golpe final grave + sino falso longo ---
+    const finHit = ctx.createOscillator();
+    const gFin = ctx.createGain();
+    finHit.type = 'sine';
+    finHit.frequency.setValueAtTime(48, climax + 0.22);
+    finHit.frequency.exponentialRampToValueAtTime(19, climax + 1.65);
+    gFin.gain.setValueAtTime(0.001, climax + 0.18);
+    gFin.gain.exponentialRampToValueAtTime(g * 0.48, climax + 0.26);
+    gFin.gain.exponentialRampToValueAtTime(g * 0.12, climax + 1.85);
+    gFin.gain.exponentialRampToValueAtTime(0.001, end);
+    finHit.connect(gFin);
+    gFin.connect(ctx.destination);
+    finHit.start(climax + 0.18);
+    finHit.stop(end + 0.04);
+
+    const ring = ctx.createOscillator();
+    const gR = ctx.createGain();
+    ring.type = 'triangle';
+    ring.frequency.setValueAtTime(415, climax + 0.35);
+    ring.frequency.exponentialRampToValueAtTime(122, climax + 3.4);
+    gR.gain.setValueAtTime(0.001, climax + 0.32);
+    gR.gain.exponentialRampToValueAtTime(g * 0.12, climax + 0.55);
+    gR.gain.linearRampToValueAtTime(g * 0.07, climax + 2.2);
+    gR.gain.exponentialRampToValueAtTime(0.001, end - 0.15);
+    ring.connect(gR);
+    gR.connect(ctx.destination);
+    ring.start(climax + 0.32);
+    ring.stop(end + 0.02);
+  }
+
   private playTone(freq: number, dur: number, vol: number, type: OscillatorType = 'sine'): void {
     const ctx = this.host.ensureContext();
     const g = this.host.gain(vol);

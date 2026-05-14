@@ -256,6 +256,10 @@ export type Effect =
   | { op: 'registerEnding'; endingId: string }
   | { op: 'resetRun' };
 
+/** Som ao confirmar escolha (`commitSfx` no YAML). Alinhar a `GameAudio` / UI. */
+export const ChoiceCommitSfxSchema = z.enum(['horrific_sacrifice']);
+export type ChoiceCommitSfx = z.infer<typeof ChoiceCommitSfxSchema>;
+
 export const ChoiceSchema = z
   .object({
     id: z.string().optional(),
@@ -282,6 +286,8 @@ export const ChoiceSchema = z
      * Omitir em todas as escolhas mantém a lista única como antes.
      */
     uiSection: z.string().optional(),
+    /** Se definido, toca este efeito em vez do clique de UI ao confirmar a escolha. */
+    commitSfx: ChoiceCommitSfxSchema.optional(),
   })
   .superRefine((data, ctx) => {
     if (data.showWhenLocked) {

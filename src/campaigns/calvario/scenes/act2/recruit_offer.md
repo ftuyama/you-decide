@@ -8,8 +8,10 @@ highlight: true
 artHighlightFrames:
   - mira_offer_hl0
   - mira_offer_hl1
-  - mira_offer_hl2
-highlightHoldMs: 2200
+  - mira_offer_hl0
+  - mira_offer_hl1
+  - mira_offer_hl0
+highlightHoldMs: 3200
 choices:
   - text: "Recrutar Mira"
     next: act2/recruit_mira

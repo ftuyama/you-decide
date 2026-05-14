@@ -927,7 +927,11 @@ export class GameApp {
 
   private applyChoice(choice: Choice): void {
     this.unlockAudio();
-    this.audio.playUiClick();
+    if (choice.commitSfx === 'horrific_sacrifice') {
+      this.audio.playHorrificSacrificeCommit();
+    } else {
+      this.audio.playUiClick();
+    }
     if (this.timedTimer) {
       clearTimeout(this.timedTimer);
       this.timedTimer = null;

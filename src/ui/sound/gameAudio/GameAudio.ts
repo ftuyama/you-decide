@@ -231,6 +231,11 @@ export class GameAudio {
     this.sfx.playMysteriousHighlight();
   }
 
+  /** Confirmação ritual abominável — escolha com `commitSfx: horrific_sacrifice` (~7s, gesto longo). */
+  playHorrificSacrificeCommit(): void {
+    this.sfx.playHorrificSacrificeCommit();
+  }
+
   private gain(base: number): number {
     return base * this.volume;
   }

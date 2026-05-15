@@ -11,11 +11,15 @@ choices:
     effects:
       - { op: addRep, faction: vigilia, delta: 1, directGain: true }
   - text: "Aceitar servir ao Terceiro Sino"
-    next: act4/pact/pact_ascent
     condition: { rep: { faction: culto, gte: 2 } }
     showWhenLocked: true
     lockedHint: "O Terceiro Sino só estende a mão a quem o Culto ainda não trata como inimigo declarado."
-    preview: "Corrupção e poder sombrio."
+    preview: "Confronto verbal com Morvayn; vitória leva ao pacto, falha ao combate."
+    effects:
+      - op: startCombat
+        encounterId: act4_morvayn_parley_dialogue
+        onVictory: act4/pact/pact_ascent
+        onDefeat: act4/encounters/fight_morvayn
   - text: "Tentar selar a masmorra (sacrifício)"
     next: act4/seal_ending
     condition: { resource: { faith: { gte: 2 } } }

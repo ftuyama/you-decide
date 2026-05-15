@@ -7,6 +7,14 @@ artKey: act6_mirror_final
 highlight: true
 artHighlightSfx: mysterious
 choices:
+  - text: "Tirar palavra ao reflexo antes do ferro (rascunho)"
+    effects:
+      - op: startCombat
+        encounterId: act6_mirror_sovereign_dialogue
+        onVictory: act6/encounters/mirror_boss_resolve
+        onDefeat: act6/encounters/mirror_boss_blades
+        onFlee: act6/hub_fractured_nave
+    preview: "Confronto verbal; falha leva ao combate físico."
   - text: "Lutar contra o meu reflexo soberano"
     effects:
       - op: startCombat

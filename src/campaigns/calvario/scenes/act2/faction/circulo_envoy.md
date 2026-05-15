@@ -15,11 +15,11 @@ choices:
     condition: { rep: { faction: circulo, lte: -2 } }
     effects:
       - op: startCombat
-        encounterId: faction_circle_initiate
-        onVictory: act2/hub_catacomb
+        encounterId: act2_circulo_envoy_dialogue
+        onVictory: act2/faction/circulo_envoy_verbal_win
+        onDefeat: act2/faction/circulo_envoy_blades
         onFlee: act2/hub_catacomb
-        onDefeat: shared/game_over
-    preview: "Combate · adepto osso"
+    preview: "Confronto verbal (rascunho); falha leva ao combate."
   - text: "Voltar ao cruzeiro"
     next: act2/hub_catacomb
 onEnter:

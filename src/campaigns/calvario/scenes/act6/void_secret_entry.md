@@ -14,13 +14,13 @@ choices:
       all:
         - { noFlag: kaelsworn_recruited }
         - { noFlag: kr_won_act6 }
-    preview: "Encontro especial: Kael, o Rastreador Cinzento."
+    preview: "Confronto verbal com Kael (rascunho); falha leva ao ferro."
     effects:
       - op: startCombat
-        encounterId: kael_rival_act6
+        encounterId: kael_rival_act6_dialogue
         onVictory: shared/kaelsworn_post_act6
+        onDefeat: shared/kael_act6_blades
         onFlee: act6/void_secret_entry
-        onDefeat: shared/game_over
   - text: "Recuar antes que o vazio te reconheca"
     next: act6/hub_fractured_nave
 onEnter:

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { dialogueEnemies } from '../../src/campaigns/calvario/data/dialogueEnemies.ts';
+import { dialogueEnemies } from '../../src/campaigns/calvario/data/dialogueEnemies/index.ts';
 import { beginEncounter, resolveDialogueChoice } from '../../src/engine/combat/index.ts';
 import { createInitialState, createPlayerCharacter } from '../../src/engine/core/index.ts';
 import {
@@ -141,7 +141,81 @@ const skillFailBranchEnemy: DialogueEnemyDef = {
   },
 };
 
+const terminalDefeatDialogue: DialogueEnemyDef = {
+  id: 'dlg_terminal_defeat',
+  name: 'Teste derrota terminal',
+  sprite: 'X',
+  tensionMax: 10,
+  graph: {
+    rootNodeId: 'r',
+    nodes: {
+      r: {
+        linePt: 'Escolhe.',
+        choices: [
+          {
+            textPt: 'Ir para derrota',
+            resolution: { kind: 'fixed', nextNodeId: 'lose' },
+          },
+        ],
+      },
+      lose: {
+        linePt: 'Perdeste o duelo de palavras.',
+        terminal: 'defeat',
+      },
+    },
+  },
+};
+
 describe('dialogue combat', () => {
+  it('ends on terminal defeat and navigates to onDefeat scene', () => {
+    DialogueEnemyDefSchema.parse(terminalDefeatDialogue);
+    const data = createTestData();
+    data.dialogueEnemies = { dlg_terminal_defeat: terminalDefeatDialogue };
+    const enc: Encounter = {
+      combatType: 'dialogue',
+      id: 'dlg_td_enc',
+      dialogueEnemyId: 'dlg_terminal_defeat',
+      xpReward: 0,
+    };
+    data.encounters = { dlg_td_enc: enc };
+    let state = createInitialState(testCampaign, 200);
+    state.party = [createPlayerCharacter('Hero', 'knight')];
+    state = beginEncounter(state, enc, data, {
+      returnScene: 'hub',
+      onVictory: 'won_scene',
+      onDefeat: 'lost_scene',
+    });
+    const after = resolveDialogueChoice(state, 0, data);
+    expect(after.mode).toBe('story');
+    expect(after.dialogueCombat).toBeNull();
+    expect(after.sceneId).toBe('lost_scene');
+    expect(after.lastCombatXpGain).toBeNull();
+  });
+
+  it('calvario act4_morvayn_parley dialogue graph parses', () => {
+    DialogueEnemyDefSchema.parse(dialogueEnemies.act4_morvayn_parley);
+    const leaves = Object.values(dialogueEnemies.act4_morvayn_parley.graph.nodes).filter(
+      (n) => n.terminal === 'victory' || n.terminal === 'defeat'
+    );
+    expect(leaves.length).toBe(2);
+  });
+
+  it('calvario high-priority dialogue enemies parse', () => {
+    for (const id of [
+      'act3_cult_negotiate_verbal',
+      'act2_vigilia_envoy_verbal',
+      'act2_circulo_envoy_verbal',
+      'act2_culto_envoy_verbal',
+      'act6_mirror_sovereign_verbal',
+      'kael_rival_act2_verbal',
+      'kael_rival_act4_verbal',
+      'kael_rival_act5_verbal',
+      'kael_rival_act6_verbal',
+    ] as const) {
+      DialogueEnemyDefSchema.parse(dialogueEnemies[id]);
+    }
+  });
+
   it('begins in dialogue_combat mode with runtime node and tension HP', () => {
     const data = createTestData();
     data.dialogueEnemies = { dlg_dummy: tinyDialogueEnemy };

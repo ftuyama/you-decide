@@ -25,6 +25,93 @@ main.main--combat {
   }
 }
 
+/** Confronto verbal: inimigo em cima (largura total); conversa + réplicas em baixo. */
+.combat-layout.combat-layout--verbal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  align-items: stretch;
+}
+
+.combat-enemies-column--verbal {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.6rem 0.75rem;
+}
+
+.combat-log-column--verbal {
+  width: 100%;
+  box-sizing: border-box;
+  max-height: calc(100vh - 10rem);
+}
+
+.combat-log-outer--verbal {
+  max-height: min(88vh, 60rem);
+  min-height: 26rem;
+}
+
+/* Scroll verbal: `flex:1` no `.combat-log-scroll` fazia crescer até ao painel; `max-height` + `flex: 0 1 auto` e `margin-top: auto` nas réplicas repartem o espaço. */
+.combat-dialogue-log-panel--verbal .combat-dialogue-composer {
+  margin-top: auto;
+}
+
+.combat-log-scroll.combat-log-scroll--verbal {
+  flex: 0 1 auto;
+  min-height: 12rem;
+  max-height: min(42vh, 22rem);
+}
+
+.enemy-panel--verbal {
+  padding: 0.5rem 0.55rem;
+}
+
+.enemy-panel--verbal .enemy-panel-header {
+  flex-wrap: wrap;
+  margin-bottom: 0.22rem;
+}
+
+.enemy-panel--verbal .enemy-panel-header.enemy-panel-header--verbal-only {
+  justify-content: flex-start;
+  margin-bottom: 0.12rem;
+}
+
+.enemy-panel--verbal .enemy-panel-header strong {
+  font-size: 0.82rem;
+  line-height: 1.25;
+}
+
+.enemy-panel--verbal .enemy-hp-text {
+  font-size: 0.68rem;
+}
+
+.enemy-verbal-hostility {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  margin-top: 0.35rem;
+}
+
+.enemy-panel--verbal .enemy-hp-text--verbal-hostility {
+  font-size: 0.68rem;
+  line-height: 1.2;
+}
+
+.enemy-panel--verbal .enemy-hp-track.enemy-hp-track--verbal-below-sprite {
+  height: 5px;
+  margin: 0;
+}
+
+.enemy-sprite-stack--verbal {
+  margin: 0.35rem 0 0;
+  min-height: auto;
+}
+
+.enemy-sprite.enemy-sprite--verbal {
+  font-size: 0.52rem;
+  line-height: 1.12;
+  min-height: 3.25rem;
+}
+
 .combat-enemies-column {
   min-width: 0;
   border: 1px solid var(--border);
@@ -212,6 +299,10 @@ button.combat-flee-btn:hover {
     top: auto;
     max-height: none;
   }
+
+  .combat-log-column--verbal {
+    max-height: none;
+  }
 }
 
 /** Caixa: dados + log — contraste e altura útil na coluna direita */
@@ -235,6 +326,11 @@ button.combat-flee-btn:hover {
   .combat-log-outer {
     max-height: min(56vh, 28rem);
     min-height: 14rem;
+  }
+
+  .combat-log-outer--verbal {
+    max-height: min(74vh, 44rem);
+    min-height: 22rem;
   }
 }
 
@@ -2035,21 +2131,41 @@ button.combat-boss-twist-continue:hover {
 }
 
 /* Combate de diálogo */
-.combat-dialogue-node-line {
-  margin: 0.5rem 0 0.75rem;
-  padding: 0.5rem 0.65rem;
-  font-size: 0.95rem;
-  line-height: 1.5;
-  color: var(--text-muted);
-  border-left: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
-  background: color-mix(in srgb, var(--panel-overlay-28) 88%, transparent);
-  border-radius: 2px;
+.combat-dialogue-hdr {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin: 0 0 0.42rem;
+  padding-bottom: 0.32rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
+}
+
+.combat-dialogue-composer {
+  flex-shrink: 0;
+  padding: 0.5rem 0.6rem 0.65rem;
+  border-top: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+  background: color-mix(in srgb, var(--surface-inset) 40%, transparent);
 }
 
 .combat-dialogue-choices {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+}
+
+.combat-dialogue-choices--composer {
+  width: 100%;
+  max-width: none;
+  margin-top: 0.15rem;
+}
+
+.combat-dialogue-choices--composer > .combat-dialogue-choice {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 button.combat-dialogue-choice {
@@ -2216,12 +2332,12 @@ button.combat-dialogue-choice:hover:not(:disabled) {
   flex-direction: column;
   align-items: flex-end;
   gap: 0.38rem;
-  max-width: min(100%, 22rem);
+  max-width: min(100%, 36rem);
 }
 
 .combat-dialogue-bubble {
-  max-width: min(100%, 20rem);
-  padding: 0.42rem 0.55rem 0.48rem;
+  max-width: min(100%, 35rem);
+  padding: 0.42rem 0.62rem 0.48rem;
   border-radius: 10px;
   border: 1px solid color-mix(in srgb, var(--border) 55%, transparent);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
@@ -2246,6 +2362,7 @@ button.combat-dialogue-choice:hover:not(:disabled) {
 }
 
 .combat-dialogue-bubble--npc {
+  max-width: min(100%, 48rem);
   border-color: color-mix(in srgb, #a05848 55%, var(--border));
   background: color-mix(in srgb, rgba(110, 48, 42, 0.14) 100%, var(--panel-overlay-35));
 }
@@ -2255,6 +2372,7 @@ button.combat-dialogue-choice:hover:not(:disabled) {
 }
 
 .combat-dialogue-bubble--player {
+  max-width: min(100%, 36rem);
   border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
   background: color-mix(in srgb, var(--accent) 10%, var(--panel-overlay-35));
 }
@@ -2264,7 +2382,7 @@ button.combat-dialogue-choice:hover:not(:disabled) {
 }
 
 .combat-dialogue-bubble--roll {
-  max-width: min(100%, 19rem);
+  max-width: min(100%, 24rem);
   padding-top: 0.35rem;
   border-style: dashed;
   border-color: color-mix(in srgb, var(--border) 70%, transparent);

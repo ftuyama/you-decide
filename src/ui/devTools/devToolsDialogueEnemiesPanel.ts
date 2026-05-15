@@ -221,6 +221,11 @@ export function mountDialogueEnemiesPanel(
       tag.className = 'dev-tools-dialogue-enemies-sim-tag dev-tools-dialogue-enemies-sim-tag--victory';
       tag.textContent = 'vitória';
       nodeBar.appendChild(tag);
+    } else if (node.terminal === 'defeat') {
+      const tag = document.createElement('span');
+      tag.className = 'dev-tools-dialogue-enemies-sim-tag dev-tools-dialogue-enemies-sim-tag--defeat';
+      tag.textContent = 'derrota';
+      nodeBar.appendChild(tag);
     }
     simBody.appendChild(nodeBar);
 
@@ -236,12 +241,20 @@ export function mountDialogueEnemiesPanel(
       simBody.appendChild(endNote);
       return;
     }
+    if (node.terminal === 'defeat') {
+      const endNote = document.createElement('p');
+      endNote.className = 'dev-tools-dialogue-enemies-sim-endnote';
+      endNote.textContent = 'Fim do ramo (derrota no confronto de diálogo). Usa «Recomeçar» para voltar ao início.';
+      simBody.appendChild(endNote);
+      return;
+    }
 
     const choices = node.choices ?? [];
     if (choices.length === 0) {
       const dead = document.createElement('p');
       dead.className = 'dev-tools-missing';
-      dead.textContent = 'Nó sem escolhas e sem terminal:victory — grafo inválido para este simulador.';
+      dead.textContent =
+        'Nó sem escolhas e sem terminal:victory nem terminal:defeat — grafo inválido para este simulador.';
       simBody.appendChild(dead);
       return;
     }

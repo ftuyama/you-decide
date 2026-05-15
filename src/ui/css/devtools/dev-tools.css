@@ -485,6 +485,12 @@
   background: color-mix(in srgb, #6ecf9a 12%, transparent);
 }
 
+.dev-tools-dialogue-enemies-sim-tag--defeat {
+  color: color-mix(in srgb, #cf6e6e 85%, var(--text));
+  border-color: color-mix(in srgb, #cf6e6e 35%, var(--border));
+  background: color-mix(in srgb, #cf6e6e 12%, transparent);
+}
+
 .dev-tools-dialogue-enemies-sim-line {
   margin: 0 0 1rem;
   font-size: 0.9rem;

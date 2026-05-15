@@ -74,11 +74,11 @@ export const DialogueNodeSchema = z
   .object({
     linePt: z.string(),
     /** Ao entrar neste nó, vitória imediata (combate de diálogo). */
-    terminal: z.enum(['victory']).optional(),
+    terminal: z.enum(['victory', 'defeat']).optional(),
     choices: z.array(DialogueChoiceSchema).optional(),
   })
   .superRefine((node, ctx) => {
-    if (node.terminal === 'victory') return;
+    if (node.terminal === 'victory' || node.terminal === 'defeat') return;
     if (!node.choices || node.choices.length < 1) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

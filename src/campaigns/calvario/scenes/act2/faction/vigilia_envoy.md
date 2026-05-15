@@ -15,11 +15,11 @@ choices:
     condition: { rep: { faction: vigilia, lte: -2 } }
     effects:
       - op: startCombat
-        encounterId: vigil_hunter_fight
-        onVictory: act2/hub_catacomb
+        encounterId: act2_vigilia_envoy_dialogue
+        onVictory: act2/faction/vigilia_envoy_verbal_win
+        onDefeat: act2/faction/vigilia_envoy_blades
         onFlee: act2/hub_catacomb
-        onDefeat: shared/game_over
-    preview: "Combate · caçador"
+    preview: "Confronto verbal (rascunho); falha leva ao combate."
   - text: "Recuar para o cruzeiro"
     next: act2/hub_catacomb
 onEnter:

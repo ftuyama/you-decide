@@ -12,13 +12,13 @@ choices:
       all:
         - { noFlag: kaelsworn_recruited }
         - { noFlag: kr_won_act2 }
-    preview: "Encontro especial: Kael, o Rastreador Cinzento."
+    preview: "Confronto verbal com Kael (rascunho); falha leva ao ferro."
     effects:
       - op: startCombat
-        encounterId: kael_rival_act2
+        encounterId: kael_rival_act2_dialogue
         onVictory: shared/kaelsworn_post_act2
+        onDefeat: shared/kael_act2_blades
         onFlee: act2/skeleton_room
-        onDefeat: shared/game_over
   - text: "Forçar a porta"
     next: act2/encounters/skeleton_combat_intro
 onEnter: []

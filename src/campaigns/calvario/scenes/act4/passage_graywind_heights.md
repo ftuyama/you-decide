@@ -9,13 +9,13 @@ choices:
       all:
         - { noFlag: kaelsworn_recruited }
         - { noFlag: kr_won_act4 }
-    preview: "Encontro especial: Kael, o Rastreador Cinzento."
+    preview: "Confronto verbal com Kael (rascunho); falha leva ao ferro."
     effects:
       - op: startCombat
-        encounterId: kael_rival_act4
+        encounterId: kael_rival_act4_dialogue
         onVictory: shared/kaelsworn_post_act4
+        onDefeat: shared/kael_act4_blades
         onFlee: act4/passage_graywind_heights
-        onDefeat: shared/game_over
   - text: "Partir rumo às Cimeiras do Vento Cinzento — seguir o rumor do gelo"
     next: act5/frost_opening
     preview: "Capítulo 5. Longe do trono, o frio ainda pergunta quem manda no silêncio."

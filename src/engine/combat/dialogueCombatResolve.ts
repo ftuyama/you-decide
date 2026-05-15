@@ -185,6 +185,15 @@ export function resolveDialogueChoice(
 
   log.push({ kind: 'interlocutor_line', message: nextNode.linePt });
 
+  if (nextNode.terminal === 'defeat') {
+    const sLose: GameState = {
+      ...s,
+      party,
+      dialogueCombat: { ...d, tensionHp, nodeId: nextNodeId, log },
+    };
+    return finishDialogueCombat(sLose, false, data, bus);
+  }
+
   if (nextNode.terminal === 'victory') {
     const sWin: GameState = {
       ...s,

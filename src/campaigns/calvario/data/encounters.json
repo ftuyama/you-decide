@@ -662,5 +662,65 @@
     "combatType": "dialogue",
     "id": "act1_mirror_dialogue",
     "dialogueEnemyId": "act1_mirror_twin"
+  },
+  "act4_morvayn_parley_dialogue": {
+    "combatType": "dialogue",
+    "id": "act4_morvayn_parley_dialogue",
+    "dialogueEnemyId": "act4_morvayn_parley",
+    "xpReward": 0
+  },
+  "act3_cult_negotiate_dialogue": {
+    "combatType": "dialogue",
+    "id": "act3_cult_negotiate_dialogue",
+    "dialogueEnemyId": "act3_cult_negotiate_verbal",
+    "xpReward": 0
+  },
+  "act2_vigilia_envoy_dialogue": {
+    "combatType": "dialogue",
+    "id": "act2_vigilia_envoy_dialogue",
+    "dialogueEnemyId": "act2_vigilia_envoy_verbal",
+    "xpReward": 0
+  },
+  "act2_circulo_envoy_dialogue": {
+    "combatType": "dialogue",
+    "id": "act2_circulo_envoy_dialogue",
+    "dialogueEnemyId": "act2_circulo_envoy_verbal",
+    "xpReward": 0
+  },
+  "act2_culto_envoy_dialogue": {
+    "combatType": "dialogue",
+    "id": "act2_culto_envoy_dialogue",
+    "dialogueEnemyId": "act2_culto_envoy_verbal",
+    "xpReward": 0
+  },
+  "act6_mirror_sovereign_dialogue": {
+    "combatType": "dialogue",
+    "id": "act6_mirror_sovereign_dialogue",
+    "dialogueEnemyId": "act6_mirror_sovereign_verbal",
+    "xpReward": 0
+  },
+  "kael_rival_act2_dialogue": {
+    "combatType": "dialogue",
+    "id": "kael_rival_act2_dialogue",
+    "dialogueEnemyId": "kael_rival_act2_verbal",
+    "xpReward": 5
+  },
+  "kael_rival_act4_dialogue": {
+    "combatType": "dialogue",
+    "id": "kael_rival_act4_dialogue",
+    "dialogueEnemyId": "kael_rival_act4_verbal",
+    "xpReward": 15
+  },
+  "kael_rival_act5_dialogue": {
+    "combatType": "dialogue",
+    "id": "kael_rival_act5_dialogue",
+    "dialogueEnemyId": "kael_rival_act5_verbal",
+    "xpReward": 25
+  },
+  "kael_rival_act6_dialogue": {
+    "combatType": "dialogue",
+    "id": "kael_rival_act6_dialogue",
+    "dialogueEnemyId": "kael_rival_act6_verbal",
+    "xpReward": 35
   }
 }

@@ -58,6 +58,16 @@ choices:
       - { op: setFlag, key: act3_negotiate_done, value: true }
       - { op: addRep, faction: vigilia, delta: 1 }
       - { op: addDiary, text: "Não disse 'não' — disse o nome de quem mandou. Bastou para o silêncio dele." }
+  - text: "Ensaiar cada cláusula em voz mínima — confronto verbal (rascunho)"
+    uiSection: "Pacto"
+    condition: { noFlag: act3_negotiate_done }
+    preview: "Tensão e rolagens; vitória fecha o pacto como a oferta; falha leva ao ferro."
+    effects:
+      - op: startCombat
+        encounterId: act3_cult_negotiate_dialogue
+        onVictory: act3/lore/cult_negotiate_verbal_win
+        onDefeat: act3/lore/cult_negotiate_verbal_fail
+        onFlee: act3/hub_depths
   - text: "[!] Atacar — ferro antes de palavra"
     uiSection: "Pacto"
     condition: { noFlag: act3_negotiate_done }

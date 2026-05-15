@@ -230,7 +230,7 @@ export class GameApp {
         if (!isDigit && !isLetter) return;
         const targetKey = isDigit ? e.key : k;
         const btn = this.root.querySelector<HTMLButtonElement>(
-          `.story-shell .combat-actions-panel button[data-quick-nav-combat="${targetKey}"]:not([disabled])`
+          `.story-shell button[data-quick-nav-combat="${targetKey}"]:not([disabled])`
         );
         if (!btn) return;
         e.preventDefault();

@@ -345,21 +345,21 @@ export function renderDialogueCombatInto(
   const combatantNames = [...ctx.state.party.map((m) => m.name), dlgDef.name];
 
   const layout = document.createElement('div');
-  layout.className = 'combat-layout';
+  layout.className = 'combat-layout combat-layout--verbal';
 
-  const left = document.createElement('div');
-  left.className = 'combat-enemies-column';
+  const mainCol = document.createElement('div');
+  mainCol.className = 'combat-log-column combat-log-column--verbal';
+
+  const sideCol = document.createElement('div');
+  sideCol.className = 'combat-enemies-column combat-enemies-column--verbal';
   const panel = document.createElement('div');
-  panel.className = 'enemy-panel';
+  panel.className = 'enemy-panel enemy-panel--verbal';
   const hpPct = Math.max(0, Math.min(100, Math.round((d.tensionHp / d.tensionMax) * 100)));
-  panel.innerHTML = `<div class="enemy-panel-header"><strong>${escHtml(dlgDef.name)}</strong><span class="enemy-hp-text">Hostilidade ${d.tensionHp}/${d.tensionMax}</span></div>
-    <div class="enemy-hp-track" title="Hostilidade ${d.tensionHp}/${d.tensionMax}">
-      <div class="enemy-hp-fill" style="width:${hpPct}%"></div>
-    </div>`;
+  panel.innerHTML = `<div class="enemy-panel-header enemy-panel-header--verbal-only"><strong>${escHtml(dlgDef.name)}</strong></div>`;
   const stack = document.createElement('div');
-  stack.className = 'enemy-sprite-stack';
+  stack.className = 'enemy-sprite-stack enemy-sprite-stack--verbal';
   const pre = document.createElement('pre');
-  pre.className = 'enemy-sprite';
+  pre.className = 'enemy-sprite enemy-sprite--verbal';
   if (verbalSpriteCrit) {
     pre.classList.add('crit-flash');
   }
@@ -386,15 +386,21 @@ export function renderDialogueCombatInto(
   }
   stack.appendChild(dmgFloatRoot);
   panel.appendChild(stack);
-  left.appendChild(panel);
+  const hostilityBlock = document.createElement('div');
+  hostilityBlock.className = 'enemy-verbal-hostility';
+  const hpLabel = document.createElement('span');
+  hpLabel.className = 'enemy-hp-text enemy-hp-text--verbal-hostility';
+  hpLabel.textContent = `Hostilidade ${d.tensionHp}/${d.tensionMax}`;
+  const hpTrack = document.createElement('div');
+  hpTrack.className = 'enemy-hp-track enemy-hp-track--verbal-below-sprite';
+  hpTrack.title = `Hostilidade ${d.tensionHp}/${d.tensionMax}`;
+  hpTrack.innerHTML = `<div class="enemy-hp-fill" style="width:${hpPct}%"></div>`;
+  hostilityBlock.appendChild(hpLabel);
+  hostilityBlock.appendChild(hpTrack);
+  panel.appendChild(hostilityBlock);
+  sideCol.appendChild(panel);
 
   const lead = ctx.state.party[0];
-  const actionsPanel = document.createElement('div');
-  actionsPanel.className = 'combat-actions-panel';
-  const actionsHdr = document.createElement('div');
-  actionsHdr.className = 'combat-actions-panel-hdr';
-  actionsHdr.textContent = 'Diálogo';
-  actionsPanel.appendChild(actionsHdr);
 
   let combatQuickNavIndex = 0;
   const decorateCombatQuickNav = (
@@ -417,29 +423,53 @@ export function renderDialogueCombatInto(
     }
   };
 
+  const logOuter = document.createElement('div');
+  logOuter.className = 'combat-log-outer combat-log-outer--verbal';
+  const logPanel = document.createElement('div');
+  logPanel.className = 'dice-panel combat-dialogue-log-panel combat-dialogue-log-panel--verbal';
+  const logHdr = document.createElement('div');
+  logHdr.className = 'dice-panel-header';
+  logHdr.textContent = 'Conversa';
+  logHdr.title =
+    'Nome do interlocutor e retrato em cima; hostilidade e barra por baixo do retrato. Histórico e réplicas na coluna da conversa. Teclas 1–9 (e letras seguintes) escolhem réplica. Rolagens ficam no registo.';
+  logPanel.appendChild(logHdr);
+
+  const logScroll = document.createElement('div');
+  logScroll.className = 'combat-log-scroll combat-log-scroll--verbal';
+  logScroll.title = logHdr.title;
+  logScroll.setAttribute('role', 'log');
+  logScroll.setAttribute('aria-live', 'polite');
+  logScroll.setAttribute('aria-relevant', 'additions text');
+  const logStack = document.createElement('div');
+  logStack.className = 'combat-log-stack combat-dialogue-log-stack';
+  appendDialogueChatLog(logStack, d.log, combatantNames, {
+    npcLabel: dlgDef.name,
+    heroLabel: lead?.name ?? 'Tu',
+    firstNewIndex: firstNewLogIndex,
+  });
+  logScroll.appendChild(logStack);
+  logPanel.appendChild(logScroll);
+
   if (dlgCtx && lead) {
     const choices = dlgCtx.node.choices ?? [];
     if (choices.length > 0) {
       const dialogueBar = document.createElement('div');
-      dialogueBar.className = 'combat-dialogue-bar';
+      dialogueBar.className = 'combat-dialogue-composer';
+      dialogueBar.setAttribute('aria-label', 'Réplicas do confronto verbal');
       appendCombatSectionHeader(
         dialogueBar,
         'combat-dialogue-hdr',
         'Réplicas',
-        'Escolhe uma resposta. O registo à direita mostra a conversa; escolhas com teste mostram a rolagem em baixo.',
-        'Réplicas do confronto verbal'
+        'Escolhe uma réplica (ou usa as teclas indicadas em cada botão). Rolagens e efeitos aparecem no histórico, ligados à tua mensagem.',
+        'Ajuda: réplicas do confronto verbal'
       );
-      const lineBox = document.createElement('div');
-      lineBox.className = 'combat-dialogue-node-line';
-      lineBox.textContent = dlgCtx.node.linePt;
-      dialogueBar.appendChild(lineBox);
       const btnRow = document.createElement('div');
-      btnRow.className = 'combat-dialogue-choices';
+      btnRow.className = 'combat-dialogue-choices combat-dialogue-choices--composer';
       for (let ci = 0; ci < choices.length; ci++) {
         const ch = choices[ci]!;
         const btn = document.createElement('button');
         btn.type = 'button';
-        btn.className = 'combat-dialogue-choice';
+        btn.className = 'combat-dialogue-choice combat-dialogue-choice--composer';
         const labelMain = document.createElement('span');
         labelMain.className = 'combat-dialogue-choice-label';
         btn.appendChild(labelMain);
@@ -475,49 +505,24 @@ export function renderDialogueCombatInto(
         btnRow.appendChild(btn);
       }
       dialogueBar.appendChild(btnRow);
-      actionsPanel.appendChild(dialogueBar);
+      logPanel.appendChild(dialogueBar);
     }
   }
 
-  left.appendChild(actionsPanel);
-
-  const right = document.createElement('div');
-  right.className = 'combat-log-column';
-  const logOuter = document.createElement('div');
-  logOuter.className = 'combat-log-outer';
-  const logPanel = document.createElement('div');
-  logPanel.className = 'dice-panel combat-dialogue-log-panel';
-  const logHdr = document.createElement('div');
-  logHdr.className = 'dice-panel-header';
-  logHdr.textContent = 'Conversa';
-  logHdr.title =
-    'Réplicas à esquerda (reflexo) e à direita (tu); rolagens e efeitos ficam agrupados com a tua resposta.';
-  logPanel.appendChild(logHdr);
-
-  const logScroll = document.createElement('div');
-  logScroll.className = 'combat-log-scroll';
-  logScroll.title = logHdr.title;
-  logScroll.setAttribute('role', 'log');
-  logScroll.setAttribute('aria-live', 'polite');
-  logScroll.setAttribute('aria-relevant', 'additions text');
-  const logStack = document.createElement('div');
-  logStack.className = 'combat-log-stack combat-dialogue-log-stack';
-  appendDialogueChatLog(logStack, d.log, combatantNames, {
-    npcLabel: dlgDef.name,
-    heroLabel: lead?.name ?? 'Tu',
-    firstNewIndex: firstNewLogIndex,
-  });
-  logScroll.appendChild(logStack);
-  logPanel.appendChild(logScroll);
   logOuter.appendChild(logPanel);
-  right.appendChild(logOuter);
+  mainCol.appendChild(logOuter);
 
-  layout.appendChild(left);
-  layout.appendChild(right);
+  layout.appendChild(sideCol);
+  layout.appendChild(mainCol);
   inner.appendChild(layout);
   shell.appendChild(inner);
 
-  window.requestAnimationFrame(() => {
+  const scrollVerbalLogToBottom = (): void => {
     logScroll.scrollTop = logScroll.scrollHeight;
+  };
+  scrollVerbalLogToBottom();
+  window.requestAnimationFrame(() => {
+    scrollVerbalLogToBottom();
+    window.requestAnimationFrame(scrollVerbalLogToBottom);
   });
 }

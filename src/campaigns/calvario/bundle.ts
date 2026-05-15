@@ -14,7 +14,7 @@ import { validateExplorationGraphCatalog } from '../../engine/world/index.ts';
 import type { CampaignUIAdapter } from '../campaignUi.ts';
 import campaignIndex from './index.json';
 import { enemies as enemiesTs } from './data/enemies.ts';
-import { dialogueEnemies as dialogueEnemiesTs } from './data/dialogueEnemies.ts';
+import { dialogueEnemies as dialogueEnemiesTs } from './data/dialogueEnemies/index.ts';
 import { items as itemsTs } from './data/items.ts';
 import encounters from './data/encounters.json';
 import companions from './data/companions.json';

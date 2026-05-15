@@ -29,11 +29,11 @@ choices:
     condition: { rep: { faction: culto, lte: -2 } }
     effects:
       - op: startCombat
-        encounterId: cultist_patrol
-        onVictory: act2/hub_catacomb
+        encounterId: act2_culto_envoy_dialogue
+        onVictory: act2/faction/culto_envoy_verbal_win
+        onDefeat: act2/faction/culto_envoy_blades
         onFlee: act2/hub_catacomb
-        onDefeat: shared/game_over
-    preview: "Combate · cultista"
+    preview: "Confronto verbal (rascunho); falha leva ao combate."
   - text: "Afastar-se do rumor"
     next: act2/hub_catacomb
 onEnter:

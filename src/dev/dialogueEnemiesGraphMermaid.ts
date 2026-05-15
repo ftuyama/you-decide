@@ -59,6 +59,8 @@ function buildNodeLabelHtml(nid: string, node: DialogueNode): string {
   let inner = `<span class='dev-dialogue-node-id'>[${idHtml}]</span>`;
   if (node.terminal === 'victory') {
     inner += `<br/><span class='dev-dialogue-node-badge'>vitória</span>`;
+  } else if (node.terminal === 'defeat') {
+    inner += `<br/><span class='dev-dialogue-node-badge'>derrota</span>`;
   }
   inner += `<br/><span class='dev-dialogue-node-line'>${lineHtml}</span>`;
   return inner;
@@ -96,6 +98,7 @@ export function dialogueGraphToMermaid(graph: DialogueGraph): string {
     'flowchart TD',
     '  classDef root fill:#1e3a5f,stroke:#7eb8ff,color:#f0f7ff,stroke-width:2px',
     '  classDef terminal fill:#1a3d2a,stroke:#6ecf8e,color:#e8fef0,stroke-width:2px',
+    '  classDef terminalDefeat fill:#3d1a1a,stroke:#cf6e6e,color:#fef0f0,stroke-width:2px',
     '  classDef mid fill:#252b38,stroke:#5a6a82,color:#e4e9f2,stroke-width:1px',
     '  classDef orphan fill:#3d2e18,stroke:#d4a84b,color:#fff6e0,stroke-width:1px',
   ];
@@ -106,15 +109,20 @@ export function dialogueGraphToMermaid(graph: DialogueGraph): string {
 
   for (const [nid, node] of Object.entries(graph.nodes)) {
     const isRoot = nid === graph.rootNodeId;
-    const isTerm = node.terminal === 'victory';
+    const isTermVictory = node.terminal === 'victory';
+    const isTermDefeat = node.terminal === 'defeat';
     const labelHtml = buildNodeLabelHtml(nid, node);
     lines.push(`  ${nid}["${labelHtml}"]`);
     if (isRoot) {
       lines.push(`  class ${nid} root`);
       styled.add(nid);
     }
-    if (isTerm) {
+    if (isTermVictory) {
       lines.push(`  class ${nid} terminal`);
+      styled.add(nid);
+    }
+    if (isTermDefeat) {
+      lines.push(`  class ${nid} terminalDefeat`);
       styled.add(nid);
     }
 

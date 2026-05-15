@@ -32,3 +32,4 @@ export const act6_wild_murmur_host = { sprite: S('act6_wild_murmur_host') };
 export const act6_wild_chain_penitent = { sprite: S('act6_wild_chain_penitent') };
 export const act6_wild_glass_regent = { sprite: S('act6_wild_glass_regent') };
 export const act6_wild_stain_preacher = { sprite: S('act6_wild_stain_preacher') };
+export const act1_mirror_twin = { sprite: S('act1_mirror_twin') };

@@ -657,5 +657,10 @@
     "playerAdvantage": false,
     "enemyAdvantage": false,
     "fleeRate": 0.56
+  },
+  "act1_mirror_dialogue": {
+    "combatType": "dialogue",
+    "id": "act1_mirror_dialogue",
+    "dialogueEnemyId": "act1_mirror_twin"
   }
 }

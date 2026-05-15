@@ -1,6 +1,6 @@
 import type { Character, ClassId, GameState, LevelUpStatDeltas, LevelUpStep } from '../schema/index.ts';
 import type { GameData } from '../data/gameData.ts';
-import type { Encounter } from '../schema/index.ts';
+import { isBattleEncounter, isDialogueEncounter, type Encounter } from '../schema/index.ts';
 import type { EventBus } from '../core/eventBus.ts';
 import { unlockSpellsForNewLevel } from '../progression/spellsKnown.ts';
 
@@ -77,14 +77,23 @@ function defaultXpFromEnemyDef(maxHp: number): number {
 }
 
 export function computeCombatXp(enc: Encounter, data: GameData): number {
-  let sum = 0;
-  for (const id of enc.enemies) {
-    const def = data.enemies[id];
-    if (!def) continue;
-    sum += def.xp !== undefined ? def.xp : defaultXpFromEnemyDef(def.maxHp);
+  if (isBattleEncounter(enc)) {
+    let sum = 0;
+    for (const id of enc.enemies) {
+      const def = data.enemies[id];
+      if (!def) continue;
+      sum += def.xp !== undefined ? def.xp : defaultXpFromEnemyDef(def.maxHp);
+    }
+    const bonus = enc.xpReward ?? 0;
+    return Math.max(0, sum + bonus);
   }
-  const bonus = enc.xpReward ?? 0;
-  return Math.max(0, sum + bonus);
+  if (isDialogueEncounter(enc)) {
+    const dlg = data.dialogueEnemies[enc.dialogueEnemyId];
+    const base = dlg ? defaultXpFromEnemyDef(dlg.tensionMax) : 0;
+    const bonus = enc.xpReward ?? 0;
+    return Math.max(0, base + bonus);
+  }
+  return 0;
 }
 
 const ZERO_DELTAS: LevelUpStatDeltas = {

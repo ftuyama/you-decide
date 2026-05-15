@@ -28,6 +28,7 @@ describe('xpToNextLevel', () => {
 describe('computeCombatXp', () => {
   it('sums enemy xp and encounter bonus', () => {
     const enc: Encounter = {
+      combatType: 'battle',
       id: 'e1',
       enemies: ['gob'],
       xpReward: 5,
@@ -53,6 +54,35 @@ describe('computeCombatXp', () => {
       },
     };
     expect(computeCombatXp(enc, data)).toBe(12 + 5);
+  });
+
+  it('dialogue encounter uses tensionMax base xp plus xpReward', () => {
+    const enc: Encounter = {
+      combatType: 'dialogue',
+      id: 'd1',
+      dialogueEnemyId: 'noop',
+      xpReward: 7,
+    };
+    expect(computeCombatXp(enc, minimalData)).toBe(7);
+    const dataWithDlg = {
+      ...minimalData,
+      dialogueEnemies: {
+        ...minimalData.dialogueEnemies,
+        dlg: {
+          id: 'dlg',
+          name: 'X',
+          sprite: 's',
+          tensionMax: 10,
+          graph: { rootNodeId: 'r', nodes: { r: { linePt: 'a', terminal: 'victory' as const } } },
+        },
+      },
+    };
+    const enc2: Encounter = {
+      combatType: 'dialogue',
+      id: 'd2',
+      dialogueEnemyId: 'dlg',
+    };
+    expect(computeCombatXp(enc2, dataWithDlg)).toBe(15);
   });
 });
 

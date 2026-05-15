@@ -12,7 +12,7 @@ export type ClassId = z.infer<typeof ClassIdSchema>;
 export const StanceSchema = z.enum(['aggressive', 'defensive', 'focus']);
 export type Stance = z.infer<typeof StanceSchema>;
 
-export const AppModeSchema = z.enum(['story', 'combat', 'modal']);
+export const AppModeSchema = z.enum(['story', 'combat', 'dialogue_combat', 'modal']);
 export type AppMode = z.infer<typeof AppModeSchema>;
 
 /** Condições declarativas reutilizáveis */
@@ -401,6 +401,7 @@ export const SceneFrontmatterSchema = z.object({
       'act2',
       'combat',
       'combat_rival',
+      'dialogue_combat',
       'camp',
       'boss',
       'act3',
@@ -432,6 +433,7 @@ export const SceneFrontmatterSchema = z.object({
    * Se true, na primeira visita com arte resolvida (`art` / `artKey`), mostra a arte em overlay
    * em tela cheia (hold configurável via `highlightHoldMs`, default ~1s) com fade-out (UI).
    * Com `artHighlightFrames` (2+ chaves), cicla quadros durante o hold.
+   * Com `artKey` definido, o overlay conta como já visto para todas as cenas que partilham essa chave.
    */
   highlight: z.boolean().optional(),
   /**

@@ -36,6 +36,7 @@ export function createInitialState(campaign: CampaignIndex, seed?: number): Game
     resources: { supply: 5, faith: 3, corruption: 0, gold: 8 },
     extraLifeReady: false,
     combat: null,
+    dialogueCombat: null,
     mode: 'story',
     modal: null,
     diary: [],
@@ -300,6 +301,7 @@ export function deserializeState(json: string): GameState {
     timedChoiceDeadline: null,
     activeBuffs: Array.isArray((o as GameState).activeBuffs) ? (o as GameState).activeBuffs : [],
     knownSpells: Array.isArray((o as GameState).knownSpells) ? (o as GameState).knownSpells : [],
+    dialogueCombat: ((o as Partial<GameState>).dialogueCombat ?? null) as GameState['dialogueCombat'],
     party: rawParty.map((p) => {
       let mana = typeof p.mana === 'number' ? p.mana : 0;
       let maxMana = typeof p.maxMana === 'number' ? p.maxMana : 0;
@@ -318,5 +320,17 @@ export function deserializeState(json: string): GameState {
       };
     }),
   };
-  return syncLeadPassiveStats(merged);
+  let out = syncLeadPassiveStats(merged);
+  const combatLegacy = out.combat as { phase?: string } | null | undefined;
+  if (combatLegacy && combatLegacy.phase === 'dialogue') {
+    console.warn(
+      'Save legado: combate de diálogo armazenado em CombatState foi descartado; volta à narrativa.'
+    );
+    out = {
+      ...out,
+      combat: null,
+      mode: out.mode === 'combat' ? 'story' : out.mode,
+    };
+  }
+  return out;
 }

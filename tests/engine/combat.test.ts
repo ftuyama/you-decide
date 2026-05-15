@@ -49,6 +49,12 @@ const dummyEnemy: EnemyDef = {
 function combatTestData() {
   const data = createTestData();
   data.enemies = { dummy: dummyEnemy };
+  data.encounters = {
+    flee_ok: { combatType: 'battle', id: 'flee_ok', enemies: ['dummy'], fleeRate: 1 },
+    flee_fail: { combatType: 'battle', id: 'flee_fail', enemies: ['dummy'], fleeRate: 0 },
+    flee_default: { combatType: 'battle', id: 'flee_default', enemies: ['dummy'] },
+    x: { combatType: 'battle', id: 'x', enemies: ['dummy'], fleeRate: 1 },
+  };
   return data;
 }
 
@@ -64,6 +70,7 @@ describe('fleeCombat', () => {
   it('escapes on success and goes to onFlee scene', () => {
     const data = combatTestData();
     const enc: Encounter = {
+      combatType: 'battle',
       id: 'flee_ok',
       enemies: ['dummy'],
       fleeRate: 1,
@@ -83,6 +90,7 @@ describe('fleeCombat', () => {
   it('failed flee consumes the player turn and advances to next player round', () => {
     const data = combatTestData();
     const enc: Encounter = {
+      combatType: 'battle',
       id: 'flee_fail',
       enemies: ['dummy'],
       fleeRate: 0,
@@ -103,6 +111,7 @@ describe('fleeCombat', () => {
   it('uses fleeRate 0.5 when encounter omits fleeRate', () => {
     const data = combatTestData();
     const enc: Encounter = {
+      combatType: 'battle',
       id: 'flee_default',
       enemies: ['dummy'],
     };
@@ -120,7 +129,7 @@ describe('fleeCombat', () => {
 
   it('no-ops when not in choose_stance phase', () => {
     const data = combatTestData();
-    const enc: Encounter = { id: 'x', enemies: ['dummy'], fleeRate: 1 };
+    const enc: Encounter = { combatType: 'battle', id: 'x', enemies: ['dummy'], fleeRate: 1 };
     let state = createInitialState(testCampaign, 1);
     state.party = [createPlayerCharacter('H', 'knight')];
     state = beginEncounter(state, enc, data, { returnScene: 'hub', onFlee: 'f' });

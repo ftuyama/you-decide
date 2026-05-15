@@ -2,16 +2,19 @@ import {
   CampaignIndexSchema,
   EncounterSchema,
   type CompanionDef,
+  type DialogueEnemyDef,
   type EnemyDef,
   type Encounter,
   type ItemDef,
   type SpellDef,
 } from '../../engine/schema/index.ts';
+import { DialogueEnemyDefSchema } from '../../engine/schema/dialogueCombat.ts';
 import { emptyGameData } from '../../engine/data/index.ts';
 import { validateExplorationGraphCatalog } from '../../engine/world/index.ts';
 import type { CampaignUIAdapter } from '../campaignUi.ts';
 import campaignIndex from './index.json';
 import { enemies as enemiesTs } from './data/enemies.ts';
+import { dialogueEnemies as dialogueEnemiesTs } from './data/dialogueEnemies.ts';
 import { items as itemsTs } from './data/items.ts';
 import encounters from './data/encounters.json';
 import companions from './data/companions.json';
@@ -48,10 +51,18 @@ export function loadCalvarioContent() {
   const idx = CampaignIndexSchema.parse(campaignIndex);
   const data = emptyGameData(idx, calvarioHeroNarrative);
   data.enemies = enemiesTs as Record<string, EnemyDef>;
-  const encRecord = encounters as Record<string, Encounter>;
+  for (const def of Object.values(dialogueEnemiesTs)) {
+    DialogueEnemyDefSchema.parse(def);
+  }
+  data.dialogueEnemies = dialogueEnemiesTs as Record<string, DialogueEnemyDef>;
+  const encRecord = encounters as unknown as Record<string, Encounter>;
   for (const enc of Object.values(encRecord)) {
     EncounterSchema.parse(enc);
-    if ((enc.twists?.length ?? 0) > 0 && !enc.isBoss) {
+    if (
+      enc.combatType === 'battle' &&
+      (enc.twists?.length ?? 0) > 0 &&
+      !enc.isBoss
+    ) {
       throw new Error(`[calvario] Encounter "${enc.id}" has twists but isBoss is not true`);
     }
   }

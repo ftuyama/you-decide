@@ -1,5 +1,6 @@
 import {
   CampaignIndexSchema,
+  EncounterSchema,
   type CompanionDef,
   type EnemyDef,
   type Encounter,
@@ -40,7 +41,12 @@ export function loadDemoContent() {
   const idx = CampaignIndexSchema.parse(campaignIndex);
   const data = emptyGameData(idx, demoHeroNarrative);
   data.enemies = enemiesTs as Record<string, EnemyDef>;
-  data.encounters = encounters as Record<string, Encounter>;
+  data.dialogueEnemies = {};
+  const encRecord = encounters as Record<string, Encounter>;
+  for (const enc of Object.values(encRecord)) {
+    EncounterSchema.parse(enc);
+  }
+  data.encounters = encRecord;
   data.items = itemsTs as Record<string, ItemDef>;
   data.companions = companions as Record<string, CompanionDef>;
   data.spells = spellsTs as Record<string, SpellDef>;

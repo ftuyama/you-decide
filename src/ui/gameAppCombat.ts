@@ -57,7 +57,7 @@ type PendingEnemyFloatingDamage = {
 
 let pendingEnemyFloatingDamage: PendingEnemyFloatingDamage[] = [];
 
-function rollFloatingDmgAnchor(reducedMotion: boolean): { leftPct: number; topPct: number } {
+export function rollFloatingDmgAnchor(reducedMotion: boolean): { leftPct: number; topPct: number } {
   const leftPct = Math.round((28 + Math.random() * 44) * 10) / 10;
   const topMin = reducedMotion ? 12 : 14;
   const topSpan = reducedMotion ? 16 : 20;
@@ -65,7 +65,7 @@ function rollFloatingDmgAnchor(reducedMotion: boolean): { leftPct: number; topPc
   return { leftPct, topPct };
 }
 
-function floatingEnemyDamageDurationMs(): number {
+export function floatingEnemyDamageDurationMs(): number {
   if (typeof document === 'undefined') return 2250;
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 1200 : 2250;
 }
@@ -82,7 +82,7 @@ function splitNewLogForEnemyTurnStagger(
   return { pre: entries.slice(0, idx), enemy: entries.slice(idx) };
 }
 
-function appendEnemyFloatingDamage(
+export function appendEnemyFloatingDamage(
   fxLayer: HTMLElement,
   amount: number,
   damageKind: 'crit' | 'normal' | undefined,
@@ -116,7 +116,7 @@ export function combatQuickKeyAt(index: number): string | null {
   return j < COMBAT_QUICK_KEYS_AFTER_9.length ? COMBAT_QUICK_KEYS_AFTER_9[j]! : null;
 }
 
-function combatShortcutTitle(btn: HTMLButtonElement): string {
+export function combatShortcutTitle(btn: HTMLButtonElement): string {
   const raw = btn.dataset.quickNavCombat;
   if (raw == null) return '';
   const keyDisplay =
@@ -141,7 +141,7 @@ const COMBAT_FLEE_SECTION_HINT_PT =
 const COMBAT_CONSUMABLES_SECTION_HINT_PT =
   'Cada uso gasta o turno. Consumíveis aplicam-se ao líder do grupo. Quantidade no inventário aparece no botão quando há mais de uma unidade. Passe o cursor em cada item para ver HP, mana, Stress e restrições.';
 
-function appendCombatSectionHeader(
+export function appendCombatSectionHeader(
   parent: HTMLElement,
   className: string,
   label: string,
@@ -623,6 +623,9 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
   const c = ctx.state.combat;
   if (!c) return;
 
+  const enc = ctx.registry.data.encounters[c.encounterId];
+  if (!enc) return;
+
   const encId = c.encounterId;
   const fxI = ctx.combatLog.fxCursor.index;
   const partyMemberNames = new Set(ctx.state.party.map((m) => m.name));
@@ -734,7 +737,8 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
   for (let enemyIdx = 0; enemyIdx < c.enemies.length; enemyIdx++) {
     const inst = c.enemies[enemyIdx]!;
     if (inst.hp <= 0) continue;
-    const def = ctx.registry.data.enemies[inst.defId];
+    const battleDef = ctx.registry.data.enemies[inst.defId];
+    const def = battleDef;
     if (!def) continue;
     const panel = document.createElement('div');
     panel.className = 'enemy-panel';
@@ -770,7 +774,7 @@ export function renderCombatInto(shell: HTMLElement, ctx: CombatRenderContext): 
       });
     }
     const hpPct = Math.max(0, Math.min(100, Math.round((inst.hp / inst.maxHp) * 100)));
-    panel.innerHTML = `<div class="enemy-panel-header"><strong>${escHtml(def.name)}</strong><span class="enemy-hp-text">${inst.hp}/${inst.maxHp}</span></div>
+    panel.innerHTML = `<div class="enemy-panel-header"><strong>${escHtml(def.name)}</strong><span class="enemy-hp-text">HP ${inst.hp}/${inst.maxHp}</span></div>
       <div class="enemy-hp-track" title="HP ${inst.hp}/${inst.maxHp}">
         <div class="enemy-hp-fill" style="width:${hpPct}%"></div>
       </div>`;

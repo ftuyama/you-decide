@@ -103,14 +103,24 @@ const ACTS: ActConfig[] = [
 
 // --------- Helpers de XP / encontros ---------
 
-type EncounterDef = { id: string; enemies: string[]; xpReward?: number; isBoss?: boolean };
+type EncounterDef = {
+  id: string;
+  combatType?: string;
+  enemies?: string[];
+  dialogueEnemyId?: string;
+  xpReward?: number;
+  isBoss?: boolean;
+};
 const encounters = encountersJson as Record<string, EncounterDef>;
 
 function encounterXp(encId: string): number | null {
   const enc = encounters[encId];
   if (!enc) return null;
+  if (enc.combatType === 'dialogue') {
+    return enc.xpReward ?? 0;
+  }
   let xp = enc.xpReward ?? 0;
-  for (const enemyId of enc.enemies) {
+  for (const enemyId of enc.enemies ?? []) {
     const def = enemies[enemyId];
     if (!def) continue;
     xp += def.xp ?? 10 + Math.floor(def.maxHp / 2);

@@ -329,7 +329,7 @@ function buildChromeDom(opts: MountAppChromeOptions): AppChromeRefs {
   devToolsBtn.type = 'button';
   devToolsBtn.className = 'menu-item';
   devToolsBtn.textContent = 'Ferramentas de desenvolvimento';
-  devToolsBtn.title = 'Itens, cenas, música, inimigos (?view=dev). Disponível com modo desenvolvedor.';
+  devToolsBtn.title = 'Itens, cenas, música, inimigos, diálogo (?view=dev). Disponível com modo desenvolvedor.';
   devToolsBtn.addEventListener('click', () => opts.onDevTools());
 
   const graphBtn = document.createElement('button');

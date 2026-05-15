@@ -34,6 +34,7 @@ export {
   resolveSceneArtHighlightFrames,
   collectArtKeysFromAnimatedHighlightScenes,
   collectHighlightHoldMsByAnimatedHighlightBase,
+  sceneArtHighlightDedupeKey,
 } from './story/storyArt.ts';
 
 function buildExplorationMovementRows(

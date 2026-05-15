@@ -5,6 +5,7 @@ import type {
   EnemyInstance,
   GameState,
 } from '../schema/index.ts';
+import { isBattleEncounter } from '../schema/index.ts';
 import type { GameData } from '../data/gameData.ts';
 import { finishCombat } from './resolution.ts';
 import type { EventBus } from '../core/eventBus.ts';
@@ -46,7 +47,7 @@ export function applyBossTwistsAfterEnemyPhase(
 } {
   const enc = data.encounters[c.encounterId];
   const twistLog: CombatLogEntry[] = [];
-  if (!enc?.isBoss || !enc.twists?.length) {
+  if (!isBattleEncounter(enc) || !enc.isBoss || !enc.twists?.length) {
     return { party, enemies, combatPatch: {}, twistLog };
   }
 

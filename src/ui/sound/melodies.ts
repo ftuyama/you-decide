@@ -124,3 +124,17 @@ export const ASH_SKY_MELODY: number[] = [
   130.81, // C3
   116.54, // A#2
 ];
+
+/** Combate verbal: 2ªs menores e quase-uníssono — tensão de espelho / duelo de palavras, sem percussão marcial. */
+export const DIALOGUE_COMBAT_MELODY: number[] = [
+  207.65, // G#3
+  196.0, // G3
+  220.0, // A3
+  246.94, // B3
+  233.08, // Bb3
+  196.0, // G3
+  174.61, // F3
+  164.81, // E3
+  174.61, // F3
+  196.0, // G3
+];

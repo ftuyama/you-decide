@@ -40,6 +40,7 @@ export function finishCombatFaithRescue(
     ...s,
     mode: 'story',
     combat: null,
+    dialogueCombat: null,
     sceneId: c.returnScene,
   });
   return s;
@@ -51,6 +52,71 @@ export function reducePartyStressAfterCombat(state: GameState): GameState {
     stress: Math.max(0, member.stress - 1),
   }));
   return { ...state, party };
+}
+
+/** Fim do confronto verbal: XP e loot como combate (sem loot de `enemies`). */
+export function finishDialogueCombat(
+  state: GameState,
+  victory: boolean,
+  data: GameData,
+  bus?: EventBus
+): GameState {
+  const d = state.dialogueCombat;
+  if (!d) return state;
+  const pick = (id: string | undefined, fallback: string): string => {
+    const t = id?.trim();
+    return t && t.length > 0 ? t : fallback;
+  };
+  const next = victory
+    ? pick(d.onVictory ?? d.returnScene, d.returnScene)
+    : pick(d.onDefeat, 'shared/game_over');
+  let s = state;
+  if (victory) {
+    const dlg = data.dialogueEnemies[d.dialogueEnemyId];
+    const lootRng = mulberry32(
+      (state.rngSeed + d.encounterId.length * 7919 + d.log.length * 97 + 503) >>> 0
+    );
+    const { state: afterLoot, lootLines } = applyLootFromDropSources(
+      s,
+      [{ drops: dlg?.lootDrops ?? [] }],
+      lootRng,
+      data
+    );
+    s = afterLoot;
+    let xpGain = 0;
+    let lastCombatLevelUps: GameState['lastCombatLevelUps'] = null;
+    const enc = data.encounters[d.encounterId];
+    if (enc) {
+      xpGain = computeCombatXp(enc, data);
+      if (xpGain > 0) {
+        const { state: afterXp, levelUps } = addXp(s, xpGain, { bus, data });
+        s = afterXp;
+        lastCombatLevelUps = levelUps.length > 0 ? levelUps : null;
+      }
+    }
+    s = {
+      ...s,
+      lastCombatXpGain: xpGain > 0 ? xpGain : null,
+      lastCombatLevelUps,
+      lastCombatLootLines: lootLines.length > 0 ? lootLines : null,
+    };
+    bus?.emit({ type: 'combat.end', victory: true });
+  } else {
+    s = {
+      ...s,
+      lastCombatXpGain: null,
+      lastCombatLevelUps: null,
+      lastCombatLootLines: null,
+    };
+    bus?.emit({ type: 'combat.end', victory: false });
+  }
+  s = reducePartyStressAfterCombat(s);
+  return tickActiveBuffs({
+    ...s,
+    mode: 'story',
+    dialogueCombat: null,
+    sceneId: next,
+  });
 }
 
 export function finishCombat(
@@ -104,6 +170,7 @@ export function finishCombat(
     ...s,
     mode: 'story',
     combat: null,
+    dialogueCombat: null,
     sceneId: next,
   });
 }
@@ -156,6 +223,19 @@ function applyEnemyLootOnVictory(
   c: CombatState,
   data: GameData
 ): { state: GameState; lootLines: string[] } {
+  const rng = mulberry32(state.rngSeed + c.round * 131 + c.enemies.length * 17);
+  const sources = c.enemies.map((inst) => ({
+    drops: data.enemies[inst.defId]?.lootDrops ?? [],
+  }));
+  return applyLootFromDropSources(state, sources, rng, data);
+}
+
+function applyLootFromDropSources(
+  state: GameState,
+  dropSources: readonly { drops: readonly EnemyLootDrop[] }[],
+  rng: () => number,
+  data: GameData
+): { state: GameState; lootLines: string[] } {
   let s = state;
   const resourceTotals: Record<'gold' | 'supply' | 'faith' | 'corruption', number> = {
     gold: 0,
@@ -165,11 +245,8 @@ function applyEnemyLootOnVictory(
   };
   const itemCounts = new Map<string, { display: string; count: number }>();
   const itemOrder: string[] = [];
-  const rng = mulberry32(state.rngSeed + c.round * 131 + c.enemies.length * 17);
-  for (const inst of c.enemies) {
-    const def = data.enemies[inst.defId];
-    if (!def?.lootDrops?.length) continue;
-    for (const drop of def.lootDrops) {
+  for (const src of dropSources) {
+    for (const drop of src.drops) {
       if (rng() >= drop.chance) continue;
       const next = applySingleLootDrop(s, drop, data);
       if (next === s) continue;

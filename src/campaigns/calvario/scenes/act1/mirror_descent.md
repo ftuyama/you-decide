@@ -10,6 +10,7 @@ choices:
   - text: "Afastar-se do brilho e voltar ao degrau anterior"
     next: act1/crawl_entrada
 onEnter:
+  - { op: setFlag, key: act1_mirror_dialogue_done, value: true }
   - { op: addDiary, text: "Vi-me num caco de espelho: um estranho com o meu nome." }
 ---
 Na argamassa, um **caco de espelho** — borda negra, luz a mentir — devolve *{{playerName}}* **cansado**, boca mais fechada do que lembravas.

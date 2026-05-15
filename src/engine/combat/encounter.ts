@@ -1,11 +1,13 @@
 import { mulberry32, roll2d6 } from '../core/rng.ts';
 import type {
+  BattleEncounter,
   CombatLogEntry,
   CombatState,
   Encounter,
   EnemyInstance,
   GameState,
 } from '../schema/index.ts';
+import { isDialogueEncounter } from '../schema/index.ts';
 import type { GameData } from '../data/gameData.ts';
 import { effectiveLeadAttr } from '../progression/leadStats.ts';
 
@@ -17,6 +19,73 @@ export function bumpRngSeed(state: GameState): GameState {
 export function beginEncounter(
   state: GameState,
   enc: Encounter,
+  data: GameData,
+  opts: {
+    returnScene: string;
+    onVictory?: string;
+    onFlee?: string;
+    onDefeat?: string;
+  }
+): GameState {
+  if (isDialogueEncounter(enc)) {
+    return beginDialogueEncounter(state, enc, data, opts);
+  }
+  return beginBattleEncounter(state, enc, data, opts);
+}
+
+function beginDialogueEncounter(
+  state: GameState,
+  enc: Extract<Encounter, { combatType: 'dialogue' }>,
+  data: GameData,
+  opts: {
+    returnScene: string;
+    onVictory?: string;
+    onFlee?: string;
+    onDefeat?: string;
+  }
+): GameState {
+  const dlgDef = data.dialogueEnemies[enc.dialogueEnemyId];
+  if (!dlgDef) {
+    console.error(`Dialogue enemy not found: ${enc.dialogueEnemyId} @ encounter ${enc.id}`);
+    return state;
+  }
+  const rootId = dlgDef.graph.rootNodeId;
+  const rootNode = dlgDef.graph.nodes[rootId];
+  if (!rootNode) {
+    console.error(`Dialogue graph missing root "${rootId}" @ ${enc.id}`);
+    return state;
+  }
+
+  const dialogueCombat = {
+    encounterId: enc.id,
+    dialogueEnemyId: enc.dialogueEnemyId,
+    nodeId: rootId,
+    tensionHp: dlgDef.tensionMax,
+    tensionMax: dlgDef.tensionMax,
+    log: [
+      { kind: 'info' as const, message: `${dlgDef.name} prende-te no reflexo.` },
+      { kind: 'interlocutor_line' as const, message: rootNode.linePt },
+    ],
+    returnScene: opts.returnScene,
+    onVictory: opts.onVictory,
+    onFlee: opts.onFlee,
+    onDefeat: opts.onDefeat,
+  };
+
+  const party = state.party.map((p) => ({ ...p, specialUsedThisCombat: false }));
+
+  return {
+    ...bumpRngSeed(state),
+    party,
+    mode: 'dialogue_combat',
+    combat: null,
+    dialogueCombat,
+  };
+}
+
+function beginBattleEncounter(
+  state: GameState,
+  enc: BattleEncounter,
   data: GameData,
   opts: {
     returnScene: string;
@@ -88,6 +157,7 @@ export function beginEncounter(
     party,
     mode: 'combat',
     combat,
+    dialogueCombat: null,
   };
 }
 
@@ -105,7 +175,7 @@ function buildTurnOrder(
     rolls.push({ id: `p:${p.id}`, score });
   }
   for (let i = 0; i < combat.enemies.length; i++) {
-    const def = data.enemies[combat.enemies[i].defId];
+    const def = data.enemies[combat.enemies[i]!.defId];
     if (!def) continue;
     const [d1, d2] = roll2d6(rng);
     rolls.push({ id: `e:${i}`, score: d1 + d2 + def.agi });

@@ -444,7 +444,7 @@ function mountMusicPanel(
   const note = document.createElement('p');
   note.className = 'dev-tools-note';
   note.textContent =
-    'Os temas "combat", "combat_rival" (encontros kael_rival_*) e "boss" são escolhidos em combate pelo jogo (não vêm do YAML das cenas). As contagens abaixo são só de cenas com ambientTheme explícito.';
+    'Os temas "combat", "combat_rival" (encontros kael_rival_*), "boss" e "dialogue_combat" são escolhidos em combate pelo jogo (não vêm do YAML das cenas). As contagens abaixo são só de cenas com ambientTheme explícito.';
 
   const table = document.createElement('table');
   table.className = 'dev-tools-table';
@@ -865,7 +865,7 @@ export function mountDevToolsView(root: HTMLElement, campaignId: string): void {
 
   const stats = document.createElement('div');
   stats.className = 'dev-tools-stats';
-  stats.textContent = `${scenes.size} cenas · ${Object.keys(bundle.data.items).length} itens · ${Object.keys(bundle.data.enemies).length} inimigos`;
+  stats.textContent = `${scenes.size} cenas · ${Object.keys(bundle.data.items).length} itens · ${Object.keys(bundle.data.enemies).length} inimigos · ${Object.keys(bundle.data.dialogueEnemies).length} diálogo`;
 
   toolbar.appendChild(title);
   toolbar.appendChild(campaignWrap);
@@ -889,6 +889,7 @@ export function mountDevToolsView(root: HTMLElement, campaignId: string): void {
       music: 'Música',
       visual: 'Paleta visual',
       enemies: 'Inimigos',
+      'dialogue-enemies': 'Diálogo',
       'ascii-web': 'Busca Web → Braille',
       ascii: 'Arte ASCII (Braille)',
       'ascii-bejamas': 'Arte ASCII (Bejamas IA)',
@@ -908,6 +909,25 @@ export function mountDevToolsView(root: HTMLElement, campaignId: string): void {
     case 'enemies':
       mountEnemiesPanel(main, bundle.data.enemies);
       break;
+    case 'dialogue-enemies': {
+      const loading = document.createElement('p');
+      loading.className = 'dev-tools-muted';
+      loading.textContent = 'A carregar…';
+      main.appendChild(loading);
+      void import('./devToolsDialogueEnemiesPanel.ts')
+        .then((m) => {
+          main.removeChild(loading);
+          m.mountDialogueEnemiesPanel(main, bundle.data.dialogueEnemies);
+        })
+        .catch((err: unknown) => {
+          main.removeChild(loading);
+          const p = document.createElement('p');
+          p.className = 'dev-tools-missing';
+          p.textContent = err instanceof Error ? err.message : String(err);
+          main.appendChild(p);
+        });
+      break;
+    }
     case 'music':
       mountMusicPanel(main, campaignId, ambientCounts);
       break;

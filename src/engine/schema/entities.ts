@@ -5,22 +5,11 @@ import {
   FactionIdSchema,
   StanceSchema,
 } from './core.ts';
+import { DialogueCombatStateSchema } from './dialogueCombat.ts';
+import { EnemyLootDropSchema } from './loot.ts';
 
 export const EnemyTypeSchema = z.enum(['normal', 'undead', 'armored', 'cultist']);
 export type EnemyType = z.infer<typeof EnemyTypeSchema>;
-
-export const EnemyLootDropSchema = z.union([
-  z.object({
-    chance: z.number().min(0).max(1),
-    itemId: z.string(),
-  }),
-  z.object({
-    chance: z.number().min(0).max(1),
-    resource: z.enum(['gold', 'supply', 'faith', 'corruption']),
-    amount: z.number().int().positive().default(1),
-  }),
-]);
-export type EnemyLootDrop = z.infer<typeof EnemyLootDropSchema>;
 
 export const EnemyAttackStrategySchema = z.enum(['random', 'focus_leader']);
 export type EnemyAttackStrategy = z.infer<typeof EnemyAttackStrategySchema>;
@@ -95,7 +84,8 @@ const BossTwistSchema = z.object({
   apply: z.array(BossTwistApplySchema).min(1),
 });
 
-export const EncounterSchema = z.object({
+const BattleEncounterSchema = z.object({
+  combatType: z.literal('battle'),
   id: z.string(),
   enemies: z.array(z.string()),
   /** Só encontros de boss podem declarar `twists`; o validador de dados exige correspondência. */
@@ -109,7 +99,33 @@ export const EncounterSchema = z.object({
   xpReward: z.number().int().min(0).optional(),
 });
 
+const DialogueEncounterSchema = z.object({
+  combatType: z.literal('dialogue'),
+  id: z.string(),
+  dialogueEnemyId: z.string(),
+  /** XP extra (soma ao XP base derivado de `dialogueEnemies[id].tensionMax`, mesma fórmula que inimigos sem `xp` fixo). */
+  xpReward: z.number().int().min(0).optional(),
+});
+
+export const EncounterSchema = z.preprocess((raw: unknown) => {
+  if (raw && typeof raw === 'object' && !('combatType' in raw)) {
+    return { ...(raw as Record<string, unknown>), combatType: 'battle' };
+  }
+  return raw;
+}, z.discriminatedUnion('combatType', [BattleEncounterSchema, DialogueEncounterSchema]));
+
 export type Encounter = z.infer<typeof EncounterSchema>;
+
+export type BattleEncounter = Extract<Encounter, { combatType: 'battle' }>;
+export type DialogueEncounter = Extract<Encounter, { combatType: 'dialogue' }>;
+
+export function isBattleEncounter(e: Encounter | undefined | null): e is BattleEncounter {
+  return e != null && e.combatType === 'battle';
+}
+
+export function isDialogueEncounter(e: Encounter | undefined | null): e is DialogueEncounter {
+  return e != null && e.combatType === 'dialogue';
+}
 
 export const ItemDefSchema = z.object({
   id: z.string(),
@@ -384,6 +400,8 @@ export const GameStateSchema = z.object({
     gold: z.number().int().min(0).max(999).default(0),
   }),
   combat: CombatStateSchema.nullable(),
+  /** Confronto verbal (piloto); separado de `combat` e do log de combate. */
+  dialogueCombat: DialogueCombatStateSchema.nullable().default(null),
   mode: AppModeSchema.default('story'),
   modal: z
     .object({
@@ -396,7 +414,10 @@ export const GameStateSchema = z.object({
   /** IDs de magias conhecidas pelo líder (combate e sidebar) */
   knownSpells: z.array(z.string()).default([]),
   visitedScenes: z.record(z.string(), z.boolean()).default({}),
-  /** Cenas em que o overlay `highlight` da arte já foi mostrado (persiste na gravação). */
+  /**
+   * Overlay `highlight` da arte já mostrado (persiste na gravação).
+   * Com `artKey` na cena: chave `art:<artKey>` (partilhado entre cenas); sem `artKey`: id da cena (legado).
+   */
   sceneArtHighlightShown: z.record(z.string(), z.boolean()).default({}),
   /** Mapa ASCII ativo; posição do jogador vem do grafo de exploração + `mapCell` do nó. */
   asciiMap: z

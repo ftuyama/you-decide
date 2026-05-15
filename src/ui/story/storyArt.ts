@@ -2,6 +2,18 @@ import type { SceneFrontmatter } from '../../engine/schema/index.ts';
 import type { ContentRegistry } from '../../content/registry.ts';
 import type { LoadedScene } from '../../engine/core/index.ts';
 
+/**
+ * Chave em `GameState.sceneArtHighlightShown`: uma vez por `artKey` quando definido no frontmatter;
+ * caso contrário mantém-se o comportamento antigo por `scene.id` (arte só inline / sem chave).
+ */
+export function sceneArtHighlightDedupeKey(
+  scene: Pick<LoadedScene, 'id' | 'frontmatter'>
+): string {
+  const k = scene.frontmatter.artKey?.trim();
+  if (k) return `art:${k}`;
+  return scene.id;
+}
+
 type SceneWithHighlightFm = {
   frontmatter: Pick<SceneFrontmatter, 'highlight' | 'artHighlightFrames' | 'highlightHoldMs'>;
 };

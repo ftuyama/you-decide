@@ -30,6 +30,7 @@ import {
   hasFactionPerkUnlocked,
 } from '../engine/progression/reputation.ts';
 import type { Choice, Effect, GameState } from '../engine/schema/index.ts';
+import { isDialogueEncounter } from '../engine/schema/index.ts';
 import { GameAudio, type AmbientTheme } from './sound/index.ts';
 import { buildDevToolsHref, buildScenesGraphHref } from './campaignUrl.ts';
 import { preserveExplorationNodeForChoiceEffects } from './gameAppUtils.ts';
@@ -41,10 +42,12 @@ import {
   slotReturnRewardDateKey,
 } from './gameAppSaveSlots.ts';
 import { appendCombatLogMessageWithBoldNames, renderCombatInto } from './gameAppCombat.ts';
+import { renderDialogueCombatInto } from './gameAppDialogueCombat.ts';
 import {
   renderStoryInto,
   resolveSceneArt,
   resolveSceneArtHighlightFrames,
+  sceneArtHighlightDedupeKey,
   SCENE_ART_HIGHLIGHT_HOLD_MS_DEFAULT,
   type StoryDiceBannerHost,
   type StoryRenderContext,
@@ -132,6 +135,12 @@ export class GameApp {
   private diaryBannerExiting = false;
   private itemBannerFadeTimer: ReturnType<typeof setTimeout> | null = null;
   private itemAcquireBannerExiting = false;
+  /** Índice até onde som do log do confronto verbal já foi consumido. */
+  private dialogueCombatLogCursor: { encounterId: string; index: number } = {
+    encounterId: '',
+    index: 0,
+  };
+
   /** Índice até onde som/FX do log de combate já foram consumidos (som e FX partilham o mesmo cursor). */
   private combatLogCursor: { encounterId: string; index: number } = { encounterId: '', index: 0 };
   /** Filas de mensagens de twist de boss (cada entrada = um lote mostrado de uma vez). */
@@ -214,7 +223,7 @@ export class GameApp {
         btn.click();
         return;
       }
-      if (this.state.mode === 'combat') {
+      if (this.state.mode === 'combat' || this.state.mode === 'dialogue_combat') {
         const k = e.key.length === 1 ? e.key.toLowerCase() : '';
         const isDigit = /^[1-9]$/.test(e.key);
         const isLetter = /^[a-z]$/.test(k);
@@ -602,7 +611,13 @@ export class GameApp {
         ? [
             ...this.state.party.map((m) => m.name),
             ...c.enemies
-              .map((e) => this.registry.data.enemies[e.defId]?.name)
+              .map((e) => {
+                const enc = this.registry.data.encounters[c.encounterId];
+                if (enc && isDialogueEncounter(enc)) {
+                  return this.registry.data.dialogueEnemies[e.defId]?.name;
+                }
+                return this.registry.data.enemies[e.defId]?.name;
+              })
               .filter((n): n is string => Boolean(n)),
           ]
         : this.state.party.map((m) => m.name);
@@ -683,6 +698,9 @@ export class GameApp {
       if (id.startsWith('boss_') || id.includes('boss')) return 'boss';
       if (id.startsWith('kael_rival')) return 'combat_rival';
       return 'combat';
+    }
+    if (this.state.mode === 'dialogue_combat' && this.state.dialogueCombat) {
+      return 'dialogue_combat';
     }
     const sceneTheme = this.registry.getScene(this.state.sceneId)?.frontmatter.ambientTheme;
     if (sceneTheme) {
@@ -830,9 +848,10 @@ export class GameApp {
 
   /** Não reentrar em cenas narrativas enquanto o combate está ativo (evita sobrescrever mode). */
   private stabilize(state: GameState): GameState {
+    state = this.migrateSceneArtHighlightLegacyKeys(state);
     state = migrateLegacyKnownSpells(state, this.registry.data);
     state = syncCompanionPartyWithFriendship(state, this.registry.data);
-    if (state.mode === 'combat') return state;
+    if (state.mode === 'combat' || state.mode === 'dialogue_combat') return state;
     let s = state;
     for (let i = 0; i < 14; i++) {
       const sc = this.registry.getScene(s.sceneId);
@@ -1316,14 +1335,33 @@ export class GameApp {
     };
   }
 
+  private migrateSceneArtHighlightLegacyKeys(state: GameState): GameState {
+    const sh = state.sceneArtHighlightShown;
+    let changed = false;
+    const next = { ...sh };
+    for (const [k, v] of Object.entries(sh)) {
+      if (!v) continue;
+      if (k.startsWith('art:')) continue;
+      const sc = this.registry.getScene(k);
+      const ak = sc?.frontmatter.artKey?.trim();
+      if (!ak) continue;
+      const prefixed = `art:${ak}`;
+      if (!next[prefixed]) {
+        next[prefixed] = true;
+        changed = true;
+      }
+    }
+    return changed ? { ...state, sceneArtHighlightShown: next } : state;
+  }
+
   private flushSceneArtHighlightIfInterrupted(): void {
-    const sid = this.activeSceneArtHighlight;
-    if (sid == null) return;
+    const hlKey = this.activeSceneArtHighlight;
+    if (hlKey == null) return;
     this.activeSceneArtHighlight = null;
-    if (this.state.sceneArtHighlightShown[sid]) return;
+    if (this.state.sceneArtHighlightShown[hlKey]) return;
     this.state = {
       ...this.state,
-      sceneArtHighlightShown: { ...this.state.sceneArtHighlightShown, [sid]: true },
+      sceneArtHighlightShown: { ...this.state.sceneArtHighlightShown, [hlKey]: true },
     };
   }
 
@@ -1331,13 +1369,14 @@ export class GameApp {
     const fm = scene.frontmatter;
     if (fm.highlight !== true) return null;
     const s = this.state;
-    if (s.sceneArtHighlightShown[scene.id]) return null;
+    const hlKey = sceneArtHighlightDedupeKey(scene);
+    if (s.sceneArtHighlightShown[hlKey]) return null;
     const artText = resolveSceneArt(this.registry, scene);
     if (!artText) return null;
     if (!this.sceneArtHighlightEnabled) {
       this.state = {
         ...this.state,
-        sceneArtHighlightShown: { ...this.state.sceneArtHighlightShown, [scene.id]: true },
+        sceneArtHighlightShown: { ...this.state.sceneArtHighlightShown, [hlKey]: true },
       };
       return null;
     }
@@ -1376,13 +1415,13 @@ export class GameApp {
       holdMs,
       onHighlightSfx,
       onBegin: () => {
-        this.activeSceneArtHighlight = sid;
+        this.activeSceneArtHighlight = hlKey;
       },
       onEnd: () => {
         this.activeSceneArtHighlight = null;
         this.state = {
           ...this.state,
-          sceneArtHighlightShown: { ...this.state.sceneArtHighlightShown, [sid]: true },
+          sceneArtHighlightShown: { ...this.state.sceneArtHighlightShown, [hlKey]: true },
         };
         this.render();
       },
@@ -1487,7 +1526,7 @@ export class GameApp {
   private render(): void {
     this.flushSceneArtHighlightIfInterrupted();
     this.sceneArtHighlightGen += 1;
-    if (this.state.mode === 'combat' || !this.timedChoiceMode) {
+    if (this.state.mode === 'combat' || this.state.mode === 'dialogue_combat' || !this.timedChoiceMode) {
       if (this.state.timedChoiceDeadline != null) {
         this.state = { ...this.state, timedChoiceDeadline: null };
       }
@@ -1500,6 +1539,11 @@ export class GameApp {
     this.syncSidebarDisclosureSections();
     if (this.state.mode !== 'combat') {
       this.combatLogCursor = { encounterId: '', index: 0 };
+    }
+    if (this.state.mode !== 'dialogue_combat') {
+      this.dialogueCombatLogCursor = { encounterId: '', index: 0 };
+    }
+    if (this.state.mode !== 'combat' && this.state.mode !== 'dialogue_combat') {
       this.flushBossTwistOverlayOnLeaveCombat();
     }
 
@@ -1620,6 +1664,38 @@ export class GameApp {
               },
             },
             onBossTwistReveal: (messages) => this.enqueueBossTwistReveal(messages),
+          });
+        } else if (this.state.mode === 'dialogue_combat') {
+          main.classList.add('main--combat');
+          renderDialogueCombatInto(main, {
+            state: this.state,
+            registry: this.registry,
+            bus: this.bus,
+            audio: this.audio,
+            dialogueLog: {
+              soundCursor: this.dialogueCombatLogCursor,
+              setSoundCursor: (v) => {
+                this.dialogueCombatLogCursor = v;
+              },
+            },
+            lifecycle: {
+              unlockAudio: () => this.unlockAudio(),
+              stabilize: (s) => this.stabilize(s),
+              commitState: (s) => {
+                const prevScene = this.state.sceneId;
+                const prevDiaryQueueLen = this.diaryEntryQueue.length;
+                const prevStatusQueueLen = this.statusHighlightQueue.length;
+                const prevItemAcquireQueueLen = this.itemAcquireQueue.length;
+                this.state = this.stabilize(s);
+                this.trimOverlayQueuesIfSceneChanged(
+                  prevScene,
+                  prevDiaryQueueLen,
+                  prevStatusQueueLen,
+                  prevItemAcquireQueueLen
+                );
+                this.render();
+              },
+            },
           });
         } else {
           const scene = this.registry.getScene(this.state.sceneId);

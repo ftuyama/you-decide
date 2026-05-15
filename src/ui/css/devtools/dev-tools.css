@@ -1,4 +1,4 @@
-/* Vista ?view=dev — hub de ferramentas (cenas, itens, música, inimigos) */
+/* Vista ?view=dev — hub de ferramentas (cenas, itens, música, inimigos, diálogo, ASCII…) */
 #app.app--dev-tools {
   min-height: 100vh;
   min-height: 100dvh;
@@ -148,6 +148,434 @@
   min-width: 0;
 }
 
+/* Interlocutores de confronto de diálogo (?view=dev&tab=dialogue-enemies) */
+.dev-tools-dialogue-enemies {
+  max-width: 100%;
+  min-width: 0;
+}
+
+.dev-tools-dialogue-enemies-intro {
+  margin: 0 0 1rem;
+  color: var(--muted, #9aa3b2);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.dev-tools-dialogue-enemies-label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--muted, #9aa3b2);
+}
+
+.dev-tools-dialogue-enemies-select {
+  margin-bottom: 1rem;
+}
+
+.dev-tools-dialogue-enemies-meta-wrap {
+  margin-bottom: 1rem;
+}
+
+.dev-tools-dialogue-enemies-meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.25rem 1rem;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.dev-tools-dialogue-enemies-meta dt {
+  color: var(--muted, #9aa3b2);
+}
+
+.dev-tools-dialogue-enemies-meta dd {
+  margin: 0;
+}
+
+.dev-tools-dialogue-enemies-graph {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  min-width: 0;
+  margin-bottom: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--panel) 88%, var(--bg));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--text) 6%, transparent),
+    0 8px 28px color-mix(in srgb, #000 35%, transparent);
+  overflow: hidden;
+}
+
+.dev-tools-dialogue-enemies-graph-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem 1rem;
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+  background: color-mix(in srgb, var(--panel) 65%, var(--bg));
+}
+
+.dev-tools-dialogue-enemies-graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 1rem;
+  font-size: 0.72rem;
+  color: var(--muted, #9aa3b2);
+  letter-spacing: 0.02em;
+}
+
+.dev-tools-dialogue-enemies-graph-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dev-tools-dialogue-enemies-graph-legend-item::before {
+  content: '';
+  width: 1.35rem;
+  height: 0;
+  border-top: 2px solid var(--link, #7eb8ff);
+  border-radius: 1px;
+}
+
+.dev-tools-dialogue-enemies-graph-legend-item--dashed::before {
+  border-top-style: dashed;
+  opacity: 0.85;
+}
+
+.dev-tools-dialogue-enemies-graph-zoom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dev-tools-dialogue-enemies-graph-btn {
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  min-width: 2rem;
+  padding: 0.28rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.dev-tools-dialogue-enemies-graph-btn:hover {
+  border-color: color-mix(in srgb, var(--accent, #7eb8ff) 45%, var(--border));
+  background: color-mix(in srgb, var(--panel) 80%, var(--accent, #7eb8ff) 8%);
+}
+
+.dev-tools-dialogue-enemies-graph-btn:focus-visible {
+  outline: 2px solid var(--accent, #7eb8ff);
+  outline-offset: 2px;
+}
+
+.dev-tools-dialogue-enemies-graph-zoom-readout {
+  min-width: 2.75rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted, #9aa3b2);
+}
+
+.dev-tools-dialogue-enemies-graph-scroll {
+  overflow: auto;
+  max-height: min(72vh, 880px);
+  min-height: 200px;
+  padding: 0.65rem 0.75rem 0.85rem;
+  scrollbar-gutter: stable;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.dev-tools-dialogue-enemies-graph-scroll.dev-tools-dialogue-enemies-graph-scroll--panning {
+  cursor: grabbing;
+}
+
+.dev-tools-dialogue-enemies-graph-scroll:focus-visible {
+  outline: none;
+}
+
+.dev-tools-dialogue-enemies-graph-sizer {
+  position: relative;
+  display: block;
+  min-width: min(100%, 120px);
+  min-height: 120px;
+}
+
+.dev-tools-dialogue-enemies-graph-scaler {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: top left;
+  will-change: transform;
+}
+
+.dev-tools-dialogue-enemies-graph-svg {
+  display: block;
+  min-height: 2rem;
+}
+
+.dev-tools-dialogue-enemies-graph-svg svg {
+  display: block;
+  max-width: none;
+  filter: none;
+}
+
+/* Arestas: traço simples, sem sombra nem preenchimento no traço */
+.dev-tools-dialogue-enemies-graph-svg svg g.edgePaths path,
+.dev-tools-dialogue-enemies-graph-svg svg .edgePath .path {
+  fill: none !important;
+  filter: none !important;
+  stroke: color-mix(in srgb, var(--text, #e4e9f2) 58%, var(--muted, #8892a5));
+  stroke-width: 1.35px;
+}
+
+/* Pontas de seta do Mermaid: só contorno (sem triângulo cheio) */
+.dev-tools-dialogue-enemies-graph-svg svg defs marker path,
+.dev-tools-dialogue-enemies-graph-svg svg defs marker polygon,
+.dev-tools-dialogue-enemies-graph-svg svg marker path,
+.dev-tools-dialogue-enemies-graph-svg svg marker polygon {
+  fill: none !important;
+  filter: none !important;
+  stroke: color-mix(in srgb, var(--text, #e4e9f2) 58%, var(--muted, #8892a5));
+  stroke-width: 1.15px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Etiquetas de aresta (htmlLabels): efeitos por baixo do texto, resolução por baixo dos efeitos */
+.dev-tools-dialogue-enemies-graph-svg svg foreignObject .dev-dialogue-edge-fx {
+  display: inline-block;
+  margin-top: 0.12em;
+  font-weight: 700;
+  font-size: 0.92em;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--accent, #8ecfff) 75%, var(--text, #e8eef6));
+}
+
+.dev-tools-dialogue-enemies-graph-svg svg foreignObject .dev-dialogue-edge-res {
+  display: inline-block;
+  margin-top: 0.1em;
+  font-size: 0.84em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: color-mix(in srgb, var(--accent, #b8c9ff) 55%, var(--muted, #aab6ca));
+}
+
+/* Nós: [id] sozinho na 1.ª linha; vitória (se); texto da fala */
+.dev-tools-dialogue-enemies-graph-svg svg foreignObject .dev-dialogue-node-id {
+  display: inline-block;
+  font-weight: 800;
+  font-size: 0.95em;
+  letter-spacing: 0.03em;
+  color: color-mix(in srgb, var(--text, #f2f6ff) 88%, var(--accent, #7eb8ff));
+}
+
+.dev-tools-dialogue-enemies-graph-svg svg foreignObject .dev-dialogue-node-badge {
+  display: inline-block;
+  margin-top: 0.08em;
+  font-size: 0.76em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: color-mix(in srgb, var(--accent, #6ecf8e) 65%, var(--text, #e8eef6));
+}
+
+.dev-tools-dialogue-enemies-graph-svg svg foreignObject .dev-dialogue-node-line {
+  display: inline-block;
+  margin-top: 0.12em;
+  font-weight: 400;
+  font-size: 0.88em;
+  line-height: 1.38;
+  color: var(--text, #e4e9f2);
+}
+
+.dev-tools-dialogue-enemies-mermaid-src {
+  margin-top: 0.5rem;
+}
+
+.dev-tools-dialogue-enemies-pre {
+  margin: 0.5rem 0 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-size: 0.75rem;
+  color: var(--muted, #9aa3b2);
+}
+
+/* Simulador de percurso no grafo (dev) */
+.dev-tools-dialogue-enemies-sim {
+  margin-bottom: 1.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--panel) 92%, var(--bg));
+}
+
+.dev-tools-dialogue-enemies-sim-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.35rem;
+}
+
+.dev-tools-dialogue-enemies-sim-title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.dev-tools-dialogue-enemies-sim-reset {
+  min-width: auto;
+  padding-inline: 0.65rem;
+}
+
+.dev-tools-dialogue-enemies-sim-intro {
+  margin: 0 0 0.85rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--muted, #9aa3b2);
+}
+
+.dev-tools-dialogue-enemies-sim-body {
+  min-width: 0;
+}
+
+.dev-tools-dialogue-enemies-sim-nodebar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.65rem;
+  margin-bottom: 0.5rem;
+}
+
+.dev-tools-dialogue-enemies-sim-nodeid {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--accent, #8ecfff) 55%, var(--text));
+}
+
+.dev-tools-dialogue-enemies-sim-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.12rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.dev-tools-dialogue-enemies-sim-tag--victory {
+  color: color-mix(in srgb, #6ecf9a 85%, var(--text));
+  border-color: color-mix(in srgb, #6ecf9a 35%, var(--border));
+  background: color-mix(in srgb, #6ecf9a 12%, transparent);
+}
+
+.dev-tools-dialogue-enemies-sim-line {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+
+.dev-tools-dialogue-enemies-sim-endnote {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--muted, #9aa3b2);
+  line-height: 1.45;
+}
+
+.dev-tools-dialogue-enemies-sim-choices {
+  margin: 0;
+  padding-left: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.dev-tools-dialogue-enemies-sim-choice {
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--border) 90%, var(--text) 6%);
+  background: color-mix(in srgb, var(--panel) 75%, var(--bg));
+}
+
+.dev-tools-dialogue-enemies-sim-choice-text {
+  margin: 0 0 0.35rem;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.dev-tools-dialogue-enemies-sim-choice-fx {
+  margin: 0 0 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--accent, #8ecfff) 70%, var(--muted));
+}
+
+.dev-tools-dialogue-enemies-sim-choice-hint {
+  margin: 0 0 0.5rem;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: var(--muted, #9aa3b2);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  word-break: break-word;
+}
+
+.dev-tools-dialogue-enemies-sim-choice-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.dev-tools-dialogue-enemies-sim-nav-btn {
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.32rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.dev-tools-dialogue-enemies-sim-nav-btn:hover {
+  border-color: color-mix(in srgb, var(--accent, #7eb8ff) 45%, var(--border));
+  background: color-mix(in srgb, var(--panel) 80%, var(--accent, #7eb8ff) 8%);
+}
+
+.dev-tools-dialogue-enemies-sim-nav-btn:focus-visible {
+  outline: 2px solid var(--accent, #7eb8ff);
+  outline-offset: 2px;
+}
+
+.dev-tools-dialogue-enemies-sim-nav-btn--ok {
+  border-color: color-mix(in srgb, #6ecf9a 40%, var(--border));
+}
+
+.dev-tools-dialogue-enemies-sim-nav-btn--fail {
+  border-color: color-mix(in srgb, #e88a7a 40%, var(--border));
+}
+
 .dev-tools-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -217,6 +645,12 @@
   opacity: 0.7;
   font-style: italic;
   margin: 0.5rem 0;
+}
+
+.dev-tools-muted {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--muted, #9aa3b2);
 }
 
 .dev-tools-details {

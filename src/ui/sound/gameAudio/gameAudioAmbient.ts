@@ -2,6 +2,7 @@ import {
   ACT3_DEPTH_MELODY,
   ACT5_ICE_MELODY,
   ASH_SKY_MELODY,
+  DIALOGUE_COMBAT_MELODY,
   ANCIENT_MACABRE_MELODY,
   BOSS_LEAD_MELODY,
   CAMP_MELODY,
@@ -58,6 +59,9 @@ export class GameAmbientPlayer {
         break;
       case 'combat_rival':
         this.playAmbientCombatRival();
+        break;
+      case 'dialogue_combat':
+        this.playAmbientDialogueCombat();
         break;
       case 'camp':
         this.playAmbientCamp();
@@ -539,6 +543,123 @@ export class GameAmbientPlayer {
         lowDrone.stop();
         highDrone.stop();
         bass.stop();
+        master.disconnect();
+        comp.disconnect();
+      } catch {
+        /* noop */
+      }
+    };
+  }
+
+  /**
+   * Combate verbal: drones espelhados + motivo lento (2ªs menores), sem kit de bateria —
+   * contraste com o combate físico (kick/snare).
+   */
+  private playAmbientDialogueCombat(): void {
+    if (this.bgCleanup) return;
+    const ctx = this.host.ensureContext();
+    const master = ctx.createGain();
+    master.gain.value = this.host.gain(0.2);
+    const comp = ctx.createDynamicsCompressor();
+    comp.threshold.value = -30;
+    comp.knee.value = 16;
+    comp.ratio.value = 2.8;
+    comp.attack.value = 0.008;
+    comp.release.value = 0.35;
+    master.connect(comp);
+    comp.connect(ctx.destination);
+
+    const root = 123.47; // B2
+    const beat = ctx.createOscillator();
+    const beatGain = ctx.createGain();
+    beat.type = 'sine';
+    beat.frequency.value = root * 0.5;
+    beatGain.gain.value = 0;
+    beat.connect(beatGain);
+    beatGain.connect(comp);
+    beat.start();
+
+    const layers: { freq: number; level: number; type: OscillatorType; detune: number }[] = [
+      { freq: root, level: 0.11, type: 'sine', detune: -5 },
+      { freq: root * 1.011, level: 0.1, type: 'sine', detune: 6 },
+      { freq: 174.61, level: 0.055, type: 'triangle', detune: 0 },
+      { freq: 233.08, level: 0.04, type: 'sine', detune: -3 },
+    ];
+
+    const oscillators: OscillatorNode[] = [];
+    for (const { freq, level, type, detune } of layers) {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = type;
+      o.frequency.value = freq;
+      o.detune.value = detune;
+      g.gain.value = level * 0.38;
+      o.connect(g);
+      g.connect(master);
+      o.start();
+      oscillators.push(o);
+    }
+
+    let t = 0;
+    this.bgPulseTimer = setInterval(() => {
+      const ac = this.host.getAudioContext();
+      if (!ac) return;
+      t += 0.028;
+      const breathe = 0.16 + Math.sin(t * 0.35) * 0.05 + Math.sin(t * 0.11) * 0.035;
+      try {
+        master.gain.setTargetAtTime(this.host.gain(breathe), ac.currentTime, 0.62);
+      } catch {
+        /* noop */
+      }
+    }, 440);
+
+    let melodyStep = 0;
+    let pulseStep = 0;
+    const tickMs = 980;
+    this.bgRhythmTimer = setInterval(() => {
+      const ac = this.host.getAudioContext();
+      if (!ac) return;
+      const tNow = ac.currentTime + 0.02;
+      const note = DIALOGUE_COMBAT_MELODY[melodyStep % DIALOGUE_COMBAT_MELODY.length]!;
+      melodyStep++;
+      triggerPluck(ctx, master, tNow, note, this.host.gain(0.11), 'triangle', 2.85);
+      triggerPluck(ctx, master, tNow + 0.09, note * 0.5, this.host.gain(0.064), 'sine', 3.1);
+      if (melodyStep % 3 === 0) {
+        triggerPluck(ctx, master, tNow + 0.16, note * 1.498, this.host.gain(0.042), 'sine', 1.9);
+      }
+      pulseStep++;
+      if (pulseStep % 2 === 0) {
+        const sub = tNow + 0.04;
+        beatGain.gain.setTargetAtTime(this.host.gain(0.09), sub, 0.04);
+        beatGain.gain.setTargetAtTime(0, sub + 0.22, 0.12);
+      }
+      if (melodyStep % 5 === 0) {
+        triggerHat(ctx, master, tNow + 0.22, this.host.gain(0.018));
+      }
+    }, tickMs);
+
+    this.bgCleanup = () => {
+      if (this.bgPulseTimer) {
+        clearInterval(this.bgPulseTimer);
+        this.bgPulseTimer = null;
+      }
+      if (this.bgRhythmTimer) {
+        clearInterval(this.bgRhythmTimer);
+        this.bgRhythmTimer = null;
+      }
+      try {
+        beat.stop();
+      } catch {
+        /* noop */
+      }
+      for (const o of oscillators) {
+        try {
+          o.stop();
+        } catch {
+          /* noop */
+        }
+      }
+      try {
         master.disconnect();
         comp.disconnect();
       } catch {

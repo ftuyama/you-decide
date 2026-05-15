@@ -72,6 +72,11 @@ function meleeLayerClass(style: 'slash' | 'blunt' | 'staff', crit: boolean): str
   return crit ? `${base}--crit` : base;
 }
 
+/** Uma pancada “corpo a corpo” verbal no reflexo (FX da mesma família que o combate normal). */
+export function dialogueVerbalHitFxClass(attacker: Character | undefined, crit: boolean): string {
+  return meleeLayerClass(meleeStyleForCharacter(attacker), crit);
+}
+
 function spellDamageLayerClass(spell: SpellDef | undefined, spellId: string, crit: boolean): string {
   let base: string;
   if (spellId === 'ember_spark') base = 'combat-fx-spell-ember';

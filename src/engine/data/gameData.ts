@@ -2,6 +2,7 @@ import type {
   CampaignIndex,
   ClassId,
   CompanionDef,
+  DialogueEnemyDef,
   EnemyDef,
   Encounter,
   ItemDef,
@@ -47,6 +48,8 @@ export type GameData = {
   campaign: CampaignIndex;
   heroNarrative: HeroNarrative;
   enemies: Record<string, EnemyDef>;
+  /** Interlocutores de combate por diálogo (árvore + tensão); separado de `enemies`. */
+  dialogueEnemies: Record<string, DialogueEnemyDef>;
   encounters: Record<string, Encounter>;
   items: Record<string, ItemDef>;
   companions: Record<string, CompanionDef>;
@@ -63,6 +66,7 @@ export function emptyGameData(campaign: CampaignIndex, heroNarrative: HeroNarrat
     campaign,
     heroNarrative,
     enemies: {},
+    dialogueEnemies: {},
     encounters: {},
     items: {},
     companions: {},
